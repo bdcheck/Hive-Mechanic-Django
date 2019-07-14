@@ -1,8 +1,14 @@
+# pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import traceback
+
+from twilio.rest import Client
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.utils import timezone
 
 from integrations.models import Integration
 
@@ -16,7 +22,7 @@ class OutgoingMessage(models.Model):
 
     errored = models.BooleanField(default=False)
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
-    
+
     integration = models.ForeignKey(Integration, related_name='twilio_outgoing')
 
     def transmit(self):
@@ -55,4 +61,3 @@ class IncomingMessage(models.Model):
 
 def process_incoming(integration, payload):
     integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip())
-

@@ -19,7 +19,7 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
 
     fieldsets = (
         (None, {
-           'fields': ('name', 'identifier',)
+            'fields': ('name', 'identifier', 'endabled')
         }),
         ('Server Implementaion', {
             'fields': ('entry_actions', 'evaluate_function'),

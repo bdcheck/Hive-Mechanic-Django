@@ -1,3 +1,5 @@
+# pylint: disable=line-too-long
+
 from django.conf.urls import url
 
 from .views import builder_home, builder_game, builder_game_definition_json

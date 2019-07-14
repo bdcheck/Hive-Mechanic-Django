@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
@@ -12,10 +13,10 @@ class Game(models.Model):
 
     def __unicode__(self):
         return self.name
-        
-    def definition_json(self, timestamp=None):
+
+    def definition_json(self):
         return reverse('builder_game_definition_json', args=[self.slug])
-    
+
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions')
     created = models.DateTimeField()
@@ -24,7 +25,7 @@ class GameVersion(models.Model):
 
     def __unicode__(self):
         return self.game.name + ' (' + str(self.created) + ')'
-        
+
     def process_incoming(self, session, payload):
         pass
 
@@ -35,7 +36,7 @@ class InteractionCard(models.Model):
     description = models.TextField(max_length=16384, null=True, blank=True)
 
     enabled = models.BooleanField(default=True)
-    
+
     evaluate_function = models.TextField(max_length=1048576, default='return None, [], None')
     entry_actions = models.TextField(max_length=1048576, default='return []')
 
@@ -43,29 +44,29 @@ class Player(models.Model):
     identifier = models.CharField(max_length=4096, unique=True)
 
     player_state = JSONField(default=dict)
-        
+
 class Session(models.Model):
     player = models.ForeignKey(Player, related_name='sessions')
     game_version = models.ForeignKey(GameVersion, related_name='sessions')
-    
+
     started = models.DateTimeField()
     completed = models.DateTimeField(null=True, blank=True)
-    
+
     session_state = JSONField(default=dict)
 
-    def process_incoming(self, integation, payload):
-        current_node = None
-        
-        if 'session_current_node' in self.session_state:
-            current_node = self.session_state['session_current_node']
-        
+    def process_incoming(self, integration, payload):
+        current_node = None # pylint: disable=unused-variable
+
+        if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
+            current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
+
         actions = self.game_version.process_incoming(self, payload)
-        
+
         if integration is not None:
             integration.execute_actions(self, actions)
         else:
-            for integration in self.game_version.game.integrations.all():
-                integration.execute_actions(self, actions)
-        
+            for game_integration in self.game_version.game.integrations.all():
+                game_integration.execute_actions(self, actions)
+
     def tick(self):
         self.process_incoming(None, None)
