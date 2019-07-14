@@ -3,7 +3,7 @@ import sys, os
 INTERP = '/var/www/django/stokes/venv/bin/python'
 
 if sys.executable != INTERP:
-    os.execl(INTERP, INTERP, *sys.argv)
+    os.execl(INTERP, INTERP, *sys.argv) # nosec
 
 sys.path.append(os.getcwd())
 

@@ -2,7 +2,7 @@
 
 import os
 import shutil
-import subprocess
+import subprocess # nosec
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         build_path = os.path.abspath(os.path.join(react_path, 'build'))
 
-        subprocess.check_call('npm --prefix ' + str(react_path) + ' run build', shell=True)
+        subprocess.check_call('npm --prefix ' + str(react_path) + ' run build', shell=True) # nosec
 
         shutil.rmtree(static_path, ignore_errors=True)
         shutil.move(build_path, static_path)
