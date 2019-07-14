@@ -1,0 +1,685 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+		<style>
+			.card-row {
+				overflow-x: scroll; 
+				white-space: nowrap;
+				display: block;
+			}
+
+			.interaction-card {
+			  width: 300px;
+			  margin: 0px 10px 10px 10px;
+			  display: inline-block;
+			  white-space: normal;
+			}
+
+			.mdc-layout-grid__inner {
+				grid-gap: 0px;
+			}
+		</style>
+	</head>
+	<body style="margin: 0px; overscroll-behavior: none;">
+		<header class="mdc-top-app-bar">
+			<div class="mdc-top-app-bar__row">
+				<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+					<!-- <a href="#" class="material-icons mdc-top-app-bar__navigation-icon">menu</a> -->
+				<span class="mdc-top-app-bar__title">SMS Dialog Builder</span>
+				</section>
+				<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+					<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Print this page" alt="Print this page">print</a>
+					<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page" alt="Bookmark this page">bookmark</a> -->
+				</section>
+			</div>
+		</header>
+		<div id="content">
+			<div class="mdc-layout-grid" style="padding: 0px;">
+				<div class="mdc-layout-grid__inner">
+					<div class="mdc-layout-grid__cell--span-9" style="background-color: #E0E0E0; overflow-x: scroll; overflow-y: hidden;">
+						<table style="margin:0; padding: 0; border-spacing: 0px; border-collapse: separate; height: 90vh;">
+							<tr>
+								<td style="vertical-align: top; padding: 0; margin: 0;">
+									<div style="width: 320px; height: 100vh; overflow-y: scroll; border-right: thin solid rgba(0, 0, 0, 0.25);">								
+										<div style="height: 64px; margin: 0;"></div>
+										<div class="mdc-card interaction-card" style="margin: 10px; background-color: #B3E5FC;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Test SMS Dialog</h2>
+												<h2 class="mdc-typography--subtitle2">Wait For Response</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Summary of interaction.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button" id="button_wait_for_response">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+								<td style="vertical-align: top; padding: 0; margin: 0;">
+									<div style="width: 320px; height: 100vh; overflow-y: scroll; border-right: thin solid rgba(0, 0, 0, 0.25);">								
+										<div style="height: 64px; margin: 0;"></div>
+										<div style="padding: 10px; font-family: sans-serif; background-color: #BDBDBD; margin-bottom: 10px;">
+											<span class="material-icons" style="float: right;">add</span>
+											<b>Message Received</b>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #FFF9C4;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Note: Suggested Messages</h2>
+												<h2 class="mdc-typography--subtitle2">Comment / Note</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">For Times Treasure Hunt, we recommend no more than 3 keywords to avoid confusing user.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button" id="button_comment">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #FFCDD2;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Too Many Keywords</h2>
+												<h2 class="mdc-typography--subtitle2">Validator</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Too many keywords!</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button" id="button_validator">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Message Contains "GO"</h2>
+												<h2 class="mdc-typography--subtitle2">Evaluate State</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">self.last_message ~ "GO"</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button" id="button_evaluate">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Message Contains "STOP"</h2>
+												<h2 class="mdc-typography--subtitle2">Evaluate State</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">self.last_message ~ "STOP"</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Message Contains "HELP"</h2>
+												<h2 class="mdc-typography--subtitle2">Evaluate State</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">self.last_message ~ "HELP"</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div style="padding: 10px; font-family: sans-serif; background-color: #BDBDBD; margin-bottom: 10px;">
+											<b>Timeout (3600 Seconds)</b>
+										</div>
+									</div>
+								</td>
+								<td style="vertical-align: top; padding: 0; margin: 0;">
+									<div style="width: 320px; height: 100vh; overflow-y: scroll; border-right: thin solid rgba(0, 0, 0, 0.25);">								
+									<div style="height: 64px; margin: 0;"></div>
+									<div style="padding: 10px; font-family: sans-serif; background-color: #BDBDBD; margin-bottom: 10px;">
+										<b>True</b>
+									</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Say Hi</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Welcome to our test site!</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Details</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">We will contact you throughout the month.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Status</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">To see where you are, text us "STATUS".</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Continue</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">To continue, reply with GO.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+
+										<div class="mdc-card interaction-card" style="background-color: #B3E5FC;;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Confirm</h2>
+												<h2 class="mdc-typography--subtitle2">Wait For Response</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Wait to go.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button" id="button_wait_for_response">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+
+										<div style="padding: 10px; font-family: sans-serif; background-color: #BDBDBD; margin-bottom: 10px;">
+											<b>False</b>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Try Again</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">We didn't understand that. Text GO, STOP, or HELP to continue.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Go Home</h2>
+												<h2 class="mdc-typography--subtitle2">Go To</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Go back 2 levels.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+
+										<div style="padding: 10px; font-family: sans-serif; background-color: #BDBDBD; margin-bottom: 10px;">
+											<b>Failure</b>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Try Again</h2>
+												<h2 class="mdc-typography--subtitle2">Send Message</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">We didn't understand that. Text GO, STOP, or HELP to continue.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+										<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+											<div style="padding: 0 1rem 1rem 1rem;">
+												<h2 class="mdc-typography--headline6">Go Home</h2>
+												<h2 class="mdc-typography--subtitle2">Go To</h2>
+											</div>
+											<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Go back 2 levels.</div>
+											<div class="mdc-card__actions">
+												<div class="mdc-card__action-buttons">
+													<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+												</div>
+												<div class="mdc-card__action-icons">
+													<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</td>
+								<td style="vertical-align: top; padding: 0; margin: 0;">
+								<div style="width: 320px; height: 100vh; overflow-y: scroll; border-right: thin solid rgba(0, 0, 0, 0.25);">								
+									<div style="height: 64px; margin: 0;"></div>
+									<div class="mdc-card interaction-card" style="margin: 10px; background-color: #ffff;">
+
+										<div style="padding: 0 1rem 1rem 1rem;">
+											<h2 class="mdc-typography--headline6">Custom Name</h2>
+											<h2 class="mdc-typography--subtitle2">Interaction Type</h2>
+										</div>
+										<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Summary of interaction.</div>
+										<div class="mdc-card__actions">
+											<div class="mdc-card__action-buttons">
+												<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+											</div>
+											<div class="mdc-card__action-icons">
+												<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+											</div>
+										</div>
+									</div>
+									</div>
+								</td>
+								<td style="vertical-align: top; padding: 0; margin: 0;">
+								<div style="width: 320px; height: 100vh; overflow-y: scroll;">								
+									<div style="height: 64px; margin: 0;"></div>
+									<div class="mdc-card interaction-card" style="margin: 10px; background-color: #ffffff;">
+
+										<div style="padding: 0 1rem 1rem 1rem;">
+											<h2 class="mdc-typography--headline6">Custom Name</h2>
+											<h2 class="mdc-typography--subtitle2">Interaction Type</h2>
+										</div>
+										<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Summary of interaction.</div>
+										<div class="mdc-card__actions">
+											<div class="mdc-card__action-buttons">
+												<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+											</div>
+											<div class="mdc-card__action-icons">
+												<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+											</div>
+										</div>
+									</div>
+									<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+
+										<div style="padding: 0 1rem 1rem 1rem;">
+											<h2 class="mdc-typography--headline6">Custom Name</h2>
+											<h2 class="mdc-typography--subtitle2">Interaction Type</h2>
+										</div>
+										<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Summary of interaction.</div>
+										<div class="mdc-card__actions">
+											<div class="mdc-card__action-buttons">
+												<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+											</div>
+											<div class="mdc-card__action-icons">
+												<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+											</div>
+										</div>
+									</div>
+									<div class="mdc-card interaction-card" style="background-color: #ffffff;">
+
+										<div style="padding: 0 1rem 1rem 1rem;">
+											<h2 class="mdc-typography--headline6">Custom Name</h2>
+											<h2 class="mdc-typography--subtitle2">Interaction Type</h2>
+										</div>
+										<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Summary of interaction.</div>
+										<div class="mdc-card__actions">
+											<div class="mdc-card__action-buttons">
+												<button class="mdc-button mdc-card__action mdc-card__action--button">Options</button>
+											</div>
+											<div class="mdc-card__action-icons">
+												<button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">delete</button>
+											</div>
+										</div>
+									</div>
+									</div>
+								</td>
+						</table>
+					</div>
+					<div class="mdc-layout-grid__cell--span-3" style="background-color: #E0E0E0; height: 100vh; overflow-y: scroll; border-left: 4px solid #6100EE;">
+						<div style="height: 64px; margin: 0;"></div>
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Send Message</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Send a message to the user.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Wait For Response</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Wait to receive a message from the user.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Note / Comment</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Annotate your dialog.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Validator</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Evaluate your dialog and highlight any issues.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Evaluate State</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Evaluate the current state of the dialog to take action.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Wait For Duration</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Pause for a period of time before continuing</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+
+						<div style="width: 100%; padding: 0px; overflow-y: scroll;">
+							<div class="mdc-card" style="margin: 0 10px 10px 10px;">
+								<div style="padding: 0 1rem 1rem 1rem;">
+									<h2 class="mdc-typography--headline6">Wait Until Date</h2>
+								</div>
+								<div class="mdc-typography--body2" style="padding: 0 1rem 1rem 1rem;">Wait until a particular date before continuing.</div>
+
+								  <div class="mdc-card__actions">
+									<div class="mdc-card__action-buttons"></div>
+									<div class="mdc-card__action-icons">
+									  <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="More options">add</button>
+									</div>
+								  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="wait_for_response_dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title">Wait For Response</h2>
+					<div class="mdc-dialog__content" id="my-dialog-content" style="padding-top: 12px;">
+						<div class="mdc-text-field mdc-text-field--outlined" id="wait_for_response_dialog_title" style="width: 480px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="Test SMS Dialog" />
+							<label for="tf-outlined" class="mdc-floating-label">Card Name</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--textarea mdc-text-field" id="wait_for_response_dialog_description" style="width: 480px; margin-top: 24px;">
+							<textarea id="textarea" class="mdc-text-field__input" rows="4" cols="40">Summary of interaction.</textarea>
+							<label for="textarea" class="mdc-floating-label">Description</label>
+						</div>
+						<div class="mdc-text-field mdc-text-field--outlined" id="wait_for_response_dialog_timeout" style="width: 480px; margin-top: 24px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="3600"/>
+							<label for="tf-outlined" class="mdc-floating-label">Timeout (Seconds)</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">Cancel</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="save">Save</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="comment_dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title">Comment / Note</h2>
+					<div class="mdc-dialog__content" id="my-dialog-content" style="padding-top: 12px;">
+						<div class="mdc-text-field mdc-text-field--outlined" id="comment_dialog_title" style="width: 480px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="Test SMS Dialog" />
+							<label for="tf-outlined" class="mdc-floating-label">Card Name</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--textarea mdc-text-field" id="comment_dialog_description" style="width: 480px; margin-top: 24px;">
+							<textarea id="textarea" class="mdc-text-field__input" rows="4" cols="40">For Times Treasure Hunt, we recommend no more than 3 keywords to avoid confusing user.</textarea>
+							<label for="textarea" class="mdc-floating-label">Description</label>
+						</div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">Cancel</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="save">Save</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="validator_dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title">Validator</h2>
+					<div class="mdc-dialog__content" id="my-dialog-content" style="padding-top: 12px;">
+						<div class="mdc-text-field mdc-text-field--outlined" id="validator_dialog_title" style="width: 100%; margin-bottom: 12px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="Keyword Count Validator" />
+							<label for="tf-outlined" class="mdc-floating-label">Card Name</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--outlined" id="validator_dialog_pass" style="width: 100%; margin-bottom: 12px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="You have a good number of keywords." />
+							<label for="tf-outlined" class="mdc-floating-label">Success</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--outlined" id="validator_dialog_fail" style="width: 100%; margin-bottom: 12px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="Too many keywords!" />
+							<label for="tf-outlined" class="mdc-floating-label">Failure</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--textarea mdc-text-field" id="validator_dialog_conditions" style="width: 100%;">
+							<textarea id="textarea" class="mdc-text-field__input" rows="2" cols="40">self.siblings[type='validator'].count < 3</textarea>
+							<label for="textarea" class="mdc-floating-label">Success Condition</label>
+						</div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">Cancel</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="save">Save</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="evaluate_dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title">Validator</h2>
+					<div class="mdc-dialog__content" id="my-dialog-content" style="padding-top: 12px;">
+						<div class="mdc-text-field mdc-text-field--outlined" id="evaluate_dialog_title" style="width: 100%; margin-bottom: 12px;">
+							<input type="text" id="tf-outlined" class="mdc-text-field__input" value="Message Contains "GO"" />
+							<label for="tf-outlined" class="mdc-floating-label">Card Name</label>
+							<div class="mdc-notched-outline">
+								<svg>
+									<path class="mdc-notched-outline__path"/>
+								</svg>
+							</div>
+							<div class="mdc-notched-outline__idle"></div>
+						</div>
+						<div class="mdc-text-field mdc-text-field--textarea mdc-text-field" id="evaluate_dialog_conditions" style="width: 100%;">
+							<textarea id="textarea" class="mdc-text-field__input" rows="2" cols="40">self.last_message ~ "GO"</textarea>
+							<label for="textarea" class="mdc-floating-label">Condition</label>
+						</div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">Cancel</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="save">Save</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+	</body>
+	
+	<script>
+		$(document).ready(function() {
+			$("#button_wait_for_response").click(function(e) {
+				new mdc.textField.MDCTextField(document.getElementById("wait_for_response_dialog_title"));
+				new mdc.textField.MDCTextField(document.getElementById("wait_for_response_dialog_description"));
+				new mdc.textField.MDCTextField(document.getElementById("wait_for_response_dialog_timeout"));
+
+    			var dialog = new mdc.dialog.MDCDialog(document.getElementById("wait_for_response_dialog"));
+    			dialog.open();
+			});
+
+			$("#button_comment").click(function(e) {
+				new mdc.textField.MDCTextField(document.getElementById("comment_dialog_title"));
+				new mdc.textField.MDCTextField(document.getElementById("comment_dialog_description"));
+
+    			var dialog = new mdc.dialog.MDCDialog(document.getElementById("comment_dialog"));
+    			dialog.open();
+			});
+
+			$("#button_validator").click(function(e) {
+				new mdc.textField.MDCTextField(document.getElementById("validator_dialog_title"));
+				new mdc.textField.MDCTextField(document.getElementById("validator_dialog_pass"));
+				new mdc.textField.MDCTextField(document.getElementById("validator_dialog_fail"));
+				new mdc.textField.MDCTextField(document.getElementById("validator_dialog_conditions"));
+
+    			var dialog = new mdc.dialog.MDCDialog(document.getElementById("validator_dialog"));
+    			dialog.open();
+			});
+
+			$("#button_evaluate").click(function(e) {
+				new mdc.textField.MDCTextField(document.getElementById("evaluate_dialog_title"));
+				new mdc.textField.MDCTextField(document.getElementById("evaluate_dialog_conditions"));
+
+    			var dialog = new mdc.dialog.MDCDialog(document.getElementById("evaluate_dialog"));
+    			dialog.open();
+			});
+		});
+	</script>
+</html>

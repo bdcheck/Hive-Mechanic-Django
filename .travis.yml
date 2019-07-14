@@ -1,0 +1,48 @@
+#   A basic travis.yml boilerplate for Django projects
+#
+#   The set-up assumes a postgreSQL database.
+#
+#   Replace the following variables in the code:
+# * your_project_settings
+# * your_github_username
+# * your_repo
+
+language: python
+dist: trusty
+
+python:
+  - 2.7
+
+services:
+  - postgresql
+
+addons:
+  postgresql: 9.5
+  apt:
+    packages:
+      - postgresql-9.5-postgis-2.3
+
+before_install:
+  - export DJANGO_SETTINGS_MODULE=stokes.settings
+  - export PYTHONPATH=$HOME/builds/audaciouscode/Community-SMS-Django
+  
+install:
+  - pip install --upgrade pip setuptools wheel
+  - pip install -r requirements.txt
+
+before_script:
+  - psql -U postgres -c "CREATE EXTENSION postgis" 
+  - psql -U postgres -c "CREATE DATABASE travisci;"
+  - psql -U postgres -c "CREATE EXTENSION postgis" -d travisci
+  - psql -U postgres -c "CREATE EXTENSION postgis_topology" -d travisci
+
+script:
+  - mv stokes/local_settings.py-template  stokes/local_settings.py
+  - python manage.py migrate
+  - python manage.py test
+  - pylint passive_data_kit
+  - pylint builder
+  - pylint integrations
+  - pylint twilio_support
+  - bandit -r .
+

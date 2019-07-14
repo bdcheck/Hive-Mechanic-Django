@@ -1,0 +1,213 @@
+[
+	{
+		"type": "sequence",
+		"id": "welcome-sequence",
+		"name": "Welcome",
+		"items": [{
+			"type": "send-message",
+			"id": "welcome-intro",
+			"message": "Welcome to Arkham. I'll be your electronic guide to the local town.",
+			"next": "request-consent",
+			"name": "Welcome to Arkham Card",
+			"context": "This is the first thing the player sees when starting the game"
+		}, {
+			"type": "send-message",
+			"id": "request-consent",
+			"message": "Are you ready to proceed? (Respond Y to continue.)",
+			"next": "process-consent"
+		}, {
+			"type": "process-response",
+			"id": "process-consent",
+			"timeout": {
+				"duration": 4,
+				"units": "hour",
+				"action": "consent-timeout"
+			}, 
+			"patterns": [{
+				"pattern": "^[Yy]",
+				"action": "continue-intro"
+			}, {
+				"pattern": "^[Nn]",
+				"action": "nonconsent-thanks"
+			}, {
+				"pattern": ".*",
+				"action": "consent-unclear"
+			}]
+		}, {
+			"type": "process-cookie",
+			"id": "consent-timeout",
+			"cookie": "consent-reprompt",
+			"patterns": [{
+				"pattern": ".+",
+				"action": "quit-sequence"
+			}, {
+				"pattern": "",
+				"action": "request-consent-again"
+			}]
+		}, {
+			"type": "set-cookie",
+			"id": "consent-timeout",
+			"value": "consent-timeout",
+			"next": "process-consent"
+		}, {
+			"id": "request-consent-again",
+			"type": "set-cookie",
+			"cookie": "consent-reprompt",
+			"value": "1",
+			"next": "request-consent-message"
+		}, {
+			"type": "send-message",
+			"id": "request-consent-message",
+			"message": "We didn't hear from you in time.",
+			"next": "request-consent"
+	}, {
+			"type": "send-message",
+			"id": "nonconsent-thanks",
+			"message": "Sorry you don't want to play.",
+			"next": "quit-sequence"
+		}, {
+			"type": "send-message",
+			"id": "continue-intro",
+			"message": "Glad you're on board. How this works:",
+			"next": "instruction-1"
+		}, {
+			"type": "send-message",
+			"id": "instruction-1",
+			"message": "When you're wandering, you'll see signs that look like this:",
+			"next": "instruction-2"
+		}, {
+			"type": "send-picture",
+			"id": "instruction-2",
+			"image": "https://via.placeholder.com/150",
+			"next": "instruction-3"
+		}, {
+			"type": "send-message",
+			"id": "instruction-3",
+			"message": "Notice the code on the bottom. You'll text that code to this number to learn more about where you are at.",
+			"next": "instruction-4"
+		}, {
+			"type": "send-message",
+			"id": "instruction-4",
+			"message": "Pop quiz! You see this sign:",
+			"next": "instruction-5"
+		}, {
+			"type": "send-picture",
+			"id": "instruction-5",
+			"image": "https://via.placeholder.com/150",
+			"next": "instruction-6"
+		}, {
+			"type": "send-message",
+			"id": "instruction-6",
+			"message": "What is the code you'll send me?",
+			"next": "evaluate-pop-quiz"
+		}, {
+			"type": "process-response",
+			"id": "evaluate-pop-quiz",
+			"patterns": [{
+				"pattern": "abc13",
+				"action": "instruction-7"
+			}, {
+				"pattern": ".*",
+				"action": "incorrect-pop-quiz"
+			}]
+		}, {
+			"type": "send-message",
+			"id": "incorrect-pop-quiz",
+			"message": "That's not quite right. Look closely at the bottom of the sign. What code do you see?",
+			"next": "evaluate-pop-quiz"
+		}, {
+			"type": "send-message",
+			"id": "instruction-7",
+			"message": "That's it! You're ready to play. A couple of things before we set you loose.",
+			"next": "instruction-8"
+		}, {
+			"type": "send-message",
+			"id": "instruction-8",
+			"message": "If you ever need assistance, text HELP to this number for assistance.",
+			"next": "instruction-9"
+		}, {
+			"type": "send-message",
+			"id": "instruction-9",
+			"message": "Similarly, if you want to stop playing the game, text QUIT to this number.",
+			"next": "instruction-10"
+		}, {
+			"type": "send-message",
+			"id": "instruction-10",
+			"message": "Otherwise, have fun!",
+			"next": "location-check-in"
+		}]
+	}, {
+		"type": "sequence",
+		"id": "location-check-in",
+		"name": "Location Check In",
+		"items": [{
+			"type": "send-message",
+			"id": "location-check-in-prompt",
+			"message": "What is the code that you see? (No need to respond until you find a code!)",
+			"next": "process-code"
+		}, {
+			"type": "process-response",
+			"id": "process-code",
+			"patterns": [{
+				"pattern": "help",
+				"action": "help-sequence"
+			}, {
+				"pattern": "quit",
+				"action": "quit-sequence"
+			}, {
+				"pattern": "arkham",
+				"action": "location-arkham"
+			}]
+		}]
+	}, {
+		"type": "sequence",
+		"id": "help-sequence",
+		"name": "Game Help",
+		"items": []
+	}, {
+		"type": "sequence",
+		"id": "quit-sequence",
+		"name": "Quit Game",
+		"items": []
+	}, {
+		"type": "sequence",
+		"id": "location-arkham",
+		"name": "Location: Arkham",
+		"items": [{
+			"type": "send-message",
+			"id": "arkham-1",
+			"message": "Welcome to Arkham, Massachusetts!",
+			"next": "arkham-1"
+		}, {
+			"type": "send-message",
+			"id": "arkham-2",
+			"message": "The city is situated northeast of another historically bewitching New England town. Do you know what that is?",
+			"next": "arkham-3"
+		}, {
+			"type": "process-response",
+			"id": "arkham-3",
+			"patterns": [{
+				"pattern": "salem",
+				"action": "arkham-4a"
+			}, {
+				"pattern": ".+",
+				"action": "arkham-4b"
+			}]
+		}, {
+			"type": "send-message",
+			"id": "arkham-4a",
+			"message": "Indeed. While the witch trials were going on in Salem, Arkham avoided the Puritan's fury and became a town renowned internationally for its occult reputation.",
+			"next": "arkham-5"
+		}, {
+			"type": "send-message",
+			"id": "arkham-4b",
+			"message": "Not quite. Salem was founded 25 miles to the southwest, a decade after Arkham.",
+			"next": "arkham-5"
+		}, {
+			"type": "send-message",
+			"id": "arkham-5",
+			"message": "Thanks for visiting Arkham! Be sure to look around for more local treasures and sights.",
+			"next": "location-check-in"
+		}]
+	}
+]

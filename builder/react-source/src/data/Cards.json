@@ -1,0 +1,86 @@
+[
+	{
+		"Action": "SendMessage",
+		"Name": "SendMessage.Name",
+		"Description": "SendMessage.Description",
+		"Color": "#800000"
+	},
+	{
+		"Action": "SetCookie",
+		"Name": "SetCookie.Name",
+		"Description": "SetCookie.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "ClearCookie",
+		"Name": "ClearCookie.Name",
+		"Description": "ClearCookie.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "CookieExists",
+		"Name": "CookieExists.Name",
+		"Description": "CookieExists.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "SetSystemCookie",
+		"Name": "SetSystemCookie.Name",
+		"Description": "SetSystemCookie.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "ClearSystemCookie",
+		"Name": "ClearSystemCookie.Name",
+		"Description": "ClearSystemCookie.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "SystemCookieExists",
+		"Name": "SystemCookieExists.Name",
+		"Description": "SystemCookieExists.Description",
+		"Color": "#008000"
+	},
+	{
+		"Action": "WaitForResponse",
+		"Name": "WaitForResponse.Name",
+		"Description": "WaitForResponse.Description",
+		"Color": "#000080"
+	},
+	{
+		"Action": "PauseForDuration",
+		"Name": "PauseForDuration.Name",
+		"Description": "PauseForDuration.Description",
+		"Color": "#808080"
+	},
+	{
+		"Action": "PauseUntilDate",
+		"Name": "PauseForDuration.Name",
+		"Description": "PauseForDuration.Description",
+		"Color": "#808080"
+	},
+	{
+		"Action": "EvaluateLastMessage",
+		"Name": "EvaluateLastMessage.Name",
+		"Description": "EvaluateLastMessage.Description",
+		"Color": "#808080"
+	},
+	{
+		"Action": "EvaluateCookie",
+		"Name": "EvaluateCookie.Name",
+		"Description": "EvaluateCookie.Description",
+		"Color": "#808080"
+	},
+	{
+		"Action": "MakeRandomChoice",
+		"Name": "MakeRandomChoice.Name",
+		"Description": "MakeRandomChoice.Description",
+		"Color": "#808080"
+	},
+	{
+		"Action": "Comment",
+		"Name": "Comment.Name",
+		"Description": "Comment.Description",
+		"Color": "#808080"
+	}
+]
