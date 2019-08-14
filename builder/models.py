@@ -48,7 +48,7 @@ class Game(models.Model):
         for card in self.cards.all():
             modules.append(reverse('builder_interaction_card', args=[card.identifier]))
 
-        return mark_safe(json.dumps(modules))
+        return mark_safe(json.dumps(modules)) # nosec
 
     def current_active_session(self, player):
         session = None
@@ -174,7 +174,7 @@ class Session(models.Model):
         self.process_incoming(None, None)
 
     def set_cookie(self, cookie, value):
-        self.session_state[cookie] = value # pylint: disable=unsubscriptable-object
+        self.session_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
     def fetch_cookie(self, cookie):
