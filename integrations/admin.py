@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-# from django.contrib import admin
+from django.contrib import admin
 
-# Register your models here.
+from .models import Integration
+
+@admin.register(Integration)
+class IntegrationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'url_slug', 'type', 'game')
+    search_fields = ('name', 'url_slug', 'type', 'configuration',)
+    list_filter = ('game', 'type', 'create_new_players',)

@@ -150,14 +150,7 @@
     
     <script>
         window.dialogBuilder = {
-            cards: [
-                'cards/process_response',
-                'cards/process_cookie',
-                'cards/send_message',
-                'cards/send_picture',
-                'cards/set_cookie',
-                'cards/send_premade_welcome_message',
-            ],
+            cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
             update: function(definition, success, failure) {
                 var payload = {

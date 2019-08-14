@@ -26,7 +26,7 @@ def incoming_twilio(request):
         integration_match = None
 
         for integration in Integration.objects.filter(type='twilio'):
-            if 'twilio_phone_numbers' in integration.configuration and (destination in integration.configuration['twilio_phone_numbers']):
+            if 'phone_number' in integration.configuration and destination == integration.configuration['phone_number']:
                 integration_match = integration
 
         if integration_match is not None:

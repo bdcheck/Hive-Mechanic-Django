@@ -105,4 +105,4 @@ venv.bak/
 
 /static/
 local_settings.py
-
+/media/

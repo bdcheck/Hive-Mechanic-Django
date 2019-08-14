@@ -30,7 +30,7 @@ class Integration(models.Model):
         if self.type == 'twilio':
             from twilio_support.models import process_incoming as twilio_incoming
 
-            twilio_incoming(payload) # pylint: disable=no-value-for-parameter
+            twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 
@@ -43,13 +43,13 @@ class Integration(models.Model):
                     player_match = player
 
         if player_match is None and self.create_new_players:
-            player_match = Player(identifier=(player_lookup_key + ':' + player_lookup_key))
+            player_match = Player(identifier=(player_lookup_key + ':' + player_lookup_value))
             player_match.player_state[player_lookup_key] = player_lookup_value # pylint: disable=unsupported-assignment-operation
 
             player_match.save()
 
         if player_match is not None:
-            session = self.game.sessions.filter(player=player_match, completed=None).first()
+            session = self.game.current_active_session(player=player_match)
 
             if session is None:
                 session = Session(game_version=self.game.versions.order_by('-created').first(), player=player_match, started=timezone.now())
@@ -58,4 +58,41 @@ class Integration(models.Model):
             session.process_incoming(self, payload)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
-        print 'TODO: Process actions: ' + json.dumps(actions, indent=2)
+        if actions is not None:
+            for action in actions:
+                processed = False
+            
+                if self.type == 'twilio':
+                    from twilio_support.models import execute_action as twilio_execute
+
+                    processed = twilio_execute(self, session, action) 
+                
+                if processed is False:
+                    processed = execute_action(self, session, action) 
+
+                if processed is False:
+                    print('TODO: PROCESS ' + str(action))
+        else:
+            print('None ACTION')
+
+def execute_action(integration, session, action):
+    print('DEFAULT ACTION: ' + str(action))
+
+    if action['type'] == 'set-cookie':
+        scope = 'session'
+        
+        if 'scope' in action:
+            scope = action['scope']
+            
+            if scope == 'session':
+                session.set_cookie(action['cookie'], action['value'])
+            elif scope == 'player':
+                session.player.set_cookie(action['cookie'], action['value'])
+            elif scope == 'game':
+                session.game_version.game.set_cookie(action['cookie'], action['value'])
+        
+        return True
+        
+    return False
+
+
