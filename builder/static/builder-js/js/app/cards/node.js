@@ -78,22 +78,16 @@ define(modules, function (mdc) {
 			$('#' + this.cardId + '_identifier_value').on("change paste", function() {
 				var value = $('#' + me.cardId + '_identifier_value').val();
 				
-				console.log("SETTING ID: " + value);
-				
 				var oldId = me.definition['id'];
 				var newId = value;
 				
-				const sources = me.sourceNodes(me.sequence);
+				const sources = me.sourceNodes();
 
-				console.log("SOURCES: " + sources.length);
-				
 				for (var i = 0; i < sources.length; i++) {
 					sources[i].updateReferences(oldId, newId);
 				}
 
 				me.definition['id'] = value;
-
-//				me.sequence.updateId(oldId, newId);
 
 				me.sequence.markChanged(me.id);
 			});
@@ -135,27 +129,51 @@ define(modules, function (mdc) {
 		}
 
 		sourceNodes(sequence) {
+			console.log("SOURCE FOR " + sequence.definition["id"] + " # " + this.id);
+			
 			var sources = [];
+			var includedIds = [];
 
-			for (var i = 0; i < sequence.definition['items'].length; i++) {
-				var item = sequence.definition['items'][i];
+			console.log("SEQS");
+			console.log(window.dialogBuilder.sequences);
+			
+			for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+				console.log("SEQ LU " + i);
+				
+				var sequenceDef = window.dialogBuilder.sequences[i];
+				
+				for (var j = 0; j < sequenceDef["items"].length; j++) {
+					var item = sequenceDef["items"][j];
 
-				var node = Node.createCard(item, sequence);
+					console.log("NODE LU " + j);
+					console.log(item );
+					console.log(" ==> " + sequenceDef["id"] + "#" + item["id"]);
+					
+					var node = this.sequence.resolveNode(sequenceDef["id"] + "#" + item["id"]);
+					
+					if (node != null) {
+						console.log("NODE");
+						console.log(node);
 
-				var destinations = node.destinationNodes(sequence);
+						var destinations = node.destinationNodes(sequence);
 
-				var isSource = false;
+						console.log(destinations);
 
-				for (var j = 0; j < destinations.length && isSource == false; j++) {
-					var destination = destinations[j];
+						var isSource = false;
 
-					if (this.id == destination.id) {
-						isSource = true;
+						for (var k = 0; k < destinations.length && isSource == false; k++) {
+							var destination = destinations[k];
+
+							if (this.id == destination.id) {
+								isSource = true;
+							}
+						}
+
+						if (isSource && includedIds.indexOf(node.id) == -1) {
+							sources.push(node);
+							includedIds.push(node.id);
+						}
 					}
-				}
-
-				if (isSource) {
-					sources.push(node);
 				}
 			}
 
@@ -167,10 +185,6 @@ define(modules, function (mdc) {
 				callback();
 			});
 		}
-		
-//		updateDestination(oldId, newId) {
-//			con
-//		}
 
 		static createCard(definition, sequence) {
 			if (window.dialogBuilder.cardMapping != undefined) {

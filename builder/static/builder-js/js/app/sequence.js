@@ -41,13 +41,63 @@ define(modules, function (mdc, Node) {
             return this.definition['name'];
         }
 
-        selectInitialNode() {
+        identifier() {
+            return this.definition['id'];
+        }
+
+        selectInitialNode(nodeId) {
+            console.log("INITIAL NODE: " + nodeId);
+            
+            if (typeof nodeId == 'undefined') {
+                throw "UNdefined Node Id";
+            }
+            
             $("#sequence_breadcrumbs").html(this.name());
             
-            this.loadNode(this.definition.items[0]);
+            if (nodeId == null || nodeId == undefined) {
+                this.loadNode(this.definition.items[0]);
+            } else {
+                var loaded = false;
+                
+                for (var i = 0; loaded == false && i < this.definition.items.length; i++) {
+                    var item = this.definition.items[i];
+                    
+                    if (nodeId == item["id"] || nodeId.endsWith("#" + item["id"])) {
+                        console.log(item);
+
+                        this.loadNode(item);
+                        
+                        loaded = true;
+                    }
+                }
+
+                if (loaded == false) {
+                    console.log(this.definition.items[0]);
+
+                    this.loadNode(this.definition.items[0]);
+                }
+            }
         }
         
         loadNode(definition) {
+            for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+            	var sequence = window.dialogBuilder.sequences[i];
+            	
+				if (sequence["id"] != this.definition["id"]) {
+					for (var j = 0; j < sequence["items"].length; j++) {
+						var item = sequence["items"][j];
+
+						if (item["id"] == definition["id"]) {
+							console.log(sequence);
+		
+							window.dialogBuilder.loadSequence(sequence, definition['id']);
+
+							return;             
+						}
+					}
+				}
+            }
+
             var me = this;
             
             var node = Node.createCard(definition, this);
@@ -55,10 +105,11 @@ define(modules, function (mdc, Node) {
             var current = $("#builder_current_node");
             
             var html = node.editHtml();
-            
+
             current.html(html);
+
             node.initialize();
-            
+
             if ($("#sequence_breadcrumbs").children("#breadcrumb-" + node.id).length > 0) {
                 var match = $("#sequence_breadcrumbs").children("#breadcrumb-" + node.id);
                 var last = $("#sequence_breadcrumbs").children().last();
@@ -99,11 +150,10 @@ define(modules, function (mdc, Node) {
             for (var i = 0; i < destinationNodes.length; i++) {
                 const destinationNode = destinationNodes[i];
                 
-            	console.log(destinationNode);
-                
                 $("#" + destinationNode["cardId"]).css("background-color", "#E0E0E0");
-            
+
                 destinationNode.onClick(function() {
+                    console.log("CLICKED NODE");
                     me.loadNode(destinationNode.definition);    
                 });
             }
@@ -210,62 +260,184 @@ define(modules, function (mdc, Node) {
             $(selectId).append('<option value="add_card">Add&#8230;</option>');
         }
 
+        chooseDestinationMenu(cardId) {
+            var me = this;
+            var body = '';
+
+            body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
+
+            $.each(window.dialogBuilder.sequences, function(index, value) {
+                body += '      <li class="mdc-list-item prevent-menu-close" role="menuitem" id="' + cardId + '_destination_sequence_' + value['id'] + '">';
+                body += '        <span class="mdc-list-item__text">' + value['name'] + '</span>';
+                body += '        <span class="mdc-list-item__meta material-icons destination_disclosure_icon">arrow_right</span>';
+                body += '      </li>';
+
+                var items = value['items'];
+            
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+
+                    body += '     <li class="mdc-list-item builder-destination-item ' + cardId + '_destination_sequence_' + value['id'] + '_item" role="menuitem" id="' + cardId + '_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+                    body += '       <span class="mdc-list-item__text">' + item["name"] + '</span>';
+                    body += '     </li>';
+                }
+
+                body += '      <li class="mdc-list-divider" role="separator"></li>';
+            });
+
+            body += '      <li class="mdc-list-item" role="menuitem" id="' + cardId + '_destination_item_add_card">';
+            body += '        <span class="mdc-list-item__text">Add&#8230;</span>';
+            body += '        <span class="mdc-list-item__meta material-icons">add</span>';
+            body += '      </li>';
+
+            body += '    </ul>';
+            
+            return body;
+        }
+
+        initializeDestinationMenu(cardId, onSelect) {
+            var me = this;
+
+            const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item');
+            
+            for (let option of options) {
+                option.addEventListener('click', (event) => {
+                    let prevent = event.currentTarget.classList.contains('prevent-menu-close');
+
+                    if (prevent) {
+                        event.stopPropagation();
+
+                        var id = event.currentTarget.id;
+
+                        id = id.replace(cardId + '_destination_sequence_', '')
+
+                        $(".builder-destination-item").hide();
+                        
+                        var icon = "#" + cardId + '_destination_sequence_' + id + " .destination_disclosure_icon"; 
+                        
+                        var isVisible = $(icon).html() == "arrow_drop_down";
+
+                        $(".destination_disclosure_icon").text("arrow_right");
+                        
+                        if (isVisible) {
+                            $(icon).text("arrow_right");
+
+                            $("." + cardId + '_destination_sequence_' + id + '_item').hide();
+                        } else {
+                            $("#" + cardId + '_destination_sequence_' + id + " .destination_disclosure_icon").text("arrow_drop_down");
+
+                            $("." + cardId + '_destination_sequence_' + id + '_item').show();
+                        }
+                    } else {
+                        var nodeId = $(event.currentTarget).attr("data-node-id");
+                        
+                        var id = event.currentTarget.id;
+
+                        id = id.replace(cardId + '_destination_item_', '')
+
+                        console.log("TAPPED ITEM! " + nodeId);
+                                                
+                        if (id == "add_card") {
+                            me.addCard(cardId, onSelect);
+                        } else {
+                            onSelect(nodeId);
+                        }
+                    }
+                });
+            }
+            
+            $(".builder-destination-item").hide();
+        }
+
+        refreshDestinationSelect(cardId) {
+            var selectId = '#' + cardId + '_destination select';
+            
+            $(selectId).empty();
+            
+            $(selectId).append('<option value="" disabled selected></option>');
+
+            var actions = this.allActions();
+
+            for (var i = 0; i < actions.length; i++) {
+                var action = actions[i];
+
+                $(selectId).append('<option value="' + action['id'] + '">' + action['name'] + '</option>');
+            }
+            
+            $(selectId).append('<option value="add_card">Add&#8230;</option>');
+        }
+
         addCard(cardId, callback) {
-        	$("#add-card-name-value").val("");
+            $("#add-card-name-value").val("");
             $("#add-card-select-widget").val("");
             
             var me = this;
             
             var listener = {
-				handleEvent: function (event) {
-					if (event.detail.action == "add_card") {
-						var cardName = $("#add-card-name-value").val();
-						var cardType = $("#add-card-select-widget").val();
+                handleEvent: function (event) {
+                    if (event.detail.action == "add_card") {
+                        var cardName = $("#add-card-name-value").val();
+                        var cardType = $("#add-card-select-widget").val();
 
-						console.log('CARD TYPE');
-						console.log(cardType);
-					
-						var cardClass = window.dialogBuilder.cardMapping[cardType];
-					
-						var cardDef = cardClass.createCard(cardName);
-					
-						if (me.definition["items"].includes(cardDef) == false) {
-							me.definition["items"].push(cardDef);
-						}   
+                        var cardClass = window.dialogBuilder.cardMapping[cardType];
+                    
+                        var cardDef = cardClass.createCard(cardName);
+                    
+                        if (me.definition["items"].includes(cardDef) == false) {
+                            me.definition["items"].push(cardDef);
+                        }   
 
-						me.refreshDestinationSelect(cardId);
+                        // me.refreshDestinationSelect(cardId);
 
-						$('#' + cardId + '_destination select').val(cardDef["id"]);
+                        // $('#' + cardId + '_destination select').val(cardDef["id"]);
 
-						callback(cardDef["id"]);
-					
-						window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this);
-				   }
-				}
-			};
+                        callback(cardDef["id"]);
+                    
+                        window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this);
+                   }
+                }
+            };
             
             window.dialogBuilder.addCardDialog.listen('MDCDialog:closed', listener);
 
             window.dialogBuilder.addCardDialog.open();
         }
         
-/*        updateId(oldId, newId) {
-        	for (var i = 0; i < this.definition["items"].length; i++) {
-        		var item = this.definition["items"][i];
-        		
-        		if (item["id"] == oldId) {
-        			item["id"] = newId;
-        			
-        			break;
-        		}
-        		
-        		for (allActions)
-        		            var node = Node.createCard(definition, this);
-
-        		// item.updateDestination(oldId, newId);
-        	}
+        resolveNode(nodeId) {
+            if (nodeId == null) {
+                return null;
+            }
+            
+            console.log("nodeId = " + nodeId);
+            
+            if (nodeId.startsWith(this.definition["id"] + "#")) {
+                for (var i = 0; i < this.definition["items"].length; i++) {
+                    var item = this.definition["items"][i];
+                
+                    if (nodeId.endsWith("#" + item["id"])) {
+                        return Node.createCard(item, this);
+                    }
+                }
+            } else {
+                for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+                    var sequence = window.dialogBuilder.sequences[i];
+                
+                    if (nodeId.startsWith(sequence["id"] + "#")) {
+                        return this.loadSequence(sequence).resolveNode(nodeId);
+                    }
+                }
+            }
+            
+            return null;
         }
-*/
+
+        loadSequence(definition) {
+            var sequence = new Sequence(definition);
+        
+            sequence.checkCorrectness();
+        
+            return sequence;
+        }
     }
 
     var sequence = {}

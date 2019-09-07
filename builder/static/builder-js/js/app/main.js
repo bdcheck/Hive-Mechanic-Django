@@ -39,7 +39,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $("#action_save").show();
     }
     
-    function loadSequence(definition) {
+    window.dialogBuilder.loadSequence = function(definition, initialId) {
         if (selectedSequence != null) {
             selectedSequence.removeChangeListener(onSequenceChanged);
         }
@@ -50,12 +50,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         
         selectedSequence.addChangeListener(onSequenceChanged);
         
-        selectedSequence.selectInitialNode();
+        selectedSequence.selectInitialNode(initialId);
     };
     
     $("#action_save").hide();
     
     $.getJSON(window.dialogBuilder.source, function(data) {
+    	window.dialogBuilder.sequences = data;
+    	
         $("#action_save").off("click");
 
         $("#action_save").click(function(eventObj) {
@@ -71,7 +73,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         var items = [];
         
-        $.each(data, function(index, value) {
+        $.each(window.dialogBuilder.sequences, function(index, value) {
             items.push('<a class="mdc-list-item select_sequence" href="#" data-index="' + index +'">');
             items.push('<i class="material-icons mdc-list-item__graphic" aria-hidden="true">view_module</i>');
             items.push('<span class="mdc-list-item__text">' + value['name'] + '</span>');
@@ -82,11 +84,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         
         $(".select_sequence").off("click");
         $(".select_sequence").click(function(eventObj) {
-            loadSequence(data[$(eventObj.target).data("index")]);
+        	console.log("SELECT SEQUENCE TAP");
+            window.dialogBuilder.loadSequence(data[$(eventObj.target).data("index")], null);
         });
-        
-        console.log('CARDS');
-        console.log(window.dialogBuilder.cardMapping);
         
         var keys = Object.keys(window.dialogBuilder.cardMapping);
         
@@ -108,7 +108,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
         mdc.select.MDCSelect.attachTo(document.getElementById('add-card-type'));
 
-        loadSequence(data[0]);
+        window.dialogBuilder.loadSequence(window.dialogBuilder.sequences[0], null);
     });
     
     var csrftoken = Cookies.get('csrftoken');

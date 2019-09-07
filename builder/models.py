@@ -101,24 +101,35 @@ class GameVersion(models.Model):
 
     def dialog_snapshot(self):
         snapshot = []
+        
+        print('DEF: ' + str(self.pk) + ' -- ' + self.definition)
 
         sequences = json.loads(self.definition)
 
         for sequence in sequences:
             for item in sequence['items']:
+                item_id = item['id']
+                
+                if ((sequence['id'] + '#') in item_id) is False:
+                    item_id = sequence['id'] + '#' + item_id
+
                 if len(snapshot) == 0: # pylint: disable=len-as-condition
                     snapshot.append({
                         'type': 'begin',
                         'id': 'dialog-start',
-                        'next_id': item['id']
+                        'next_id': item_id
                     })
 
                 interaction_card = InteractionCard.objects.filter(identifier=item['type']).first()
+                
+                item['sequence_id'] = sequence['id']
+                
+                print(item_id + ' -> ' + json.dumps(item, indent=2))
 
                 if interaction_card is not None:
                     snapshot.append({
                         'type': 'custom',
-                        'id': item['id'],
+                        'id': item_id,
                         'definition': item,
                         'evaluate': interaction_card.evaluate_function,
                         'actions': interaction_card.entry_actions
@@ -126,7 +137,7 @@ class GameVersion(models.Model):
                 else:
                     snapshot.append({
                         'type': 'echo',
-                        'id': item['id'],
+                        'id': item_id,
                         'next_id': 'dialog-end',
                         'message': 'Unknown interaction type "' + item['type'] + '".'
                     })
