@@ -101,15 +101,13 @@ class GameVersion(models.Model):
 
     def dialog_snapshot(self):
         snapshot = []
-        
-        print('DEF: ' + str(self.pk) + ' -- ' + self.definition)
 
         sequences = json.loads(self.definition)
 
         for sequence in sequences:
             for item in sequence['items']:
                 item_id = item['id']
-                
+
                 if ((sequence['id'] + '#') in item_id) is False:
                     item_id = sequence['id'] + '#' + item_id
 
@@ -121,10 +119,8 @@ class GameVersion(models.Model):
                     })
 
                 interaction_card = InteractionCard.objects.filter(identifier=item['type']).first()
-                
+
                 item['sequence_id'] = sequence['id']
-                
-                print(item_id + ' -> ' + json.dumps(item, indent=2))
 
                 if interaction_card is not None:
                     snapshot.append({
