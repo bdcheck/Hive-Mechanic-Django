@@ -154,6 +154,9 @@ class Player(models.Model):
         self.player_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def __unicode__(self):
+        return self.identifier.split(':')[-1]
+
 class Session(models.Model):
     player = models.ForeignKey(Player, related_name='sessions')
     game_version = models.ForeignKey(GameVersion, related_name='sessions')
