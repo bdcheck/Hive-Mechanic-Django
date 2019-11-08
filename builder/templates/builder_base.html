@@ -1,0 +1,145 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <link rel="shortcut icon" href="{% static 'builder-react' %}/favicon.ico">
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+        <link rel="manifest" href="{% static 'builder-react' %}/manifest.json">
+
+		<link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+		<script src="https://unpkg.com/material-components-web@3.2.0/dist/material-components-web.js"></script>
+
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+        <title>{% block 'page_title' %}Interaction Builder{% endblock %}</title>
+
+        <style>
+            body {
+                display: flex;
+                height: 100vh;
+                margin: 0px;
+            }
+
+            .mdc-drawer-app-content {
+                flex: auto;
+                overflow: auto;
+                position: relative;
+            }
+
+            .main-content {
+                overflow: auto;
+                height: 100%;
+            }
+
+            .app-bar {
+                position: absolute;
+                z-index: 10;
+            }
+
+            .mdc-top-app-bar {
+                z-index: 7;
+            }
+            
+            a {
+            	text-decoration: none;
+            }
+            
+            .floating-action-button {
+            	position: absolute;
+            	bottom: 16px;
+            	right: 16px;
+            }
+        </style>
+    </head>
+    <body class="mdc-typography">
+        <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">
+            <div class="mdc-top-app-bar__row">
+                <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                    <a href="#" class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
+                    <span class="mdc-top-app-bar__title">{% block 'navigation_title' %}Dashboard{% endblock %}</span>
+                </section>
+                <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+					{% block 'page_help' %}
+						<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+					{% endblock %}
+                </section>
+            </div>
+        </header>
+        <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
+            <div class="mdc-drawer__content">
+                <div class="mdc-list" id="sequences_list">
+                    <a class="mdc-list-item" href="{% url 'builder_home' %}">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dashboard</i>
+                        <span class="mdc-list-item__text">Dashboard</span>
+                    </a>
+					<li role="separator" class="mdc-list-divider"></li>
+                    <a class="mdc-list-item" href="{% url 'builder_games' %}">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">videogame_asset</i>
+                        <span class="mdc-list-item__text">Games</span>
+                    </a>
+                    <a class="mdc-list-item" href="{% url 'builder_players' %}">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">people</i>
+                        <span class="mdc-list-item__text">Players</span>
+                    </a>
+                    <a class="mdc-list-item" href="{% url 'builder_sessions' %}">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">phonelink_ring</i>
+                        <span class="mdc-list-item__text">Sessions</span>
+                    </a>
+					<li role="separator" class="mdc-list-divider"></li>
+                    <a class="mdc-list-item" href="#">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">supervisor_account</i>
+                        <span class="mdc-list-item__text">Authors</span>
+                    </a>
+					<li role="separator" class="mdc-list-divider"></li>
+                    <a class="mdc-list-item" href="#">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">account_box</i>
+                        <span class="mdc-list-item__text">My Account</span>
+                    </a>
+                    <a class="mdc-list-item" href="{% url 'logout' %}">
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">exit_to_app</i>
+                        <span class="mdc-list-item__text">Logout</span>
+                    </a>
+
+                </div>
+            </div>
+        </aside>
+
+        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust"  style="background-color: #BDBDBD;">
+            <main class="main-content" id="main-content">
+            	{% block 'main_content' %}
+					<div class="mdc-layout-grid">
+						<div class="mdc-layout-grid__inner">
+							<div class="mdc-layout-grid__cell" style="padding-bottom: 16px;">
+								<span class="mdc-typography--subtitle2">Content Goes Here</span>
+							</div>
+						</div>
+					</div>
+				{% endblock %}
+            </main>
+        </div>
+        
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-content" id="base-dialog">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title" id="dialog-title">TITLE HERE</h2>
+					<div class="mdc-dialog__content" id="dialog-content">
+						MESSAGE HERE
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+							<span class="mdc-button__label">Close</span>
+						</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+        
+		{% block 'js_init' %}
+			<!-- <script data-main="{% static 'builder-js/js/app/home.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script> -->
+		{% endblock %}
+    </body>
+</html>

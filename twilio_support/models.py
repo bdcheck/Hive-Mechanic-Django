@@ -7,11 +7,32 @@ import traceback
 
 from twilio.rest import Client
 
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 
 from integrations.models import Integration
+
+OUTGOING_CALL_NEXT_ACTIONS = (
+    ('continue', 'Continue',),
+    ('pause', 'Pause',),
+    ('gather', 'Gather Response',),
+    ('hangup', 'Hang Up',),
+)
+
+GATHER_INPUT_OPTIONS = (
+    ('dtmf speech', 'Speech and Key Presses'),
+    ('dtmf', 'Key Presses'),
+    ('speech', 'Speech'),
+)
+
+GATHER_SPEECH_MODELS = (
+    ('default', 'Default'),
+    ('numbers_and_commands', 'Numbers and Commands'),
+    ('phone_call', 'Phone Call'),
+)
 
 class OutgoingMessage(models.Model):
     destination = models.CharField(max_length=256)
@@ -66,8 +87,89 @@ class IncomingMessage(models.Model):
 
     integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True)
 
+class OutgoingCall(models.Model):
+    destination = models.CharField(max_length=256)
+
+    send_date = models.DateTimeField()
+    sent_date = models.DateTimeField(null=True, blank=True)
+
+    start_call = models.BooleanField(default=False)
+
+    message = models.TextField(max_length=1024, null=True, blank=True)
+    file = models.URLField(max_length=(1024 * 1024), null=True, blank=True)
+
+    errored = models.BooleanField(default=False)
+    transmission_metadata = JSONField(default=dict, blank=True, null=True)
+
+    integration = models.ForeignKey(Integration, related_name='twilio_outgoing_calls')
+
+    next_action = models.CharField(max_length=64, choices=OUTGOING_CALL_NEXT_ACTIONS, default='continue')
+
+    pause_length = models.IntegerField(default=5)
+
+    gather_input = models.CharField(max_length=64, choices=GATHER_INPUT_OPTIONS, default='dtmf speech')
+    gather_finish_on_key = models.CharField(max_length=64, default='#')
+    gather_num_digits = models.IntegerField(default=4)
+    gather_timeout = models.IntegerField(default=5)
+    gather_speech_timeout = models.IntegerField(default=5)
+    gather_speech_profanity_filter = models.BooleanField(default=False)
+    gather_speech_model = models.CharField(max_length=64, choices=GATHER_SPEECH_MODELS, default='default')
+
+    def transmit(self):
+        if self.transmission_metadata is None:
+            self.transmission_metadata = {}
+
+        if self.sent_date is not None:
+            raise Exception('Call (pk=' + str(self.pk) + ') already transmitted on ' + self.sent_date.isoformat() + '.')
+
+        try:
+            client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
+
+            call = client.calls.create(
+                url=(settings.SITE_URL + reverse('incoming_twilio_call')),
+                to=self.destination,
+                from_=self.integration.configuration['phone_number']
+            )
+
+            self.transmission_metadata['twilio_sid'] = call.sid
+            self.errored = False
+            self.save()
+        except: # pylint: disable=bare-except
+            self.errored = True
+
+            self.transmission_metadata['error'] = traceback.format_exc().splitlines()
+
+            self.save()
+
+class IncomingCallResponse(models.Model):
+    source = models.CharField(max_length=256)
+
+    receive_date = models.DateTimeField()
+
+    message = models.TextField(max_length=1024)
+
+    transmission_metadata = JSONField(default=dict, blank=True, null=True)
+
+    integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True)
+
 def process_incoming(integration, payload):
-    integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip())
+    if ('Body' in payload) is False:
+        if 'Digits' in payload:
+            payload['Body'] = payload['Digits']
+        elif 'SpeechResult' in payload:
+            payload['Body'] = payload['SpeechResult']
+        else:
+            payload['Body'] = ''
+
+    if 'CallStatus' in payload:
+        from_ = payload['From']
+
+        payload['From'] = payload['To']
+
+        payload['To'] = from_
+
+    if payload['Body']:
+        integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip())
 
 def execute_action(integration, session, action):
     player = session.player
@@ -92,6 +194,23 @@ def execute_action(integration, session, action):
         outgoing.save()
 
         outgoing.transmit()
+
+        return True
+    elif action['type'] == 'echo-voice':
+        unsent = OutgoingCall.objects.filter(destination=player.player_state['twilio_player'], sent_date=None)
+
+        outgoing = OutgoingCall(destination=player.player_state['twilio_player'])
+        outgoing.start_call = unsent.count() == 0
+        outgoing.send_date = timezone.now()
+        outgoing.message = action['message']
+        outgoing.next_action = action['next_action']
+
+        outgoing.integration = integration
+
+        outgoing.save()
+
+        if outgoing.next_action != 'hangup' and outgoing.start_call is True:
+            outgoing.transmit()
 
         return True
 

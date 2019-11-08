@@ -54,7 +54,9 @@
                     <span class="mdc-top-app-bar__title">SMS Builder</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save">save</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence">edit</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
                 </section>
             </div>
         </header>
@@ -125,16 +127,21 @@
 							</div>
 						</div>
 						<div class="mdc-select mdc-select--outlined" id="add-card-type" style="width: 100%; margin-top: 16px;">
-							<i class="mdc-select__dropdown-icon"></i>
-							<select class="mdc-select__native-control" id="add-card-select-widget">
-								<option value=""></option>
-							</select>
-							<div class="mdc-notched-outline">
-								<div class="mdc-notched-outline__leading"></div>
-								<div class="mdc-notched-outline__notch">
-									<label class="mdc-floating-label">Action</label>
-								</div>
+							<div class="mdc-select__anchor" style="width: 100%;">
+								<i class="mdc-select__dropdown-icon"></i>
+								<div id="demo-selected-text" class="mdc-select__selected-text" aria-labelledby="outlined-select-label"></div>
+									<div class="mdc-notched-outline">
+										<div class="mdc-notched-outline__leading"></div>
+										<div class="mdc-notched-outline__notch">
+										<label id="outlined-select-label" class="mdc-floating-label">Action</label>
+									</div>
 								<div class="mdc-notched-outline__trailing"></div>
+								</div>
+							</div>
+							<div class="mdc-select__menu mdc-menu mdc-menu-surface demo-width-class">
+								<ul class="mdc-list" id="add-card-select-widget">
+									<li class="mdc-list-item mdc-list-item--selected" data-value="" aria-selected="true"></li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -173,6 +180,58 @@
 						</button>
 						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add_sequence">
 							<span class="mdc-button__label">Add Sequence</span>
+						</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="edit-sequence-dialog"  aria-labelledby="edit-sequence-dialog-title" aria-describedby="edit-sequence-dialog-content">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title" id="add-sequence-dialog-title">Edit Sequence</h2>
+					<div class="mdc-dialog__content" id="add-sequence-dialog-content">
+						<div class="mdc-text-field mdc-text-field--outlined" id="edit-sequence-name" style="width: 100%; margin-top: 8px;">
+							<input type="text" class="mdc-text-field__input" id="edit-sequence-name-value">
+							<div class="mdc-notched-outline">
+								<div class="mdc-notched-outline__leading"></div>
+								<div class="mdc-notched-outline__notch">
+									<label for="add-card-name-value" class="mdc-floating-label">Sequence Name</label>
+								</div>
+								<div class="mdc-notched-outline__trailing"></div>
+							</div>
+						</div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+							<span class="mdc-button__label">Cancel</span>
+						</button>
+						<!-- <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="remove_sequence">
+							<span class="mdc-button__label">Remove</span>
+						</button> -->
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="update_sequence">
+							<span class="mdc-button__label">Update</span>
+						</button>
+					</footer>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="remove-sequence-dialog"  aria-labelledby="remove-sequence-dialog-title" aria-describedby="remove-sequence-dialog-content">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title" id="add-sequence-dialog-title">Remove Sequence?</h2>
+					<div class="mdc-dialog__content" id="add-sequence-dialog-content">
+						Are you sure that you want to remove the "<span id="remove-sequence-name-value">SEQUENCE</span>" sequence?
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+							<span class="mdc-button__label">No</span>
+						</button>
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="remove_sequence">
+							<span class="mdc-button__label">Yes</span>
 						</button>
 					</footer>
 				</div>

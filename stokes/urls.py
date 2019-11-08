@@ -15,10 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
+    url('^', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^data/', include('passive_data_kit.urls')),
     url(r'^builder/', include('builder.urls')),
     url(r'^twilio/', include('twilio_support.urls')),
+    url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')
 ]

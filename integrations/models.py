@@ -26,6 +26,9 @@ class Integration(models.Model):
 
     configuration = JSONField(default=dict)
 
+    def __unicode__(self):
+        return self.name
+
     def process_incoming(self, payload):
         if self.type == 'twilio':
             from twilio_support.models import process_incoming as twilio_incoming

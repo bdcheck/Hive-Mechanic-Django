@@ -1,0 +1,49 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+
+{% block 'page_title' %}Sessions | Interaction Builder{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'navigation_title' %}Sessions{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="padding-bottom: 16px;">
+				<div class="mdc-data-table">
+					<table class="mdc-data-table__table" aria-label="Active Sessions" id="table_sessions">
+						<thead>
+							<tr class="mdc-data-table__header-row">
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Player</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Game</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Started</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Completed</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
+							</tr>
+						</thead>
+						<tbody class="mdc-data-table__content">
+							{% for session in sessions %}
+								<tr class="mdc-data-table__row">
+									<td class="mdc-data-table__cell">{{ session.player }}</td>
+									<td class="mdc-data-table__cell"><a href="{% url 'builder_game' session.game_version.game.slug %}">{{ session.game_version.game.name }}</a></td>
+									<td class="mdc-data-table__cell">{{ session.started }}</td>
+									<td class="mdc-data-table__cell">{{ session.completed }}</td>
+									<td class="mdc-data-table__cell">
+										<a href="#" class="material-icons" aria-hidden="true">delete_forever</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/sessions.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

@@ -380,7 +380,8 @@ define(modules, function (mdc, Node) {
 
         addCard(callback) {
             $("#add-card-name-value").val("");
-            $("#add-card-select-widget").val("");
+
+			window.dialogBuilder.newCardSelect.value = '';
             
             var me = this;
             
@@ -388,7 +389,7 @@ define(modules, function (mdc, Node) {
                 handleEvent: function (event) {
                     if (event.detail.action == "add_card") {
                         var cardName = $("#add-card-name-value").val();
-                        var cardType = $("#add-card-select-widget").val();
+                        var cardType = window.dialogBuilder.newCardSelect.value;
 
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
                     
