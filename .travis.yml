@@ -23,9 +23,9 @@ addons:
       - postgresql-9.5-postgis-2.3
 
 before_install:
-  - export DJANGO_SETTINGS_MODULE=stokes.settings
-  - export PYTHONPATH=$HOME/builds/audaciouscode/Community-SMS-Django
-  
+  - export DJANGO_SETTINGS_MODULE=hivemechanic.settings
+  - export PYTHONPATH=$HOME/builds/audacious-software/Hive-Mechanic-Django
+
 install:
   - pip install --upgrade pip setuptools wheel
   - pip install -r requirements.txt
@@ -37,7 +37,7 @@ before_script:
   - psql -U postgres -c "CREATE EXTENSION postgis_topology" -d travisci
 
 script:
-  - mv stokes/local_settings.py-template  stokes/local_settings.py
+  - mv hivemechanic/local_settings.py-template hivemechanic/local_settings.py
   - python manage.py migrate
   - python manage.py test
   - pylint passive_data_kit
