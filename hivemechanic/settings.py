@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'builder',
     'integrations',
     'twilio_support',
+    'http_support',
 ]
 
 MIDDLEWARE = [

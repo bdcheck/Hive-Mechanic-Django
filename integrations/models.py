@@ -12,6 +12,7 @@ from builder.models import Game, Player, Session
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
+    ('http', 'HTTP'),
     ('other', 'Other'),
 )
 
@@ -34,6 +35,10 @@ class Integration(models.Model):
             from twilio_support.models import process_incoming as twilio_incoming
 
             twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'http':
+            from http_support.models import process_incoming as http_incoming
+
+            return http_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 

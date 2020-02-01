@@ -14,7 +14,7 @@
 
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-        <title>{% block 'page_title' %}Interaction Builder{% endblock %}</title>
+        <title>{% block 'page_title' %}Hive Mechanic{% endblock %}</title>
 
         <style>
             body {
@@ -59,7 +59,7 @@
             <div class="mdc-top-app-bar__row">
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
                     <a href="#" class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
-                    <span class="mdc-top-app-bar__title">{% block 'navigation_title' %}Dashboard{% endblock %}</span>
+                    <span class="mdc-top-app-bar__title">{% block 'navigation_title' %}Hive Mechanic{% endblock %}</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
 					{% block 'page_help' %}
@@ -77,12 +77,12 @@
                     </a>
 					<li role="separator" class="mdc-list-divider"></li>
                     <a class="mdc-list-item" href="{% url 'builder_games' %}">
-                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">videogame_asset</i>
-                        <span class="mdc-list-item__text">Games</span>
+                        <i class="material-icons mdc-list-item__graphic" aria-hidden="true">emoji_people</i>
+                        <span class="mdc-list-item__text">Activities</span>
                     </a>
                     <a class="mdc-list-item" href="{% url 'builder_players' %}">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">people</i>
-                        <span class="mdc-list-item__text">Players</span>
+                        <span class="mdc-list-item__text">Participants</span>
                     </a>
                     <a class="mdc-list-item" href="{% url 'builder_sessions' %}">
                         <i class="material-icons mdc-list-item__graphic" aria-hidden="true">phonelink_ring</i>
