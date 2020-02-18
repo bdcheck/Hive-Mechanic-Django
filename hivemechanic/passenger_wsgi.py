@@ -1,6 +1,11 @@
-import sys, os
+import os
+import sys
 
-INTERP = '/var/www/django/dev.hivemechanic.org/venv/bin/python'
+install_dir = os.path.dirname(os.path.abspath(__file__))
+install_dir = os.path.dirname(install_dir)
+install_dir = os.path.dirname(install_dir)
+
+INTERP = os.path.join(install_dir, 'venv/bin/python')
 
 if sys.executable != INTERP:
     os.execl(INTERP, INTERP, *sys.argv) # nosec

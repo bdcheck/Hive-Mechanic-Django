@@ -38,7 +38,7 @@ class Integration(models.Model):
         elif self.type == 'http':
             from http_support.models import process_incoming as http_incoming
 
-            return http_incoming(self, payload) # pylint: disable=no-value-for-parameter
+            http_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 
@@ -94,6 +94,11 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 session.player.set_cookie(action['cookie'], action['value'])
             elif scope == 'game':
                 session.game_version.game.set_cookie(action['cookie'], action['value'])
+
+        return True
+    elif action['type'] == 'end-activity':
+        session.completed = timezone.now()
+        session.save()
 
         return True
 

@@ -13,6 +13,6 @@ urlpatterns = [
     url(r'players$', builder_players, name='builder_players'),
     url(r'^activity/(?P<game>.+).json$', builder_game_definition_json, name='builder_game_definition_json'),
     url(r'^card/(?P<card>.+)', builder_interaction_card, name='builder_interaction_card'),
-    url(r'activity^game/(?P<game>.+)', builder_game, name='builder_game'),
+    url(r'^activity/(?P<game>.+)', builder_game, name='builder_game'),
     url(r'^', builder_home, name='builder_home'),
 ]
