@@ -36,6 +36,32 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     });
     
     function onSequenceChanged(changedId) {
+        console.log('SEQ');
+        console.log(window.dialogBuilder.sequences);
+
+        $("#action_save").text("save");
+        
+        if (window.dialogBuilder.sequences != undefined) {
+            var issues = [];
+            
+            for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+                var loadedSequence = sequence.loadSequence(window.dialogBuilder.sequences[i]);
+                
+				console.log('SEQ ' + i);
+				console.log(loadedSequence);
+
+                issues = issues.concat(loadedSequence.issues());
+            }
+            
+            console.log("ISSUES: " + issues);
+            
+            if (issues.length > 0) {
+	            $("#action_save").text("warning");
+	        }
+        }
+
+        console.log('SEQ DONE');
+
         $("#action_save").show();
     }
 
@@ -49,15 +75,15 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     }
     
     window.dialogBuilder.removeSequence = function(sequenceDefinition) {
-    	window.dialogBuilder.sequences = window.dialogBuilder.sequences.filter(function(value) {
-    		return value != sequenceDefinition;
-    	});
-    	
-    	window.dialogBuilder.reloadSequences();
-    	
+        window.dialogBuilder.sequences = window.dialogBuilder.sequences.filter(function(value) {
+            return value != sequenceDefinition;
+        });
+        
+        window.dialogBuilder.reloadSequences();
+        
         window.dialogBuilder.loadSequence(window.dialogBuilder.sequences[0], null);
 
-		$("#action_save").show();
+        $("#action_save").show();
     }
 
     var editListener = undefined;
@@ -82,7 +108,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             
             $("#edit-sequence-name-value").val(selectedSequence.name());
 
-			window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', editListener);
+            window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', editListener);
 
             editListener = {
                 handleEvent: function (event) {
@@ -90,11 +116,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                         var name = $("#edit-sequence-name-value").val();
                         
                         definition["name"] = name;
-				        $(".mdc-top-app-bar__title").html(name);
+                        $(".mdc-top-app-bar__title").html(name);
 
-				    	window.dialogBuilder.reloadSequences();
+                        window.dialogBuilder.reloadSequences();
 
-				        $("#action_save").show();
+                        $("#action_save").show();
                     
                         window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this);
                    }
@@ -111,7 +137,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             
             $("#remove-sequence-name-value").html(selectedSequence.name());
 
-			window.dialogBuilder.removeSequenceDialog.unlisten('MDCDialog:closed', removeListener);
+            window.dialogBuilder.removeSequenceDialog.unlisten('MDCDialog:closed', removeListener);
 
             removeListener = {
                 handleEvent: function (event) {
@@ -124,7 +150,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                    }
                 }
             };
-			
+            
             window.dialogBuilder.removeSequenceDialog.listen('MDCDialog:closed', removeListener);
            
             window.dialogBuilder.removeSequenceDialog.open()
@@ -198,7 +224,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $(".go_home").off("click");
         $(".go_home").click(function(eventObj) {
-        	location.href = '/builder/';
+            location.href = '/builder/';
         });
     }
     
@@ -209,12 +235,19 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#action_save").click(function(eventObj) {
             eventObj.preventDefault();
+
             if (window.dialogBuilder.update != undefined) {
-                window.dialogBuilder.update(data, function() {
-                    $("#action_save").hide();
-                }, function(error) {
-                    console.log(error);
-                });
+            	if ($("#action_save").text() == "warning") {
+            		console.log("TODO: SAVE WITH WARNING");
+            	} else {
+            		console.log("TODO: SAVE NORMAL");
+            
+					window.dialogBuilder.update(data, function() {
+						$("#action_save").hide();
+					}, function(error) {
+						console.log(error);
+					});
+				}
             }
         });
         
