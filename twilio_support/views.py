@@ -1,5 +1,15 @@
 # pylint: disable=no-member, line-too-long
 
+import mimetypes
+
+from io import BytesIO
+
+import requests
+
+
+from django.conf import settings
+from django.core import files
+from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -7,7 +17,7 @@ from twilio.twiml.voice_response import VoiceResponse
 
 from integrations.models import Integration
 
-from .models import IncomingMessage, OutgoingCall, IncomingCallResponse
+from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse
 
 @csrf_exempt
 def incoming_twilio(request):
@@ -34,6 +44,77 @@ def incoming_twilio(request):
             incoming.integration = integration_match
 
         incoming.save()
+
+        num_media = 0
+        
+        media_objects = {}
+
+        if 'NumMedia' in request.POST:
+            num_media = int(request.POST['NumMedia'])
+            
+            for i in range(0, num_media):
+                media = IncomingMessageMedia(message=incoming)
+                
+                media.content_url = request.POST['MediaUrl' + str(i)]
+                media.content_type = request.POST['MediaContentType' + str(i)]
+                media.index = i
+                
+                media.save()
+
+                media_response = requests.get(media.content_url)
+
+                if media_response.status_code != requests.codes.ok:
+                    continue
+
+                filename = media.content_url.split('/')[-1]
+                
+                extension = mimetypes.guess_extension(media.content_type)
+                
+                if extension is not None:
+                    if extension == '.jpe':
+                        extension = '.jpg'
+
+                    filename += extension
+
+                file_bytes = BytesIO()
+                file_bytes.write(media_response.content)
+
+                media.content_file.save(filename, files.File(file_bytes))
+                media.save()
+                
+                media_objects[filename] = {
+                    'content': file_bytes.getvalue(),
+                    'mime-type': media.content_type
+                }
+                
+        try:
+            if integration_match is not None:
+                if 'mirror_emails' in integration_match.game.game_state:
+                    if settings.BUILDER_MIRROR_MESSAGES:
+                        if num_media > 0 or settings.BUILDER_MIRROR_MESSAGES_REQUIRE_MEDIA is False:
+                            message_body = ' -- Message Content --\n'
+                
+                            for key in request.POST:
+                                value = request.POST[key]
+                                message_body += key + ': ' + value + '\n'
+                
+                            subject = '[' + integration_match.game.name + '] New SMS Message'
+
+                            email = EmailMessage(
+                                subject,
+                                message_body,
+                                settings.BUILDER_MIRROR_MESSAGES_FROM_ADDRESS,
+                                integration_match.game.game_state['mirror_emails'],
+                            )
+                    
+                            for filename in media_objects:
+                                email.attach(filename, media_objects[filename]['content'], media_objects[filename]['mime-type'])
+                        
+                            email.send()
+                
+        
+        except AttributeError:
+            pass
 
         if integration_match is not None:
             integration_match.process_incoming(request.POST)

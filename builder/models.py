@@ -72,7 +72,7 @@ class GameVersion(models.Model):
     def __unicode__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
-    def process_incoming(self, session, payload):
+    def process_incoming(self, session, payload, extras=None):
         actions = []
 
         dialog_key = 'session-' + str(session.pk)
@@ -84,7 +84,7 @@ class GameVersion(models.Model):
             dialog.dialog_snapshot = self.dialog_snapshot()
             dialog.save()
 
-        new_actions = dialog.process(payload, extras={'session': session})
+        new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
         while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
             actions.extend(new_actions)
@@ -166,13 +166,13 @@ class Session(models.Model):
 
     session_state = JSONField(default=dict)
 
-    def process_incoming(self, integration, payload):
+    def process_incoming(self, integration, payload, extras=None):
         current_node = None # pylint: disable=unused-variable
 
         if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
-        actions = self.game_version.process_incoming(self, payload)
+        actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
             integration.execute_actions(self, actions)

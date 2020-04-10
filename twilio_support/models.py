@@ -87,6 +87,15 @@ class IncomingMessage(models.Model):
 
     integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True)
 
+class IncomingMessageMedia(models.Model):
+    message = models.ForeignKey(IncomingMessage, related_name='media')
+    
+    index = models.IntegerField(default=0)
+    
+    content_file = models.FileField(upload_to='incoming_message_media', null=True, blank=True)
+    content_url = models.CharField(max_length=1024, null=True, blank=True)
+    content_type = models.CharField(max_length=128, default='application/octet-stream')
+
 class OutgoingCall(models.Model):
     destination = models.CharField(max_length=256)
 
@@ -168,8 +177,10 @@ def process_incoming(integration, payload):
 
         payload['To'] = from_
 
-    if payload['Body']:
-        integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip())
+    incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
+
+    if payload['Body'] or incoming_message.media.count() > 0:
+        integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip(), { 'last_message': incoming_message })
 
 def execute_action(integration, session, action):
     player = session.player

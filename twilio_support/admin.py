@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from .models import OutgoingMessage, IncomingMessage, OutgoingCall, IncomingCallResponse
+from .models import OutgoingMessage, IncomingMessage, OutgoingCall, IncomingCallResponse, IncomingMessageMedia
 
 @admin.register(OutgoingMessage)
 class OutgoingMessageAdmin(admin.ModelAdmin):
@@ -17,6 +17,12 @@ class IncomingMessageAdmin(admin.ModelAdmin):
     list_display = ('source', 'receive_date', 'message')
     search_fields = ('message', 'source',)
     list_filter = ('receive_date',)
+
+@admin.register(IncomingMessageMedia)
+class Admin(admin.ModelAdmin):
+    list_display = ('message', 'index', 'content_url', 'content_type')
+    search_fields = ('content_url', 'content_type',)
+    list_filter = ('content_type',)
 
 def initiate_call(modeladmin, request, queryset): # pylint: disable=unused-argument
     for call in queryset:

@@ -42,7 +42,7 @@ class Integration(models.Model):
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 
-    def process_player_incoming(self, player_lookup_key, player_lookup_value, payload):
+    def process_player_incoming(self, player_lookup_key, player_lookup_value, payload, extras=None):
         player_match = None
 
         for player in Player.objects.all():
@@ -62,8 +62,10 @@ class Integration(models.Model):
             if session is None:
                 session = Session(game_version=self.game.versions.order_by('-created').first(), player=player_match, started=timezone.now())
                 session.save()
+                
+                session.process_incoming(self, payload, extras)
 
-            session.process_incoming(self, payload)
+            session.process_incoming(self, payload, extras)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
         if actions is not None:
@@ -95,6 +97,8 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             elif scope == 'game':
                 session.game_version.game.set_cookie(action['cookie'], action['value'])
 
+        return True
+    elif action['type'] == 'continue':
         return True
     elif action['type'] == 'end-activity':
         session.completed = timezone.now()
