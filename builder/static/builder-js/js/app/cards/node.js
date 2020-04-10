@@ -84,15 +84,16 @@ define(modules, function (mdc) {
             return htmlString;
         }
         
+        /* Error / validity checking */
         issues(sequence) {
             var issues = [];
             
             if (this.definition['name'] == undefined || this.definition['name'].trim().length == 0) {
-	            issues.push(['Please provide a node name.', 'node', this.definition['id']]);
+	            issues.push(['Please provide a node name.', 'node', this.definition['id'], this.cardName()]);
             }
 
             if (this.definition['id'] == undefined || this.definition['id'].trim().length == 0) {
-	            issues.push(['Please provide a node ID.', 'node', this.definition['id']]);
+	            issues.push(['Please provide a node ID.', 'node', this.definition['id']], this.cardName());
             }
             
             var destinations = this.destinationNodes(sequence);
@@ -101,9 +102,9 @@ define(modules, function (mdc) {
             	var destination = destinations[i];
             	
             	if (destination == null || destination == undefined) {
-		            issues.push(['Empty destination node.', 'node', this.definition['id']]);
+		            issues.push(['Empty destination node.', 'node', this.definition['id'], this.cardName()]);
             	} else if (this.id == destination.id) {
-		            issues.push(['Node references self in destination.', 'node', this.definition['id']]);
+		            issues.push(['Node references self in destination.', 'node', this.definition['id'], this.cardName()]);
             	}
             }
             

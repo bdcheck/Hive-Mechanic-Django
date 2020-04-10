@@ -24,6 +24,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
     
+    const warningDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-outstanding-issues-dialog'));
+
     // console.log('MDC');
     // console.log(mdc);
     
@@ -36,31 +38,66 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     });
     
     function onSequenceChanged(changedId) {
-        console.log('SEQ');
-        console.log(window.dialogBuilder.sequences);
-
         $("#action_save").text("save");
         
         if (window.dialogBuilder.sequences != undefined) {
             var issues = [];
+
+			$(".outstanding-issue-item").remove();
             
             for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
                 var loadedSequence = sequence.loadSequence(window.dialogBuilder.sequences[i]);
                 
-				console.log('SEQ ' + i);
-				console.log(loadedSequence);
-
                 issues = issues.concat(loadedSequence.issues());
             }
             
-            console.log("ISSUES: " + issues);
+            console.log("ISSUES: " + JSON.stringify(issues, null, 2));
             
             if (issues.length > 0) {
+				for (var i = 0; i < issues.length; i++) {
+					var issue = issues[i];
+				
+					var item = '<li class="mdc-list-item prevent-menu-close outstanding-issue-item" role="menuitem" id="builder-outstanding-issues-dialog-' + issue[2] + '">';
+					item +=    '  <span class="mdc-list-item__text">';
+					item +=    '    <span class="mdc-list-item__primary-text">' + issue[0] + '</span>';
+					item +=    '    <span class="mdc-list-item__secondary-text">' + issue[3] + '</span>';
+					item +=    '  </span>';
+					item +=    '</li>';
+				
+					$(item).insertBefore(".outstanding-issue-items .mdc-list-divider");
+				}
+
 	            $("#action_save").text("warning");
+
+				const options = document.querySelectorAll('.outstanding-issue-item');
+			
+				for (let option of options) {
+					option.addEventListener('click', (event) => {
+						var id = event.currentTarget.id;
+
+						id = id.replace('builder-outstanding-issues-dialog-', '')
+
+						for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+							var sequence = window.dialogBuilder.sequences[i];
+				
+							for (var j = 0; j < sequence["items"].length; j++) {
+								var item = sequence["items"][j];
+
+								if (item["id"] == id) {
+									console.log(sequence);
+	
+									window.dialogBuilder.loadSequence(sequence, id);
+									
+									warningDialog.close();
+
+									return;             
+								}
+							}
+						}
+					});
+				}
 	        }
         }
-
-        console.log('SEQ DONE');
 
         $("#action_save").show();
     }
@@ -238,10 +275,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             if (window.dialogBuilder.update != undefined) {
             	if ($("#action_save").text() == "warning") {
-            		console.log("TODO: SAVE WITH WARNING");
+					warningDialog.open();
             	} else {
-            		console.log("TODO: SAVE NORMAL");
-            
 					window.dialogBuilder.update(data, function() {
 						$("#action_save").hide();
 					}, function(error) {
@@ -283,6 +318,25 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         window.dialogBuilder.removeSequenceDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('remove-sequence-dialog'));
 
         window.dialogBuilder.loadSequence(window.dialogBuilder.sequences[0], null);
+
+		const warning = document.getElementById('builder-outstanding-issues-dialog-save');
+		
+		warning.addEventListener('click', (event) => {
+			window.dialogBuilder.update(data, function() {
+				$("#action_save").hide();
+
+				console.log("SAVE WITH WARNINGS");
+
+				warningDialog.close();
+
+				console.log("CLOSE");
+			}, function(error) {
+				console.log(error);
+			});
+			
+			return;
+		});
+        
     });
     
     var csrftoken = Cookies.get('csrftoken');

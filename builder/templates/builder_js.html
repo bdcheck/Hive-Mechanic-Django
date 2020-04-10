@@ -237,6 +237,30 @@
 			</div>
 			<div class="mdc-dialog__scrim"></div>
 		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="builder-outstanding-issues-dialog"  aria-labelledby="builder-outstanding-issues-dialog-title" aria-describedby="builder-outstanding-issues-dialog-content">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title" id="builder-outstanding-issues-dialog-title">Outstanding Issues</h2>
+					<div class="mdc-dialog__content" id="builder-outstanding-issues-dialog-content" style="padding: 0;">
+						<ul class="mdc-list mdc-list--two-line mdc-dialog__content outstanding-issue-items" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+							<li class="mdc-list-item outstanding-issue-item" role="menuitem" id="builder-outstanding-issues-dialog-1">
+							  <span class="mdc-list-item__text">Issue 1</span>
+							  <span class="mdc-list-item__meta material-icons">build</span>
+							</li>
+							<li class="mdc-list-divider" role="separator"></li>
+							<li class="mdc-list-item prevent-menu-close" role="menuitem" id="builder-outstanding-issues-dialog-save">
+								<span class="mdc-list-item__text">
+									<span class="mdc-list-item__primary-text">Save With Issues</span>
+									<span class="mdc-list-item__secondary-text">May exhibit unexpected behavior!</span>
+								</span>
+								<span class="mdc-list-item__meta material-icons">save</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
     </body>
     
     <script>
