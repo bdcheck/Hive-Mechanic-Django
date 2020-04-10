@@ -78,118 +78,118 @@ define(modules, function (mdc, Node) {
         }
         
         loadNode(definition) {
-        	var me = this;
-        	
-        	if (definition != undefined) {
-				for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
-					var sequence = window.dialogBuilder.sequences[i];
-				
-					if (sequence["id"] != this.definition["id"]) {
-						for (var j = 0; j < sequence["items"].length; j++) {
-							var item = sequence["items"][j];
+            var me = this;
+            
+            if (definition != undefined) {
+                for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+                    var sequence = window.dialogBuilder.sequences[i];
+                
+                    if (sequence["id"] != this.definition["id"]) {
+                        for (var j = 0; j < sequence["items"].length; j++) {
+                            var item = sequence["items"][j];
 
-							if (item["id"] == definition["id"]) {
-								console.log(sequence);
-		
-								window.dialogBuilder.loadSequence(sequence, definition['id']);
-
-								return;             
-							}
-						}
-					}
-				}
-			
-				var node = Node.createCard(definition, this);
-			
-				var current = $("#builder_current_node");
-			
-				var html = node.editHtml();
-
-				current.html(html);
-
-				node.initialize();
-
-				if ($("#sequence_breadcrumbs").children("#breadcrumb-" + node.id).length > 0) {
-					var match = $("#sequence_breadcrumbs").children("#breadcrumb-" + node.id);
-					var last = $("#sequence_breadcrumbs").children().last();
-				
-					while (match.attr("id") != last.attr("id")) {
-
-						last.remove();
-
-						last = $("#sequence_breadcrumbs").children().last();
-					}
-				} else {
-					var chevron = '<i class="material-icons" style="font-size: 0.75rem;">chevron_right</i>';
-					var breadcrumb = '<a id="breadcrumb-' + node.id + '" href="#">' + node.cardName() + '</a>';
-
-					$("#sequence_breadcrumbs").append(chevron + breadcrumb);
-
-					$("#breadcrumb-" + node.id).click(function(eventObj) {
-						eventObj.preventDefault();
-				
-						me.loadNode(definition);
-			
-						return false;
-					})
-				}
-			
-				var destinations = $("#builder_next_nodes");
-			
-				var destinationNodes = node.destinationNodes(this);
-			
-				var destinationHtml = '';
-
-				for (var i = 0; i < destinationNodes.length; i++) {
-					destinationHtml += destinationNodes[i].viewHtml();
-				}
-
-				destinations.html(destinationHtml);
-			
-				for (var i = 0; i < destinationNodes.length; i++) {
-					const destinationNode = destinationNodes[i];
-				
-					$("#" + destinationNode["cardId"]).css("background-color", "#E0E0E0");
-
-					destinationNode.onClick(function() {
-						me.loadNode(destinationNode.definition);    
-					});
-				}
-
-				var sources = $("#builder_source_nodes");
-			
-				var sourceNodes = node.sourceNodes(this);
-			
-				var sourceHtml = '';
-
-				for (var i = 0; i < sourceNodes.length; i++) {
-					sourceHtml += sourceNodes[i].viewHtml();
-				}
-
-				sources.html(sourceHtml);
-
-				for (var i = 0; i < sourceNodes.length; i++) {
-					const sourceNode = sourceNodes[i];
-				
-					sourceNode.onClick(function() {
-						me.loadNode(sourceNode.definition);    
-					});
-				}
-        	} else {
-                me.addCard(function(cardId) {
-					for (var j = 0; j < me.definition["items"].length; j++) {
-						var item = me.definition["items"][j];
-
-						if (item["id"] == cardId) {
-							me.loadNode(item);
-
-							return;             
-						}
-					}
-                });
-        	}
-        }
+                            if (item["id"] == definition["id"]) {
+                                console.log(sequence);
         
+                                window.dialogBuilder.loadSequence(sequence, definition['id']);
+
+                                return;             
+                            }
+                        }
+                    }
+                }
+            
+                var node = Node.createCard(definition, this);
+            
+                var current = $("#builder_current_node");
+            
+                var html = node.editHtml();
+
+                current.html(html);
+
+                node.initialize();
+
+                if ($("#sequence_breadcrumbs").children("#breadcrumb-" + node.id).length > 0) {
+                    var match = $("#sequence_breadcrumbs").children("#breadcrumb-" + node.id);
+                    var last = $("#sequence_breadcrumbs").children().last();
+                
+                    while (match.attr("id") != last.attr("id")) {
+
+                        last.remove();
+
+                        last = $("#sequence_breadcrumbs").children().last();
+                    }
+                } else {
+                    var chevron = '<i class="material-icons" style="font-size: 0.75rem;">chevron_right</i>';
+                    var breadcrumb = '<a id="breadcrumb-' + node.id + '" href="#">' + node.cardName() + '</a>';
+
+                    $("#sequence_breadcrumbs").append(chevron + breadcrumb);
+
+                    $("#breadcrumb-" + node.id).click(function(eventObj) {
+                        eventObj.preventDefault();
+                
+                        me.loadNode(definition);
+            
+                        return false;
+                    })
+                }
+            
+                var destinations = $("#builder_next_nodes");
+            
+                var destinationNodes = node.destinationNodes(this);
+            
+                var destinationHtml = '';
+
+                for (var i = 0; i < destinationNodes.length; i++) {
+                    destinationHtml += destinationNodes[i].viewHtml();
+                }
+
+                destinations.html(destinationHtml);
+            
+                for (var i = 0; i < destinationNodes.length; i++) {
+                    const destinationNode = destinationNodes[i];
+                
+                    $("#" + destinationNode["cardId"]).css("background-color", "#E0E0E0");
+
+                    destinationNode.onClick(function() {
+                        me.loadNode(destinationNode.definition);    
+                    });
+                }
+
+                var sources = $("#builder_source_nodes");
+            
+                var sourceNodes = node.sourceNodes(this);
+            
+                var sourceHtml = '';
+
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    sourceHtml += sourceNodes[i].viewHtml();
+                }
+
+                sources.html(sourceHtml);
+
+                for (var i = 0; i < sourceNodes.length; i++) {
+                    const sourceNode = sourceNodes[i];
+                
+                    sourceNode.onClick(function() {
+                        me.loadNode(sourceNode.definition);    
+                    });
+                }
+            } else {
+                me.addCard(function(cardId) {
+                    for (var j = 0; j < me.definition["items"].length; j++) {
+                        var item = me.definition["items"][j];
+
+                        if (item["id"] == cardId) {
+                            me.loadNode(item);
+
+                            return;             
+                        }
+                    }
+                });
+            }
+        }
+         
         checkCorrectness() {
             console.log("Checking correctness...");
             var items = this.definition.items;
@@ -222,6 +222,29 @@ define(modules, function (mdc, Node) {
             for (var i = 0; i < this.changeListeners.length; i++) {
                 this.changeListeners[i](changedId);
             }
+        }
+        
+        issues() {
+            var sequenceIssues = [];
+            
+        	var seenIds = [];
+
+            for (var i = 0; i < this.definition.items.length; i++) {
+                var item = this.definition.items[i];
+                
+                var node = Node.createCard(item, this);
+                
+                var id = item['id'];
+                
+                if (seenIds.indexOf(id) == -1) {
+	                sequenceIssues = sequenceIssues.concat(node.issues(this))
+	                seenIds.push(id);
+	            } else {
+	            	sequenceIssues.push(['Duplicate ID "' + id + '" in "' + this.definition['name'] + '".', 'sequence', this.definition["id"]]);
+	            }
+            }
+            
+            return sequenceIssues;
         }
 
         chooseDestinationSelect(cardId) {
@@ -381,7 +404,7 @@ define(modules, function (mdc, Node) {
         addCard(callback) {
             $("#add-card-name-value").val("");
 
-			window.dialogBuilder.newCardSelect.value = '';
+            window.dialogBuilder.newCardSelect.value = '';
             
             var me = this;
             
