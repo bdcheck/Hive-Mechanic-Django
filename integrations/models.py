@@ -62,7 +62,7 @@ class Integration(models.Model):
             if session is None:
                 session = Session(game_version=self.game.versions.order_by('-created').first(), player=player_match, started=timezone.now())
                 session.save()
-                
+
                 session.process_incoming(self, payload, extras)
 
             session.process_incoming(self, payload, extras)

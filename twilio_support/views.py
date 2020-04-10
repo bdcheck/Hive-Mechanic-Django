@@ -20,10 +20,10 @@ from integrations.models import Integration
 from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse
 
 @csrf_exempt
-def incoming_twilio(request):
+def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-locals,too-many-statements
     response = '<?xml version="1.0" encoding="UTF-8" ?><Response></Response>'
 
-    if request.method == 'POST':
+    if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         now = timezone.now()
 
         destination = request.POST['To']
@@ -46,19 +46,19 @@ def incoming_twilio(request):
         incoming.save()
 
         num_media = 0
-        
+
         media_objects = {}
 
         if 'NumMedia' in request.POST:
             num_media = int(request.POST['NumMedia'])
-            
+
             for i in range(0, num_media):
                 media = IncomingMessageMedia(message=incoming)
-                
+
                 media.content_url = request.POST['MediaUrl' + str(i)]
                 media.content_type = request.POST['MediaContentType' + str(i)]
                 media.index = i
-                
+
                 media.save()
 
                 media_response = requests.get(media.content_url)
@@ -67,9 +67,9 @@ def incoming_twilio(request):
                     continue
 
                 filename = media.content_url.split('/')[-1]
-                
+
                 extension = mimetypes.guess_extension(media.content_type)
-                
+
                 if extension is not None:
                     if extension == '.jpe':
                         extension = '.jpg'
@@ -81,23 +81,23 @@ def incoming_twilio(request):
 
                 media.content_file.save(filename, files.File(file_bytes))
                 media.save()
-                
+
                 media_objects[filename] = {
                     'content': file_bytes.getvalue(),
                     'mime-type': media.content_type
                 }
-                
+
         try:
             if integration_match is not None:
                 if 'mirror_emails' in integration_match.game.game_state:
                     if settings.BUILDER_MIRROR_MESSAGES:
                         if num_media > 0 or settings.BUILDER_MIRROR_MESSAGES_REQUIRE_MEDIA is False:
                             message_body = ' -- Message Content --\n'
-                
+
                             for key in request.POST:
                                 value = request.POST[key]
                                 message_body += key + ': ' + value + '\n'
-                
+
                             subject = '[' + integration_match.game.name + '] New SMS Message'
 
                             email = EmailMessage(
@@ -106,13 +106,13 @@ def incoming_twilio(request):
                                 settings.BUILDER_MIRROR_MESSAGES_FROM_ADDRESS,
                                 integration_match.game.game_state['mirror_emails'],
                             )
-                    
+
                             for filename in media_objects:
                                 email.attach(filename, media_objects[filename]['content'], media_objects[filename]['mime-type'])
-                        
+
                             email.send()
-                
-        
+
+
         except AttributeError:
             pass
 
