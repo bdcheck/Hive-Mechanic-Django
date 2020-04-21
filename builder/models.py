@@ -31,9 +31,9 @@ class InteractionCard(models.Model):
 class Game(models.Model):
     name = models.CharField(max_length=1024, db_index=True)
     slug = models.SlugField(max_length=1024, db_index=True, unique=True)
-	
+
     cards = models.ManyToManyField(InteractionCard, related_name='games')
-    
+
     game_state = JSONField(default=dict)
 
     def __unicode__(self):
