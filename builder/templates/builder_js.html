@@ -8,6 +8,8 @@
         <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
         <meta name="theme-color" content="#000000">
 
+        <script src="https://kit.fontawesome.com/78410c1b93.js" crossorigin="anonymous"></script>
+
         <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
@@ -52,6 +54,20 @@
                     <a href="#" class="demo-menu material-icons mdc-top-app-bar__navigation-icon">menu</a>
                     <span class="mdc-top-app-bar__title">Hive Mechanic</span>
                 </section>
+				<section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-middle" role="toolbar">
+					<div class="mdc-select" id="select-all-cards" style="margin-right: 20px;" style="width: 100%;">
+						<div class="mdc-select__anchor demo-width-class">
+							<i class="mdc-select__dropdown-icon"></i>
+							<div class="mdc-select__selected-text"></div>
+							<span class="mdc-floating-label"></span>
+							<div class="mdc-line-ripple"></div>
+						</div>
+						<div class="mdc-select__menu mdc-menu mdc-menu-surface demo-width-class">
+							<ul class="mdc-list" id="select-all-cards-items">
+							</ul>
+						</div>
+					</div>
+				</section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence">edit</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>

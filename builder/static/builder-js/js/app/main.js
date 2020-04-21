@@ -263,7 +263,113 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".go_home").click(function(eventObj) {
             location.href = '/builder/';
         });
-    }
+
+		var allCardSelectContent =  '<li class="mdc-list-item mdc-list-item--selected">';
+		allCardSelectContent +=     '  <span class="mdc-list-item__text">Please Select a Card&#8230;</span>';
+		allCardSelectContent +=     '</li>';
+
+		$.each(window.dialogBuilder.sequences, function(index, value) {
+			allCardSelectContent += '<li class="mdc-list-divider" role="separator"></li>';
+			allCardSelectContent += '<li class="mdc-list-item prevent-menu-close" role="menuitem" id="all_cards_destination_sequence_' + value['id'] + '">';
+			allCardSelectContent += '  <span class="mdc-list-item__text">' + value['name'] + '</span>';
+			allCardSelectContent += '  <span class="mdc-list-item__meta material-icons destination_disclosure_icon">arrow_right</span>';
+			allCardSelectContent += '</li>';
+
+			var items = value['items'];
+
+			for (var i = 0; i < items.length; i++) {
+				var item = items[i];
+
+				allCardSelectContent += '<li class="mdc-list-item all-cards-select-item all_cards_destination_sequence_' + value['id'] + '_item" role="menuitem" id="all_cards_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+				allCardSelectContent += '  <span class="mdc-list-item__text">' + item["name"] + '</span>';
+				allCardSelectContent += '</li>';
+			}
+		});
+
+		$("#select-all-cards-items").html(allCardSelectContent);
+
+		$(".all-cards-select-item").hide();
+
+		$("#select-all-cards .mdc-list-item").off("click");
+
+		const options = document.querySelectorAll('#select-all-cards .mdc-list-item');
+
+		for (let option of options) {
+			option.addEventListener('click', (event) => {
+				let prevent = event.currentTarget.classList.contains('prevent-menu-close');
+
+				if (prevent) {
+					event.stopPropagation();
+
+					var id = event.currentTarget.id;
+
+					id = id.replace('all_cards_destination_sequence_', '')
+
+					$(".all-cards-select-item").hide();
+
+					var icon = "#all_cards_destination_sequence_" + id + " .destination_disclosure_icon"; 
+
+					var isVisible = $(icon).html() == "arrow_drop_down";
+
+					$(".destination_disclosure_icon").text("arrow_right");
+
+					if (isVisible) {
+						$(icon).text("arrow_right");
+
+						$(".all_cards_destination_sequence_" + id + '_item').hide();
+					} else {
+						$("#all_cards_destination_sequence_" + id + " .destination_disclosure_icon").text("arrow_drop_down");
+
+						$(".all_cards_destination_sequence_" + id + '_item').show();
+					}
+				} else {
+					var nodeId = $(event.currentTarget).attr("data-node-id");
+
+					var id = event.currentTarget.id;
+
+					id = id.replace("all_cards_destination_item_", '');
+
+					window.dialogBuilder.loadNodeById(id);
+				}
+			});
+		}
+
+		window.setTimeout(function() {
+			window.dialogBuilder.allCardsSelect.selectedIndex = 0;
+		}, 500);
+	}
+
+	window.dialogBuilder.loadNodeById = function(cardId) {
+		var me = this;
+
+		for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+			var sequence = window.dialogBuilder.sequences[i];
+
+			if (sequence["id"] != cardId) {
+				for (var j = 0; j < sequence["items"].length; j++) {
+					var item = sequence["items"][j];
+
+					if (item["id"] == cardId) {
+						console.log(sequence);
+
+						window.dialogBuilder.loadSequence(sequence, item['id']);
+
+						var node = Node.createCard(item, sequence);
+
+						var current = $("#builder_current_node");
+
+						var html = node.editHtml();
+
+						current.html(html);
+
+						node.initialize();    
+
+						return;             
+					}
+				}
+			}
+		}
+	};
     
     $.getJSON(window.dialogBuilder.source, function(data) {
         window.dialogBuilder.sequences = data;
@@ -303,6 +409,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
         
         window.dialogBuilder.reloadSequences();
+
+        window.dialogBuilder.allCardsSelect = mdc.select.MDCSelect.attachTo(document.getElementById('select-all-cards'));
         
         window.dialogBuilder.addCardDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-card-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
