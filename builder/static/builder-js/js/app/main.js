@@ -26,9 +26,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     
     const warningDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-outstanding-issues-dialog'));
 
-    // console.log('MDC');
-    // console.log(mdc);
-    
     var selectedSequence = null;
 
     topAppBar.setScrollTarget(document.getElementById('main-content'));
@@ -40,18 +37,26 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     function onSequenceChanged(changedId) {
         $("#action_save").text("save");
         
+        console.log("Looking for issues");
+        
         if (window.dialogBuilder.sequences != undefined) {
             var issues = [];
 
 			$(".outstanding-issue-item").remove();
             
             for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
+		        
                 var loadedSequence = sequence.loadSequence(window.dialogBuilder.sequences[i]);
                 
-                issues = issues.concat(loadedSequence.issues());
+                var sequenceIssues = loadedSequence.issues();
+
+		        console.log("LOOK " + sequenceIssues.length);
+                
+                issues = issues.concat(sequenceIssues);
             }
-            
-            console.log("ISSUES: " + JSON.stringify(issues, null, 2));
+
+	        console.log("Found issues");
+	        console.log(issues);
             
             if (issues.length > 0) {
 				for (var i = 0; i < issues.length; i++) {
@@ -84,8 +89,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 								var item = sequence["items"][j];
 
 								if (item["id"] == id) {
-									console.log(sequence);
-	
 									window.dialogBuilder.loadSequence(sequence, id);
 									
 									warningDialog.close();
@@ -265,7 +268,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         });
 
 		var allCardSelectContent =  '<li class="mdc-list-item mdc-list-item--selected">';
-		allCardSelectContent +=     '  <span class="mdc-list-item__text">Please Select a Card&#8230;</span>';
+		allCardSelectContent +=     '  <span class="mdc-list-item__text"></span>';
 		allCardSelectContent +=     '</li>';
 
 		$.each(window.dialogBuilder.sequences, function(index, value) {
@@ -350,8 +353,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 					var item = sequence["items"][j];
 
 					if (item["id"] == cardId) {
-						console.log(sequence);
-
 						window.dialogBuilder.loadSequence(sequence, item['id']);
 
 						var node = Node.createCard(item, sequence);

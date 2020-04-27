@@ -168,8 +168,6 @@ define(modules, function (mdc) {
             const advancedDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById(this.cardId + '-advanced-dialog'));
 
             advancedDialog.listen("MDCDialog:closed", function (event) {
-                console.log(event.detail);
-                
                 if (event.detail['action'] == 'delete') {
                     me.sequence.removeCard(me.id);
                 }
@@ -178,8 +176,6 @@ define(modules, function (mdc) {
             const menu = mdc.menu.MDCMenu.attachTo(document.getElementById(this.cardId + '_menu'));
 
             menu.listen("MDCMenu:selected", function (event) {
-                console.log(event.detail);
-                
                 advancedDialog.open();
             });
             
@@ -282,8 +278,6 @@ define(modules, function (mdc) {
                     
                     if (node != null) {
                         var destinations = node.destinationNodes(sequence);
-
-                        console.log(destinations);
 
                         var isSource = false;
 

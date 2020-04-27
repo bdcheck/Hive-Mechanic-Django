@@ -13,8 +13,6 @@ define(modules, function (mdc, Node) {
         constructor(definition) {
             this.definition = definition;
             this.changeListeners = [];
-            
-            console.log(definition);
         }
         
         allActions() {
@@ -61,8 +59,6 @@ define(modules, function (mdc, Node) {
                     var item = this.definition.items[i];
                     
                     if (nodeId == item["id"] || nodeId.endsWith("#" + item["id"])) {
-                        console.log(item);
-
                         this.loadNode(item);
                         
                         loaded = true;
@@ -70,8 +66,6 @@ define(modules, function (mdc, Node) {
                 }
 
                 if (loaded == false) {
-                    console.log(this.definition.items[0]);
-
                     this.loadNode(this.definition.items[0]);
                 }
             }
@@ -89,8 +83,6 @@ define(modules, function (mdc, Node) {
                             var item = sequence["items"][j];
 
                             if (item["id"] == definition["id"]) {
-                                console.log(sequence);
-        
                                 window.dialogBuilder.loadSequence(sequence, definition['id']);
 
                                 return;             
@@ -191,7 +183,6 @@ define(modules, function (mdc, Node) {
         }
          
         checkCorrectness() {
-            console.log("Checking correctness...");
             var items = this.definition.items;
             
             for (var i = 0; i < items.length; i++) {
@@ -202,8 +193,6 @@ define(modules, function (mdc, Node) {
                     console.log(item);
                 }
             }
-            
-            console.log("Check complete.");
         }
         
         addChangeListener(changeFunction) {
@@ -219,8 +208,60 @@ define(modules, function (mdc, Node) {
         }
         
         markChanged(changedId) {
+        	console.log("CHANGED: " + changedId + " -- " + this.changeListeners.length);
+        	
             for (var i = 0; i < this.changeListeners.length; i++) {
                 this.changeListeners[i](changedId);
+            }
+        }
+
+        removeCard(identifier) {
+        	var removeIndex = -1;
+
+            for (var i = 0; i < this.definition.items.length; i++) {
+                var item = this.definition.items[i];
+                
+                if (item['id'] == identifier) {
+                	removeIndex = i;
+                }
+            }
+            
+            if (removeIndex == -1) {
+				for (var i = 0; i < this.definition.items.length; i++) {
+					var item = this.definition.items[i];
+				
+					if (item['id'] == this.definition["id"] + "#" + identifier) {
+						removeIndex = i;
+					}
+				}
+			}
+            
+            if (removeIndex != -1) {
+				var node = Node.createCard(item, this);
+
+            	var sources = node.sourceNodes(this);
+            	var destinations = node.destinationNodes(this);
+            	
+				for (var i = 0; i < sources.length; i++) {
+					var node = sources[i];
+					
+					node.updateReferences(identifier, null);
+					node.updateReferences(this.definition["id"] + "#" + identifier, null);
+				}
+
+				for (var i = 0; i < destinations.length; i++) {
+					var node = destinations[i];
+					
+					node.updateReferences(identifier, null);
+					node.updateReferences(this.definition["id"] + "#" + identifier, null);
+				}
+
+            	this.definition.items.splice(removeIndex, 1);
+
+                this.markChanged(null);
+            	
+            	window.dialogBuilder.reloadSequences();
+	            window.dialogBuilder.loadSequence(this.definition, null);
             }
         }
         
@@ -237,7 +278,11 @@ define(modules, function (mdc, Node) {
                 var id = item['id'];
                 
                 if (seenIds.indexOf(id) == -1) {
-	                sequenceIssues = sequenceIssues.concat(node.issues(this))
+                	var nodeIssues = node.issues(this);
+                	
+                	console.log("NODE ISSUES: " + nodeIssues.length);
+                	
+	                sequenceIssues = sequenceIssues.concat(nodeIssues)
 	                seenIds.push(id);
 	            } else {
 	            	sequenceIssues.push(['Duplicate ID "' + id + '" in "' + this.definition['name'] + '".', 'sequence', this.definition["id"]]);
@@ -369,8 +414,6 @@ define(modules, function (mdc, Node) {
 
                         id = id.replace(cardId + '_destination_item_', '')
 
-                        console.log("TAPPED ITEM! " + nodeId);
-                                                
                         if (id == "add_card") {
                             me.addCard(onSelect);
                         } else {
@@ -381,24 +424,6 @@ define(modules, function (mdc, Node) {
             }
             
             $(".builder-destination-item").hide();
-        }
-
-        refreshDestinationSelect(cardId) {
-            var selectId = '#' + cardId + '_destination select';
-            
-            $(selectId).empty();
-            
-            $(selectId).append('<option value="" disabled selected></option>');
-
-            var actions = this.allActions();
-
-            for (var i = 0; i < actions.length; i++) {
-                var action = actions[i];
-
-                $(selectId).append('<option value="' + action['id'] + '">' + action['name'] + '</option>');
-            }
-            
-            $(selectId).append('<option value="add_card">Add&#8230;</option>');
         }
 
         addCard(callback) {
@@ -438,8 +463,6 @@ define(modules, function (mdc, Node) {
             if (nodeId == null) {
                 return null;
             }
-            
-            console.log("nodeId = " + nodeId);
             
             if (nodeId.startsWith(this.definition["id"] + "#")) {
                 for (var i = 0; i < this.definition["items"].length; i++) {
