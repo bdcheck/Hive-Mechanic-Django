@@ -63,6 +63,12 @@ class Game(models.Model):
         self.game_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def fetch_cookie(self, cookie):
+        if cookie in self.game_state: # pylint: disable=unsupported-membership-test
+            return self.game_state[cookie] # pylint: disable=unsubscriptable-object
+
+        return None
+
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions')
     created = models.DateTimeField()
@@ -89,7 +95,7 @@ class GameVersion(models.Model):
         while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
             actions.extend(new_actions)
 
-            new_actions = dialog.process(None)
+            new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
 
         dialog = Dialog.objects.filter(key=dialog_key).order_by('-started').first()
 

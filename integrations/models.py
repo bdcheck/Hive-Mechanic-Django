@@ -63,6 +63,9 @@ class Integration(models.Model):
                 session = Session(game_version=self.game.versions.order_by('-created').first(), player=player_match, started=timezone.now())
                 session.save()
 
+                if extras is not None and 'last_message' in extras:
+                    del extras['last_message']
+
                 session.process_incoming(self, payload, extras)
 
             session.process_incoming(self, payload, extras)
