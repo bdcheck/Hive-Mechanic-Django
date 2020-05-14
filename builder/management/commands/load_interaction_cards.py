@@ -19,6 +19,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
+        print(str(cmd_options))
         for cards_file in cmd_options['cards_file']:
             with zipfile.ZipFile(cards_file, 'r') as import_files:
                 manifest_json = import_files.read('manifest.json')
@@ -30,7 +31,7 @@ class Command(BaseCommand):
 
                     card = InteractionCard.objects.filter(identifier=identifier).first()
 
-                    if (card is None) or cmd_options['update-existing']:
+                    if (card is None) or ('update_existing' in cmd_options and cmd_options['update_existing']):
                         if card is None:
                             print 'Creating card for "' + identifier + '"...'
 
