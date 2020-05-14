@@ -19,7 +19,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
-        print(str(cmd_options))
         for cards_file in cmd_options['cards_file']:
             with zipfile.ZipFile(cards_file, 'r') as import_files:
                 manifest_json = import_files.read('manifest.json')
