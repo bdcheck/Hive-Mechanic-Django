@@ -34,7 +34,7 @@ class Command(BaseCommand):
                         if card is None:
                             print 'Creating card for "' + identifier + '"...'
 
-                            card = InteractionCard(identifier)
+                            card = InteractionCard(identifier=identifier)
                         else:
                             print 'Updating card for "' + identifier + '"...'
 
