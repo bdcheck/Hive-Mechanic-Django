@@ -103,6 +103,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# /static/
+/static/
 local_settings.py
-# /media/
+/media/

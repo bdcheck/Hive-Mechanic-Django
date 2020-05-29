@@ -4,3 +4,6 @@
 [submodule "dialog_engine"]
 	path = django_dialog_engine
 	url = https://github.com/audacious-software/Django-Dialog-Engine.git
+[submodule "quicksilver"]
+	path = quicksilver
+	url = https://github.com/audaciouscode/Quicksilver-Django.git
