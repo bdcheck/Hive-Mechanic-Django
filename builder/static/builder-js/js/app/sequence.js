@@ -75,8 +75,8 @@ define(modules, function (mdc, Node) {
             var me = this;
             
             if (definition != undefined) {
-                for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
-                    var sequence = window.dialogBuilder.sequences[i];
+                for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
+                    var sequence = window.dialogBuilder.definition.sequences[i];
                 
                     if (sequence["id"] != this.definition["id"]) {
                         for (var j = 0; j < sequence["items"].length; j++) {
@@ -345,7 +345,7 @@ define(modules, function (mdc, Node) {
 
             body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 
-            $.each(window.dialogBuilder.sequences, function(index, value) {
+            $.each(window.dialogBuilder.definition.sequences, function(index, value) {
                 body += '      <li class="mdc-list-item prevent-menu-close" role="menuitem" id="' + cardId + '_destination_sequence_' + value['id'] + '">';
                 body += '        <span class="mdc-list-item__text">' + value['name'] + '</span>';
                 body += '        <span class="mdc-list-item__meta material-icons destination_disclosure_icon">arrow_right</span>';
@@ -473,8 +473,8 @@ define(modules, function (mdc, Node) {
                     }
                 }
             } else {
-                for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
-                    var sequence = window.dialogBuilder.sequences[i];
+                for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
+                    var sequence = window.dialogBuilder.definition.sequences[i];
                 
                     if (nodeId.startsWith(sequence["id"] + "#")) {
                         return this.loadSequence(sequence).resolveNode(nodeId);

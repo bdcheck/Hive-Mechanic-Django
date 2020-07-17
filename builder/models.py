@@ -89,26 +89,64 @@ class GameVersion(models.Model):
             dialog = Dialog(key=dialog_key, started=timezone.now())
             dialog.dialog_snapshot = self.dialog_snapshot()
             dialog.save()
+            
+        print('DIALOG 1: ' + str(self.interrupt(payload, dialog)))
 
-        new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
+        if self.interrupt(payload, dialog) is False:
+            print('DIALOG 1.1')
 
-        while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
-            actions.extend(new_actions)
+            new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
-            new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+            print('DIALOG 1.2: ' + str(new_actions))
 
-        dialog = Dialog.objects.filter(key=dialog_key).order_by('-started').first()
+            while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
+                actions.extend(new_actions)
 
-        if dialog.finished is not None:
-            session.completed = dialog.finished
-            session.save()
+                new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+
+            dialog = Dialog.objects.filter(key=dialog_key).order_by('-started').first()
+
+            print('DIALOG 1.3: ' + str(dialog))
+
+            if dialog.finished is not None:
+                session.completed = dialog.finished
+                session.save()
+
+            print('DIALOG 1.4: ' + str(dialog))
+
+        print('DIALOG 2: ' + str(actions))
 
         return actions
+
+    def interrupt(self, payload, dialog):
+        definition = json.loads(self.definition)
+
+        if 'interrupts' in definition:
+            for interrupt in definition['interrupts']:
+                for integration in self.game.integrations.all():
+                    if integration.is_interrupt(interrupt['pattern'], payload):
+                        dialog.advance_to(interrupt['action'])
+
+                        return True
+
+        return False
 
     def dialog_snapshot(self):
         snapshot = []
 
-        sequences = json.loads(self.definition)
+        definition = json.loads(self.definition)
+
+        sequences = []
+        
+        initial_card = None
+
+        if 'sequences' in definition:
+            sequences = definition['sequences']
+            
+            if 'initial-card' in definition:
+                initial_card = definition['initial-card']
+        else:
+            sequences = definition
 
         for sequence in sequences:
             for item in sequence['items']:
@@ -118,11 +156,18 @@ class GameVersion(models.Model):
                     item_id = sequence['id'] + '#' + item_id
 
                 if len(snapshot) == 0: # pylint: disable=len-as-condition
-                    snapshot.append({
-                        'type': 'begin',
-                        'id': 'dialog-start',
-                        'next_id': item_id
-                    })
+                    if initial_card is not None:
+                        snapshot.append({
+                            'type': 'begin',
+                            'id': 'dialog-start',
+                            'next_id': initial_card
+                        })
+                    else:
+                        snapshot.append({
+                            'type': 'begin',
+                            'id': 'dialog-start',
+                            'next_id': item_id
+                        })
 
                 interaction_card = InteractionCard.objects.filter(identifier=item['type']).first()
 
