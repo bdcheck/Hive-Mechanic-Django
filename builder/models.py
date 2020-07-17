@@ -89,15 +89,9 @@ class GameVersion(models.Model):
             dialog = Dialog(key=dialog_key, started=timezone.now())
             dialog.dialog_snapshot = self.dialog_snapshot()
             dialog.save()
-            
-        print('DIALOG 1: ' + str(self.interrupt(payload, dialog)))
 
         if self.interrupt(payload, dialog) is False:
-            print('DIALOG 1.1')
-
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
-
-            print('DIALOG 1.2: ' + str(new_actions))
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
                 actions.extend(new_actions)
@@ -106,15 +100,9 @@ class GameVersion(models.Model):
 
             dialog = Dialog.objects.filter(key=dialog_key).order_by('-started').first()
 
-            print('DIALOG 1.3: ' + str(dialog))
-
             if dialog.finished is not None:
                 session.completed = dialog.finished
                 session.save()
-
-            print('DIALOG 1.4: ' + str(dialog))
-
-        print('DIALOG 2: ' + str(actions))
 
         return actions
 
@@ -137,12 +125,12 @@ class GameVersion(models.Model):
         definition = json.loads(self.definition)
 
         sequences = []
-        
+
         initial_card = None
 
         if 'sequences' in definition:
             sequences = definition['sequences']
-            
+
             if 'initial-card' in definition:
                 initial_card = definition['initial-card']
         else:

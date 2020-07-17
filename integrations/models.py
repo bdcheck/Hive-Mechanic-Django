@@ -45,7 +45,7 @@ class Integration(models.Model):
 
     def is_interrupt(self, pattern, value): # pylint: disable=no-self-use
         # TODO: Implement support-specific interrupts here... # pylint: disable=fixme
-        
+
         if pattern == '':
             return False
 
