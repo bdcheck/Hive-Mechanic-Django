@@ -81,16 +81,9 @@ class GameVersion(models.Model):
     def process_incoming(self, session, payload, extras=None):
         actions = []
 
-        dialog_key = 'session-' + str(session.pk)
+        if self.interrupt(payload, session) is False:
+            dialog = session.dialog()
 
-        dialog = Dialog.objects.filter(key=dialog_key, finished=None).order_by('-started').first()
-
-        if dialog is None:
-            dialog = Dialog(key=dialog_key, started=timezone.now())
-            dialog.dialog_snapshot = self.dialog_snapshot()
-            dialog.save()
-
-        if self.interrupt(payload, dialog) is False:
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
@@ -98,22 +91,20 @@ class GameVersion(models.Model):
 
                 new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
 
-            dialog = Dialog.objects.filter(key=dialog_key).order_by('-started').first()
-
             if dialog.finished is not None:
                 session.completed = dialog.finished
                 session.save()
 
         return actions
 
-    def interrupt(self, payload, dialog):
+    def interrupt(self, payload, session):
         definition = json.loads(self.definition)
 
         if 'interrupts' in definition:
             for interrupt in definition['interrupts']:
                 for integration in self.game.integrations.all():
                     if integration.is_interrupt(interrupt['pattern'], payload):
-                        dialog.advance_to(interrupt['action'])
+                        session.advance_to(interrupt['action'])
 
                         return True
 
@@ -237,3 +228,18 @@ class Session(models.Model):
             return self.game_version.game.game_state[cookie]
 
         return None
+
+    def dialog(self):
+        dialog_key = 'session-' + str(self.pk)
+
+        dialog = Dialog.objects.filter(key=dialog_key, finished=None).order_by('-started').first()
+
+        if dialog is None:
+            dialog = Dialog(key=dialog_key, started=timezone.now())
+            dialog.dialog_snapshot = self.dialog_snapshot()
+            dialog.save()
+
+        return dialog
+
+    def advance_to(self, destination):
+        self.dialog().advance_to(destination)
