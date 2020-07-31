@@ -1,42 +1,50 @@
+# pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import json
+import re
 
-# from django.db import models
+from builder.models import Player, Session
 
-def process_incoming(integration, payload):
-    metadata = {'last_message': incoming_message}
+def process_incoming(integration, payload): # pylint: disable=too-many-branches
+    issues = []
 
-    integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip(), metadata)
+    commands = None
+    players = None
 
-'''
-def process_incoming(integration, payload):
-    if ('Body' in payload) is False:
-        if 'Digits' in payload:
-            payload['Body'] = payload['Digits']
-        elif 'SpeechResult' in payload:
-            payload['Body'] = payload['SpeechResult']
-        else:
-            payload['Body'] = ''
+    if 'commands' in payload:
+        commands = json.loads(payload['commands'])
+    else:
+        issues.append('Missing "commands" parameter in request.')
 
-    if 'CallStatus' in payload:
-        from_ = payload['From']
+    if 'players' in payload:
+        players = json.loads(payload['players'])
+    else:
+        issues.append('Missing "players" parameter in request.')
 
-        payload['From'] = payload['To']
+    if commands is not None and players is not None:
+        player_pks = []
 
-        payload['To'] = from_
+        for player in players:
+            for existing_player in Player.objects.all():
+                to_add = False
 
-    incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
+                if existing_player.identifier == player:
+                    to_add = True
+                elif re.match(player, existing_player.identifier) is not None:
+                    to_add = True
 
-    if payload['Body'] or incoming_message.media.count() > 0:
-'''
+                if to_add and (existing_player.pk in player_pks) is False:
+                    player_pks.append(existing_player.pk)
 
+        for player_pk in player_pks:
+            player = Player.objects.get(pk=player_pk)
 
-def execute_action(integration, action):
-    action_type = action['action']
-    
-    if action_type == 'check_server':
-        return None 
-        
-    return 'No action found for "' + action_type + '".'
+            for game_version in integration.game.versions.order_by('-created'):
+                session = Session.objects.filter(player=player, game_version=game_version, completed=None).first()
+
+                if session is not None:
+                    integration.execute_actions(session, commands)
+
+    return issues

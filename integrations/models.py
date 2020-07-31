@@ -35,11 +35,11 @@ class Integration(models.Model):
         if self.type == 'twilio':
             from twilio_support.models import process_incoming as twilio_incoming
 
-            twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
+            return twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
         elif self.type == 'http':
             from http_support.models import process_incoming as http_incoming
 
-            http_incoming(self, payload) # pylint: disable=no-value-for-parameter
+            return http_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 
@@ -116,6 +116,11 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         return True
     elif action['type'] == 'continue':
         return True
+    elif action['type'] == 'go-to':
+        if 'destination' in action:
+            session.advance_to(action['destination'])
+
+            return True
     elif action['type'] == 'end-activity':
         session.completed = timezone.now()
         session.save()
