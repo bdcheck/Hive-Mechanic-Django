@@ -268,8 +268,8 @@ define(modules, function (mdc) {
             var sources = [];
             var includedIds = [];
 
-            for (var i = 0; i < window.dialogBuilder.sequences.length; i++) {
-                var sequenceDef = window.dialogBuilder.sequences[i];
+            for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
+                var sequenceDef = window.dialogBuilder.definition.sequences[i];
                 
                 for (var j = 0; j < sequenceDef["items"].length; j++) {
                     var item = sequenceDef["items"][j];

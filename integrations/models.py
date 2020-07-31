@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import json
+import re
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -41,6 +42,18 @@ class Integration(models.Model):
             http_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
+
+    def is_interrupt(self, pattern, value): # pylint: disable=no-self-use
+        # TODO: Implement support-specific interrupts here... # pylint: disable=fixme
+
+        if pattern == '':
+            return False
+
+        if isinstance(pattern, basestring) and isinstance(value, basestring):
+            if re.match(pattern, value) is not None:
+                return True
+
+        return False
 
     def process_player_incoming(self, player_lookup_key, player_lookup_value, payload, extras=None):
         player_match = None
