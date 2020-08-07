@@ -236,7 +236,7 @@ class Session(models.Model):
 
         if dialog is None:
             dialog = Dialog(key=dialog_key, started=timezone.now())
-            dialog.dialog_snapshot = self.dialog_snapshot()
+            dialog.dialog_snapshot = self.game_version.dialog_snapshot()
             dialog.save()
 
         return dialog
