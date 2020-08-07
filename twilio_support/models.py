@@ -181,9 +181,9 @@ def process_incoming(integration, payload):
 
     if payload['Body'] or incoming_message.media.count() > 0:
         integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip(), {'last_message': incoming_message})
-        
+
         return []
-        
+
     return ['No content provided.']
 
 def execute_action(integration, session, action):
