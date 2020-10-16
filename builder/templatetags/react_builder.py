@@ -16,9 +16,8 @@ def base_static_path(original_path):
 def react_asset(parser, token): # pylint: disable=unused-argument
     try:
         tag_name, filename = token.split_contents() # pylint: disable=unused-variable
-    except ValueError:
-        raise template.TemplateSyntaxError("%r tag requires a single argument" % \
-                                           token.contents.split()[0])
+    except ValueError as value_exc:
+        raise template.TemplateSyntaxError("%r tag requires a single argument" % token.contents.split()[0]) from value_exc
 
     return ReactAssetNode(filename)
 

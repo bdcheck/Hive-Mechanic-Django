@@ -25,7 +25,7 @@ class Integration(models.Model):
     url_slug = models.SlugField(max_length=1024, unique=True)
     type = models.CharField(max_length=1024, choices=INTEGRATION_TYPES, default='twilio')
 
-    game = models.ForeignKey(Game, related_name='integrations')
+    game = models.ForeignKey(Game, related_name='integrations', on_delete=models.CASCADE)
 
     create_new_players = models.BooleanField(default=True)
 
@@ -35,12 +35,12 @@ class Integration(models.Model):
         return self.name
 
     def process_incoming(self, payload):
-        if self.type == 'twilio':
-            from twilio_support.models import process_incoming as twilio_incoming
+        if self.type == 'twilio': # pylint: disable=no-else-return
+            from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
 
             return twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
         elif self.type == 'http':
-            from http_support.models import process_incoming as http_incoming
+            from http_support.models import process_incoming as http_incoming # pylint: disable=import-outside-toplevel
 
             return http_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
@@ -101,11 +101,11 @@ class Integration(models.Model):
                 processed = False
 
                 if self.type == 'twilio':
-                    from twilio_support.models import execute_action as twilio_execute
+                    from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
                     processed = twilio_execute(self, session, action)
                 elif self.type == 'http':
-                    from http_support.models import execute_action as http_execute
+                    from http_support.models import execute_action as http_execute # pylint: disable=import-outside-toplevel
 
                     processed = http_execute(self, session, action)
 
@@ -120,7 +120,7 @@ class Integration(models.Model):
                     print('TODO: Process ' + str(action))
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
-    if action['type'] == 'set-cookie':
+    if action['type'] == 'set-cookie': # pylint: disable=-else-return
         scope = 'session'
 
         if 'scope' in action:

@@ -75,7 +75,7 @@ class Game(models.Model):
         return None
 
 class GameVersion(models.Model):
-    game = models.ForeignKey(Game, related_name='versions')
+    game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)
     created = models.DateTimeField()
 
     definition = models.TextField(max_length=(1024 * 1024 * 1024))
@@ -199,8 +199,8 @@ class Player(models.Model):
         return self.identifier.split(':')[-1]
 
 class Session(models.Model):
-    player = models.ForeignKey(Player, related_name='sessions')
-    game_version = models.ForeignKey(GameVersion, related_name='sessions')
+    player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)
+    game_version = models.ForeignKey(GameVersion, related_name='sessions', on_delete=models.CASCADE)
 
     started = models.DateTimeField()
     completed = models.DateTimeField(null=True, blank=True)

@@ -15,7 +15,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_str, smart_text
 
 from integrations.models import Integration
 
@@ -49,7 +49,7 @@ class OutgoingMessage(models.Model):
     errored = models.BooleanField(default=False)
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
-    integration = models.ForeignKey(Integration, related_name='twilio_outgoing')
+    integration = models.ForeignKey(Integration, related_name='twilio_outgoing', null=True, blank=True, on_delete=models.SET_NULL)
 
     def transmit(self):
         if self.transmission_metadata is None:
@@ -89,10 +89,10 @@ class IncomingMessage(models.Model):
 
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
-    integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True)
+    integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True,  on_delete=models.SET_NULL)
 
 class IncomingMessageMedia(models.Model):
-    message = models.ForeignKey(IncomingMessage, related_name='media')
+    message = models.ForeignKey(IncomingMessage, related_name='media', on_delete=models.CASCADE)
 
     index = models.IntegerField(default=0)
 
@@ -114,7 +114,7 @@ class OutgoingCall(models.Model):
     errored = models.BooleanField(default=False)
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
-    integration = models.ForeignKey(Integration, related_name='twilio_outgoing_calls')
+    integration = models.ForeignKey(Integration, related_name='twilio_outgoing_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
     next_action = models.CharField(max_length=64, choices=OUTGOING_CALL_NEXT_ACTIONS, default='continue')
 
@@ -163,7 +163,7 @@ class IncomingCallResponse(models.Model):
 
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
-    integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True)
+    integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
 def process_incoming(integration, payload):
     if ('Body' in payload) is False:
@@ -184,7 +184,7 @@ def process_incoming(integration, payload):
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
 
     if payload['Body'] or incoming_message.media.count() > 0:
-        payload_body = smart_unicode(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
+        payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
 
         print('BODY:')
         print(smart_str(payload_body))
