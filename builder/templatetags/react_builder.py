@@ -1,6 +1,8 @@
 import json
 import os
 
+from future.utils import raise_from
+
 from django import template
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -17,7 +19,7 @@ def react_asset(parser, token): # pylint: disable=unused-argument
     try:
         tag_name, filename = token.split_contents() # pylint: disable=unused-variable
     except ValueError as value_exc:
-        raise template.TemplateSyntaxError("%r tag requires a single argument" % token.contents.split()[0]) from value_exc
+        raise_from(template.TemplateSyntaxError("%r tag requires a single argument" % token.contents.split()[0]), value_exc)
 
     return ReactAssetNode(filename)
 

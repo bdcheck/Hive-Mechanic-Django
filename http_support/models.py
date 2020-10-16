@@ -20,7 +20,7 @@ class ApiClient(models.Model):
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     
-    integration = models.ForeignKey(Integration, related_name='api_clients')
+    integration = models.ForeignKey(Integration, related_name='api_clients', on_delete=models.CASCADE)
 
 def process_incoming(integration, payload): # pylint: disable=too-many-branches
     issues = []

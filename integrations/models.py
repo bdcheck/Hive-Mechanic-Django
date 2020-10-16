@@ -120,7 +120,7 @@ class Integration(models.Model):
                     print('TODO: Process ' + str(action))
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
-    if action['type'] == 'set-cookie': # pylint: disable=-else-return
+    if action['type'] == 'set-cookie': # pylint: disable=no-else-return
         scope = 'session'
 
         if 'scope' in action:

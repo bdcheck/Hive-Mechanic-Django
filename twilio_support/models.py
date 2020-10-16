@@ -198,7 +198,7 @@ def process_incoming(integration, payload):
 def execute_action(integration, session, action):
     player = session.player
 
-    if action['type'] == 'echo':
+    if action['type'] == 'echo': # pylint: disable=no-else-return
         outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
         outgoing.send_date = timezone.now()
         outgoing.message = action['message']
