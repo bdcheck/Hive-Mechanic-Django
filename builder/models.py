@@ -1,11 +1,11 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 
+from builtins import str # pylint: disable=redefined-builtin
+
+import json
 
 from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-import json
 
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog
+
+standard_library.install_aliases()
 
 class InteractionCard(models.Model):
     name = models.CharField(max_length=4096, unique=True)

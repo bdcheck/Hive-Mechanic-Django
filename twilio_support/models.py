@@ -1,7 +1,10 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-from builtins import str
+from __future__ import print_function
+
+from builtins import str # pylint: disable=redefined-builtin
+
 import time
 import traceback
 
@@ -182,10 +185,10 @@ def process_incoming(integration, payload):
 
     if payload['Body'] or incoming_message.media.count() > 0:
         payload_body = smart_unicode(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
-        
+
         print('BODY:')
         print(smart_str(payload_body))
-    
+
         integration.process_player_incoming('twilio_player', payload['From'], payload_body, {'last_message': incoming_message})
 
         return []

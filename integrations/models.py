@@ -1,10 +1,10 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 
+from builtins import str # pylint: disable=redefined-builtin
 
-from builtins import str
-from past.builtins import str
 import json
 import re
 
@@ -81,14 +81,14 @@ class Integration(models.Model):
 
                 if extras is not None and 'last_message' in extras:
                     del extras['last_message']
-                    
+
                 session.process_incoming(self, None, extras)
-                    
+
             if isinstance(payload, list):
                 actions = payload
-                
+
                 payload = None
-                
+
                 self.execute_actions(session, actions)
 
             session.process_incoming(self, payload, extras)
@@ -97,7 +97,7 @@ class Integration(models.Model):
         if actions is not None:
             for action in actions:
                 print('ACTION: ' + str(action))
-            
+
                 processed = False
 
                 if self.type == 'twilio':
