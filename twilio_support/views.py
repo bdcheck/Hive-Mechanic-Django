@@ -1,5 +1,8 @@
+
 # pylint: disable=no-member, line-too-long
 
+from builtins import str
+from builtins import range
 import mimetypes
 
 from io import BytesIO
@@ -25,6 +28,8 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         now = timezone.now()
+        
+        print('HEADERS: ' + str(request.META))
 
         destination = request.POST['To']
         source = request.POST['From']

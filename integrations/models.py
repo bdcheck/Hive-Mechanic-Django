@@ -1,7 +1,10 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
+
+
+from builtins import str
+from past.builtins import str
 import json
 import re
 
@@ -49,7 +52,7 @@ class Integration(models.Model):
         if pattern == '':
             return False
 
-        if isinstance(pattern, basestring) and isinstance(value, basestring):
+        if isinstance(pattern, str) and isinstance(value, str):
             if re.match(pattern, value) is not None:
                 return True
 
@@ -78,26 +81,43 @@ class Integration(models.Model):
 
                 if extras is not None and 'last_message' in extras:
                     del extras['last_message']
-
-                session.process_incoming(self, payload, extras)
+                    
+                session.process_incoming(self, None, extras)
+                    
+            if isinstance(payload, list):
+                actions = payload
+                
+                payload = None
+                
+                self.execute_actions(session, actions)
 
             session.process_incoming(self, payload, extras)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
         if actions is not None:
             for action in actions:
+                print('ACTION: ' + str(action))
+            
                 processed = False
 
                 if self.type == 'twilio':
                     from twilio_support.models import execute_action as twilio_execute
 
                     processed = twilio_execute(self, session, action)
+                elif self.type == 'http':
+                    from http_support.models import execute_action as http_execute
+
+                    processed = http_execute(self, session, action)
+
+                print('P 1  ' + str(processed))
 
                 if processed is False:
                     processed = execute_action(self, session, action)
 
+                print('P 2  ' + str(processed))
+
                 if processed is False:
-                    print 'TODO: Process ' + str(action)
+                    print('TODO: Process ' + str(action))
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
     if action['type'] == 'set-cookie':

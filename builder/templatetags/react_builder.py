@@ -58,7 +58,7 @@ class ReactHeaderTagsNode(template.Node):
         with open(manifest_path) as manifest_file:
             manifest = json.load(manifest_file)
 
-            for key, path in manifest.iteritems():
+            for key, path in list(manifest.items()):
                 if key.endswith('css'):
                     output += '<link href="' + base_static_path(path) + '" rel="stylesheet">\n'
 
@@ -83,7 +83,7 @@ class ReactFooterTagsNode(template.Node):
         with open(manifest_path) as manifest_file:
             manifest = json.load(manifest_file)
 
-            for key, path in manifest.iteritems():
+            for key, path in list(manifest.items()):
                 if key == 'main.js':
                     output += '<script src="' + base_static_path(path) + '"></script>\n'
                 elif key.startswith('static/js/') and key.endswith('.js'):

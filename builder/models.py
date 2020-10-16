@@ -1,7 +1,10 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import json
 
 from django.contrib.postgres.fields import JSONField
@@ -184,6 +187,12 @@ class Player(models.Model):
         self.player_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def fetch_cookie(self, cookie):
+        if cookie in self.player_state: # pylint: disable=unsupported-membership-test
+            return self.player_state[cookie] # pylint: disable=unsubscriptable-object
+
+        return None
+
     def __unicode__(self):
         return self.identifier.split(':')[-1]
 
@@ -236,7 +245,7 @@ class Session(models.Model):
 
         if dialog is None:
             dialog = Dialog(key=dialog_key, started=timezone.now())
-            dialog.dialog_snapshot = self.dialog_snapshot()
+            dialog.dialog_snapshot = self.game_version.dialog_snapshot()
             dialog.save()
 
         return dialog

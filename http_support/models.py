@@ -1,50 +1,86 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import json
 import re
 
+from django.core.management import call_command
+from django.db import models
+
 from builder.models import Player, Session
+from integrations.models import Integration
+
+
+class ApiClient(models.Model):
+    name = models.CharField(max_length=4096, unique=True)
+    
+    shared_secret = models.CharField(max_length=4096, unique=True)
+    
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    
+    integration = models.ForeignKey(Integration, related_name='api_clients')
 
 def process_incoming(integration, payload): # pylint: disable=too-many-branches
     issues = []
 
-    commands = None
-    players = None
-
-    if 'commands' in payload:
-        commands = json.loads(payload['commands'])
-    else:
-        issues.append('Missing "commands" parameter in request.')
-
-    if 'players' in payload:
-        players = json.loads(payload['players'])
-    else:
-        issues.append('Missing "players" parameter in request.')
-
-    if commands is not None and players is not None:
-        player_pks = []
-
-        for player in players:
-            for existing_player in Player.objects.all():
-                to_add = False
-
-                if existing_player.identifier == player:
-                    to_add = True
-                elif re.match(player, existing_player.identifier) is not None:
-                    to_add = True
-
-                if to_add and (existing_player.pk in player_pks) is False:
-                    player_pks.append(existing_player.pk)
-
-        for player_pk in player_pks:
-            player = Player.objects.get(pk=player_pk)
-
-            for game_version in integration.game.versions.order_by('-created'):
-                session = Session.objects.filter(player=player, game_version=game_version, completed=None).first()
-
-                if session is not None:
-                    integration.execute_actions(session, commands)
+    if 'commands' in payload and 'player' in payload:
+        tokens = payload['player'].split(':')
+        
+        if len(tokens) < 2:
+            tokens = ['http_player', tokens[0]]
+            
+        integration.process_player_incoming(tokens[0], tokens[1], payload['commands'])
+        
+        call_command('nudge_active_sessions')
 
     return issues
+
+
+def execute_action(integration, session, action):
+    player = session.player
+
+    '''
+    if action['type'] == 'echo':
+        outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
+        outgoing.send_date = timezone.now()
+        outgoing.message = action['message']
+        outgoing.integration = integration
+
+        outgoing.save()
+
+        outgoing.transmit()
+
+        return True
+    elif action['type'] == 'echo-image':
+        outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
+        outgoing.send_date = timezone.now()
+        outgoing.message = 'image:' + action['image-url']
+        outgoing.integration = integration
+
+        outgoing.save()
+
+        outgoing.transmit()
+
+        return True
+    elif action['type'] == 'echo-voice':
+        unsent = OutgoingCall.objects.filter(destination=player.player_state['twilio_player'], sent_date=None)
+
+        outgoing = OutgoingCall(destination=player.player_state['twilio_player'])
+        outgoing.start_call = unsent.count() == 0
+        outgoing.send_date = timezone.now()
+        outgoing.message = action['message']
+        outgoing.next_action = action['next_action']
+
+        outgoing.integration = integration
+
+        outgoing.save()
+
+        if outgoing.next_action != 'hangup' and outgoing.start_call is True:
+            outgoing.transmit()
+
+        return True
+    '''
+
+    return False

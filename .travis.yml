@@ -1,17 +1,9 @@
-#   A basic travis.yml boilerplate for Django projects
-#
-#   The set-up assumes a postgreSQL database.
-#
-#   Replace the following variables in the code:
-# * your_project_settings
-# * your_github_username
-# * your_repo
-
+dist: bionic
 language: python
-dist: trusty
 
 python:
   - 2.7
+  - 3.5
 
 services:
   - postgresql
@@ -20,7 +12,7 @@ addons:
   postgresql: 9.5
   apt:
     packages:
-      - postgresql-9.5-postgis-2.3
+      - postgresql-9.5-postgis-2.4
 
 before_install:
   - export DJANGO_SETTINGS_MODULE=hivemechanic.settings

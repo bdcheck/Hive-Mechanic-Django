@@ -1,17 +1,52 @@
+
 # pylint: disable=no-member, line-too-long
 
+from builtins import str
 import json
 import re
 
 from django.conf import settings
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.urls import reverse
 
 from builder.models import Game
 from integrations.models import Integration
 
+from .models import ApiClient
+
+def valid_client(handle):
+    def wrapper(request, *args, **options):
+        token = request.GET.get('token', request.POST.get('token', None))
+
+        print('TOKEN: ' + str(token))
+
+        if token is None:
+            return HttpResponseForbidden('No API token provided.')
+
+        client = ApiClient.objects.filter(shared_secret=token).first()
+
+        if client is None:
+            return HttpResponseForbidden('Invalid API token provided.')
+
+        now = timezone.now()
+
+        if client.start_date is not None and now < client.start_date:
+            return HttpResponseForbidden('Inactive API token provided.')
+
+        if client.end_date is not None and now > client.end_date:
+            return HttpResponseForbidden('Expired API token provided.')
+
+        options['integration'] = client.integration
+
+        return handle(request, *args, **options)
+
+    return wrapper
+
+
 @csrf_exempt
+@valid_client
 def incoming_http(request, slug):
     issues = None
 
@@ -31,9 +66,9 @@ def incoming_http(request, slug):
 
         for key in request.GET:
             integration_match.game.game_state[key] = request.GET.get(key)
-        
+
             updated = True
-        
+
         if updated:
             integration_match.game.save()
 
@@ -63,7 +98,7 @@ def incoming_http(request, slug):
                 session_def['player']['api_url'] = settings.SITE_URL + reverse('incoming_http_player', args=[slug, session.player.identifier])
 
                 payload['sessions'].append(session_def)
-                
+
         response['game'] = payload
 
     elif request.method == 'POST':
@@ -106,12 +141,12 @@ def incoming_http_player(request, slug, player):
 
                         for key in request.GET:
                             session.player.player_state[key] = request.GET.get(key)
-                            
+
                             updated = True
-                            
+
                         if updated:
                             session.player.save()
-                            
+
                         seen_players[session.player.identifier] = {}
                         seen_players[session.player.identifier]['identifier'] = session.player.identifier
                         seen_players[session.player.identifier]['variables'] = session.player.player_state
@@ -133,11 +168,11 @@ def incoming_http_player(request, slug, player):
                     if session.completed is not None:
                         session_def['completed'] = session.completed.isoformat()
                         session_def['active'] = False
-                        
+
                     seen_players[session.player.identifier]['sessions'].append(session_def)
-                    
+
         response['players'] = players
-        
+
         response['game'] = {}
         response['game']['variables'] = integration_match.game.game_state
 
@@ -153,5 +188,78 @@ def incoming_http_player(request, slug, player):
         response['issues'] = issues
 
         status_code = 500
+
+    return HttpResponse(json.dumps(response, indent=2), content_type='application/json', status=status_code)
+
+
+@csrf_exempt
+@valid_client
+def incoming_http_commands(request, *args, **options):
+    commands_str = request.POST.get('commands', request.GET.get('commands', '[]'))
+
+    commands = None
+
+    try:
+        commands = json.loads(commands_str)
+    except ValueError:
+        return HttpResponseBadRequest('Invalid JSON provided for "commands" parameter: "' + str(commands_str) + '".')
+
+    if commands is None:
+        return HttpResponseBadRequest('No JSON provided for "commands" parameter.')
+
+    player = request.POST.get('player', request.GET.get('player', None))
+
+    issues = options['integration'].process_incoming({
+        'player': player,
+        'commands': commands,
+    })
+
+    response = {
+        'success': True,
+    }
+
+    status_code = 200
+
+    if issues:
+        response['success'] = False
+        response['issues'] = issues
+
+        status_code = 400
+
+    return HttpResponse(json.dumps(response, indent=2), content_type='application/json', status=status_code)
+
+@csrf_exempt
+@valid_client
+def incoming_http_fetch(request, *args, **options):
+    name = request.POST.get('name', request.GET.get('name', None))
+    scope = request.POST.get('scope', request.GET.get('scope', None))
+    player = request.POST.get('player', request.GET.get('player', None))
+    
+    issues = []
+
+    response = {
+        'success': True,
+    }
+    
+    if scope == 'player':
+        match = Player.objects.filter(identifier=player).first()
+        
+        if player is not None:
+            response['value'] = match.fetch_cookie(name)
+        else:
+            response['value'] = None
+            issue.append('Player not found.')
+    elif scope == 'session':
+        response['value'] = 'todo: implement scope lookup'
+    else:
+        response['value'] = options['integration'].game.fetch_cookie(name)
+
+    status_code = 200
+
+    if issues:
+        response['success'] = False
+        response['issues'] = issues
+
+        status_code = 400
 
     return HttpResponse(json.dumps(response, indent=2), content_type='application/json', status=status_code)

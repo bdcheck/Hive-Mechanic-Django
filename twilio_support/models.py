@@ -1,7 +1,9 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
+
+
+from builtins import str
 import time
 import traceback
 
@@ -12,6 +14,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import smart_str, smart_unicode
 
 from integrations.models import Integration
 
@@ -180,7 +183,12 @@ def process_incoming(integration, payload):
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
 
     if payload['Body'] or incoming_message.media.count() > 0:
-        integration.process_player_incoming('twilio_player', payload['From'], payload['Body'].strip(), {'last_message': incoming_message})
+        payload_body = smart_unicode(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
+        
+        print('BODY:')
+        print(smart_str(payload_body))
+    
+        integration.process_player_incoming('twilio_player', payload['From'], payload_body, {'last_message': incoming_message})
         
         return []
         

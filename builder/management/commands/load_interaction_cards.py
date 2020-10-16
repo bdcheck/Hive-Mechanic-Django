@@ -1,3 +1,4 @@
+
 # pylint: disable=no-member, line-too-long
 
 import json
@@ -25,18 +26,18 @@ class Command(BaseCommand):
 
                 manifest = json.loads(manifest_json)
 
-                for key, value in manifest.iteritems():
+                for key, value in list(manifest.items()):
                     identifier = key
 
                     card = InteractionCard.objects.filter(identifier=identifier).first()
 
                     if (card is None) or ('update_existing' in cmd_options and cmd_options['update_existing']):
                         if card is None:
-                            print 'Creating card for "' + identifier + '"...'
+                            print('Creating card for "' + identifier + '"...')
 
                             card = InteractionCard(identifier=identifier)
                         else:
-                            print 'Updating card for "' + identifier + '"...'
+                            print('Updating card for "' + identifier + '"...')
 
                         card.name = value['name']
 
@@ -48,4 +49,4 @@ class Command(BaseCommand):
                         card.client_implementation.save(identifier + '.js', ContentFile(import_files.read(identifier + '.js')))
                         card.save()
                     else:
-                        print 'Skipping update for "' + identifier + '"...'
+                        print('Skipping update for "' + identifier + '"...')

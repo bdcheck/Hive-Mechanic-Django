@@ -7,3 +7,6 @@
 [submodule "quicksilver"]
 	path = quicksilver
 	url = https://github.com/audaciouscode/Quicksilver-Django.git
+[submodule "http_support/client"]
+	path = http_support/client
+	url = https://github.com/audacious-software/Hive-Mechanic-Client-Python.git
