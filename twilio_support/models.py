@@ -89,7 +89,7 @@ class IncomingMessage(models.Model):
 
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
-    integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True,  on_delete=models.SET_NULL)
+    integration = models.ForeignKey(Integration, related_name='twilio_incoming', null=True, blank=True, on_delete=models.SET_NULL)
 
 class IncomingMessageMedia(models.Model):
     message = models.ForeignKey(IncomingMessage, related_name='media', on_delete=models.CASCADE)
