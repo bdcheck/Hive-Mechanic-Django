@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-
-
 from builtins import str
 import time
 import traceback
@@ -189,9 +187,9 @@ def process_incoming(integration, payload):
         print(smart_str(payload_body))
     
         integration.process_player_incoming('twilio_player', payload['From'], payload_body, {'last_message': incoming_message})
-        
+
         return []
-        
+
     return ['No content provided.']
 
 def execute_action(integration, session, action):

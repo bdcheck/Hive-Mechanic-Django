@@ -360,6 +360,9 @@
             cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
             update: function(definition, success, failure) {
+            	console.log("UPDATE");
+            	console.log(definition);
+            	
                 var payload = {
                     'definition': JSON.stringify(definition, 2)
                 };
