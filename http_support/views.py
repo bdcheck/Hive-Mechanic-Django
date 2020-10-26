@@ -243,14 +243,14 @@ def incoming_http_fetch(request, *args, **options): # pylint: disable=unused-arg
         match = Player.objects.filter(identifier=player).first()
 
         if player is not None:
-            response['value'] = match.fetch_cookie(name)
+            response['value'] = match.fetch_variable(name)
         else:
             response['value'] = None
             issues.append('Player not found.')
     elif scope == 'session':
         response['value'] = 'todo: implement scope lookup'
     else:
-        response['value'] = options['integration'].game.fetch_cookie(name)
+        response['value'] = options['integration'].game.fetch_variable(name)
 
     status_code = 200
 

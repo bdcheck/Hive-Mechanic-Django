@@ -1,13 +1,12 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 from builtins import str # pylint: disable=redefined-builtin
 
 import json
 import re
 
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
@@ -111,21 +110,21 @@ class Integration(models.Model):
                     processed = execute_action(self, session, action)
 
                 if processed is False:
-                    print('TODO: Process ' + str(action))
+                	settings.FETCH_LOGGER().warn('TODO: Process %', action)
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
-    if action['type'] == 'set-cookie': # pylint: disable=no-else-return
+    if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
         if 'scope' in action:
             scope = action['scope']
 
             if scope == 'session':
-                session.set_cookie(action['cookie'], action['value'])
+                session.set_variable(action['variable'], action['value'])
             elif scope == 'player':
-                session.player.set_cookie(action['cookie'], action['value'])
+                session.player.set_variable(action['variable'], action['value'])
             elif scope == 'game':
-                session.game_version.game.set_cookie(action['cookie'], action['value'])
+                session.game_version.game.set_variable(action['variable'], action['value'])
 
         return True
     elif action['type'] == 'continue':

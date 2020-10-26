@@ -89,8 +89,8 @@ class Game(models.Model):
 
         return session
 
-    def set_cookie(self, cookie, value):
-        self.game_state[cookie] = value # pylint: disable=unsupported-assignment-operation
+    def set_variable(self, variable, value):
+        self.game_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
     def fetch_variable(self, variable):
@@ -210,8 +210,8 @@ class Player(models.Model):
 
     player_state = JSONField(default=dict)
 
-    def set_cookie(self, cookie, value):
-        self.player_state[cookie] = value # pylint: disable=unsupported-assignment-operation
+    def set_variable(self, variable, value):
+        self.player_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
     def fetch_variable(self, variable):
@@ -249,8 +249,8 @@ class Session(models.Model):
     def nudge(self):
         self.process_incoming(None, None)
 
-    def set_cookie(self, cookie, value):
-        self.session_state[cookie] = value # pylint: disable=unsupported-assignment-operation
+    def set_variable(self, variable, value):
+        self.session_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
     def fetch_variable(self, variable):

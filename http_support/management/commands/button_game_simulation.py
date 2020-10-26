@@ -15,25 +15,20 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options): # pylint: disable=unused-argument
-        logger = logging.getLogger('db')
-
-        handler = logging.StreamHandler(sys.stdout)
-
         verbosity = int(options['verbosity'])
+        
+        level = logging.DEBUG
 
         if verbosity == 3:
-            handler.setLevel(logging.DEBUG)
+	        level = logging.DEBUG
         elif verbosity == 2:
-            handler.setLevel(logging.INFO)
+	        level = logging.INFO
         elif verbosity == 1:
-            handler.setLevel(logging.WARN)
+	        level = logging.WARN
         else:
-            handler.setLevel(logging.ERROR)
+	        level = logging.ERROR
 
-        formatter = logging.Formatter('[%(levelname)s] %(asctime)s: %(message)s')
-        handler.setFormatter(formatter)
-
-        logger.addHandler(handler)
+        logger = settings.FETCH_LOGGER(level)
 
         client = HiveClient(api_url=settings.HIVE_API_URL, token=settings.HIVE_CLIENT_TOKEN, logger=logger)
 

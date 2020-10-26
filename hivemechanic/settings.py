@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
+import logging
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -144,4 +146,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+def FETCH_LOGGER(level=logging.DEBUG):
+    logger = logging.getLogger('db')
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(level)
+
+    formatter = logging.Formatter('[%(levelname)s] %(asctime)s: %(message)s')
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    
+    return logger
+
 from .local_settings import *
+

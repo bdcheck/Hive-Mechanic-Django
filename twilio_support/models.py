@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 from builtins import str # pylint: disable=redefined-builtin
 
 import time
@@ -166,6 +164,8 @@ class IncomingCallResponse(models.Model):
     integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
 def process_incoming(integration, payload):
+    print('TWILIO PROCESS: ' + str(payload))
+
     if ('Body' in payload) is False:
         if 'Digits' in payload:
             payload['Body'] = payload['Digits']
