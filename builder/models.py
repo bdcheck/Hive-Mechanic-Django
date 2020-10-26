@@ -42,9 +42,7 @@ class InteractionCard(models.Model):
         prefix = card_issues.__name__ + "."
 
         for importer, modname, ispkg in pkgutil.iter_modules(card_issues.__path__, prefix): # pylint: disable=unused-variable
-            print "Found submodule %s (is a package: %s)" % (modname, ispkg)
             module = __import__(modname, fromlist="dummy")
-            print "Imported", module
 
             if self.entry_actions is not None:
                 for issue in module.evaluate(self.entry_actions):
