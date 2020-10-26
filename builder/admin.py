@@ -15,7 +15,7 @@ class GameVersionAdmin(admin.OSMGeoAdmin):
 
 @admin.register(InteractionCard)
 class InteractionCardAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'identifier', 'enabled',)
+    list_display = ('name', 'identifier', 'enabled', 'issues',)
 
     fieldsets = (
         (None, {

@@ -1,7 +1,6 @@
-
 # pylint: disable=no-member, line-too-long
 
-from builtins import str
+from builtins import str # pylint: disable=redefined-builtin
 import json
 import re
 
@@ -11,16 +10,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.urls import reverse
 
-from builder.models import Game
 from integrations.models import Integration
+
+from builder.models import Player
 
 from .models import ApiClient
 
 def valid_client(handle):
     def wrapper(request, *args, **options):
         token = request.GET.get('token', request.POST.get('token', None))
-
-        print('TOKEN: ' + str(token))
 
         if token is None:
             return HttpResponseForbidden('No API token provided.')
@@ -129,7 +127,7 @@ def incoming_http_player(request, slug, player):
     if integration_match is None:
         raise Http404("Activity not found.")
 
-    if request.method == 'GET':
+    if request.method == 'GET': # pylint: disable=too-many-nested-blocks
         players = []
         seen_players = {}
 
@@ -194,7 +192,7 @@ def incoming_http_player(request, slug, player):
 
 @csrf_exempt
 @valid_client
-def incoming_http_commands(request, *args, **options):
+def incoming_http_commands(request, *args, **options): # pylint: disable=unused-argument
     commands_str = request.POST.get('commands', request.GET.get('commands', '[]'))
 
     commands = None
@@ -230,25 +228,25 @@ def incoming_http_commands(request, *args, **options):
 
 @csrf_exempt
 @valid_client
-def incoming_http_fetch(request, *args, **options):
+def incoming_http_fetch(request, *args, **options): # pylint: disable=unused-argument
     name = request.POST.get('name', request.GET.get('name', None))
     scope = request.POST.get('scope', request.GET.get('scope', None))
     player = request.POST.get('player', request.GET.get('player', None))
-    
+
     issues = []
 
     response = {
         'success': True,
     }
-    
+
     if scope == 'player':
         match = Player.objects.filter(identifier=player).first()
-        
+
         if player is not None:
             response['value'] = match.fetch_cookie(name)
         else:
             response['value'] = None
-            issue.append('Player not found.')
+            issues.append('Player not found.')
     elif scope == 'session':
         response['value'] = 'todo: implement scope lookup'
     else:

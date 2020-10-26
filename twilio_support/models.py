@@ -15,7 +15,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import smart_str, smart_text
+from django.utils.encoding import smart_text
 
 from integrations.models import Integration
 
@@ -185,9 +185,6 @@ def process_incoming(integration, payload):
 
     if payload['Body'] or incoming_message.media.count() > 0:
         payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
-
-        print('BODY:')
-        print(smart_str(payload_body))
 
         integration.process_player_incoming('twilio_player', payload['From'], payload_body, {'last_message': incoming_message})
 

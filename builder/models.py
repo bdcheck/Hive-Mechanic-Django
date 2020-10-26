@@ -4,6 +4,7 @@
 from builtins import str # pylint: disable=redefined-builtin
 
 import json
+import pkgutil
 
 from future import standard_library
 
@@ -14,6 +15,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog
+
+from . import card_issues
 
 standard_library.install_aliases()
 
@@ -32,6 +35,30 @@ class InteractionCard(models.Model):
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
+
+    def issues(self):
+        identified_issues = []
+
+        prefix = card_issues.__name__ + "."
+
+        for importer, modname, ispkg in pkgutil.iter_modules(card_issues.__path__, prefix): # pylint: disable=unused-variable
+            print "Found submodule %s (is a package: %s)" % (modname, ispkg)
+            module = __import__(modname, fromlist="dummy")
+            print "Imported", module
+
+            if self.entry_actions is not None:
+                for issue in module.evaluate(self.entry_actions):
+                    identified_issues.append('Entry Actions: ' + issue)
+
+            if self.evaluate_function is not None:
+                for issue in module.evaluate(self.evaluate_function):
+                    identified_issues.append('Evaluate Function: ' + issue)
+
+        if identified_issues:
+            return '<br />'.join(identified_issues)
+
+        return None
+
 
 class Game(models.Model):
     name = models.CharField(max_length=1024, db_index=True)
@@ -68,9 +95,9 @@ class Game(models.Model):
         self.game_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
-    def fetch_cookie(self, cookie):
-        if cookie in self.game_state: # pylint: disable=unsupported-membership-test
-            return self.game_state[cookie] # pylint: disable=unsubscriptable-object
+    def fetch_variable(self, variable):
+        if variable in self.game_state: # pylint: disable=unsupported-membership-test
+            return self.game_state[variable] # pylint: disable=unsubscriptable-object
 
         return None
 
@@ -189,9 +216,9 @@ class Player(models.Model):
         self.player_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
-    def fetch_cookie(self, cookie):
-        if cookie in self.player_state: # pylint: disable=unsupported-membership-test
-            return self.player_state[cookie] # pylint: disable=unsubscriptable-object
+    def fetch_variable(self, variable):
+        if variable in self.player_state: # pylint: disable=unsupported-membership-test
+            return self.player_state[variable] # pylint: disable=unsubscriptable-object
 
         return None
 
@@ -228,15 +255,15 @@ class Session(models.Model):
         self.session_state[cookie] = value # pylint: disable=unsupported-assignment-operation
         self.save()
 
-    def fetch_cookie(self, cookie):
-        if cookie in self.session_state: # pylint: disable=unsupported-membership-test
-            return self.session_state[cookie]  # pylint: disable=unsubscriptable-object
+    def fetch_variable(self, variable):
+        if variable in self.session_state: # pylint: disable=unsupported-membership-test
+            return self.session_state[variable]  # pylint: disable=unsubscriptable-object
 
-        if cookie in self.player.player_state:
-            return self.player.player_state[cookie]
+        if variable in self.player.player_state:
+            return self.player.player_state[variable]
 
-        if cookie in self.game_version.game.game_state:
-            return self.game_version.game.game_state[cookie]
+        if variable in self.game_version.game.game_state:
+            return self.game_version.game.game_state[variable]
 
         return None
 

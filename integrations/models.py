@@ -96,8 +96,6 @@ class Integration(models.Model):
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
         if actions is not None:
             for action in actions:
-                print('ACTION: ' + str(action))
-
                 processed = False
 
                 if self.type == 'twilio':
@@ -109,12 +107,8 @@ class Integration(models.Model):
 
                     processed = http_execute(self, session, action)
 
-                print('P 1  ' + str(processed))
-
                 if processed is False:
                     processed = execute_action(self, session, action)
-
-                print('P 2  ' + str(processed))
 
                 if processed is False:
                     print('TODO: Process ' + str(action))
@@ -141,6 +135,9 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             session.advance_to(action['destination'])
 
             return True
+    elif action['type'] == 'trigger-interrupt':
+        if 'interrupt' in action:
+            return session.game_version.interrupt(action['interrupt'], session)
     elif action['type'] == 'end-activity':
         session.completed = timezone.now()
         session.save()
