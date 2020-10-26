@@ -110,7 +110,7 @@ class Integration(models.Model):
                     processed = execute_action(self, session, action)
 
                 if processed is False:
-                	settings.FETCH_LOGGER().warn('TODO: Process %', action)
+                    settings.FETCH_LOGGER().warn('TODO: Process %', action)
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
     if action['type'] == 'set-variable': # pylint: disable=no-else-return

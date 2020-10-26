@@ -164,8 +164,6 @@ class IncomingCallResponse(models.Model):
     integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
 def process_incoming(integration, payload):
-    print('TWILIO PROCESS: ' + str(payload))
-
     if ('Body' in payload) is False:
         if 'Digits' in payload:
             payload['Body'] = payload['Digits']
