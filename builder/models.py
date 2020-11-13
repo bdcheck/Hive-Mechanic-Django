@@ -25,16 +25,16 @@ from . import card_issues
 standard_library.install_aliases()
 
 class RemoteRepository(models.Model):
-    class Meta:
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
         verbose_name_plural = "Remote Repositories"
-        
+
     name = models.CharField(max_length=4096, unique=True)
     url = models.URLField(max_length=4096, unique=True)
-    
+
     priority = models.IntegerField(default=0)
 
     repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
-    
+
     last_updated = models.DateTimeField(null=True, blank=True)
 
 
@@ -83,29 +83,29 @@ class InteractionCard(models.Model):
     def available_update(self):
         try:
             card_metadata = json.loads(self.repository_definition)
-        
+
             versions = sorted(card_metadata['versions'], key=lambda version: version['version'])
-        
+
             if self.version >= versions[-1]['version']:
                 return None
 
             return versions[-1]['version']
         except TypeError:
             pass
-            
+
         return None
-        
+
     def update_card(self):
         messages = []
 
         if self.available_update() is not None:
             try:
                 card_metadata = json.loads(self.repository_definition)
-        
+
                 versions = sorted(card_metadata['versions'], key=lambda version: version['version'])
-                
+
                 latest_version = versions[-1]
-                
+
                 entry_content = requests.get(latest_version['entry-actions']).content
                 evaluate_content = requests.get(latest_version['evaluate-function']).content
                 client_content = requests.get(latest_version['client-implementation']).content
@@ -117,15 +117,15 @@ class InteractionCard(models.Model):
                 computed_hash.update(client_content)
 
                 local_hash = computed_hash.hexdigest()
-                
+
                 if local_hash == latest_version['sha512-hash']:
                     self.entry_actions = entry_content
                     self.evaluate_function = evaluate_content
-                    
+
                     self.version = latest_version['version']
-                    
+
                     self.save()
-                    
+
                     self.client_implementation.save(self.identifier + '.js', ContentFile(client_content))
 
                     messages.append('[Success] ' + self.identifier + ': Updated to latest version.')
@@ -133,7 +133,7 @@ class InteractionCard(models.Model):
                     messages.append('[Error] ' + self.identifier + ': Unable to update to latest version. Remote hash does not match file contents.')
             except TypeError:
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
-        
+
         return messages
 
 class Game(models.Model):

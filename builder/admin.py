@@ -33,21 +33,21 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
     )
 
     actions = ['update_interaction_card']
-    
+
     def update_interaction_card(self, request, queryset):
         add_messages = []
-    
+
         for card in queryset:
             add_messages.extend(card.update_card())
-        
+
         for message in add_messages:
             if '[Success]' in message:
                 self.message_user(request, message, messages.SUCCESS)
             else:
                 self.message_user(request, message, messages.ERROR)
-        
+
     update_interaction_card.short_description = "Install updated versions"
-    
+
 @admin.register(Player)
 class PlayerAdmin(admin.OSMGeoAdmin):
     list_display = ('identifier',)

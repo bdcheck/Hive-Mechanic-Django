@@ -1,6 +1,7 @@
 # pylint: disable=no-member, line-too-long
 
-import hashlib
+from __future__ import print_function
+
 import json
 
 import requests
@@ -28,7 +29,7 @@ class Command(BaseCommand):
 
                 for key in repository_def.keys():
                     card_def = repository_def[key]
-                    
+
                     card_json = json.dumps(card_def, indent=2)
 
                     versions = sorted(card_def['versions'], key=lambda version: version['version'])

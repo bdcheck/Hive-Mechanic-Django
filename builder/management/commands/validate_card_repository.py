@@ -1,7 +1,8 @@
 # pylint: disable=no-member, line-too-long
 
+from __future__ import print_function
+
 import hashlib
-import json
 
 import arrow
 import requests
@@ -40,5 +41,5 @@ class Command(BaseCommand):
 
                 try:
                     arrow.get(version['created'])
-                except:
+                except: # pylint: disable=bare-except
                     print('[' + key + ' / ' + str(version['version']) + '] Unable to parse created date: ' + str(version['created']))
