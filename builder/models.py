@@ -76,7 +76,7 @@ class InteractionCard(models.Model):
                     identified_issues.append('Evaluate Function: ' + issue)
 
         if identified_issues:
-            return '<br />'.join(identified_issues)
+            return mark_safe('<br />'.join(identified_issues))
 
         return None
 
