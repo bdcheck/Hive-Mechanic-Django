@@ -112,14 +112,14 @@ class Integration(models.Model):
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process %', action)
 
-    def translate_value(self, value, session, scope='session'):
+    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use
         translated_value = value
 
         while '[ME]' in translated_value:
             translated_value = translated_value.replace('[ME]', session.player.identifier)
 
-        while '[SCOPE:' in translated_value:
-            start = translated_value.find('[SCOPE:')
+        while '[SESSION:' in translated_value:
+            start = translated_value.find('[SESSION:')
 
             end = translated_value.find(']', start)
 
