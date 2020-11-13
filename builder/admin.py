@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-
+from django.contrib import messages
 from django.contrib.gis import admin
 
-from .models import Game, GameVersion, InteractionCard, Player, Session
+from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
@@ -15,11 +15,11 @@ class GameVersionAdmin(admin.OSMGeoAdmin):
 
 @admin.register(InteractionCard)
 class InteractionCardAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'identifier', 'enabled', 'issues',)
+    list_display = ('name', 'identifier', 'enabled', 'version', 'issues', 'available_update',)
 
     fieldsets = (
         (None, {
-            'fields': ('name', 'identifier', 'enabled')
+            'fields': ('name', 'identifier', 'enabled', 'version',)
         }),
         ('Server Implementaion', {
             'fields': ('entry_actions', 'evaluate_function'),
@@ -27,8 +27,27 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
         ('Client Implementaion', {
             'fields': ('client_implementation',),
         }),
+        ('Miscellaneous', {
+            'fields': ('repository_definition',),
+        }),
     )
 
+    actions = ['update_interaction_card']
+    
+    def update_interaction_card(self, request, queryset):
+        add_messages = []
+    
+        for card in queryset:
+            add_messages.extend(card.update_card())
+        
+        for message in add_messages:
+            if '[Success]' in message:
+                self.message_user(request, message, messages.SUCCESS)
+            else:
+                self.message_user(request, message, messages.ERROR)
+        
+    update_interaction_card.short_description = "Install updated versions"
+    
 @admin.register(Player)
 class PlayerAdmin(admin.OSMGeoAdmin):
     list_display = ('identifier',)
@@ -36,3 +55,7 @@ class PlayerAdmin(admin.OSMGeoAdmin):
 @admin.register(Session)
 class SessionAdmin(admin.OSMGeoAdmin):
     list_display = ('player', 'game_version', 'started', 'completed')
+
+@admin.register(RemoteRepository)
+class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
+    list_display = ('name', 'url', 'priority', 'last_updated')

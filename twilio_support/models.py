@@ -196,7 +196,7 @@ def execute_action(integration, session, action):
     if action['type'] == 'echo': # pylint: disable=no-else-return
         outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
         outgoing.send_date = timezone.now()
-        outgoing.message = action['message']
+        outgoing.message = integration.translate_value(action['message'], session)
         outgoing.integration = integration
 
         outgoing.save()
@@ -207,7 +207,7 @@ def execute_action(integration, session, action):
     elif action['type'] == 'echo-image':
         outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
         outgoing.send_date = timezone.now()
-        outgoing.message = 'image:' + action['image-url']
+        outgoing.message = 'image:' + integration.translate_value(action['image-url'], session)
         outgoing.integration = integration
 
         outgoing.save()
@@ -221,7 +221,7 @@ def execute_action(integration, session, action):
         outgoing = OutgoingCall(destination=player.player_state['twilio_player'])
         outgoing.start_call = unsent.count() == 0
         outgoing.send_date = timezone.now()
-        outgoing.message = action['message']
+        outgoing.message = integration.translate_value(action['message'], session)
         outgoing.next_action = action['next_action']
 
         outgoing.integration = integration

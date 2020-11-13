@@ -112,6 +112,65 @@ class Integration(models.Model):
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process %', action)
 
+    def translate_value(self, value, session, scope='session'):
+        translated_value = value
+
+        while '[ME]' in translated_value:
+            translated_value = translated_value.replace('[ME]', session.player.identifier)
+
+        while '[SCOPE:' in translated_value:
+            start = translated_value.find('[SCOPE:')
+
+            end = translated_value.find(']', start)
+
+            if end != -1:
+                tag = translated_value[start:(end + 1)]
+
+                variable = tag[7:-1]
+
+                variable_value = session.fetch_variable(variable)
+
+                if variable_value is None:
+                    variable_value = '???'
+
+                translated_value = translated_value.replace(tag, variable_value)
+
+        while '[GAME:' in translated_value:
+            start = translated_value.find('[GAME:')
+
+            end = translated_value.find(']', start)
+
+            if end != -1:
+                tag = translated_value[start:(end + 1)]
+
+                variable = tag[6:-1]
+
+                variable_value = session.game_version.game.fetch_variable(variable)
+
+                if variable_value is None:
+                    variable_value = '???'
+
+                translated_value = translated_value.replace(tag, variable_value)
+
+        while '[PLAYER:' in translated_value:
+            start = translated_value.find('[PLAYER:')
+
+            end = translated_value.find(']', start)
+
+            if end != -1:
+                tag = translated_value[start:(end + 1)]
+
+                variable = tag[8:-1]
+
+                variable_value = session.player.fetch_variable(variable)
+
+                if variable_value is None:
+                    variable_value = '???'
+
+                translated_value = translated_value.replace(tag, variable_value)
+
+        return translated_value
+
 def execute_action(integration, session, action): # pylint: disable=unused-argument
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
@@ -119,12 +178,18 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         if 'scope' in action:
             scope = action['scope']
 
+            action['translated_value'] = integration.translate_value(action['value'], session, scope)
+
             if scope == 'session':
-                session.set_variable(action['variable'], action['value'])
+                session.set_variable(action['variable'], action['translated_value'])
             elif scope == 'player':
-                session.player.set_variable(action['variable'], action['value'])
+                session.player.set_variable(action['variable'], action['translated_value'])
             elif scope == 'game':
-                session.game_version.game.set_variable(action['variable'], action['value'])
+                session.game_version.game.set_variable(action['variable'], action['translated_value'])
+        else:
+            action['translated_value'] = integration.translate_variable(action['variable'], session)
+
+            session.set_variable(action['variable'], action['translated_value'])
 
         return True
     elif action['type'] == 'continue':

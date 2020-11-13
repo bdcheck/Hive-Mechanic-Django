@@ -3,12 +3,16 @@
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import hashlib
 import json
 import pkgutil
 
 from future import standard_library
 
+import requests
+
 from django.contrib.postgres.fields import JSONField
+from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -19,6 +23,20 @@ from django_dialog_engine.models import Dialog
 from . import card_issues
 
 standard_library.install_aliases()
+
+class RemoteRepository(models.Model):
+    class Meta:
+        verbose_name_plural = "Remote Repositories"
+        
+    name = models.CharField(max_length=4096, unique=True)
+    url = models.URLField(max_length=4096, unique=True)
+    
+    priority = models.IntegerField(default=0)
+
+    repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
+    
+    last_updated = models.DateTimeField(null=True, blank=True)
+
 
 class InteractionCard(models.Model):
     name = models.CharField(max_length=4096, unique=True)
@@ -32,6 +50,11 @@ class InteractionCard(models.Model):
     entry_actions = models.TextField(max_length=1048576, default='return []')
 
     client_implementation = models.FileField(upload_to='interaction_cards/', null=True, blank=True)
+
+    metadata = models.TextField(max_length=1048576, null=True, blank=True)
+    repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
+
+    version = models.FloatField(default=0.0)
 
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
@@ -57,6 +80,61 @@ class InteractionCard(models.Model):
 
         return None
 
+    def available_update(self):
+        try:
+            card_metadata = json.loads(self.repository_definition)
+        
+            versions = sorted(card_metadata['versions'], key=lambda version: version['version'])
+        
+            if self.version >= versions[-1]['version']:
+                return None
+
+            return versions[-1]['version']
+        except TypeError:
+            pass
+            
+        return None
+        
+    def update_card(self):
+        messages = []
+
+        if self.available_update() is not None:
+            try:
+                card_metadata = json.loads(self.repository_definition)
+        
+                versions = sorted(card_metadata['versions'], key=lambda version: version['version'])
+                
+                latest_version = versions[-1]
+                
+                entry_content = requests.get(latest_version['entry-actions']).content
+                evaluate_content = requests.get(latest_version['evaluate-function']).content
+                client_content = requests.get(latest_version['client-implementation']).content
+
+                computed_hash = hashlib.sha512()
+
+                computed_hash.update(entry_content)
+                computed_hash.update(evaluate_content)
+                computed_hash.update(client_content)
+
+                local_hash = computed_hash.hexdigest()
+                
+                if local_hash == latest_version['sha512-hash']:
+                    self.entry_actions = entry_content
+                    self.evaluate_function = evaluate_content
+                    
+                    self.version = latest_version['version']
+                    
+                    self.save()
+                    
+                    self.client_implementation.save(self.identifier + '.js', ContentFile(client_content))
+
+                    messages.append('[Success] ' + self.identifier + ': Updated to latest version.')
+                else:
+                    messages.append('[Error] ' + self.identifier + ': Unable to update to latest version. Remote hash does not match file contents.')
+            except TypeError:
+                messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
+        
+        return messages
 
 class Game(models.Model):
     name = models.CharField(max_length=1024, db_index=True)
