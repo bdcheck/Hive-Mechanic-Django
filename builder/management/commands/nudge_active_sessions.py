@@ -2,11 +2,12 @@
 
 from django.core.management.base import BaseCommand
 
-from quicksilver.decorators import handle_lock, handle_schedule
+from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
 from ...models import Session
 
 class Command(BaseCommand):
+    @add_qs_arguments
     def add_arguments(self, parser):
         pass
 

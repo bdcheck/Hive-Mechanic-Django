@@ -16,6 +16,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog
@@ -37,7 +38,7 @@ class RemoteRepository(models.Model):
 
     last_updated = models.DateTimeField(null=True, blank=True)
 
-
+@python_2_unicode_compatible
 class InteractionCard(models.Model):
     name = models.CharField(max_length=4096, unique=True)
     identifier = models.SlugField(max_length=4096, unique=True)
@@ -56,7 +57,7 @@ class InteractionCard(models.Model):
 
     version = models.FloatField(default=0.0)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name + ' (' + self.identifier + ')'
 
     def issues(self):
@@ -136,6 +137,7 @@ class InteractionCard(models.Model):
 
         return messages
 
+@python_2_unicode_compatible
 class Game(models.Model):
     name = models.CharField(max_length=1024, db_index=True)
     slug = models.SlugField(max_length=1024, db_index=True, unique=True)
@@ -144,8 +146,8 @@ class Game(models.Model):
 
     game_state = JSONField(default=dict)
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return str(self.name)
 
     def definition_json(self):
         return reverse('builder_game_definition_json', args=[self.slug])
@@ -177,13 +179,14 @@ class Game(models.Model):
 
         return None
 
+@python_2_unicode_compatible
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)
     created = models.DateTimeField()
 
     definition = models.TextField(max_length=(1024 * 1024 * 1024))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
     def process_incoming(self, session, payload, extras=None):
@@ -283,6 +286,7 @@ class GameVersion(models.Model):
 
         return snapshot
 
+@python_2_unicode_compatible
 class Player(models.Model):
     identifier = models.CharField(max_length=4096, unique=True)
 
@@ -298,7 +302,7 @@ class Player(models.Model):
 
         return None
 
-    def __unicode__(self):
+    def __str__(self):
         return self.identifier.split(':')[-1]
 
 class Session(models.Model):
