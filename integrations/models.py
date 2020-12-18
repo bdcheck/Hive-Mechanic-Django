@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 
 from builder.models import Game, Player, Session
 
@@ -19,6 +20,7 @@ INTEGRATION_TYPES = (
     ('other', 'Other'),
 )
 
+@python_2_unicode_compatible
 class Integration(models.Model):
     name = models.CharField(max_length=1024, unique=True)
     url_slug = models.SlugField(max_length=1024, unique=True)
@@ -30,7 +32,7 @@ class Integration(models.Model):
 
     configuration = JSONField(default=dict)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def process_incoming(self, payload):
