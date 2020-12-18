@@ -33,7 +33,7 @@ class Integration(models.Model):
     configuration = JSONField(default=dict)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
