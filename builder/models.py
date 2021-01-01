@@ -178,6 +178,26 @@ class Game(models.Model):
             return self.game_state[variable] # pylint: disable=unsubscriptable-object
 
         return None
+        
+    def active_session_count(self):
+        count = 0
+        
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is None:
+                    count += 1
+        
+        return count
+
+    def inactive_session_count(self):
+        count = 0
+        
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is not None:
+                    count += 1
+        
+        return count
 
 @python_2_unicode_compatible
 class GameVersion(models.Model):
@@ -304,6 +324,24 @@ class Player(models.Model):
 
     def __str__(self):
         return self.identifier.split(':')[-1]
+        
+    def most_recent_game(self):
+        latest = self.sessions.order_by('-started').first()
+        
+        if latest is not None:
+            return latest.game_version.game
+            
+        return None
+
+    def earliest_session(self):
+        return self.sessions.order_by('started').first()
+
+    def active_session_count(self):
+        return self.sessions.filter(completed=None).count()
+
+    def inactive_session_count(self):
+        return self.sessions.exclude(completed=None).count()
+
 
 class Session(models.Model):
     player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)

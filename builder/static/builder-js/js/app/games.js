@@ -41,8 +41,22 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
 	const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_add_game'));
 
 	$("#action_add_game").click(function(eventObj) {
+		eventObj.preventDefault();
+
 		$("#field_add_game").val("");
 		addDialog.open();
+	});
+
+	$(".action_clone_game").click(function(eventObj) {
+		eventObj.preventDefault();
+		
+		alert('TODO: Clone game #' + $(eventObj.target).attr('data-id'));
+	});
+	
+	$(".action_delete_game").click(function(eventObj) {
+		eventObj.preventDefault();
+		
+		alert('TODO: Remove game #' + $(eventObj.target).attr('data-id'));
 	});
 
 	addDialog.listen('MDCDialog:closed', function() {
