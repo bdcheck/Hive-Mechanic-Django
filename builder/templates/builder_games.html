@@ -1,7 +1,7 @@
 {% extends 'builder_base.html' %}
 {% load static %}
 
-{% block 'page_title' %}All Activities | Interaction Builder{% endblock %}
+{% block 'page_title' %}All Activities | Hive Mechanic{% endblock %}
 
 {% block 'page_help' %}
 	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
@@ -30,11 +30,11 @@
 								<td class="mdc-data-table__cell"><a href="{% url 'builder_game' game.slug %}">{{ game.name }}</a></td>
 								<td class="mdc-data-table__cell">{{ game.slug }}</td>
 								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.versions.count }}</td>
-								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">-1</td>
-								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">-1</td>
+								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.active_session_count }}</td>
+								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.inactive_session_count }}</td>
 								<td class="mdc-data-table__cell">
-									<a href="#" class="material-icons" aria-hidden="true">file_copy</a>
-									<a href="#" class="material-icons" aria-hidden="true">delete_forever</a>
+									<a href="#" class="material-icons action_clone_game" data-id="{{ game.pk }}" aria-hidden="true">file_copy</a>
+									<a href="#" class="material-icons action_delete_game"  data-id="{{ game.pk }}" aria-hidden="true">delete_forever</a>
 								</td>
 							</tr>
 						{% endfor %}
