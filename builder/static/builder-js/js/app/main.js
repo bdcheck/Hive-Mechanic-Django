@@ -614,11 +614,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".builder-destination-item").hide();
     }
 
-
     $("#action_open_settings").click(function(eventObj) {
         eventObj.preventDefault();
-        
-        console.log("OPEN ACTIVITY SETTINGS");
         
         var refreshSettingsInterrupts = function() {
             $("#activity_settings_interrupts").empty();
@@ -841,4 +838,22 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
         }
     });
+    
+    var viewportHeight = $(window).height();
+    
+    console.log("VPH: " + viewportHeight);
+    
+    var sourceTop = $("#builder_source_nodes").offset().top;
+
+    var sourceHeight = $("#builder_source_nodes").height();
+
+    console.log("ST: " + sourceTop);
+    
+    var columnHeight = viewportHeight - sourceTop - sourceHeight - 24;
+    
+    console.log("CH: " + columnHeight);
+    
+    $("#builder_source_nodes").height(columnHeight);
+    $("#builder_current_node").height(columnHeight);
+    $("#builder_next_nodes").height(columnHeight);
 });
