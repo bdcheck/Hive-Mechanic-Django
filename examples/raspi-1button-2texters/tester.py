@@ -9,7 +9,7 @@ from tkinter import *
 
 #Swap in the correct Hive API URL and Client Token for your game here:
 HIVE_API_URL = 'https://dev.hivemechanic.org/http/'
-HIVE_CLIENT_TOKEN = 'abc12345'
+HIVE_CLIENT_TOKEN = 'abc12345' # nosec
 
 
 #DO NOT TOUCH -- this connects your button to Hive Mechanic
