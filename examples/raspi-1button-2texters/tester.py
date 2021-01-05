@@ -3,6 +3,7 @@ import sys
 import time
 import client
 import settings
+import datetime
 
 from client import *
 from tkinter import *
@@ -12,25 +13,22 @@ HIVE_API_URL = 'https://dev.hivemechanic.org/http/'
 HIVE_CLIENT_TOKEN = 'abc12345'
 
 
-#DO NOT TOUCH -- this connects your button to Hive Mechanic
-client = HiveClient(api_url= HIVE_API_URL, token= HIVE_CLIENT_TOKEN)
-
-commands = [
-            TriggerInterruptCommand('BUTTON-PRESSED'),
-            SetVariableCommand('button_press_ts', timezone.now().isoformat(), VariableScope.game)
-        ]
-
-response = client.issue_command(TriggerInterruptCommand('BUTTON-PRESSED'), player='pi:12345')
-
-time.sleep(5)
-
-audio_url = client.fetch_variable('claimed_audio_file', scope=VariableScope.game)
-
-
 #Determine what happens when the button is pressed
 def SendMsgClicked():
         print("Button Pressed")
-        
+
+        #DO NOT TOUCH -- this connects your button to Hive Mechanic
+        client = HiveClient(api_url= HIVE_API_URL, token= HIVE_CLIENT_TOKEN)
+
+        commands = [
+            TriggerInterruptCommand('BUTTON-PRESSED'),
+            SetVariableCommand('button_press_ts', datetime.timezone, VariableScope.game)
+                ]
+
+        response = client.issue_command(TriggerInterruptCommand('BUTTON-PRESSED'), player='pi:12345')
+
+        audio_url = client.fetch_variable('claimed_audio_file', scope=VariableScope.game)
+
         
 #UI for window + button, using the Python Tkinter library
 window=Tk()
