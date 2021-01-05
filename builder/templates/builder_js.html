@@ -4,7 +4,10 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <link rel="shortcut icon" href="{% static 'builder-react' %}/favicon.ico">
+		<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+		<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+		<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+		<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
         <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
         <meta name="theme-color" content="#000000">
 
@@ -28,8 +31,8 @@
             }
 
             .main-content {
-                overflow: auto;
-                height: 100%;
+                overflow: hidden;
+                /* height: 100%; */
             }
 
             .app-bar {
@@ -44,6 +47,15 @@
             a {
                 text-decoration: none;
             }
+
+			#builder_source_nodes, #builder_current_node, #builder_next_nodes {
+				padding-top: 5px; 
+				padding-bottom: 5px; 
+				-webkit-mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
+				mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
+
+				overflow-y: scroll;
+			}
         </style>
         
     </head>
@@ -88,7 +100,7 @@
             </div>
         </aside>
 
-        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust"  style="background-color: #BDBDBD;">
+        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust"style="background-color: #BDBDBD; overflow: hidden;">
             <main class="main-content" id="main-content">
                 <div class="mdc-layout-grid">
                     <div class="mdc-layout-grid__inner">
@@ -108,11 +120,11 @@
                         </div>
                     </div>
                     <div class="mdc-layout-grid__inner">
-                        <div class="mdc-layout-grid__cell" id="builder_source_nodes">
+                        <div class="mdc-layout-grid__cell" id="builder_source_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Sources Here)
                         </div>
-                        <div class="mdc-layout-grid__cell" id="builder_current_node"></div>
-                        <div class="mdc-layout-grid__cell" id="builder_next_nodes">
+                        <div class="mdc-layout-grid__cell" id="builder_current_node" style="overflow-y: scroll; scrollbar-width: none;"></div>
+                        <div class="mdc-layout-grid__cell" id="builder_next_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Destinations Here)
                         </div>
                     </div>
