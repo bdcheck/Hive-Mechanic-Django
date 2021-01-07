@@ -10,7 +10,7 @@ from tkinter import *
 
 #Swap in the correct Hive API URL and Client Token for your game here:
 HIVE_API_URL = 'https://workshop.hivemechanic.org/http/'
-HIVE_CLIENT_TOKEN = 'abc12345' # nosec
+HIVE_CLIENT_TOKEN = 'abc12345' # nosec - This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
 
 
 #Determine what happens when the button is pressed
