@@ -36,6 +36,7 @@ script:
   - pylint passive_data_kit
   - pylint builder
   - pylint integrations
+  - pylint http_support
   - pylint twilio_support
   - bandit -r .
 
