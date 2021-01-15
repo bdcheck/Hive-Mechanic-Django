@@ -2,7 +2,7 @@
 
 import datetime
 
-from .client import HiveClient, TriggerInterruptCommand, SetVariableCommand, VariableScope
+from client import HiveClient, TriggerInterruptCommand, SetVariableCommand, VariableScope
 
 #Swap in the correct Hive API URL and Client Token for your game here:
 HIVE_API_URL = 'https://workshop.hivemechanic.org/http/'
@@ -10,8 +10,8 @@ HIVE_CLIENT_TOKEN = 'abc12345' # nosec - This is a placeholder for someone to fi
 
 
 #Determine what happens when the button is pressed
-def send_msg_clicked():
-    print("Button Pressed")
+def send_msg_clicked(event):
+    print("Button Pressed" +str(event))
 
     #DO NOT TOUCH -- this connects your button to Hive Mechanic
     client = HiveClient(api_url= HIVE_API_URL, token= HIVE_CLIENT_TOKEN)
@@ -32,8 +32,10 @@ try:
     window=Tk()
     lbl=Label(window, text="Welcome to the Knock-Knock Game!", fg='red', font=("Helvetica", 16))
     lbl.place(x=125, y=100)
-    btn=Button(window, text="Press to Send Message", fg='blue', command=send_msg_clicked)
-    btn.place(x=175, y=175)
+    #btn=Button(window, text="Press to Send Message", fg='blue', command=send_msg_clicked)
+    #btn.place(x=175, y=175)
+
+    window.bind('<space>', send_msg_clicked)
 
     window.title('Knock-Knock Game Button')
     window.geometry("500x300+400+275")
