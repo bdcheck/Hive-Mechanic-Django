@@ -6,7 +6,7 @@ from client import HiveClient, TriggerInterruptCommand, SetVariableCommand, Vari
 
 #Swap in the correct Hive API URL and Client Token for your game here:
 HIVE_API_URL = 'https://workshop.hivemechanic.org/http/'
-HIVE_CLIENT_TOKEN = 'abc12345' # nosec - This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
+HIVE_CLIENT_TOKEN = 'testerapi481943' # nosec - This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
 
 
 #Determine what happens when the button is pressed
@@ -25,10 +25,10 @@ def send_msg_clicked(event):
 
     audio_url = client.fetch_variable('claimed_audio_file', scope=VariableScope.game)
 
+#UI for window + button, using the Python Tkinter library
 try:
     from tkinter import Tk, Label, Button
 
-    #UI for window + button, using the Python Tkinter library
     window=Tk()
     lbl=Label(window, text="Welcome to the Knock-Knock Game!", fg='red', font=("Helvetica", 16))
     lbl.place(x=125, y=100)
