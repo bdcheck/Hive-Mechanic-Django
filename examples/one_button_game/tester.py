@@ -4,12 +4,16 @@ import datetime
 
 from client import HiveClient, TriggerInterruptCommand, SetVariableCommand, VariableScope
 
-#Swap in the correct Hive API URL and Client Token for your game here:
+#INSTRUCTIONS: swap out the variables in the list below with the variables specific to your game:
 HIVE_API_URL = 'https://workshop.hivemechanic.org/http/'
 HIVE_CLIENT_TOKEN = 'testerapi481943' # nosec - This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
+#DEVICE_NAME should be a unique name for your computer or RasPi (ex. "RasPi_202A")
+DEVICE_NAME = 'pi:12345'
+AUDIO_VARIABLE_NAME = 'claimed_audio_file'
 
+#More advanced code follows
 
-#Determine what happens when the button is pressed
+#Here we define what we want the button to do when pressed
 def send_msg_clicked(event):
     print("Button Pressed" +str(event))
 
@@ -21,9 +25,9 @@ def send_msg_clicked(event):
         SetVariableCommand('button_press_ts', datetime.timezone, VariableScope.game)
     ]
 
-    response = client.issue_command(TriggerInterruptCommand('BUTTON-PRESSED'), player='pi:12345')
+    response = client.issue_command(TriggerInterruptCommand('BUTTON-PRESSED'), player=DEVICE_NAME)
 
-    audio_url = client.fetch_variable('claimed_audio_file', scope=VariableScope.game)
+    audio_url = client.fetch_variable(AUDIO_VARIABLE_NAME, scope=VariableScope.game)
 
 #UI for window + button, using the Python Tkinter library
 try:
