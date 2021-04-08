@@ -66,7 +66,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 302)
 
-        self.client.login(username='first_test_user', password='foobar')
+        self.client.login(username='first_test_user', password='foobar') # nosec
 
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 403)
@@ -81,7 +81,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 403)
 
-        self.client.login(username='second_test_user', password='foobar')
+        self.client.login(username='second_test_user', password='foobar') # nosec
 
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 403)
@@ -126,7 +126,7 @@ class UserPermissionsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'bar222')
 
-        self.client.login(username='first_test_user', password='foobar')
+        self.client.login(username='first_test_user', password='foobar') # nosec
 
         response = self.client.get(reverse('builder_game', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 403)
@@ -147,7 +147,7 @@ class UserPermissionsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def test_views_misc_permissions(self): # pylint: disable=invalid-name
+    def test_views_misc_permissions(self): # pylint: disable=invalid-name, too-many-statements
         self.client.logout()
 
         # self.editor_group = Group.objects.get(group='Hive Mechanic Game Editor')
@@ -181,7 +181,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_add_game'))
         self.assertEqual(response.status_code, 302)
 
-        self.client.login(username='views_user', password='foobar')
+        self.client.login(username='views_user', password='foobar') # nosec
 
         response = self.client.get(reverse('builder_home'))
         self.assertEqual(response.status_code, 403)

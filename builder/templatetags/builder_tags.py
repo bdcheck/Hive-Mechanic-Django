@@ -27,7 +27,7 @@ def setvar(parser, token): # pylint: disable=unused-argument
     if not matched:
         raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
 
-    new_val, var_name = m.groups()
+    new_val, var_name = matched.groups()
 
     if not (new_val[0] == new_val[-1] and new_val[0] in ('"', "'")):
         raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)

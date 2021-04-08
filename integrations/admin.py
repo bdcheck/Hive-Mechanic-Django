@@ -22,7 +22,7 @@ class IntegrationAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         if request.user.has_perm('twilio_history_access'):
             if 'auth_token' in obj.configuration:
-                obj.configuration['auth_token'] = '*****'
+                obj.configuration['auth_token'] = '*****' # nosec
         else:
             pass
 
