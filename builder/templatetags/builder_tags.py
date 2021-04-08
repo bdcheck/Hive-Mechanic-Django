@@ -2,6 +2,8 @@
 
 import re
 
+from future.utils import raise_from
+
 from django import template
 
 register = template.Library()
@@ -30,6 +32,6 @@ def setvar(parser, token): # pylint: disable=unused-argument
     new_val, var_name = matched.groups()
 
     if not (new_val[0] == new_val[-1] and new_val[0] in ('"', "'")):
-        raise template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name)
+        raise_from(template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name), exc)    
 
     return SetVarNode(new_val[1:-1], var_name)

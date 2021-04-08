@@ -82,8 +82,8 @@ def builder_game(request, game): # pylint: disable=unused-argument
                 new_version.save()
 
                 return HttpResponse(json.dumps({'success': True}, indent=2), content_type='application/json', status=200)
-            else:
-                raise PermissionDenied('Edit permission required.')
+
+            raise PermissionDenied('Edit permission required.')
 
         return render(request, 'builder_js.html', context=context)
 
