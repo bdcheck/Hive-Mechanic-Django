@@ -1,6 +1,7 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.core.management import call_command
 from django.db import models
 
@@ -9,6 +10,9 @@ from integrations.models import Integration
 
 class ApiClient(models.Model):
     name = models.CharField(max_length=4096, unique=True)
+
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='http_api_client_editables')
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='http_api_client_viewables')
 
     shared_secret = models.CharField(max_length=4096, unique=True)
 

@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import gettext as _
 
 from builder.models import Game, Player, Session
 
@@ -19,6 +20,16 @@ INTEGRATION_TYPES = (
     ('http', 'HTTP'),
     ('other', 'Other'),
 )
+
+class PermissionsSupport(models.Model):
+    class Meta:
+        managed = False
+        default_permissions = ()
+
+        permissions = (
+            ('integration_access_view', 'View integration information'),
+            ('integration_access_edit', 'Edit integration information'),
+        )
 
 @python_2_unicode_compatible
 class Integration(models.Model):
@@ -30,7 +41,10 @@ class Integration(models.Model):
 
     create_new_players = models.BooleanField(default=True)
 
-    configuration = JSONField(default=dict)
+    configuration = JSONField(default=dict, help_text=_('configuration_help_text'))
+
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_editables')
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_viewables')
 
     def __str__(self):
         return str(self.name)

@@ -10,3 +10,27 @@ class IntegrationAdmin(admin.ModelAdmin):
     list_display = ('name', 'url_slug', 'type', 'game')
     search_fields = ('name', 'url_slug', 'type', 'configuration',)
     list_filter = ('game', 'type', 'create_new_players',)
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        
+        if request.user.has_perm('twilio_history_access'):
+            return ('configuration',)
+        
+        return fields
+        
+    
+    def get_form(self, request, obj=None, **kwargs):
+        if request.user.has_perm('twilio_history_access'):
+            if 'auth_token' in obj.configuration:
+                obj.configuration['auth_token'] = '*****'
+        else:
+            pass
+
+        form = super().get_form(request, obj=obj, **kwargs)
+        
+        print('FORM: ' + str(form.base_fields))
+
+        print('ARGS: ' + str(kwargs))
+        
+        return form

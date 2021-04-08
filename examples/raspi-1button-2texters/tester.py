@@ -25,18 +25,19 @@ def send_msg_clicked():
 
     audio_url = client.fetch_variable('claimed_audio_file', scope=VariableScope.game)
 
-try:
-    from tkinter import Tk, Label, Button
+if __name__ == '__main__':
+    try:
+        from tkinter import Tk, Label, Button
 
-    #UI for window + button, using the Python Tkinter library
-    window=Tk()
-    lbl=Label(window, text="Welcome to the Knock-Knock Game!", fg='red', font=("Helvetica", 16))
-    lbl.place(x=125, y=100)
-    btn=Button(window, text="Press to Send Message", fg='blue', command=send_msg_clicked)
-    btn.place(x=175, y=175)
+        #UI for window + button, using the Python Tkinter library
+        window=Tk()
+        lbl=Label(window, text="Welcome to the Knock-Knock Game!", fg='red', font=("Helvetica", 16))
+        lbl.place(x=125, y=100)
+        btn=Button(window, text="Press to Send Message", fg='blue', command=send_msg_clicked)
+        btn.place(x=175, y=175)
 
-    window.title('Knock-Knock Game Button')
-    window.geometry("500x300+400+275")
-    window.mainloop()
-except ImportError:
-    print('TK not installed - please implement alternative UI')
+        window.title('Knock-Knock Game Button')
+        window.geometry("500x300+400+275")
+        window.mainloop()
+    except ImportError:
+        print('TK not installed - please implement alternative UI')
