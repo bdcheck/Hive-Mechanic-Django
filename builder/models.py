@@ -27,7 +27,7 @@ from . import card_issues
 standard_library.install_aliases()
 
 class PermissionsSupport(models.Model):
-    class Meta:
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
         managed = False
         default_permissions = ()
 
@@ -217,26 +217,26 @@ class Game(models.Model):
                     count += 1
 
         return count
-        
+
     def can_view(self, user):
         if user.is_authenticated is False:
             return False
-            
+
         if self.can_edit(user):
             return True
 
         if (self.editors.count() == 0 and self.viewers.count() == 0) or self.viewers.filter(pk=user.pk).count() > 0:
             return True
-        
+
         return False
-        
+
     def can_edit(self, user):
         if user.is_authenticated is False:
             return False
 
         if (self.editors.count() == 0 and self.viewers.count() == 0) or self.editors.filter(pk=user.pk).count() > 0:
             return True
-        
+
         return False
 
 @python_2_unicode_compatible

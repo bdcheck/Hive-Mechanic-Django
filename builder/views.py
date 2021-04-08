@@ -157,7 +157,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
         'message': 'Unable to add game.',
         'success': False
     }
-    
+
     if request.method == 'POST' and 'name' in request.POST:
         name = request.POST['name'].strip()
 

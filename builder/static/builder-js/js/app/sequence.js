@@ -450,6 +450,8 @@ define(modules, function (mdc, Node) {
                         id = id.replace('choose_destination_item_', '')
 
                         if (id == "add_card") {
+   	                        window.dialogBuilder.chooseDestinationDialog.close();
+                        
                             me.addCard(window.dialogBuilder.chooseDestinationDialogCallback);
                         } else {
                             window.dialogBuilder.chooseDestinationDialogCallback(nodeId);
@@ -520,7 +522,7 @@ define(modules, function (mdc, Node) {
         addCard(callback) {
             $("#add-card-name-value").val("");
 
-            window.dialogBuilder.newCardSelect.value = '';
+            // window.dialogBuilder.newCardSelect.value = '';
             
             var me = this;
             
@@ -528,7 +530,7 @@ define(modules, function (mdc, Node) {
                 handleEvent: function (event) {
                     if (event.detail.action == "add_card") {
                         var cardName = $("#add-card-name-value").val();
-                        var cardType = window.dialogBuilder.newCardSelect.value;
+                        var cardType = $("input[name='add-card-options']:checked").val(); //  window.dialogBuilder.newCardSelect.value;
 
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
                     

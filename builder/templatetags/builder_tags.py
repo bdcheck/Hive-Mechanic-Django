@@ -16,15 +16,15 @@ class SetVarNode(template.Node):
         return ''
 
 @register.tag
-def setvar(parser, token):
+def setvar(parser, token): # pylint: disable=unused-argument
     try:
         tag_name, arg = token.contents.split(None, 1)
     except ValueError:
         raise template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0])
 
-    m = re.search(r'(.*?) as (\w+)', arg)
+    matched = re.search(r'(.*?) as (\w+)', arg)
 
-    if not m:
+    if not matched:
         raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
 
     new_val, var_name = m.groups()

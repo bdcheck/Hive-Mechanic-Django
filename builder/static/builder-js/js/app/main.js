@@ -502,7 +502,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
         
         // window.dialogBuilder.newCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('add-card-type'));
-        window.dialogBuilder.newCardSelect = mdc.radio.MDCRadio.attachTo(document.getElementById('add-card-type'));
+        // window.dialogBuilder.newCardSelect = mdc.radio.MDCRadio.attachTo(document.getElementById('add-card-type'));
 
         window.dialogBuilder.addSequenceDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-sequence-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-sequence-name'));

@@ -296,7 +296,7 @@ define(modules, function (mdc) {
 
             fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + '">');
             fieldLines.push('  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">');
-            fieldLines.push('    <img src="https://via.placeholder.com/150" id="' + me.cardId + '_' + field['field'] + '_preview" style="max-width: 100%;">');
+            fieldLines.push('    <img src="https://via.placeholder.com/150" id="' + me.cardId + '_' + field['field'] + '_preview" style="max-width: 100%; margin-bottom: 8px;">');
             fieldLines.push('  </div>');
             fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field['field'] + '_field" style="width: 100%; margin-top: 4px;">');
             fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field['field'] + '_value" />');
@@ -680,6 +680,10 @@ define(modules, function (mdc) {
         initializeField(field, definition, onUpdate) {
             var me = this;
 
+           	console.log("INITING...");
+           	console.log(field);
+           	console.log(definition);
+
             var fieldName = field['field'];
 
             if (field['parent_field'] != undefined) {
@@ -705,6 +709,9 @@ define(modules, function (mdc) {
                     onUpdate(parseInt(value));
                 });
             } else if (field['type'] == 'image-url') {
+            	console.log("INITING IMAGE-URL...");
+            	console.log(field);
+            	
                 const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'));
 
                 if (definition[field['field']] == undefined && definition[field['default']] != undefined) {
@@ -713,10 +720,14 @@ define(modules, function (mdc) {
 
                 if (definition[field['field']] != undefined) {
                     fieldWidget.value = definition[field['field']];
+                    
+     				$('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', fieldWidget.value);
                 }
 
                 $('#' + me.cardId + '_' + fieldName + '_value').on("change keyup paste", function() {
                     var value = $('#' + me.cardId + '_' + fieldName + '_value').val();
+
+                    console.log("UPDATE: " + value);
 
        				$('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', value);
 
@@ -724,6 +735,8 @@ define(modules, function (mdc) {
 
                     onUpdate(value);
                 });
+
+            	console.log("INITED IMAGE-URL...");
             } else if (field['type'] == 'choice') {
                 const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName));
 
@@ -964,6 +977,8 @@ define(modules, function (mdc) {
                 };
 
                 if (field['type'] == 'integer') {
+                    me.initializeField(field, me.definition, onUpdate);
+                } else if (field['type'] == 'image-url') {
                     me.initializeField(field, me.definition, onUpdate);
                 } else if (field['type'] == 'choice') {
                     me.initializeField(field, me.definition, onUpdate);

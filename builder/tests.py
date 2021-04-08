@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
 import json
@@ -13,9 +14,9 @@ class UserPermissionsTestCase(TestCase):
     def setUp(self):
         user_model = get_user_model()
 
-        self.first_user = get_user_model().objects.create_user(username='first_test_user', email='first_test_user@example.com', password='foobar')
-        self.second_user = get_user_model().objects.create_user(username='second_test_user', email='second_test_user@example.com', password='foobar')
-        self.views_user = get_user_model().objects.create_user(username='views_user', email='views_user@example.com', password='foobar')
+        self.first_user = user_model.objects.create_user(username='first_test_user', email='first_test_user@example.com', password='foobar') # nosec
+        self.second_user = user_model.objects.create_user(username='second_test_user', email='second_test_user@example.com', password='foobar') # nosec
+        self.views_user = user_model.objects.create_user(username='views_user', email='views_user@example.com', password='foobar') # nosec
 
         self.test_game = Game.objects.create(name='Test Game', slug='unit-test-game')
 
@@ -24,7 +25,7 @@ class UserPermissionsTestCase(TestCase):
         self.manager_group = Group.objects.get(name='Hive Mechanic Manager')
 
 
-    def test_models_edit_view_permissions(self):
+    def test_models_edit_view_permissions(self): # pylint: disable=invalid-name
         self.assertIsNotNone(self.test_game)
         self.assertIsNotNone(self.first_user)
         self.assertIsNotNone(self.second_user)
@@ -61,7 +62,7 @@ class UserPermissionsTestCase(TestCase):
         self.assertTrue(self.test_game.can_view(self.second_user))
 
 
-    def test_views_edit_view_permissions(self):
+    def test_views_edit_view_permissions(self): # pylint: disable=invalid-name
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 302)
 
@@ -69,7 +70,7 @@ class UserPermissionsTestCase(TestCase):
 
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
         self.assertEqual(response.status_code, 403)
-        
+
         self.reader_group.user_set.add(self.first_user)
 
         response = self.client.get(reverse('builder_game_definition_json', args=[self.test_game.slug]))
@@ -146,7 +147,7 @@ class UserPermissionsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def test_views_misc_permissions(self):
+    def test_views_misc_permissions(self): # pylint: disable=invalid-name
         self.client.logout()
 
         # self.editor_group = Group.objects.get(group='Hive Mechanic Game Editor')

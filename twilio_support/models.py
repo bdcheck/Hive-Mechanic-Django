@@ -37,7 +37,7 @@ GATHER_SPEECH_MODELS = (
 )
 
 class PermissionsSupport(models.Model):
-    class Meta:
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
         managed = False
         default_permissions = ()
 
