@@ -11,6 +11,8 @@ from django.urls import reverse
 from .models import Game
 
 class UserPermissionsTestCase(TestCase):
+    fixtures = ['fixtures/groups.json']
+
     def setUp(self):
         user_model = get_user_model()
 

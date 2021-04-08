@@ -31,7 +31,6 @@ before_script:
 script:
   - mv hivemechanic/local_settings.py-template hivemechanic/local_settings.py
   - python manage.py migrate
-  - python manage.py loaddata group.json
   - python manage.py test
   - pylint quicksilver
   - pylint passive_data_kit
