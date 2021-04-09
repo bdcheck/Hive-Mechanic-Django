@@ -140,8 +140,8 @@ class InteractionCard(models.Model):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash == latest_version['sha512-hash']:
-                    self.entry_actions = entry_content
-                    self.evaluate_function = evaluate_content
+                    self.entry_actions = entry_content.decode("utf-8")
+                    self.evaluate_function = evaluate_content.decode("utf-8")
 
                     self.version = latest_version['version']
 
