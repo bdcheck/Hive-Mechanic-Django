@@ -55,4 +55,11 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     drawer.open = true;
 
 	const dataTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_players'));
+
+	$(".action_delete_player").click(function(eventObj) {
+		eventObj.preventDefault();
+		
+		alert('TODO: Remove player #' + $(eventObj.target).attr('data-id'));
+	});
+
 });

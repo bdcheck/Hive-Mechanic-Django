@@ -11,6 +11,7 @@ from future import standard_library
 
 import requests
 
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
 from django.db import models
@@ -24,6 +25,21 @@ from django_dialog_engine.models import Dialog
 from . import card_issues
 
 standard_library.install_aliases()
+
+class PermissionsSupport(models.Model):
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
+        managed = False
+        default_permissions = ()
+
+        permissions = (
+            ('builder_login', 'Access Hive Mechanic game builder'),
+            ('builder_auth_access_view', 'View user account information'),
+            ('builder_auth_access_edit', 'Edit user account information'),
+            ('builder_access_view', 'View game builder information'),
+            ('builder_access_edit', 'Edit game builder information'),
+            ('builder_db_logging_view', 'View database logging entries'),
+            ('builder_db_logging_edit', 'Edit database logging entries'),
+        )
 
 class RemoteRepository(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
@@ -150,6 +166,9 @@ class Game(models.Model):
 
     game_state = JSONField(default=dict)
 
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_editables')
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_viewables')
+
     def __str__(self):
         return str(self.name)
 
@@ -182,6 +201,47 @@ class Game(models.Model):
             return self.game_state[variable] # pylint: disable=unsubscriptable-object
 
         return None
+
+    def active_session_count(self):
+        count = 0
+
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is None:
+                    count += 1
+
+        return count
+
+    def inactive_session_count(self):
+        count = 0
+
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is not None:
+                    count += 1
+
+        return count
+
+    def can_view(self, user):
+        if user.is_authenticated is False:
+            return False
+
+        if self.can_edit(user):
+            return True
+
+        if (self.editors.count() == 0 and self.viewers.count() == 0) or self.viewers.filter(pk=user.pk).count() > 0:
+            return True
+
+        return False
+
+    def can_edit(self, user):
+        if user.is_authenticated is False:
+            return False
+
+        if (self.editors.count() == 0 and self.viewers.count() == 0) or self.editors.filter(pk=user.pk).count() > 0:
+            return True
+
+        return False
 
 @python_2_unicode_compatible
 class GameVersion(models.Model):
@@ -308,6 +368,23 @@ class Player(models.Model):
 
     def __str__(self):
         return self.identifier.split(':')[-1]
+
+    def most_recent_game(self):
+        latest = self.sessions.order_by('-started').first()
+
+        if latest is not None:
+            return latest.game_version.game
+
+        return None
+
+    def earliest_session(self):
+        return self.sessions.order_by('started').first()
+
+    def active_session_count(self):
+        return self.sessions.filter(completed=None).count()
+
+    def inactive_session_count(self):
+        return self.sessions.exclude(completed=None).count()
 
 class Session(models.Model):
     player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)

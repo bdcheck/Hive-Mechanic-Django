@@ -31,6 +31,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
     window.dialogBuilder.selectCardsDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-select-card-dialog'));
 
+    window.dialogBuilder.restartGameDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-reset-game-dialog'));
+
     const activityDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-activity-setting-dialog'));
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
     var initialCardSelect = null;
@@ -56,8 +58,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 var loadedSequence = sequence.loadSequence(window.dialogBuilder.definition.sequences[i]);
                 
                 var sequenceIssues = loadedSequence.issues();
-
-                console.log("LOOK " + sequenceIssues.length);
                 
                 issues = issues.concat(sequenceIssues);
             }
@@ -128,6 +128,32 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[0], null);
 
         $("#action_save").show();
+    }
+    
+    function cleanDefinition(definition) {
+    	if (definition == null) {
+    		return null;
+    	} else if (Array.isArray(definition)) {
+    		var cleanArray = [];
+
+            $.each(definition, function(index, item) {
+                cleanArray.push(cleanDefinition(item));
+            });
+            
+            return cleanArray;
+    	} else if (typeof definition === 'object') {
+    		var cleanObject = {};
+    			
+            $.each(Object.keys(definition), function(index, key) {
+            	if (key.indexOf('__') == -1) {
+	            	cleanObject[key] = cleanDefinition(definition[key])
+            	}
+            });
+    		
+    		return cleanObject;
+    	}
+    	
+    	return definition;
     }
 
     var editListener = undefined;
@@ -338,8 +364,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     var id = event.currentTarget.id;
 
                     id = id.replace("all_cards_destination_item_", '');
-                    
-                    console.log("ID: " + id);
 
                     window.dialogBuilder.loadNodeById(id);
                 }
@@ -359,6 +383,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                     if (item["id"] == cardId) {
                         window.dialogBuilder.loadSequence(sequence, item['id']);
+
+						$('#' + item['id'] + '-advanced-dialog').remove();
 
                         var node = Node.createCard(item, sequence);
 
@@ -407,7 +433,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 if ($("#action_save").text() == "warning") {
                     warningDialog.open();
                 } else {
-                    window.dialogBuilder.update(window.dialogBuilder.definition, function() {
+                	var clean = cleanDefinition(window.dialogBuilder.definition);
+                	
+                    window.dialogBuilder.update(clean, function() {
                         $("#action_save").hide();
                     }, function(error) {
                         console.log(error);
@@ -424,6 +452,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             window.dialogBuilder.selectCardsDialog.open();
         });
 
+        $("#action_reset_game").off("click");
+
+        $("#action_reset_game").click(function(eventObj) {
+            eventObj.preventDefault();
+
+            window.dialogBuilder.restartGameDialog.open();
+        });
+
         var keys = Object.keys(window.dialogBuilder.cardMapping);
         
         for (var i = 0; i < keys.length; i++) {
@@ -436,8 +472,28 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             if (name == Node.cardName()) {
                 name = key;
             }
+            
+//            var cardItem = '<li class="mdc-list-item" data-value="' + key + '" role="option">' +
+//						   ' <span class="mdc-list-item__ripple"></span>' +
+//						   ' <span class="mdc-list-item__text">' + name + '<span>' +
+//						   '</li>';
 
-            $("#add-card-select-widget").append('<li class="mdc-list-item" data-value="' + key + '">' + name + '</li>');
+            var cardItem = '';
+            
+			cardItem += '<li class="mdc-list-item" tabindex="' + i + '">';
+			cardItem += '  <span class="mdc-list-item__graphic">';
+			cardItem += '    <div class="mdc-radio">';
+			cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
+			cardItem += '      <div class="mdc-radio__background">';
+			cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+			cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+			cardItem += '      </div>';
+			cardItem += '    </div>';
+			cardItem += '  </span>';
+			cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text">' + name + '</label>';
+			cardItem += '</li>';
+
+            $("#add-card-select-widget").append(cardItem);
         }
         
         window.dialogBuilder.reloadSequences();
@@ -445,7 +501,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         window.dialogBuilder.addCardDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-card-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
         
-        window.dialogBuilder.newCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('add-card-type'));
+        // window.dialogBuilder.newCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('add-card-type'));
+        // window.dialogBuilder.newCardSelect = mdc.radio.MDCRadio.attachTo(document.getElementById('add-card-type'));
 
         window.dialogBuilder.addSequenceDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-sequence-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-sequence-name'));
@@ -454,9 +511,22 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         mdc.textField.MDCTextField.attachTo(document.getElementById('edit-sequence-name'));
 
         window.dialogBuilder.removeSequenceDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('remove-sequence-dialog'));
+
+        window.dialogBuilder.helpToggle = mdc.switchControl.MDCSwitch.attachTo(document.getElementById('hive-help-switch'));
         
-        console.log('DEF');
-        console.log(window.dialogBuilder.definition);
+		$('#hive-help-switch-toggle').change(function() {
+			if (window.dialogBuilder.helpToggle.checked) {
+				$(".hive_mechanic_help_filler").hide()
+				$(".hive_mechanic_help").show()
+			} else {
+				$(".hive_mechanic_help").hide()
+				$(".hive_mechanic_help_filler").show()
+			}
+		});
+
+		$(".hive_mechanic_help").hide();
+		
+	    window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
         
         if (Array.isArray(window.dialogBuilder.definition)) {
             var game_def = {
@@ -467,8 +537,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             };
             
             window.dialogBuilder.definition = game_def;
-            
-            console.log("UPDATED GAME STRUCTURE");
         }
 
         window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[0], null);
@@ -476,7 +544,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         const warning = document.getElementById('builder-outstanding-issues-dialog-save');
         
         warning.addEventListener('click', (event) => {
-            window.dialogBuilder.update(window.dialogBuilder.definition, function() {
+			var clean = cleanDefinition(window.dialogBuilder.definition);
+			
+            window.dialogBuilder.update(clean, function() {
                 $("#action_save").hide();
 
                 warningDialog.close();
@@ -486,7 +556,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             
             return;
         });
-        
     });
 
     $("#action_open_settings").off("click");
@@ -614,11 +683,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".builder-destination-item").hide();
     }
 
-
     $("#action_open_settings").click(function(eventObj) {
         eventObj.preventDefault();
-        
-        console.log("OPEN ACTIVITY SETTINGS");
         
         var refreshSettingsInterrupts = function() {
             $("#activity_settings_interrupts").empty();
@@ -789,8 +855,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
         
         window.setTimeout(function() {
-            console.log("INITIAL CARD: " + window.dialogBuilder.definition["initial-card"]);
-            
             if (initialCardSelect == null) {
                 initialCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('builder-activity-setting-initial-card'));
             
@@ -841,4 +905,16 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
         }
     });
+    
+    var viewportHeight = $(window).height();
+    
+    var sourceTop = $("#builder_source_nodes").offset().top;
+
+    var sourceHeight = $("#builder_source_nodes").height();
+
+    var columnHeight = viewportHeight - sourceTop - sourceHeight - 24;
+    
+    $("#builder_source_nodes").height(columnHeight);
+    $("#builder_current_node").height(columnHeight);
+    $("#builder_next_nodes").height(columnHeight);
 });

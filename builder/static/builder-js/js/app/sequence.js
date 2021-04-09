@@ -374,12 +374,47 @@ define(modules, function (mdc, Node) {
             return body;
         }
 
-        initializeDestinationMenu(cardId, onSelect) {
+        refreshDestinationMenu(updateFunction) {
+        	$("#select-card-destination-edit-dialog-menu").html("");
+        	
             var me = this;
+            var body = '';
+
+            $.each(window.dialogBuilder.definition.sequences, function(index, value) {
+            	var sequenceBody = "";
+            	
+                sequenceBody += '      <li class="mdc-list-item prevent-menu-close" role="menuitem" id="choose_destination_sequence_' + value['id'] + '">';
+                sequenceBody += '        <span class="mdc-list-item__text">' + value['name'] + '</span>';
+                sequenceBody += '        <span class="mdc-list-item__meta material-icons destination_disclosure_icon">arrow_right</span>';
+                sequenceBody += '      </li>';
+
+                var items = value['items'];
+            
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+
+                    sequenceBody += '     <li class="mdc-list-item builder-destination-item choose_destination_sequence_' + value['id'] + '_item" role="menuitem" id="choose_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+                    sequenceBody += '       <span class="mdc-list-item__text">' + item["name"] + '</span>';
+                    sequenceBody += '     </li>';
+                }
+
+                sequenceBody += '      <li class="mdc-list-divider" role="separator"></li>';
+                
+                $("#select-card-destination-edit-dialog-menu").append(sequenceBody);
+            });
+
+            var addCardBody = '      <li class="mdc-list-item" role="menuitem" id="choose_destination_item_add_card">';
+            addCardBody    += '        <span class="mdc-list-item__text">Add&#8230;</span>';
+            addCardBody    += '        <span class="mdc-list-item__meta material-icons">add</span>';
+            addCardBody    += '      </li>';
+
+            $("#select-card-destination-edit-dialog-menu").append(addCardBody);
 
             const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item');
             
             for (let option of options) {
+            	$(option).off('click');
+            	
                 option.addEventListener('click', (event) => {
                     let prevent = event.currentTarget.classList.contains('prevent-menu-close');
 
@@ -388,11 +423,11 @@ define(modules, function (mdc, Node) {
 
                         var id = event.currentTarget.id;
 
-                        id = id.replace(cardId + '_destination_sequence_', '')
+                        id = id.replace('choose_destination_sequence_', '')
 
                         $(".builder-destination-item").hide();
                         
-                        var icon = "#" + cardId + '_destination_sequence_' + id + " .destination_disclosure_icon"; 
+                        var icon = '#choose_destination_sequence_' + id + ' .destination_disclosure_icon'; 
                         
                         var isVisible = $(icon).html() == "arrow_drop_down";
 
@@ -401,23 +436,81 @@ define(modules, function (mdc, Node) {
                         if (isVisible) {
                             $(icon).text("arrow_right");
 
-                            $("." + cardId + '_destination_sequence_' + id + '_item').hide();
+                            $('.choose_destination_sequence_' + id + '_item').hide();
                         } else {
-                            $("#" + cardId + '_destination_sequence_' + id + " .destination_disclosure_icon").text("arrow_drop_down");
+                            $('#choose_destination_sequence_' + id + " .destination_disclosure_icon").text("arrow_drop_down");
 
-                            $("." + cardId + '_destination_sequence_' + id + '_item').show();
+                            $('.choose_destination_sequence_' + id + '_item').show();
                         }
                     } else {
                         var nodeId = $(event.currentTarget).attr("data-node-id");
                         
                         var id = event.currentTarget.id;
 
-                        id = id.replace(cardId + '_destination_item_', '')
+                        id = id.replace('choose_destination_item_', '')
 
                         if (id == "add_card") {
-                            me.addCard(onSelect);
+   	                        window.dialogBuilder.chooseDestinationDialog.close();
+                        
+                            me.addCard(window.dialogBuilder.chooseDestinationDialogCallback);
                         } else {
-                            onSelect(nodeId);
+                            window.dialogBuilder.chooseDestinationDialogCallback(nodeId);
+                        }
+                    }
+                });
+            }
+            
+            $(".builder-destination-item").hide();
+            
+            window.dialogBuilder.chooseDestinationDialogCallback = updateFunction;
+        }
+
+        initializeDestinationMenu() {
+            var me = this;
+
+            const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item');
+            
+            for (let option of options) {
+            	$(option).off('click');
+            	
+                option.addEventListener('click', (event) => {
+                    let prevent = event.currentTarget.classList.contains('prevent-menu-close');
+
+                    if (prevent) {
+                        event.stopPropagation();
+
+                        var id = event.currentTarget.id;
+
+                        id = id.replace('choose_destination_sequence_', '')
+
+                        $(".builder-destination-item").hide();
+                        
+                        var icon = '#choose_destination_sequence_' + id + ' .destination_disclosure_icon'; 
+                        
+                        var isVisible = $(icon).html() == "arrow_drop_down";
+
+                        $(".destination_disclosure_icon").text("arrow_right");
+                        
+                        if (isVisible) {
+                            $(icon).text("arrow_right");
+
+                            $('.choose_destination_sequence_' + id + '_item').hide();
+                        } else {
+                            $('#choose_destination_sequence_' + id + " .destination_disclosure_icon").text("arrow_drop_down");
+
+                            $('.choose_destination_sequence_' + id + '_item').show();
+                        }
+                    } else {
+                        var nodeId = $(event.currentTarget).attr("data-node-id");
+                        
+                        var id = event.currentTarget.id;
+
+                        id = id.replace('choose_destination_item_', '')
+
+                        if (id == "add_card") {
+                            me.addCard(window.dialogBuilder.chooseDestinationDialogCallback);
+                        } else {
+                            window.dialogBuilder.chooseDestinationDialogCallback(nodeId);
                         }
                     }
                 });
@@ -429,7 +522,7 @@ define(modules, function (mdc, Node) {
         addCard(callback) {
             $("#add-card-name-value").val("");
 
-            window.dialogBuilder.newCardSelect.value = '';
+            // window.dialogBuilder.newCardSelect.value = '';
             
             var me = this;
             
@@ -437,7 +530,7 @@ define(modules, function (mdc, Node) {
                 handleEvent: function (event) {
                     if (event.detail.action == "add_card") {
                         var cardName = $("#add-card-name-value").val();
-                        var cardType = window.dialogBuilder.newCardSelect.value;
+                        var cardType = $("input[name='add-card-options']:checked").val(); //  window.dialogBuilder.newCardSelect.value;
 
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
                     

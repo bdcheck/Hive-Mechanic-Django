@@ -29,13 +29,12 @@
 							{% for player in players %}
 								<tr class="mdc-data-table__row">
 									<td class="mdc-data-table__cell">{{ player.identifier }}</a></td>
-									<td class="mdc-data-table__cell">TODO</a></td>
-									<td class="mdc-data-table__cell">TODO</a></td>
-									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">-1</td>
-									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">-1</td>
+									<td class="mdc-data-table__cell">{{ player.most_recent_game }}</a></td>
+									<td class="mdc-data-table__cell">{{ player.earliest_session.started }}</a></td>
+									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.active_session_count }}</td>
+									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.inactive_session_count }}</td>
 									<td class="mdc-data-table__cell">
-										<a href="#" class="material-icons" aria-hidden="true">refresh</a>
-										<a href="#" class="material-icons" aria-hidden="true">delete_forever</a>
+										<a href="#" class="material-icons action_delete_player" data-id="{{ player.pk }}" aria-hidden="true">delete_forever</a>
 									</td>
 								</tr>
 							{% endfor %}

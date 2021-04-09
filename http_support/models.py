@@ -3,6 +3,7 @@
 
 from future.utils import python_2_unicode_compatible
 
+from django.conf import settings
 from django.core.management import call_command
 from django.db import models
 
@@ -11,6 +12,9 @@ from integrations.models import Integration
 @python_2_unicode_compatible
 class ApiClient(models.Model):
     name = models.CharField(max_length=4096, unique=True)
+
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='http_api_client_editables')
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='http_api_client_viewables')
 
     shared_secret = models.CharField(max_length=4096, unique=True)
 

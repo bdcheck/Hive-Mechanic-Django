@@ -36,6 +36,15 @@ GATHER_SPEECH_MODELS = (
     ('phone_call', 'Phone Call'),
 )
 
+class PermissionsSupport(models.Model):
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
+        managed = False
+        default_permissions = ()
+
+        permissions = (
+            ('twilio_history_access', 'Access Twilio message history'),
+        )
+
 class OutgoingMessage(models.Model):
     destination = models.CharField(max_length=256)
 

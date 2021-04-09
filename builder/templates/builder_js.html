@@ -1,16 +1,18 @@
 {% load static %}
-{% load react_builder %}
 <!doctype html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <link rel="shortcut icon" href="{% static 'builder-react' %}/favicon.ico">
+		<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+		<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+		<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+		<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
         <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
         <meta name="theme-color" content="#000000">
 
         <script src="https://kit.fontawesome.com/78410c1b93.js" crossorigin="anonymous"></script>
 
-        <link rel="stylesheet" href="https://unpkg.com/material-components-web@5.1.0/dist/material-components-web.min.css" />
+        <link rel="stylesheet" href="https://unpkg.com/material-components-web@10.0.0/dist/material-components-web.min.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
         <title>Hive Mechanic</title>
@@ -28,8 +30,8 @@
             }
 
             .main-content {
-                overflow: auto;
-                height: 100%;
+                overflow: hidden;
+                /* height: 100%; */
             }
 
             .app-bar {
@@ -40,12 +42,21 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
-            
+
             a {
                 text-decoration: none;
             }
+
+			#builder_source_nodes, #builder_current_node, #builder_next_nodes {
+				padding-top: 5px;
+				padding-bottom: 5px;
+				-webkit-mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
+				mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
+
+				overflow-y: scroll;
+			}
         </style>
-        
+
     </head>
     <body class="mdc-typography">
         <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">
@@ -55,7 +66,17 @@
                     <span class="mdc-top-app-bar__title">Hive Mechanic</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card">collections</a>
+					<label for="hive-help-switch-toggle">Help: </label>
+					<div class="mdc-switch" id="hive-help-switch" style="margin-left: 11px; margin-right: 44px;">
+						<div class="mdc-switch__track"></div>
+						<div class="mdc-switch__thumb-underlay">
+							<div class="mdc-switch__thumb"></div>
+							<input type="checkbox" id="hive-help-switch-toggle" class="mdc-switch__native-control" role="switch" aria-checked="false">
+						</div>
+					</div>
+
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" id="action_reset_game">restart_alt</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card" style="margin-left: 11px;">collections</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence" style="margin-left: 11px;">edit</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
@@ -88,7 +109,7 @@
             </div>
         </aside>
 
-        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust"  style="background-color: #BDBDBD;">
+        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust" style="background-color: #BDBDBD; overflow: hidden;">
             <main class="main-content" id="main-content">
                 <div class="mdc-layout-grid">
                     <div class="mdc-layout-grid__inner">
@@ -108,11 +129,11 @@
                         </div>
                     </div>
                     <div class="mdc-layout-grid__inner">
-                        <div class="mdc-layout-grid__cell" id="builder_source_nodes">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_source_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Sources Here)
                         </div>
-                        <div class="mdc-layout-grid__cell" id="builder_current_node"></div>
-                        <div class="mdc-layout-grid__cell" id="builder_next_nodes">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_current_node" style="overflow-y: scroll; scrollbar-width: none;"></div>
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_next_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Destinations Here)
                         </div>
                     </div>
@@ -125,7 +146,7 @@
                 <div class="mdc-dialog__surface">
                     <h2 class="mdc-dialog__title" id="add-card-dialog-title">Add Card</h2>
                     <div class="mdc-dialog__content" id="add-card-dialog-content">
-                        <div class="mdc-text-field mdc-text-field--outlined" id="add-card-name"  style="width: 100%; margin-top: 8px;">
+                        <div class="mdc-text-field mdc-text-field--outlined" id="add-card-name" style="width: 100%; margin-top: 8px;">
                             <input type="text" class="mdc-text-field__input" id="add-card-name-value">
                             <div class="mdc-notched-outline">
                                 <div class="mdc-notched-outline__leading"></div>
@@ -135,24 +156,8 @@
                                 <div class="mdc-notched-outline__trailing"></div>
                             </div>
                         </div>
-                        <div class="mdc-select mdc-select--outlined" id="add-card-type" style="width: 100%; margin-top: 16px;">
-                            <div class="mdc-select__anchor" style="width: 100%;">
-                                <i class="mdc-select__dropdown-icon"></i>
-                                <div id="demo-selected-text" class="mdc-select__selected-text" aria-labelledby="outlined-select-label"></div>
-                                    <div class="mdc-notched-outline">
-                                        <div class="mdc-notched-outline__leading"></div>
-                                        <div class="mdc-notched-outline__notch">
-                                        <label id="outlined-select-label" class="mdc-floating-label">Action</label>
-                                    </div>
-                                <div class="mdc-notched-outline__trailing"></div>
-                                </div>
-                            </div>
-                            <div class="mdc-select__menu mdc-menu mdc-menu-surface demo-width-class">
-                                <ul class="mdc-list" id="add-card-select-widget">
-                                    <li class="mdc-list-item mdc-list-item--selected" data-value="" aria-selected="true"></li>
-                                </ul>
-                            </div>
-                        </div>
+
+						<ul class="mdc-list" id="add-card-select-widget"></ul>
                     </div>
                     <footer class="mdc-dialog__actions">
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
@@ -313,7 +318,7 @@
 										</span>
 									</div>
 									<div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox" id="builder-activity-setting-initial-card-list">
-									</div>								
+									</div>
 								</div>
 								<div class="mdc-select mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="width: 100%;">
 									<h1 class="mdc-typography--button" style="margin-bottom: 0px;">Interrupt Keywords</h1>
@@ -338,7 +343,7 @@
             </div>
             <div class="mdc-dialog__scrim"></div>
         </div>
-        
+
 		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="select-interrupt-dialog"  aria-labelledby="select-interrupt-dialog-title" aria-describedby="select-interrupt-dialog-content">
 			<div class="mdc-dialog__container">
 				<div class="mdc-dialog__surface">
@@ -353,8 +358,58 @@
 			</div>
 			<div class="mdc-dialog__scrim"></div>
 		</div>
+
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="select-card-destination-edit-dialog"  aria-labelledby="select-card-destination-edit-dialog-title">
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface">
+					<h2 class="mdc-dialog__title" id="select-card-destination-edit-dialog-title">Choose Destination</h2>
+					<ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" id="select-card-destination-edit-dialog-menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" style="padding: 0px;"></ul>
+				</div>
+			</div>
+		</div>
+
+        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="builder-reset-game-dialog"  aria-labelledby="add-reset-game-dialog-title" aria-describedby="add-reset-game-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface">
+                    <h2 class="mdc-dialog__title" id="add-reset-game-dialog-title">Reset Game?</h2>
+                    <div class="mdc-dialog__content mdc-layout-grid__inner" style="row-gap: 8px" id="add-reset-game-dialog-content">
+						<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<div class="mdc-radio">
+								<input class="mdc-radio__native-control" type="radio" value="game" id="reset_game" name="builder_reset_game" checked />
+								<div class="mdc-radio__background">
+									<div class="mdc-radio__outer-circle"></div>
+									<div class="mdc-radio__inner-circle"></div>
+								</div>
+								<div class="mdc-radio__ripple"></div>
+							</div>
+							<label for="radio-1">Reset Game Variables</label>
+						</div>
+						<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<div class="mdc-radio">
+								<input class="mdc-radio__native-control" type="radio" value="sessions" id="reset_sessions" name="builder_reset_game" />
+								<div class="mdc-radio__background">
+									<div class="mdc-radio__outer-circle"></div>
+									<div class="mdc-radio__inner-circle"></div>
+								</div>
+								<div class="mdc-radio__ripple"></div>
+							</div>
+							<label for="radio-1">Reset Active Session Variables</label>
+						</div>
+                    </div>
+                    <footer class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+                            <span class="mdc-button__label">Cancel</span>
+                        </button>
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="reset_game">
+                            <span class="mdc-button__label">Reset</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+
     </body>
-    
     <script>
         window.dialogBuilder = {
             cards: {{ game.interaction_card_modules_json }},
@@ -362,11 +417,11 @@
             update: function(definition, success, failure) {
             	console.log("UPDATE");
             	console.log(definition);
-            	
+
                 var payload = {
                     'definition': JSON.stringify(definition, 2)
                 };
-                
+
                 $.post("{% url 'builder_game' game.slug %}", payload, function(data) {
                     success();
                 });

@@ -1,13 +1,13 @@
 # pylint: disable=no-member, line-too-long
 
 import logging
-import sys
 import time
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
-from ...client import HiveClient, VariableScope, TriggerInterruptCommand
+from ...client import HiveClient, VariableScope, TriggerInterruptCommand, SetVariableCommand
 
 
 class Command(BaseCommand):
@@ -16,23 +16,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options): # pylint: disable=unused-argument
         verbosity = int(options['verbosity'])
-        
+
         level = logging.DEBUG
 
         if verbosity == 3:
-	        level = logging.DEBUG
+            level = logging.DEBUG
         elif verbosity == 2:
-	        level = logging.INFO
+            level = logging.INFO
         elif verbosity == 1:
-	        level = logging.WARN
+            level = logging.WARN
         else:
-	        level = logging.ERROR
+            level = logging.ERROR
 
         logger = settings.FETCH_LOGGER(level)
 
         client = HiveClient(api_url=settings.HIVE_API_URL, token=settings.HIVE_CLIENT_TOKEN, logger=logger)
 
-        response = client.issue_command(TriggerInterruptCommand('BUTTON-PRESSED'), player='pi:12345')
+        commands = [
+            TriggerInterruptCommand('BUTTON-PRESSED'),
+            SetVariableCommand('button_press_ts', timezone.now().isoformat(), VariableScope.game)
+        ]
+
+        response = client.issue_commands(commands, player='pi:12345')
 
         logger.info('Response: %s', response)
 
