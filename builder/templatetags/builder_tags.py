@@ -2,7 +2,7 @@
 
 import re
 
-from future.utils import raise_from
+from future.utils import raise_from, raise_with_traceback
 
 from django import template
 
