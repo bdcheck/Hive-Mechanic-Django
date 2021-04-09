@@ -1,12 +1,14 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 
+from future.utils import python_2_unicode_compatible
+
 from django.core.management import call_command
 from django.db import models
 
 from integrations.models import Integration
 
-
+@python_2_unicode_compatible
 class ApiClient(models.Model):
     name = models.CharField(max_length=4096, unique=True)
 
@@ -16,6 +18,9 @@ class ApiClient(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
 
     integration = models.ForeignKey(Integration, related_name='api_clients', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.name)
 
 def process_incoming(integration, payload): # pylint: disable=too-many-branches
     issues = []

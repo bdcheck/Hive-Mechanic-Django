@@ -6,6 +6,8 @@ from builtins import str # pylint: disable=redefined-builtin
 import json
 import re
 
+from future.utils import python_2_unicode_compatible
+
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
@@ -19,6 +21,7 @@ INTEGRATION_TYPES = (
     ('other', 'Other'),
 )
 
+@python_2_unicode_compatible
 class Integration(models.Model):
     name = models.CharField(max_length=1024, unique=True)
     url_slug = models.SlugField(max_length=1024, unique=True)
@@ -30,8 +33,8 @@ class Integration(models.Model):
 
     configuration = JSONField(default=dict)
 
-    def __unicode__(self):
-        return self.name
+    def __str__(self):
+        return self.name + ' (' + self.game.slug + ')'
 
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return

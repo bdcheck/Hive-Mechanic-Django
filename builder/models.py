@@ -84,13 +84,17 @@ class InteractionCard(models.Model):
     def available_update(self):
         try:
             card_metadata = json.loads(self.repository_definition)
+            
+            if 'versions' in card_metadata:
+                versions = sorted(card_metadata['versions'], key=lambda version: version.get('version', ''))
+            
+                if versions and 'version' in versions[-1]:
+                    if self.version >= versions[-1]['version']:
+                        return None
 
-            versions = sorted(card_metadata['versions'], key=lambda version: version['version'])
-
-            if self.version >= versions[-1]['version']:
-                return None
-
-            return versions[-1]['version']
+                    return versions[-1]['version']
+                
+            return None
         except TypeError:
             pass
 
