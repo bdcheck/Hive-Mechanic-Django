@@ -99,17 +99,20 @@ class InteractionCard(models.Model):
 
     def available_update(self):
         try:
-            card_metadata = json.loads(self.repository_definition)
-            
-            if 'versions' in card_metadata:
-                versions = sorted(card_metadata['versions'], key=lambda version: version.get('version', ''))
-            
-                if versions and 'version' in versions[-1]:
-                    if self.version >= versions[-1]['version']:
-                        return None
+            try:
+                card_metadata = json.loads(self.repository_definition)
 
-                    return versions[-1]['version']
-                
+                if 'versions' in card_metadata:
+                    versions = sorted(card_metadata['versions'], key=lambda version: version.get('version', ''))
+
+                    if versions and 'version' in versions[-1]:
+                        if self.version >= versions[-1]['version']:
+                            return None
+
+                        return versions[-1]['version']
+            except json.JSONDecodeError:
+                pass
+
             return None
         except TypeError:
             pass
@@ -440,5 +443,73 @@ class Session(models.Model):
 
         return dialog
 
+    def last_message(self):
+        last_message = None
+
+        for integration in self.game_version.game.integrations.all():
+            last_integration_message = integration.last_message_for_player(self.player)
+
+            if last_integration_message is not None:
+                if last_message is None or last_message['date'] < last_integration_message['date']:
+                    last_message = last_integration_message
+
+        if last_message is not None:
+            return last_message['message']
+
+        return None
+
     def advance_to(self, destination):
         self.dialog().advance_to(destination)
+    
+    def fetch_session_context(self):
+        return self.session_state.copy()
+
+    def fetch_player_context(self):
+        return self.player.player_state.copy()
+
+    def fetch_game_context(self):
+        return self.game_version.game.game_state.copy()
+    
+
+class DataProcessor(models.Model):
+    name = models.CharField(max_length=4096, unique=True)
+    identifier = models.SlugField(max_length=4096, unique=True)
+
+    description = models.TextField(max_length=16384, null=True, blank=True)
+
+    enabled = models.BooleanField(default=True)
+
+    processor_function = models.TextField(max_length=1048576, default='return None, [], None')
+
+    metadata = models.TextField(max_length=1048576, null=True, blank=True)
+    repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
+
+    version = models.FloatField(default=0.0)
+
+    def __unicode__(self):
+        return self.name + ' (' + self.identifier + ')'
+
+    def issues(self):
+        return 'TODO'
+
+    def available_update(self):
+        try:
+            try:
+                repo_metadata = json.loads(self.repository_definition)
+
+                if 'versions' in repo_metadata:
+                    versions = sorted(repo_metadata['versions'], key=lambda version: version.get('version', ''))
+
+                    if versions and 'version' in versions[-1]:
+                        if self.version >= versions[-1]['version']:
+                            return None
+
+                        return versions[-1]['version']
+            except json.JSONDecodeError:
+                pass
+
+            return None
+        except TypeError:
+            pass
+
+        return None

@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
-from .models import Game, GameVersion, InteractionCard, Player, Session
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
 
 @login_required
 def builder_home(request): # pylint: disable=unused-argument
@@ -185,3 +185,17 @@ def builder_add_game(request): # pylint: disable=unused-argument
             response['redirect'] = reverse('builder_game', args=[new_game.slug])
 
     return HttpResponse(json.dumps(response, indent=2), content_type='application/json', status=200)
+
+@login_required
+def builder_data_processor_options(request):  # pylint: disable=unused-argument
+    options = []
+
+    for processor in DataProcessor.objects.filter(enabled=True).order_by('name'):
+        options.append({
+            'value': processor.identifier,
+            'label': {
+                'en': processor.name
+            }
+        })
+
+    return HttpResponse(json.dumps(options, indent=2), content_type='application/json', status=200)

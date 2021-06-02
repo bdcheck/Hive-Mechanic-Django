@@ -14,8 +14,8 @@ class IntegrationAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         fields = super(IntegrationAdmin, self).get_readonly_fields(request, obj=obj) # pylint: disable=super-with-arguments
 
-        if request.user.has_perm('twilio_history_access'):
-            return ('configuration',)
+        # if request.user.has_perm('twilio_history_access'):
+        #    return ('configuration',)
 
         return fields
 

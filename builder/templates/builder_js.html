@@ -12,7 +12,7 @@
 
         <script src="https://kit.fontawesome.com/78410c1b93.js" crossorigin="anonymous"></script>
 
-        <link rel="stylesheet" href="https://unpkg.com/material-components-web@10.0.0/dist/material-components-web.min.css" />
+        <link rel="stylesheet" href="{% static 'builder-js/vendor/material-components-web-11.0.0.css' %}" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
         <title>Hive Mechanic</title>
@@ -31,7 +31,7 @@
 
             .main-content {
                 overflow: hidden;
-                /* height: 100%; */
+                height: 100%;
             }
 
             .app-bar {
@@ -47,14 +47,14 @@
                 text-decoration: none;
             }
 
-			#builder_source_nodes, #builder_current_node, #builder_next_nodes {
+			/* #builder_source_nodes, #builder_current_node, #builder_next_nodes {
 				padding-top: 5px;
 				padding-bottom: 5px;
 				-webkit-mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
 				mask-image: linear-gradient(to bottom, transparent, black 1%, black 99%, transparent 100%);
 
 				overflow-y: scroll;
-			}
+			} */
         </style>
 
     </head>
@@ -109,7 +109,7 @@
             </div>
         </aside>
 
-        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust" style="background-color: #BDBDBD; overflow: hidden;">
+        <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust" style="background-color: #BDBDBD;">
             <main class="main-content" id="main-content">
                 <div class="mdc-layout-grid">
                     <div class="mdc-layout-grid__inner">
@@ -129,11 +129,11 @@
                         </div>
                     </div>
                     <div class="mdc-layout-grid__inner">
-                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_source_nodes" style="overflow-y: scroll; scrollbar-width: none;">
+                        <div class="mdc-layout-grid__cell" id="builder_source_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Sources Here)
                         </div>
-                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_current_node" style="overflow-y: scroll; scrollbar-width: none;"></div>
-                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="builder_next_nodes" style="overflow-y: scroll; scrollbar-width: none;">
+                        <div class="mdc-layout-grid__cell" id="builder_current_node" style="overflow-y: scroll; scrollbar-width: none;"></div>
+                        <div class="mdc-layout-grid__cell" id="builder_next_nodes" style="overflow-y: scroll; scrollbar-width: none;">
                             (Destinations Here)
                         </div>
                     </div>
@@ -157,7 +157,7 @@
                             </div>
                         </div>
 
-						<ul class="mdc-list" id="add-card-select-widget"></ul>
+						<ul class="mdc-list" id="add-card-select-widget" role="radiogroup"></ul>
                     </div>
                     <footer class="mdc-dialog__actions">
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">

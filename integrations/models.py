@@ -132,62 +132,77 @@ class Integration(models.Model):
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use
         translated_value = value
+        
+        try:
+            while '[ME]' in translated_value:
+                translated_value = translated_value.replace('[ME]', session.player.identifier)
 
-        while '[ME]' in translated_value:
-            translated_value = translated_value.replace('[ME]', session.player.identifier)
+            while '[LAST-MESSAGE]' in translated_value:
+                translated_value = translated_value.replace('[LAST-MESSAGE]', session.last_message())
 
-        while '[SESSION:' in translated_value:
-            start = translated_value.find('[SESSION:')
+            while '[SESSION:' in translated_value:
+                start = translated_value.find('[SESSION:')
 
-            end = translated_value.find(']', start)
+                end = translated_value.find(']', start)
 
-            if end != -1:
-                tag = translated_value[start:(end + 1)]
+                if end != -1:
+                    tag = translated_value[start:(end + 1)]
 
-                variable = tag[7:-1]
+                    variable = tag[9:-1]
+                    
+                    variable_value = session.fetch_variable(variable)
 
-                variable_value = session.fetch_variable(variable)
+                    if variable_value is None:
+                        variable_value = '???'
 
-                if variable_value is None:
-                    variable_value = '???'
+                    translated_value = translated_value.replace(tag, variable_value)
 
-                translated_value = translated_value.replace(tag, variable_value)
+            while '[GAME:' in translated_value:
+                start = translated_value.find('[GAME:')
 
-        while '[GAME:' in translated_value:
-            start = translated_value.find('[GAME:')
+                end = translated_value.find(']', start)
 
-            end = translated_value.find(']', start)
+                if end != -1:
+                    tag = translated_value[start:(end + 1)]
 
-            if end != -1:
-                tag = translated_value[start:(end + 1)]
+                    variable = tag[6:-1]
 
-                variable = tag[6:-1]
+                    variable_value = session.game_version.game.fetch_variable(variable)
 
-                variable_value = session.game_version.game.fetch_variable(variable)
+                    if variable_value is None:
+                        variable_value = '???'
 
-                if variable_value is None:
-                    variable_value = '???'
+                    translated_value = translated_value.replace(tag, variable_value)
 
-                translated_value = translated_value.replace(tag, variable_value)
+            while '[PLAYER:' in translated_value:
+                start = translated_value.find('[PLAYER:')
 
-        while '[PLAYER:' in translated_value:
-            start = translated_value.find('[PLAYER:')
+                end = translated_value.find(']', start)
 
-            end = translated_value.find(']', start)
+                if end != -1:
+                    tag = translated_value[start:(end + 1)]
 
-            if end != -1:
-                tag = translated_value[start:(end + 1)]
+                    variable = tag[8:-1]
 
-                variable = tag[8:-1]
+                    variable_value = session.player.fetch_variable(variable)
 
-                variable_value = session.player.fetch_variable(variable)
+                    if variable_value is None:
+                        variable_value = '???'
 
-                if variable_value is None:
-                    variable_value = '???'
-
-                translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, variable_value)
+        except TypeError:
+            pass # Attempting to translate non-string
 
         return translated_value
+
+    def last_message_for_player(self, player):
+        if self.type == 'twilio':
+            from twilio_support.models import last_message_for_player
+
+            return last_message_for_player(self.game, player)
+
+        return None
+
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument
     if action['type'] == 'set-variable': # pylint: disable=no-else-return

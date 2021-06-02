@@ -31,18 +31,19 @@ define(modules, function (mdc) {
                 htmlString += '    <div class="mdc-layout-grid__inner" style="row-gap: 8px;">';
                 htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">';
                 htmlString += '        <div class="mdc-typography--headline6" style="margin-bottom: 16px;">';
-                htmlString += '          <div class="mdc-menu-surface--anchor" style="display: inline-block; padding-top: 4px;">';
+                htmlString += '          <span>' + this.cardIcon() + '</span>';
+                htmlString += '          <span style="vertical-align: top;">' + this.cardType() + '</span>';
+                htmlString += '          <div class="mdc-menu-surface--anchor" style="float: right;">';
                 htmlString += '            <i class="material-icons mdc-icon-button__icon" aria-hidden="true" id="' + this.cardId + '_menu_open">more_vert</i>';
                 htmlString += '            <div class="mdc-menu mdc-menu-surface" id="' + this.cardId + '_menu">';
                 htmlString += '              <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
-                htmlString += '                <li class="mdc-list-item" role="menuitem">';
-                htmlString += '                  <span class="mdc-list-item__text">Advanced Settings&#8230;</span>';
+                htmlString += '                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem">';
+                htmlString += '                  <span class="mdc-list-item__ripple"></span>';
+                htmlString += '                  <span class="mdc-list-item__text mdc-list-item__start">Advanced Settings&#8230;</span>';
                 htmlString += '                </li>';
                 htmlString += '              </ul>';
                 htmlString += '            </div>';
                 htmlString += '          </div>';
-                htmlString += '          <span style="vertical-align: top;">' + this.cardType() + '</span>';
-                htmlString += '          <span style="float: right;">' + this.cardIcon() + '</span>';
                 htmlString += '        </div>';
                 htmlString += '      </div>';
                 htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">';
@@ -64,10 +65,9 @@ define(modules, function (mdc) {
                 htmlString += '</div>';
                 htmlString += '<div class="mdc-dialog" id="' + this.cardId + '-advanced-dialog">';
                 htmlString += '  <div class="mdc-dialog__container">';
-                // htmlString += '    <div class="mdc-dialog__surface" style="min-width: 480px; max-width: 720px;">';
                 htmlString += '    <div class="mdc-dialog__surface">';
                 htmlString += '      <h2 class="mdc-dialog__title" id="' + this.cardId + '-advanced-dialog-title">' + this.cardName() + '</h2>';
-                htmlString += '      <div class="mdc-dialog__content" id="' + this.cardId + '-advanced-dialog-content" style="padding-top: 8px; width: 24px;">';
+                htmlString += '      <div class="mdc-dialog__content" id="' + this.cardId + '-advanced-dialog-content" style="padding-top: 8px;">';
                 htmlString += this.advancedEditBody();
                 htmlString += '      </div>';
                 htmlString += '      <footer class="mdc-dialog__actions">';
@@ -169,8 +169,8 @@ define(modules, function (mdc) {
                 me.sequence.markChanged(me.id);
             });
 
-			var element = $('#' + this.cardId + '-advanced-dialog').detach();
-			$('body').append(element);
+            var element = $('#' + this.cardId + '-advanced-dialog').detach();
+            $('body').append(element);
 
             const advancedDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById(this.cardId + '-advanced-dialog'));
 
@@ -181,6 +181,7 @@ define(modules, function (mdc) {
             });
 
             const menu = mdc.menu.MDCMenu.attachTo(document.getElementById(this.cardId + '_menu'));
+            menu.setFixedPosition(true);
 
             menu.listen("MDCMenu:selected", function (event) {
                 advancedDialog.open();
@@ -245,28 +246,28 @@ define(modules, function (mdc) {
         }
 
         fetchLocalizedConstant(term) {
-        	var constants = {
-        		'begins_with': {
-        			'en': 'Begins with...'
-        		},
-        		'ends_with': {
-        			'en': 'Ends with...'
-        		},
-        		'equals': {
-        			'en': 'Equals/is...'
-        		},
-        		'not_equals': {
-        			'en': 'Does not equal / is not...'
-        		},
-        		'contains': {
-        			'en': 'Contains...'
-        		},
-        		'not_contains': {
-        			'en': 'Does not contain...'
-        		}
-        	};
+            var constants = {
+                'begins_with': {
+                    'en': 'Begins with...'
+                },
+                'ends_with': {
+                    'en': 'Ends with...'
+                },
+                'equals': {
+                    'en': 'Equals/is...'
+                },
+                'not_equals': {
+                    'en': 'Does not equal / is not...'
+                },
+                'contains': {
+                    'en': 'Contains...'
+                },
+                'not_contains': {
+                    'en': 'Does not contain...'
+                }
+            };
 
-        	this.addTerms(constants);
+            this.addTerms(constants);
 
             var keys = Object.keys(constants[term]);
 
@@ -286,7 +287,7 @@ define(modules, function (mdc) {
         }
 
         addTerms(terms) {
-        	// Override in subclasses...
+            // Override in subclasses...
         }
 
         createImageUrlField(field) {
@@ -365,28 +366,28 @@ define(modules, function (mdc) {
             var style = 'body1';
 
             if (field['style'] != undefined) {
-            	style = field['style'];
+                style = field['style'];
             }
 
             var helpClass = '';
 
             if (field['is_help']) {
-            	helpClass = 'hive_mechanic_help';
+                helpClass = 'hive_mechanic_help';
             }
 
-			if (field['value'] == '----') {
-	            fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' ' + helpClass + '">');
-				fieldLines.push('  <hr style="height: 1px; border: none; color: #9D9E9D; background-color: #9D9E9D;" />');
-	            fieldLines.push('</div>');
-			} else {
-	            fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' ' + helpClass + '" style="display: flex; align-items: center;">');
-				fieldLines.push('  <div>' + me.fetchLocalizedValue(field['value']) + '</div>');
-	            fieldLines.push('</div>');
-			}
+            if (field['value'] == '----') {
+                fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' ' + helpClass + '">');
+                fieldLines.push('  <hr style="height: 1px; border: none; color: #9D9E9D; background-color: #9D9E9D;" />');
+                fieldLines.push('</div>');
+            } else {
+                fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' ' + helpClass + '" style="display: flex; align-items: center;">');
+                fieldLines.push('  <div>' + me.fetchLocalizedValue(field['value']) + '</div>');
+                fieldLines.push('</div>');
+            }
 
-			if (field['width'] != 12 && helpClass != '') {
-	            fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' hive_mechanic_help_filler">&nbsp;&nbsp;</div>');
-			}
+            if (field['width'] != 12 && helpClass != '') {
+                fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + ' mdc-typography--' + style + ' hive_mechanic_help_filler">&nbsp;&nbsp;</div>');
+            }
 
             return fieldLines.join('\n');
         }
@@ -420,13 +421,15 @@ define(modules, function (mdc) {
 
             fieldLines.push('    <div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox">');
             fieldLines.push('      <ul class="mdc-list" role="listbox">');
-
-            $.each(field['options'], function(index, option) {
-                fieldLines.push('          <li class="mdc-list-item" data-value="' + option['value'] + '" role="option">');
-                fieldLines.push('            <span class="mdc-list-item__ripple"></span>                ');
-                fieldLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option['label']) + '<span>');
-                fieldLines.push('          </li>');
-            });
+            
+            if (Array.isArray(field['options'])) { 
+                $.each(field['options'], function(index, option) {
+                    fieldLines.push('          <li class="mdc-list-item" data-value="' + option['value'] + '" role="option">');
+                    fieldLines.push('            <span class="mdc-list-item__ripple"></span>                ');
+                    fieldLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option['label']) + '<span>');
+                    fieldLines.push('          </li>');
+                });
+            }
 
             fieldLines.push('      </ul>');
             fieldLines.push('    </div>');
@@ -505,16 +508,16 @@ define(modules, function (mdc) {
             var fieldName = field['field'];
 
             var operations = [
-            	'begins_with',
-            	'ends_with',
-            	'equals',
-            	'not_equals',
-            	'contains',
-            	'not_contains',
+                'begins_with',
+                'ends_with',
+                'equals',
+                'not_equals',
+                'contains',
+                'not_contains',
             ];
 
             if (field['operations'] != undefined) {
-            	operations = field['operations'];
+                operations = field['operations'];
             }
 
             fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['operation_width'] + ' mdc-typography--caption" style="margin-bottom: 8px;">');
@@ -609,7 +612,7 @@ define(modules, function (mdc) {
                 me.initializeField(templateField, itemDefinition, function(newValue) {
                     itemDefinition[templateField['original_field']] = newValue;
 
-	                me.sequence.markChanged(me.id);
+                    me.sequence.markChanged(me.id);
                 });
             });
         }
@@ -625,11 +628,11 @@ define(modules, function (mdc) {
 
             $('#' + listContainerId).append(fieldHtml);
 
-			me.initializeField(field, itemDefinition, function(newValue) {
-			 	itemDefinition[fieldName] = newValue;
+            me.initializeField(field, itemDefinition, function(newValue) {
+                itemDefinition[fieldName] = newValue;
 
                 me.sequence.markChanged(me.id);
-			});
+            });
         }
 
         createField(field) {
@@ -643,7 +646,7 @@ define(modules, function (mdc) {
                 field = jQuery.extend(true, {}, field);
 
                 field['original_field'] = field['field'];
-				field['field'] = field['parent_field'] + '__' + field['field'];
+                field['field'] = field['parent_field'] + '__' + field['field'];
             }
 
             if (field['type'] == 'integer') {
@@ -657,19 +660,19 @@ define(modules, function (mdc) {
                     fieldLines.push(this.createTextField(field));
                 }
             } else if (field['type'] == 'choice') {
-				fieldLines.push(this.createSelect(field));
+                fieldLines.push(this.createSelect(field));
             } else if (field['type'] == 'readonly') {
-				fieldLines.push(this.createReadOnly(field));
+                fieldLines.push(this.createReadOnly(field));
             } else if (field['type'] == 'card') {
-				fieldLines.push(this.createCardReference(field));
+                fieldLines.push(this.createCardReference(field));
             } else if (field['type'] == 'list') {
-				fieldLines.push(this.createList(field));
+                fieldLines.push(this.createList(field));
             } else if (field['type'] == 'structure') {
-				fieldLines.push(this.createStructure(field));
+                fieldLines.push(this.createStructure(field));
             } else if (field['type'] == 'pattern') {
-				fieldLines.push(this.createPattern(field));
+                fieldLines.push(this.createPattern(field));
             } else if (field['type'] == 'image-url') {
-				fieldLines.push(this.createImageUrlField(field));
+                fieldLines.push(this.createImageUrlField(field));
             } else {
                 // TODO: Unknown Card Type
             }
@@ -680,14 +683,14 @@ define(modules, function (mdc) {
         initializeField(field, definition, onUpdate) {
             var me = this;
 
-           	console.log("INITING...");
-           	console.log(field);
-           	console.log(definition);
+            console.log("INITING...");
+            console.log(field);
+            console.log(definition);
 
             var fieldName = field['field'];
 
             if (field['parent_field'] != undefined) {
-				fieldName = field['parent_field'] + '__' + fieldName;
+                fieldName = field['parent_field'] + '__' + fieldName;
             }
 
             if (field['type'] == 'integer') {
@@ -709,9 +712,6 @@ define(modules, function (mdc) {
                     onUpdate(parseInt(value));
                 });
             } else if (field['type'] == 'image-url') {
-            	console.log("INITING IMAGE-URL...");
-            	console.log(field);
-            	
                 const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'));
 
                 if (definition[field['field']] == undefined && definition[field['default']] != undefined) {
@@ -721,34 +721,50 @@ define(modules, function (mdc) {
                 if (definition[field['field']] != undefined) {
                     fieldWidget.value = definition[field['field']];
                     
-     				$('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', fieldWidget.value);
+                    $('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', fieldWidget.value);
                 }
 
                 $('#' + me.cardId + '_' + fieldName + '_value').on("change keyup paste", function() {
                     var value = $('#' + me.cardId + '_' + fieldName + '_value').val();
 
-                    console.log("UPDATE: " + value);
-
-       				$('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', value);
+                    $('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', value);
 
                     me.sequence.markChanged(me.id);
 
                     onUpdate(value);
                 });
-
-            	console.log("INITED IMAGE-URL...");
             } else if (field['type'] == 'choice') {
-                const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName));
+                if (Array.isArray(field['options'])) { 
+                    const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName));
 
-                if (definition[field['field']] != undefined) {
-                    choiceField.value = definition[field['field']];
+                    if (definition[field['field']] != undefined) {
+                        choiceField.value = definition[field['field']];
+                    }
+
+                    choiceField.listen('MDCSelect:change', function() {
+                        onUpdate(choiceField.value);
+                    });
+
+                    me.sequence.markChanged(me.id);
+                } else {
+                    // Fetch values and update structure and re-render
+                    $.get(field['options'], function(data) {
+                        field['options'] = data;
+                        
+                        var optionLines = [];
+
+                        $.each(data, function(index, option) {
+                            optionLines.push('          <li class="mdc-list-item" data-value="' + option['value'] + '" role="option">');
+                            optionLines.push('            <span class="mdc-list-item__ripple"></span>                ');
+                            optionLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option['label']) + '<span>');
+                            optionLines.push('          </li>');
+                        });
+                        
+                        $('#' + me.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join('')); 
+                        
+                        me.initializeField(field, definition, onUpdate);
+                    });
                 }
-
-                choiceField.listen('MDCSelect:change', function() {
-                    onUpdate(choiceField.value);
-                });
-
-                me.sequence.markChanged(me.id);
             } else if (field['type'] == 'text') {
                 const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'));
 
@@ -793,11 +809,11 @@ define(modules, function (mdc) {
                     }
                 });
 
-				if (definition[field['field']] == null || definition[field['field']] == undefined) {
-					$('#' + me.cardId + '_' + fieldName + '_goto').hide();
-				} else {
-					$('#' + me.cardId + '_' + fieldName + '_goto').show();
-				}
+                if (definition[field['field']] == null || definition[field['field']] == undefined) {
+                    $('#' + me.cardId + '_' + fieldName + '_goto').hide();
+                } else {
+                    $('#' + me.cardId + '_' + fieldName + '_goto').show();
+                }
             } else if (field['type'] == 'list') {
                 $('#' + me.cardId + '__' + fieldName + '__add_item').on("click", function() {
                     definition[field['field']].push({});
@@ -811,7 +827,7 @@ define(modules, function (mdc) {
                 });
             } else if (field['type'] == 'structure') {
                 $.each(field['fields'], function(index, itemField) {
-                	itemField['parent_field'] = field['field'];
+                    itemField['parent_field'] = field['field'];
 
                     me.addStructureFieldItem(itemField, definition[field['field']]);
                 });
@@ -822,7 +838,7 @@ define(modules, function (mdc) {
                 var actualFieldName = field['field'];
 
                 if (field['original_field'] != undefined) {
-                	actualFieldName = field['original_field'];
+                    actualFieldName = field['original_field'];
                 }
 
                 if (definition[actualFieldName] != undefined) {
@@ -831,13 +847,13 @@ define(modules, function (mdc) {
                 }
 
                 operationField.listen('MDCSelect:change', function() {
-					me.updatePatternValue(operationField.value, contentField.value, onUpdate);
+                    me.updatePatternValue(operationField.value, contentField.value, onUpdate);
 
                     me.updatePatternView(definition[actualFieldName], operationField, contentField);
                 });
 
-				$('#' + me.cardId + '_' + fieldName + '__content_value').on("change keyup paste", function() {
-					me.updatePatternValue(operationField.value, $('#' + me.cardId + '_' + fieldName + '__content_value').val(), onUpdate);
+                $('#' + me.cardId + '_' + fieldName + '__content_value').on("change keyup paste", function() {
+                    me.updatePatternValue(operationField.value, $('#' + me.cardId + '_' + fieldName + '__content_value').val(), onUpdate);
 
                     me.updatePatternView(definition[actualFieldName], operationField, contentField);
                 });
@@ -846,69 +862,69 @@ define(modules, function (mdc) {
             }
         }
 
-		updatePatternView(pattern, operationField, patternField) {
-			var oldOperationValue = operationField.value;
-			var newOperationValue = oldOperationValue;
+        updatePatternView(pattern, operationField, patternField) {
+            var oldOperationValue = operationField.value;
+            var newOperationValue = oldOperationValue;
 
-			var oldPatternValue = patternField.value;
-			var newPatternValue = oldPatternValue;
+            var oldPatternValue = patternField.value;
+            var newPatternValue = oldPatternValue;
 
-			if (pattern == "") {
-				newOperationValue = "contains";
-				newPatternValue = "";
-			} else if (pattern.startsWith("^(?!") && pattern.endsWith(")$")) {
-				newOperationValue = "not_equals";
-				newPatternValue = pattern.replace("^(?!", "").replace(")$", "");
-			} else if (pattern.startsWith("(?!") && pattern.endsWith(")")) {
-				newOperationValue = "not_contains";
-				newPatternValue = pattern.replace("(?!", "").replace(")", "");
-			} else if (pattern.startsWith("(?!") && pattern.endsWith(")")) {
-				newOperationValue = "not_contains";
-				newPatternValue = pattern.replace("(?!", "").replace(")", "");
-			} else if (pattern.startsWith("^") && pattern.endsWith("$")) {
-				newOperationValue = "equals";
-				newPatternValue = pattern.replace("^", "").replace("$", "");
-			} else if (pattern.startsWith("^")) {
-				newOperationValue = "begins_with";
-				newPatternValue = pattern.replace("^", "");
-			} else if (pattern.endsWith("$")) {
-				newOperationValue = "ends_with";
-				newPatternValue = pattern.replace("$", "");
-			} else {
-				newOperationValue = "contains";
-				newPatternValue = pattern;
-			}
+            if (pattern == "") {
+                newOperationValue = "contains";
+                newPatternValue = "";
+            } else if (pattern.startsWith("^(?!") && pattern.endsWith(")$")) {
+                newOperationValue = "not_equals";
+                newPatternValue = pattern.replace("^(?!", "").replace(")$", "");
+            } else if (pattern.startsWith("(?!") && pattern.endsWith(")")) {
+                newOperationValue = "not_contains";
+                newPatternValue = pattern.replace("(?!", "").replace(")", "");
+            } else if (pattern.startsWith("(?!") && pattern.endsWith(")")) {
+                newOperationValue = "not_contains";
+                newPatternValue = pattern.replace("(?!", "").replace(")", "");
+            } else if (pattern.startsWith("^") && pattern.endsWith("$")) {
+                newOperationValue = "equals";
+                newPatternValue = pattern.replace("^", "").replace("$", "");
+            } else if (pattern.startsWith("^")) {
+                newOperationValue = "begins_with";
+                newPatternValue = pattern.replace("^", "");
+            } else if (pattern.endsWith("$")) {
+                newOperationValue = "ends_with";
+                newPatternValue = pattern.replace("$", "");
+            } else {
+                newOperationValue = "contains";
+                newPatternValue = pattern;
+            }
 
-			if (newOperationValue != oldOperationValue) {
-				operationField.value = newOperationValue;
-			}
+            if (newOperationValue != oldOperationValue) {
+                operationField.value = newOperationValue;
+            }
 
-			if (newPatternValue != oldPatternValue) {
-				patternField.value = newPatternValue;
-			}
-		};
+            if (newPatternValue != oldPatternValue) {
+                patternField.value = newPatternValue;
+            }
+        };
 
-		updatePatternValue(operation, pattern, onUpdated) {
-			var patternValue = "";
+        updatePatternValue(operation, pattern, onUpdated) {
+            var patternValue = "";
 
-			if (pattern == "") {
-				patternValue = "";
-			} else if (operation == "begins_with") {
-				patternValue = "^" + pattern;
-			} else if (operation == "ends_with") {
-				patternValue = pattern + "$";
-			} else if (operation == "equals") {
-				patternValue = "^" + pattern + "$";
-			} else if (operation == "not_contains") {
-				patternValue = "(?!" + pattern + ")";
-			} else if (operation == "not_equals") {
-				patternValue = "^(?!" + pattern + ")$";
-			} else {
-				patternValue = pattern;
-			}
+            if (pattern == "") {
+                patternValue = "";
+            } else if (operation == "begins_with") {
+                patternValue = "^" + pattern;
+            } else if (operation == "ends_with") {
+                patternValue = pattern + "$";
+            } else if (operation == "equals") {
+                patternValue = "^" + pattern + "$";
+            } else if (operation == "not_contains") {
+                patternValue = "(?!" + pattern + ")";
+            } else if (operation == "not_equals") {
+                patternValue = "^(?!" + pattern + ")$";
+            } else {
+                patternValue = pattern;
+            }
 
-			onUpdated(patternValue);
-		};
+            onUpdated(patternValue);
+        };
 
         humanizePattern(pattern, action) {
             if (action == undefined || action == "?" || action == null || action == "") {
@@ -1020,7 +1036,7 @@ define(modules, function (mdc) {
 
         advancedEditBody() {
             var htmlString  = '<div class="mdc-layout-grid" style="margin: 0; padding: 0;">';
-                htmlString += '  <div class="mdc-layout-grid__inner" style="row-gap: 8px;">';
+                htmlString += '  <div class="mdc-layout-grid__inner" style="row-gap: 16px;">';
                 htmlString += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">';
                 htmlString += '      <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_advanced_identifier" style="width: 100%">';
                 htmlString += '        <input class="mdc-text-field__input" type="text" id="' + this.cardId + '_advanced_identifier_value">';

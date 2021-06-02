@@ -13,7 +13,7 @@ requirejs.config({
     baseUrl: "/static/builder-js/js/app",
     paths: {
         app: '/static/builder-js/js/app',
-        material: "/static/builder-js/vendor/material-components-web.min",
+        material: "/static/builder-js/vendor/material-components-web-11.0.0",
         jquery: "/static/builder-js/vendor/jquery-3.4.0.min",
         cookie: "/static/builder-js/vendor/js.cookie"
     }
@@ -32,6 +32,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     window.dialogBuilder.selectCardsDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-select-card-dialog'));
 
     window.dialogBuilder.restartGameDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-reset-game-dialog'));
+    
+    window.dialogBuilder.restartGameDialog.listen('MDCDialog:closed', (result) => {
+    	console.log("ACTION: ");
+    	console.log(result);
+	});
 
     const activityDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-activity-setting-dialog'));
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
@@ -480,7 +485,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             var cardItem = '';
             
-			cardItem += '<li class="mdc-list-item" tabindex="' + i + '">';
+			cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
 			cardItem += '  <span class="mdc-list-item__graphic">';
 			cardItem += '    <div class="mdc-radio">';
 			cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
@@ -490,7 +495,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 			cardItem += '      </div>';
 			cardItem += '    </div>';
 			cardItem += '  </span>';
-			cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text">' + name + '</label>';
+			cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
 			cardItem += '</li>';
 
             $("#add-card-select-widget").append(cardItem);
@@ -616,9 +621,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 
         $.each(window.dialogBuilder.definition.sequences, function(index, value) {
-            body += '      <li class="mdc-list-item prevent-menu-close" role="menuitem" id="' + identifier + '_destination_sequence_' + value['id'] + '">';
-            body += '        <span class="mdc-list-item__text">' + value['name'] + '</span>';
-            body += '        <span class="mdc-list-item__meta material-icons destination_disclosure_icon">arrow_right</span>';
+            body += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="' + identifier + '_destination_sequence_' + value['id'] + '">';
+            body += '        <span class="mdc-list-item__ripple"></span>';       	
+            body += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
+            body += '        <span class="mdc-list-item__end material-icons mdc-layout-grid--align-right destination_disclosure_icon">arrow_right</span>';
             body += '      </li>';
 
             var items = value['items'];
@@ -626,7 +632,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
 
-                body += '     <li class="mdc-list-item builder-destination-item ' + identifier + '_destination_sequence_' + value['id'] + '_item" role="menuitem" id="' + identifier + '_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+                body += '     <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item ' + identifier + '_destination_sequence_' + value['id'] + '_item" role="menuitem" id="' + identifier + '_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+                body += '       <span class="mdc-list-item__ripple"></span>';
                 body += '       <span class="mdc-list-item__text">' + item["name"] + '</span>';
                 body += '     </li>';
             }

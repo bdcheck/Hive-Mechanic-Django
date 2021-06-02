@@ -1,8 +1,12 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 from builtins import str # pylint: disable=redefined-builtin
 
+import json
+import sys
 import time
 import traceback
 
@@ -36,6 +40,24 @@ GATHER_SPEECH_MODELS = (
     ('phone_call', 'Phone Call'),
 )
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+def last_message_for_player(game, player):
+    integration = Integration.objects.filter(game=game).first()
+    
+    phone = player.player_state.get('twilio_player', None)
+    
+    incoming = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
+    
+    if incoming is not None:
+        return {
+            'message': incoming.message,
+            'received': incoming.receive_date
+        }
+    
+    return None
+
 class PermissionsSupport(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
         managed = False
@@ -66,6 +88,8 @@ class OutgoingMessage(models.Model):
             raise Exception('Message (pk=' + str(self.pk) + ') already transmitted on ' + self.sent_date.isoformat() + '.')
 
         try:
+            eprint('CLIENT: ' + json.dumps(self.integration.configuration, indent=2))
+            
             client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
 
             if self.message.startswith('image:'):
@@ -81,6 +105,7 @@ class OutgoingMessage(models.Model):
             self.save()
 
         except: # pylint: disable=bare-except
+            traceback.print_exc()
             self.errored = True
 
             self.transmission_metadata['error'] = traceback.format_exc().splitlines()

@@ -3,7 +3,7 @@
 from django.contrib import messages
 from django.contrib.gis import admin
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository
+from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository, DataProcessor
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
@@ -59,3 +59,29 @@ class SessionAdmin(admin.OSMGeoAdmin):
 @admin.register(RemoteRepository)
 class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'url', 'priority', 'last_updated')
+    
+@admin.register(DataProcessor)
+class DataProcessorAdmin(admin.OSMGeoAdmin):
+    list_display = ('name', 'identifier', 'enabled', 'version', 'issues', 'available_update',)
+
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'identifier', 'enabled', 'version',)
+        }),
+        ('Implementaion', {
+            'fields': ('processor_function',),
+        }),
+        ('Miscellaneous', {
+            'fields': ('repository_definition', 'metadata',),
+        }),
+    )
+
+    actions = ['update_data_processor']
+
+    def update_data_processor(self, request, queryset):
+        self.message_user(request, 'Not yet implemented.', messages.ERROR)
+
+    update_data_processor.short_description = "Install updated versions"
+    
+    
+    
