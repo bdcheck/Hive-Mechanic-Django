@@ -51,8 +51,8 @@ class Command(BaseCommand):
                         version['sha512-hash'] = computed_hash.hexdigest()
 
                         card_entry['versions'].append(version)
-                        
-                        file_identifier = card.identifier.replace('-', '_') 
+
+                        file_identifier = card.identifier.replace('-', '_')
 
                         export_stream.writestr(file_identifier + '/__init__.py', bytes('', 'utf-8'))
                         export_stream.writestr(file_identifier + '/entry.py', bytes(card.entry_actions, 'utf-8'))

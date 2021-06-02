@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 # -*- coding: utf-8 -*-
 
 from django.contrib import messages
@@ -59,7 +60,7 @@ class SessionAdmin(admin.OSMGeoAdmin):
 @admin.register(RemoteRepository)
 class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'url', 'priority', 'last_updated')
-    
+
 @admin.register(DataProcessor)
 class DataProcessorAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'identifier', 'enabled', 'version', 'issues', 'available_update',)
@@ -78,10 +79,7 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
 
     actions = ['update_data_processor']
 
-    def update_data_processor(self, request, queryset):
+    def update_data_processor(self, request, queryset): # pylint: disable=unused-argument
         self.message_user(request, 'Not yet implemented.', messages.ERROR)
 
     update_data_processor.short_description = "Install updated versions"
-    
-    
-    

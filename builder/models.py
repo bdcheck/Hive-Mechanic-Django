@@ -450,7 +450,7 @@ class Session(models.Model):
             last_integration_message = integration.last_message_for_player(self.player)
 
             if last_integration_message is not None:
-                if last_message is None or last_message['date'] < last_integration_message['date']:
+                if last_message is None or last_message['date'] < last_integration_message['date']: # pylint: disable=unsubscriptable-object
                     last_message = last_integration_message
 
         if last_message is not None:
@@ -460,7 +460,7 @@ class Session(models.Model):
 
     def advance_to(self, destination):
         self.dialog().advance_to(destination)
-    
+
     def fetch_session_context(self):
         return self.session_state.copy()
 
@@ -469,7 +469,7 @@ class Session(models.Model):
 
     def fetch_game_context(self):
         return self.game_version.game.game_state.copy()
-    
+
 
 class DataProcessor(models.Model):
     name = models.CharField(max_length=4096, unique=True)
@@ -489,7 +489,7 @@ class DataProcessor(models.Model):
     def __unicode__(self):
         return self.name + ' (' + self.identifier + ')'
 
-    def issues(self):
+    def issues(self): # pylint: disable=no-self-use
         return 'TODO'
 
     def available_update(self):
