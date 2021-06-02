@@ -45,17 +45,17 @@ def eprint(*args, **kwargs):
 
 def last_message_for_player(game, player):
     integration = Integration.objects.filter(game=game).first()
-    
+
     phone = player.player_state.get('twilio_player', None)
-    
+
     incoming = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
-    
+
     if incoming is not None:
         return {
             'message': incoming.message,
             'received': incoming.receive_date
         }
-    
+
     return None
 
 class PermissionsSupport(models.Model):
@@ -89,7 +89,7 @@ class OutgoingMessage(models.Model):
 
         try:
             eprint('CLIENT: ' + json.dumps(self.integration.configuration, indent=2))
-            
+
             client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
 
             if self.message.startswith('image:'):

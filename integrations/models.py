@@ -12,7 +12,6 @@ from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import gettext as _
 
 from builder.models import Game, Player, Session
@@ -132,7 +131,7 @@ class Integration(models.Model):
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use
         translated_value = value
-        
+
         try:
             while '[ME]' in translated_value:
                 translated_value = translated_value.replace('[ME]', session.player.identifier)
@@ -149,7 +148,7 @@ class Integration(models.Model):
                     tag = translated_value[start:(end + 1)]
 
                     variable = tag[9:-1]
-                    
+
                     variable_value = session.fetch_variable(variable)
 
                     if variable_value is None:
@@ -197,7 +196,7 @@ class Integration(models.Model):
 
     def last_message_for_player(self, player):
         if self.type == 'twilio':
-            from twilio_support.models import last_message_for_player
+            from twilio_support.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
 
