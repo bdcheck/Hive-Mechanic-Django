@@ -57,7 +57,7 @@ At this point, you should set up Hive Mechanic to work with your local web serve
 
 After setting up your web server, new cards will be installed into the system:
 
-    https://dev.hivemechanic.org/admin/builder/interactioncard/
+    https://my-site.example.com/admin/builder/interactioncard/
 
 Enable each of the cards that you wish to use in your activities.
 
