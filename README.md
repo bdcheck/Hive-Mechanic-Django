@@ -69,7 +69,7 @@ Once the activity has been created, you can test it from the command line:
 
     ./manage.py cli_run_activity activity-slug
 
-where `activity-slug` is the identifier you gave the game while creating it.
+where `activity-slug` is the identifier created when you named the activity. If you named your activity "Test Activity 123", then the `activity-slug` will be `test-activity-123`. You can also retrieve this identifier from the URL when you are editing it in the builder. It will be the final path component of the URL in your browser.
 
 The system will execute the game from the command line. Feel free to type your responses as if you were texting the system.
 
