@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-from urllib.parse import urlparse
+from future.moves.urllib.parse import urlparse
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -14,9 +14,7 @@ DEFAULT_REPOSITORY_NAME = 'Main Hive Mechanic Repository'
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('--repository_url',
-            type=str,
-            default=DEFAULT_REPOSITORY)
+        parser.add_argument('--repository_url', type=str, default=DEFAULT_REPOSITORY)
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         repo_url = cmd_options['repository_url']
