@@ -5,7 +5,6 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
-import json
 import sys
 import time
 import traceback
