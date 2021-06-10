@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'integrations',
     'twilio_support',
     'http_support',
+    'cli_support',
     'django.contrib.admin',
 ]
 
@@ -147,17 +148,27 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 def FETCH_LOGGER(level=logging.DEBUG):
-    logger = logging.getLogger('db')
-
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(level)
-
-    formatter = logging.Formatter('[%(levelname)s] %(asctime)s: %(message)s')
-    handler.setFormatter(formatter)
-
-    logger.addHandler(handler)
+    global SETTINGS_LOGGER
     
-    return logger
+    try:
+        if SETTINGS_LOGGER is not None:
+        	pass
+        
+    except NameError:
+        SETTINGS_LOGGER = None
+    
+    if SETTINGS_LOGGER is None:
+        SETTINGS_LOGGER = logging.getLogger('db')
+
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(level)
+
+        formatter = logging.Formatter('[%(levelname)s] %(asctime)s: %(message)s')
+        handler.setFormatter(formatter)
+
+        SETTINGS_LOGGER.addHandler(handler)
+    
+    return SETTINGS_LOGGER
 
 from .local_settings import *
 

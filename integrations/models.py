@@ -19,6 +19,7 @@ from builder.models import Game, Player, Session
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
     ('http', 'HTTP'),
+    ('command_line', 'Command Line'),
     ('other', 'Other'),
 )
 
@@ -59,6 +60,10 @@ class Integration(models.Model):
             from http_support.models import process_incoming as http_incoming # pylint: disable=import-outside-toplevel
 
             return http_incoming(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'command_line':
+            from cli_support.models import process_incoming as cli_incoming # pylint: disable=import-outside-toplevel
+
+            return cli_incoming(self, payload) # pylint: disable=no-value-for-parameter
         else:
             raise Exception('No "' + self.type + '" method implemented to process payload: ' + json.dumps(payload, indent=2))
 
@@ -122,6 +127,10 @@ class Integration(models.Model):
                     from http_support.models import execute_action as http_execute # pylint: disable=import-outside-toplevel
 
                     processed = http_execute(self, session, action)
+                elif self.type == 'command_line':
+                    from cli_support.models import execute_action as cli_execute # pylint: disable=import-outside-toplevel
+
+                    processed = cli_execute(self, session, action)
 
                 if processed is False:
                     processed = execute_action(self, session, action)

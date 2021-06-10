@@ -88,8 +88,6 @@ class OutgoingMessage(models.Model):
             raise Exception('Message (pk=' + str(self.pk) + ') already transmitted on ' + self.sent_date.isoformat() + '.')
 
         try:
-            eprint('CLIENT: ' + json.dumps(self.integration.configuration, indent=2))
-
             client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
 
             if self.message.startswith('image:'):
