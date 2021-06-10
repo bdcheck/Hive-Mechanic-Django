@@ -1,17 +1,15 @@
 # pylint: disable=no-member, line-too-long
 
-import logging
 import os
-import psutil
-import sys
 import time
 import threading
 
-from django.conf import settings
+import psutil
+
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from builder.models import Game
+
 from integrations.models import Integration
 
 from ...models import HiveActivityFinishedException
@@ -29,7 +27,7 @@ class NudgeThread(threading.Thread):
                 time.sleep(5)
         except HiveActivityFinishedException:
             print('Activity concluded. Exiting...')
-            
+
             current_pid = os.getpid()
 
             this_process = psutil.Process(current_pid)
@@ -49,7 +47,7 @@ class Command(BaseCommand):
                 integration = Integration.objects.create(type='command_line', game=activity, name=activity.name + ' (CLI)')
 
             nudge_thread = NudgeThread(integration)
-            
+
             nudge_thread.start()
 
             while nudge_thread.is_alive():

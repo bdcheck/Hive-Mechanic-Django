@@ -2,12 +2,7 @@
 
 from __future__ import print_function
 
-import hashlib
-
 from urllib.parse import urlparse
-
-import arrow
-import requests
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
