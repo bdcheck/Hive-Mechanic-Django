@@ -13,7 +13,7 @@ requirejs.config({
     baseUrl: "/static/builder-js/js/app",
     paths: {
         app: '/static/builder-js/js/app',
-        material: "/static/builder-js/vendor/material-components-web.min",
+        material: "/static/builder-js/vendor/material-components-web-11.0.0",
         jquery: "/static/builder-js/vendor/jquery-3.4.0.min",
         cookie: "/static/builder-js/vendor/js.cookie"
     }
@@ -23,10 +23,15 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    
-    // console.log('MDC');
-    // console.log(mdc);
-    
+
+    const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
+
+    itemsList.listen('MDCList:action', function(e) {
+    	const path = $(e['explicitOriginalTarget']).attr("data-href");
+    	
+    	window.location = path;
+    });
+
     var selectedSequence = null;
 
     topAppBar.setScrollTarget(document.getElementById('main-content'));

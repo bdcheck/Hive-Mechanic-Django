@@ -1014,8 +1014,8 @@ define(modules, function (mdc) {
                     // TODO: Unknown Card Type
                 }
             });
-
-            me.sequence.initializeDestinationMenu();
+            
+            window.setTimeout(me.sequence.initializeDestinationMenu, 250);
 
             if (window.dialogBuilder.helpToggle.checked) {
                 $(".hive_mechanic_help").show()

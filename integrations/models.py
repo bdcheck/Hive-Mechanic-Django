@@ -43,10 +43,10 @@ class Integration(models.Model):
 
     create_new_players = models.BooleanField(default=True)
 
-    configuration = JSONField(default=dict, help_text=_('configuration_help_text'))
+    configuration = JSONField(default=dict, help_text=_('configuration_help_text'), blank=True, null=True)
 
-    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_editables')
-    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_viewables')
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_editables', blank=True)
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_viewables', blank=True)
 
     def __str__(self):
         return self.name + ' (' + self.game.slug + ')'

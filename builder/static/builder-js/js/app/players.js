@@ -20,14 +20,17 @@ requirejs.config({
 });
 
 requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
-	console.log(mdc);
-	
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 
+    const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
+
+    itemsList.listen('MDCList:action', function(e) {
+    	const path = $(e['explicitOriginalTarget']).attr("data-href");
+
+    	window.location = path;
+    });
+
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    
-    // console.log('MDC');
-    // console.log(mdc);
     
     var selectedSequence = null;
 

@@ -280,8 +280,6 @@ define(modules, function (mdc, Node) {
                 if (seenIds.indexOf(id) == -1) {
                     var nodeIssues = node.issues(this);
 
-                    console.log("NODE ISSUES: " + nodeIssues.length);
-
                     sequenceIssues = sequenceIssues.concat(nodeIssues)
                     seenIds.push(id);
                 } else {

@@ -1,5 +1,5 @@
+# pylint: disable=line-too-long
 # -*- coding: utf-8 -*-
-
 
 from django.contrib import admin
 
@@ -21,7 +21,7 @@ class IntegrationAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs): # pylint: disable=arguments-differ
         if request.user.has_perm('twilio_history_access'):
-            if 'auth_token' in obj.configuration:
+            if obj is not None and obj.configuration is not None and 'auth_token' in obj.configuration:
                 obj.configuration['auth_token'] = '*****' # nosec
         else:
             pass
