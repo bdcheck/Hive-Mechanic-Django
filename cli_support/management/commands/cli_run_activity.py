@@ -51,7 +51,7 @@ class Command(BaseCommand):
             nudge_thread.start()
 
             while nudge_thread.is_alive():
-                input_str = input()
+                input_str = input() # nosec
 
                 integration.process_incoming(input_str)
         else:
