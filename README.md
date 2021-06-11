@@ -53,7 +53,13 @@ Install the local card repository:
 
     ./manage.py install_default_card_repository
 
-At this point, you should set up Hive Mechanic to work with your local web server to access the web interface (Apache directions are below). 
+At this point, you should set up Hive Mechanic to work with your local web server to access the web interface (Apache directions are below). To launch Django's built-in server:
+
+    ./manage.py runserver
+    
+Note the port number and access the administration interface with the superuseer account created earlier:
+
+    https://my-site.example.com:8000/admin/
 
 After setting up your web server, new cards will be installed into the system:
 
@@ -81,5 +87,89 @@ Once the activity is running as expected, you are now ready to open it up to the
 
 ## Apache integration
 
-*Coming Soon.*
+To configure Apache to serve Hive Mechanic content, verify that the `mod-wsgi` module is installed and activated.
+
+In your Apache configuration file, enable Hive Mechanic by including the following configuration directives:
+
+    Alias /media /var/www/django/hive/hive/media
+    Alias /static /var/www/django/hive/hive/static
+
+The ab ove options instruct Apache to serve static files directly, bypassing the WSGI module for increased performance.
+
+    WSGIDaemonProcess hive python-path=/var/www/django/hive/venv/lib/python3.8/site-packages:/var/www/django/hive/hive
+    WSGIProcessGroup hive
+
+The above directives set up the necessary Python paths that enable Hive Mechanic to run, including all the required dependencies.
+
+    WSGIScriptAlias / /var/www/django/hive/hive/hivemechanic/wsgi.py
+    
+This directive is the main Python script that the WSGI module will enable Apache to route all other non-static/non-media requests through your Hive installation
+
+### Recommendation: Enable SSL
+
+With the availability of free SSL certificates through projects like [Let's Encrypt](https://letsencrypt.org/), you should secure your Hive Mechanic installation with HTTPS to prevent the compromise of any traffic or passwords to resources such as your Twilio account. 
+
+After your set up your SSL certificate, the following Apache configuration will redirect traffic from unencrypted ports to safer encrypted ports, and set up Hive Mechanic to run alongside Apache's SSL module:
+
+	<VirtualHost *:80>
+		ServerName my-site.example.com
+		
+		ServerAdmin me@example.com
+		DocumentRoot /var/www/html/my-site.example.com
+		
+		ErrorLog ${APACHE_LOG_DIR}/my-site.example.com_error.log
+		CustomLog ${APACHE_LOG_DIR}/my-site.example.com_access.log combined
+		
+		RewriteEngine on
+		RewriteRule    ^(.*)$    https://my-site.example.com$1    [R=301,L]
+		
+		RewriteCond %{SERVER_NAME} =my-site.example.com
+		RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+	</VirtualHost>
+    
+	<VirtualHost *:443>
+		ServerAdmin me@example.com
+		ServerName my-site.example.com
+		
+		DocumentRoot /var/www/html/my-site.example.com
+		
+		<Directory />
+			Options FollowSymLinks
+			AllowOverride None
+		</Directory>
+		<Directory /var/www/html/my-site.example.com>
+			Options FollowSymLinks MultiViews
+			AllowOverride All
+			Order allow,deny
+			allow from all
+		</Directory>
+		
+		<Directory /var/www/django/hive/hive/static>
+			Header set Cache-Control "no-cache, no-store, must-revalidate"
+			Header set Pragma "no-cache"
+			Header set Expires -1
+		</Directory>
+		
+		ErrorLog ${APACHE_LOG_DIR}/my-site.example.com_error.log
+		CustomLog ${APACHE_LOG_DIR}/my-site.example.com_access.log combined
+		
+		SSLEngine on
+		SSLProtocol All -SSLv2 -SSLv3
+		
+		BrowserMatch "MSIE [2-6]"nokeepalive ssl-unclean-shutdown downgrade-1.0 force-response-1.0
+		
+		BrowserMatch "MSIE [17-9]"ssl-unclean-shutdown
+		
+		Alias /media /var/www/django/hive/hive/media
+		Alias /static /var/www/django/hive/hive/static
+		
+		WSGIDaemonProcess hive python-path=/var/www/django/hive/venv/lib/python3.8/site-packages:/var/www/django/hive/hive
+		WSGIProcessGroup hive
+		
+		WSGIScriptAlias / /var/www/django/hive/hive/hivemechanic/wsgi.py
+		
+		SSLCertificateFile      /etc/letsencrypt/live/my-site.example.com/fullchain.pem
+		SSLCertificateKeyFile /etc/letsencrypt/live/my-site.example.com/privkey.pem
+		Include /etc/letsencrypt/options-ssl-apache.conf
+	</VirtualHost>
 
