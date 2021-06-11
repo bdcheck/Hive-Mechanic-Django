@@ -5,7 +5,6 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
-import json
 import sys
 import time
 import traceback
@@ -88,8 +87,6 @@ class OutgoingMessage(models.Model):
             raise Exception('Message (pk=' + str(self.pk) + ') already transmitted on ' + self.sent_date.isoformat() + '.')
 
         try:
-            eprint('CLIENT: ' + json.dumps(self.integration.configuration, indent=2))
-
             client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
 
             if self.message.startswith('image:'):
