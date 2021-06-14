@@ -14,13 +14,13 @@ class IntegrationAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         fields = super(IntegrationAdmin, self).get_readonly_fields(request, obj=obj) # pylint: disable=super-with-arguments
 
-        # if request.user.has_perm('twilio_history_access'):
-        #    return ('configuration',)
+        if request.user.has_perm('twilio_support.twilio_history_access') is False:
+            return ('configuration',)
 
         return fields
 
     def get_form(self, request, obj=None, **kwargs): # pylint: disable=arguments-differ
-        if request.user.has_perm('twilio_history_access'):
+        if request.user.has_perm('twilio_support.twilio_history_access') is False:
             if obj is not None and obj.configuration is not None and 'auth_token' in obj.configuration:
                 obj.configuration['auth_token'] = '*****' # nosec
         else:

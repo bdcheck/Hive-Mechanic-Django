@@ -27,8 +27,8 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
     itemsList.listen('MDCList:action', function(e) {
-    	const path = $(e['explicitOriginalTarget']).attr("data-href");
-    	
+    	const path = $(itemsList.listElements[e['detail']['index']]).attr("data-href");
+
     	window.location = path;
     });
 
