@@ -21,11 +21,6 @@ def execute_action(integration, session, action):
 
         return True
 
-    elif action['type'] == 'echo-image':
-        print(action['image-url'])
-
-        return True
-
     elif action['type'] == 'end-activity':
         session.completed = timezone.now()
         session.save()
