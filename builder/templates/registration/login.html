@@ -1,0 +1,118 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+		<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+		<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+		<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
+        <link rel="stylesheet" href="{% static 'builder-js/vendor/material-components-web-11.0.0.css' %}" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <title>Login | Hive Mechanic</title>
+
+        <style>
+            body {
+                display: flex;
+                height: 100vh;
+                margin: 0px;
+            }
+
+            .main-content {
+                overflow: auto;
+                height: 100%;
+            }
+
+            .app-bar {
+                position: absolute;
+                z-index: 10;
+            }
+
+            .mdc-top-app-bar {
+                z-index: 7;
+            }
+            
+            a {
+            	text-decoration: none;
+            }
+            
+            .floating-action-button {
+            	position: absolute;
+            	bottom: 16px;
+            	right: 16px;
+            }
+        </style>
+    </head>
+    <body class="mdc-typography" style="background-color: #BDBDBD;">
+		<div class="mdc-layout-grid" style="width: 100%;">
+			<div class="mdc-layout-grid__inner">
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-2-phone">
+					<div class="mdc-card">
+						<form method="post" action="{% url 'login' %}">
+							{% csrf_token %}
+							<div class="mdc-layout-grid">
+								<div class="mdc-layout-grid__inner">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+										<h1 style="margin-top: 0px;" class="mdc-typography--headline5">Hive Mechanic</h1>
+										<label class="mdc-text-field mdc-text-field--outlined" id="field_username" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
+											<span class="mdc-notched-outline">
+												<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+													<span class="mdc-floating-label" id="my-label-id">Username</span>
+												</span>
+												<span class="mdc-notched-outline__trailing"></span>
+											</span>
+											<input type="text" name="username" class="mdc-text-field__input" aria-labelledby="my-label-id">
+										</label>
+									</div>
+								</div>
+								<div class="mdc-layout-grid__inner">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+										<label class="mdc-text-field mdc-text-field--outlined"  id="field_password" style="width: 100%; margin-bottom: 16px;">
+											<span class="mdc-notched-outline">
+												<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+													<span class="mdc-floating-label" id="my-password-id">Password</span>
+												</span>
+												<span class="mdc-notched-outline__trailing"></span>
+											</span>
+											<input type="password" name="password" class="mdc-text-field__input" aria-labelledby="my-password-id">
+										</label>
+									</div>
+								</div>
+								{% if form.errors %}
+									<div class="mdc-layout-grid__inner">
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+											<p>Your username and password didn't match. Please try again.</p>
+										</div>
+									</div>
+								{% endif %}									
+								<div class="mdc-layout-grid__inner">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+										<button class="mdc-button mdc-card__action mdc-card__action--button" type="submit">
+											<div class="mdc-button__ripple"></div>
+											<span class="mdc-button__label">Continue</span>
+										</button>
+									</div>
+								</div>
+								
+
+							</div>
+						</form>
+					</div>
+				</div>
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
+			</div>
+			</div>
+
+		{% block 'js_init' %}
+			<script data-main="{% static 'builder-js/js/app/login.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+		{% endblock %}
+    </body>
+</html>

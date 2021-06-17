@@ -475,6 +475,22 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         var keys = Object.keys(window.dialogBuilder.cardMapping);
 
+        keys.sort(function(one, two) {
+            var oneNodeClass = window.dialogBuilder.cardMapping[one];
+            var oneName = oneNodeClass.cardName();
+
+            var twoNodeClass = window.dialogBuilder.cardMapping[two];
+            var twoName = twoNodeClass.cardName();
+            
+            if (oneName < twoName) {
+                return -1;
+            } else if (oneName > twoName) {
+                return 1;
+            }
+            
+            return 0;
+        });
+
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
 
