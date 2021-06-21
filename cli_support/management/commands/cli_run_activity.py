@@ -7,6 +7,7 @@ import threading
 import psutil
 
 from django.core.management.base import BaseCommand
+from django.utils.text import slugify
 
 from builder.models import Game
 
@@ -44,7 +45,9 @@ class Command(BaseCommand):
             integration = Integration.objects.filter(type='command_line', game=activity).first()
 
             if integration is None:
-                integration = Integration.objects.create(type='command_line', game=activity, name=activity.name + ' (CLI)')
+                slug = slugify(activity.name + ' (CLI)')
+                
+                integration = Integration.objects.create(type='command_line', url_slug=slug, game=activity, name=activity.name + ' (CLI)')
 
             nudge_thread = NudgeThread(integration)
 
