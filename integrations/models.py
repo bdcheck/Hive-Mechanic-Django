@@ -244,8 +244,7 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         if 'interrupt' in action:
             return session.game_version.interrupt(action['interrupt'], session)
     elif action['type'] == 'end-activity':
-        session.completed = timezone.now()
-        session.save()
+        session.complete()
 
         return True
 

@@ -19,20 +19,23 @@ class NudgeThread(threading.Thread):
     def __init__(self, integration):
         threading.Thread.__init__(self)
         self.integration = integration
+        self.continue_running = True
 
     def run(self):
         try:
-            while True:
+            while self.continue_running:
                 self.integration.process_incoming(None)
 
-                time.sleep(5)
+                time.sleep(1)
         except HiveActivityFinishedException:
-            print('Activity concluded. Exiting...')
+            pass
 
-            current_pid = os.getpid()
+        print('Activity concluded. Exiting...')
 
-            this_process = psutil.Process(current_pid)
-            this_process.terminate()
+        current_pid = os.getpid()
+
+        this_process = psutil.Process(current_pid)
+        this_process.terminate()
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -46,16 +49,19 @@ class Command(BaseCommand):
 
             if integration is None:
                 slug = slugify(activity.name + ' (CLI)')
-                
+
                 integration = Integration.objects.create(type='command_line', url_slug=slug, game=activity, name=activity.name + ' (CLI)')
 
             nudge_thread = NudgeThread(integration)
 
             nudge_thread.start()
 
-            while nudge_thread.is_alive():
-                input_str = input() # nosec
+            try:
+                while nudge_thread.is_alive():
+                    input_str = input() # nosec
 
-                integration.process_incoming(input_str)
+                    integration.process_incoming(input_str)
+            except KeyboardInterrupt:
+                nudge_thread.continue_running = False
         else:
             print('Unable to find activity with identifier "' + options['activity_slug'] + '".')

@@ -443,6 +443,12 @@ class Session(models.Model):
 
         return dialog
 
+    def complete(self):
+        self.dialog().finish()
+
+        self.completed = timezone.now()
+        self.save()
+
     def last_message(self):
         last_message = None
 
