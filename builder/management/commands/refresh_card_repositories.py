@@ -42,8 +42,8 @@ class Command(BaseCommand):
                         print('Adding new card: ' + card_def['name'] + '...')
                         matched_card = InteractionCard(identifier=card_def['identifier'], name=card_def['name'], enabled=False)
 
-                        matched_card.entry_actions = requests.get(last_version['entry-actions']).content
-                        matched_card.evaluate_function = requests.get(last_version['evaluate-function']).content
+                        matched_card.entry_actions = requests.get(last_version['entry-actions']).content.decode("utf-8")
+                        matched_card.evaluate_function = requests.get(last_version['evaluate-function']).content.decode("utf-8")
                         matched_card.version = last_version['version']
                         matched_card.repository_definition = card_json
 
