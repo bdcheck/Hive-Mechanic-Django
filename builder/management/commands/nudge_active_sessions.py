@@ -4,6 +4,8 @@ from django.core.management.base import BaseCommand
 
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
+from cli_support.models import HiveActivityFinishedException
+
 from ...models import Session
 
 class Command(BaseCommand):
@@ -15,4 +17,7 @@ class Command(BaseCommand):
     @handle_schedule
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         for session in Session.objects.filter(completed=None):
-            session.nudge()
+            try:
+                session.nudge()
+            except HiveActivityFinishedException:
+                pass

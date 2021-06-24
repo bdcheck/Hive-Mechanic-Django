@@ -33,7 +33,7 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
         }),
     )
 
-    actions = ['update_interaction_card']
+    actions = ['update_interaction_card', 'enable_interaction_card', 'disable_interaction_card']
 
     def update_interaction_card(self, request, queryset):
         add_messages = []
@@ -48,6 +48,20 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
                 self.message_user(request, message, messages.ERROR)
 
     update_interaction_card.short_description = "Install updated versions"
+
+    def enable_interaction_card(self, request, queryset):
+        queryset.update(enabled=True)
+
+        self.message_user(request, str(queryset.count()) + ' card(s) enabled.')
+
+    enable_interaction_card.short_description = "Enable selected cards"
+
+    def disable_interaction_card(self, request, queryset):
+        queryset.update(enabled=False)
+
+        self.message_user(request, str(queryset.count()) + ' card(s) disabled.')
+
+    disable_interaction_card.short_description = "Disable selected cards"
 
 @admin.register(Player)
 class PlayerAdmin(admin.OSMGeoAdmin):
