@@ -3,7 +3,6 @@
 
 from builtins import str # pylint: disable=redefined-builtin
 
-import sys
 import time
 import traceback
 
@@ -43,7 +42,7 @@ def last_message_for_player(game, player):
     phone = player.player_state.get('twilio_player', None)
 
     incoming_message = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
-    
+
     last_incoming = None
 
     if incoming_message is not None:
@@ -51,9 +50,9 @@ def last_message_for_player(game, player):
             'message': incoming_message.message,
             'received': incoming_message.receive_date
         }
-        
+
     incoming_call_response = IncomingCallResponse.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
-    
+
     if incoming_call_response is None:
         incoming_call_response = IncomingCallResponse.objects.filter(transmission_metadata__To=phone, integration=integration).order_by('-receive_date').first()
 
