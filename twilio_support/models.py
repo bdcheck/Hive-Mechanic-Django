@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 from builtins import str # pylint: disable=redefined-builtin
 
 import sys
@@ -39,23 +37,34 @@ GATHER_SPEECH_MODELS = (
     ('phone_call', 'Phone Call'),
 )
 
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
 def last_message_for_player(game, player):
     integration = Integration.objects.filter(game=game).first()
 
     phone = player.player_state.get('twilio_player', None)
 
-    incoming = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
+    incoming_message = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
+    
+    last_incoming = None
 
-    if incoming is not None:
-        return {
-            'message': incoming.message,
-            'received': incoming.receive_date
+    if incoming_message is not None:
+        last_incoming = {
+            'message': incoming_message.message,
+            'received': incoming_message.receive_date
         }
+        
+    incoming_call_response = IncomingCallResponse.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
+    
+    if incoming_call_response is None:
+        incoming_call_response = IncomingCallResponse.objects.filter(transmission_metadata__To=phone, integration=integration).order_by('-receive_date').first()
 
-    return None
+    if incoming_call_response is not None:
+        if last_incoming is None or incoming_call_response.receive_date > last_incoming['received']:
+            last_incoming = {
+                'message': incoming_call_response.message,
+                'received': incoming_call_response.receive_date
+            }
+
+    return last_incoming
 
 class PermissionsSupport(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
@@ -176,6 +185,7 @@ class OutgoingCall(models.Model):
             self.transmission_metadata['twilio_sid'] = call.sid
             self.errored = False
             self.save()
+
         except: # pylint: disable=bare-except
             self.errored = True
 
@@ -259,7 +269,7 @@ def execute_action(integration, session, action):
 
         outgoing.save()
 
-        if outgoing.next_action != 'hangup' and outgoing.start_call is True:
+        if outgoing.start_call is True:
             outgoing.transmit()
 
         return True

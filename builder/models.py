@@ -3,6 +3,7 @@
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import difflib
 import hashlib
 import json
 import pkgutil
@@ -159,6 +160,46 @@ class InteractionCard(models.Model):
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
 
         return messages
+
+    def print_repository_diffs(self):
+        try:
+            repo_metadata = json.loads(self.repository_definition)
+
+            if 'versions' in repo_metadata:
+                versions = list(repo_metadata['versions'])
+
+                versions.sort(key=lambda version: version['version'], reverse=True)
+
+                if versions:
+                    latest_version = versions[0]
+
+                    repo_entry = requests.get(latest_version['entry-actions']).text
+                    repo_evaluate = requests.get(latest_version['evaluate-function']).text
+                    repo_client = requests.get(latest_version['client-implementation']).text
+
+                    local_client = open(self.client_implementation.path).read()
+
+                    entry_diff = list(difflib.unified_diff(repo_entry.splitlines(), self.entry_actions.splitlines(), lineterm=''))
+                    eval_diff = list(difflib.unified_diff(repo_evaluate.splitlines(), self.evaluate_function.splitlines(), lineterm=''))
+                    client_diff = list(difflib.unified_diff(repo_client.splitlines(), local_client.splitlines(), lineterm=''))
+
+                    if entry_diff:
+                        print('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        print('    ' + '\n    '.join(entry_diff))
+
+                    if eval_diff:
+                        print('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        print('    ' + '\n    '.join(eval_diff))
+
+                    if client_diff:
+                        print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        print('    ' + '\n    '.join(client_diff))
+                else:
+                    print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
+            else:
+                print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
+        except json.decoder.JSONDecodeError:
+            print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
 
 @python_2_unicode_compatible
 class Game(models.Model):
