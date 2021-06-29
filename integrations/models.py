@@ -136,7 +136,7 @@ class Integration(models.Model):
                     processed = execute_action(self, session, action)
 
                 if processed is False:
-                    settings.FETCH_LOGGER().warn('TODO: Process %', action)
+                    settings.FETCH_LOGGER().warn('TODO: Process', action)
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use
         translated_value = value
