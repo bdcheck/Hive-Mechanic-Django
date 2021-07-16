@@ -562,3 +562,61 @@ class DataProcessor(models.Model):
             pass
 
         return None
+
+    def update_data_processor(self):
+        messages = []
+
+        if self.available_update() is not None:
+            try:
+                processor_metadata = json.loads(self.repository_definition)
+
+                versions = sorted(processor_metadata['versions'], key=lambda version: version['version'])
+
+                latest_version = versions[-1]
+
+                implementation_content = requests.get(latest_version['implementation']).content
+
+                computed_hash = hashlib.sha512()
+
+                computed_hash.update(implementation_content)
+
+                local_hash = computed_hash.hexdigest()
+
+                if local_hash == latest_version['sha512-hash']:
+                    self.processor_function = implementation_content.decode("utf-8")
+
+                    self.version = latest_version['version']
+
+                    self.save()
+                else:
+                    messages.append('[Error] ' + self.identifier + ': Unable to update to latest version. Remote hash does not match file contents.')
+            except TypeError:
+                messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
+
+        return messages
+
+    def print_repository_diffs(self):
+        try:
+            repo_metadata = json.loads(self.repository_definition)
+
+            if 'versions' in repo_metadata:
+                versions = list(repo_metadata['versions'])
+
+                versions.sort(key=lambda version: version['version'], reverse=True)
+
+                if versions:
+                    latest_version = versions[0]
+
+                    repo_implementation = requests.get(latest_version['implementation']).text
+
+                    implementation_diff = list(difflib.unified_diff(repo_implementation.splitlines(), self.processor_function.splitlines(), lineterm=''))
+
+                    if implementation_diff:
+                        print('--- Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        print('    ' + '\n    '.join(implementation_diff))
+                else:
+                    print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
+            else:
+                print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
+        except json.decoder.JSONDecodeError:
+            print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')

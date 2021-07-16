@@ -5,6 +5,7 @@ from builtins import str # pylint: disable=redefined-builtin
 
 import json
 import re
+import traceback
 
 from future.utils import python_2_unicode_compatible
 
@@ -163,7 +164,7 @@ class Integration(models.Model):
                     if variable_value is None:
                         variable_value = '???'
 
-                    translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, str(variable_value))
 
             while '[GAME:' in translated_value:
                 start = translated_value.find('[GAME:')

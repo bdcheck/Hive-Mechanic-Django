@@ -91,9 +91,32 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
         }),
     )
 
-    actions = ['update_data_processor']
+    actions = ['update_data_processor', 'enable_data_processor', 'disable_data_processor']
 
     def update_data_processor(self, request, queryset): # pylint: disable=unused-argument
-        self.message_user(request, 'Not yet implemented.', messages.ERROR)
+        add_messages = []
+
+        for processor in queryset:
+            add_messages.extend(processor.update_data_processor())
+
+        for message in add_messages:
+            if '[Success]' in message:
+                self.message_user(request, message, messages.SUCCESS)
+            else:
+                self.message_user(request, message, messages.ERROR)
 
     update_data_processor.short_description = "Install updated versions"
+
+    def enable_data_processor(self, request, queryset):
+        queryset.update(enabled=True)
+
+        self.message_user(request, str(queryset.count()) + ' data processor(s) enabled.')
+
+    enable_data_processor.short_description = "Enable selected data processors"
+
+    def disable_data_processor(self, request, queryset):
+        queryset.update(enabled=False)
+
+        self.message_user(request, str(queryset.count()) + ' data processor(s) disabled.')
+
+    disable_data_processor.short_description = "Disable selected data processors"

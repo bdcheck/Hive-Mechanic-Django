@@ -10,10 +10,10 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from ...models import RemoteRepository, InteractionCard
+from ...models import RemoteRepository, InteractionCard, DataProcessor
 
 class Command(BaseCommand):
-    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
+    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements
         for repository in RemoteRepository.objects.order_by('priority'):
             response = requests.get(repository.url)
 
@@ -27,8 +27,8 @@ class Command(BaseCommand):
 
                 repository_def = json.loads(repository_content)
 
-                for key in repository_def.keys():
-                    card_def = repository_def[key]
+                for key in repository_def['cards'].keys():
+                    card_def = repository_def['cards'][key]
 
                     card_json = json.dumps(card_def, indent=2)
 
@@ -65,4 +65,50 @@ class Command(BaseCommand):
 
                         matched_card.repository_definition = card_json
 
+                        metadata = {}
+
+                        if matched_card.metadata is not None:
+                            metadata = json.loads(matched_card.metadata)
+
+                        metadata['updated'] = timezone.now().isoformat()
+                        matched_card.metadata = json.dumps(metadata, indent=2)
+
                         matched_card.save()
+
+                for key in repository_def['data_processors'].keys():
+                    processor_def = repository_def['data_processors'][key]
+
+                    processor_json = json.dumps(processor_def, indent=2)
+
+                    versions = sorted(processor_def['versions'], key=lambda version: version['version'])
+
+                    last_version = versions[-1]
+
+                    matched_processor = DataProcessor.objects.filter(identifier=processor_def['identifier']).first()
+
+                    if matched_processor is None:
+                        print('Adding new data processor: ' + processor_def['name'] + '...')
+                        matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
+
+                        matched_processor.processor_function = requests.get(last_version['implementation']).content.decode("utf-8")
+                        matched_processor.version = last_version['version']
+                        matched_processor.repository_definition = processor_json
+
+                        metadata = {}
+
+                        metadata['updated'] = timezone.now().isoformat()
+
+                        matched_processor.metadata = json.dumps(metadata, indent=2)
+
+                        matched_processor.save()
+                    elif last_version['version'] != matched_processor.version or matched_processor.repository_definition != processor_json:
+                        print('Update available for existing data processor: ' + processor_def['name'] + '...')
+
+                        matched_processor.repository_definition = processor_json
+
+                        metadata = json.loads(matched_processor.metadata)
+                        metadata['updated'] = timezone.now().isoformat()
+                        matched_processor.metadata = json.dumps(metadata, indent=2)
+
+
+                        matched_processor.save()
