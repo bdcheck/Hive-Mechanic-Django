@@ -21,7 +21,7 @@ def get_new_image():
     pg_image = pilImageToSurface(img.convert("RGB"))
     return pg_image
 
-token = "yelphello"
+token = "yelphello" # nosec
 url = 'https://dev.hivemechanic.org/http/'
 client = HiveClient(api_url=url,token=token)
 #event tag

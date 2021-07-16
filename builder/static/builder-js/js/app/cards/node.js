@@ -264,6 +264,9 @@ define(modules, function (mdc) {
                 },
                 'not_contains': {
                     'en': 'Does not contain...'
+                },
+                'no_action_defined': {
+                    'en': 'No action defined...'
                 }
             };
 
