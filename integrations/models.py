@@ -5,7 +5,6 @@ from builtins import str # pylint: disable=redefined-builtin
 
 import json
 import re
-import traceback
 
 from future.utils import python_2_unicode_compatible
 
