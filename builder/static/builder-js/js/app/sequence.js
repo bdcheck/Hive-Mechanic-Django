@@ -208,8 +208,6 @@ define(modules, function (mdc, Node) {
         }
 
         markChanged(changedId) {
-            console.log("CHANGED: " + changedId + " -- " + this.changeListeners.length);
-
             for (var i = 0; i < this.changeListeners.length; i++) {
                 this.changeListeners[i](changedId);
             }
@@ -561,7 +559,11 @@ define(modules, function (mdc, Node) {
             if (nodeId == null) {
                 return null;
             }
-
+            
+            if (nodeId.includes("#") == false) {
+            	nodeId = this.definition["id"] + "#" + nodeId;
+            }
+            
             if (nodeId.startsWith(this.definition["id"] + "#")) {
                 for (var i = 0; i < this.definition["items"].length; i++) {
                     var item = this.definition["items"][i];

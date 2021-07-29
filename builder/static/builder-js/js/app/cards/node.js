@@ -686,10 +686,6 @@ define(modules, function (mdc) {
         initializeField(field, definition, onUpdate) {
             var me = this;
 
-            console.log("INITING...");
-            console.log(field);
-            console.log(definition);
-
             var fieldName = field['field'];
 
             if (field['parent_field'] != undefined) {
@@ -1149,7 +1145,7 @@ define(modules, function (mdc) {
         static cardIdExists(cardId, sequence) {
             if (cardId != "") {
                 var node = sequence.resolveNode(cardId);
-
+                
                 if (node != null) {
                     return true;
                 }
@@ -1211,7 +1207,7 @@ define(modules, function (mdc) {
 
                 newId = newIdBase + '-' + index;
             }
-            
+
             return newId;
         }
         

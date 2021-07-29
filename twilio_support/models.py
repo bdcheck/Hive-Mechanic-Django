@@ -225,6 +225,8 @@ def process_incoming(integration, payload):
 
         message_type = 'call'
 
+    last_message = None
+
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
 
     incoming_call = IncomingCallResponse.objects.filter(source=payload['From']).order_by('-receive_date').first()
@@ -242,7 +244,7 @@ def process_incoming(integration, payload):
         payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
 
         integration.process_player_incoming('twilio_player', payload['From'], payload_body, {
-            'last_message': incoming_message,
+            'last_message': last_message,
             'message_type': message_type,
         })
 
