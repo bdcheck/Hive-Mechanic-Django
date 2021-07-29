@@ -140,7 +140,7 @@ class Integration(models.Model):
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process', action)
 
-    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use
+    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches
         translated_value = value
 
         try:
