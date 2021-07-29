@@ -115,8 +115,6 @@ class Integration(models.Model):
             session.process_incoming(self, payload, extras)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
-        print('EXEC[' + str(self) + ']: ' + str(actions))
-
         if actions is not None:
             for action in actions:
                 processed = False
