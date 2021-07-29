@@ -539,6 +539,7 @@ define(modules, function (mdc, Node) {
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
 
                         var cardDef = cardClass.createCard(cardName);
+                        cardDef['id'] = Node.newNodeId(cardName, me);
 
                         if (me.definition["items"].includes(cardDef) == false) {
                             me.definition["items"].push(cardDef);

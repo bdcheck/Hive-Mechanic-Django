@@ -48,7 +48,8 @@ def last_message_for_player(game, player):
     if incoming_message is not None:
         last_incoming = {
             'message': incoming_message.message,
-            'received': incoming_message.receive_date
+            'received': incoming_message.receive_date,
+            'type': 'sms-text-message',
         }
 
     incoming_call_response = IncomingCallResponse.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
@@ -60,7 +61,8 @@ def last_message_for_player(game, player):
         if last_incoming is None or incoming_call_response.receive_date > last_incoming['received']:
             last_incoming = {
                 'message': incoming_call_response.message,
-                'received': incoming_call_response.receive_date
+                'received': incoming_call_response.receive_date,
+                'type': 'phone-call',
             }
 
     return last_incoming
@@ -204,6 +206,8 @@ class IncomingCallResponse(models.Model):
     integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
 def process_incoming(integration, payload):
+    message_type = 'text'
+    
     if ('Body' in payload) is False:
         if 'Digits' in payload:
             payload['Body'] = payload['Digits']
@@ -218,13 +222,31 @@ def process_incoming(integration, payload):
         payload['From'] = payload['To']
 
         payload['To'] = from_
+        
+        message_type = 'call'
+
+    last_message = None
 
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
+
+    incoming_call = IncomingCallResponse.objects.filter(source=payload['From']).order_by('-receive_date').first()
+    
+    if incoming_message is None or (incoming_call is not None and incoming_call.receive_date > incoming_message.receive_date):
+        incoming_message = incoming_call
+        
+    if incoming_message is not None:
+        last_message = {
+            'message': incoming_message.message,
+            'received': incoming_message.receive_date
+        }
 
     if payload['Body'] or incoming_message.media.count() > 0:
         payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
 
-        integration.process_player_incoming('twilio_player', payload['From'], payload_body, {'last_message': incoming_message})
+        integration.process_player_incoming('twilio_player', payload['From'], payload_body, {
+            'last_message': incoming_message,
+            'message_type': message_type,
+        })
 
         return []
 

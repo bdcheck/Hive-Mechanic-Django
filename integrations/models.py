@@ -115,6 +115,8 @@ class Integration(models.Model):
             session.process_incoming(self, payload, extras)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
+        print('EXEC[' + str(self) + ']: ' + str(actions))
+
         if actions is not None:
             for action in actions:
                 processed = False
@@ -147,6 +149,9 @@ class Integration(models.Model):
 
             while '[LAST-MESSAGE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE]', session.last_message())
+
+            while '[LAST-MESSAGE-TYPE]' in translated_value:
+                translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
 
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')

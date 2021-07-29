@@ -1146,6 +1146,18 @@ define(modules, function (mdc) {
             return cardId;
         }
 
+        static cardIdExists(cardId, sequence) {
+            if (cardId != "") {
+                var node = sequence.resolveNode(cardId);
+
+                if (node != null) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         static createCard(definition, sequence) {
             if (window.dialogBuilder.cardMapping != undefined) {
                 var classObj = window.dialogBuilder.cardMapping[definition['type']];
@@ -1181,6 +1193,35 @@ define(modules, function (mdc) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
+        }
+
+        static newNodeId(cardName, sequence) {
+            var newIdBase = Node.slugify(cardName);
+            
+            if (Node.cardIdExists(newIdBase, sequence) == false) {
+                return newIdBase;
+            }
+            
+            var index = 1;
+            
+            var newId = newIdBase + '-' + index;
+            
+            while (Node.cardIdExists(newId, sequence)) {
+                index += 1;
+
+                newId = newIdBase + '-' + index;
+            }
+            
+            return newId;
+        }
+        
+        static slugify(text){
+            return text.toString().toLowerCase()
+                .replace(/\s+/g, '-')           // Replace spaces with -
+                .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+                .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+                .replace(/^-+/, '')             // Trim - from start of text
+                .replace(/-+$/, '');            // Trim - from end of text
         }
 
         static cardName() {

@@ -325,6 +325,9 @@ class GameVersion(models.Model):
             for interrupt in definition['interrupts']:
                 for integration in self.game.integrations.all():
                     if integration.is_interrupt(interrupt['pattern'], payload):
+                        print('INTERRUPT: ' + str(payload))
+                        session.set_variable('hive_interrupted_location', session.current_node())
+                        
                         session.advance_to(interrupt['action'])
 
                         return True
@@ -448,11 +451,15 @@ class Session(models.Model):
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
         actions = self.game_version.process_incoming(self, payload, extras)
-
+        
+        print('INTER: ' + str(integration))
+        
         if integration is not None:
             integration.execute_actions(self, actions)
         else:
             for game_integration in self.game_version.game.integrations.all():
+                print('INTER LOOP: ' + str(game_integration))
+
                 game_integration.execute_actions(self, actions)
 
     def nudge(self):
@@ -463,6 +470,15 @@ class Session(models.Model):
         self.save()
 
     def fetch_variable(self, variable):
+        if variable.startswith('[') and variable.endswith(']'):
+            value = None
+            
+            for game_integration in self.game_version.game.integrations.all():
+                if value is None:
+                    value = game_integration.translate_value(variable, self)
+                    
+            return value
+            
         if variable in self.session_state: # pylint: disable=unsupported-membership-test
             return self.session_state[variable]  # pylint: disable=unsubscriptable-object
 
@@ -486,6 +502,9 @@ class Session(models.Model):
 
         return dialog
 
+    def current_node(self):
+        return self.dialog().current_node()
+
     def complete(self):
         self.dialog().finish()
 
@@ -507,8 +526,28 @@ class Session(models.Model):
 
         return None
 
+    def last_message_type(self):
+        last_message = None
+
+        for integration in self.game_version.game.integrations.all():
+            last_integration_message = integration.last_message_for_player(self.player)
+
+            if last_integration_message is not None:
+                if last_message is None or last_message['date'] < last_integration_message['date']: # pylint: disable=unsubscriptable-object
+                    last_message = last_integration_message
+
+        if last_message is not None:
+            return last_message['type']
+
+        return None
+
     def advance_to(self, destination):
-        self.dialog().advance_to(destination)
+        actions = self.dialog().advance_to(destination)
+        
+        print('ACTIONS: ' + str(actions))
+
+        for game_integration in self.game_version.game.integrations.all():
+            game_integration.execute_actions(self, actions)
 
     def fetch_session_context(self):
         return self.session_state.copy()
@@ -573,7 +612,7 @@ class DataProcessor(models.Model):
                 versions = sorted(processor_metadata['versions'], key=lambda version: version['version'])
 
                 latest_version = versions[-1]
-
+                    
                 implementation_content = requests.get(latest_version['implementation']).content
 
                 computed_hash = hashlib.sha512()
@@ -586,6 +625,18 @@ class DataProcessor(models.Model):
                     self.processor_function = implementation_content.decode("utf-8")
 
                     self.version = latest_version['version']
+
+                    if 'required-metadata-keys' in latest_version:
+                        metadata = {}
+                    
+                        if self.metadata is not None:
+                            metadata = json.loads(self.metadata)
+                        
+                        for key in latest_version['required-metadata-keys']:
+                            if (key in metadata) is False:
+                                metadata[key] = ''
+                            
+                        self.metadata = json.dumps(metadata, indent=2)
 
                     self.save()
                 else:
