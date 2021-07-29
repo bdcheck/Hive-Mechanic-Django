@@ -207,7 +207,7 @@ class IncomingCallResponse(models.Model):
 
 def process_incoming(integration, payload):
     message_type = 'text'
-    
+
     if ('Body' in payload) is False:
         if 'Digits' in payload:
             payload['Body'] = payload['Digits']
@@ -222,18 +222,16 @@ def process_incoming(integration, payload):
         payload['From'] = payload['To']
 
         payload['To'] = from_
-        
-        message_type = 'call'
 
-    last_message = None
+        message_type = 'call'
 
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
 
     incoming_call = IncomingCallResponse.objects.filter(source=payload['From']).order_by('-receive_date').first()
-    
+
     if incoming_message is None or (incoming_call is not None and incoming_call.receive_date > incoming_message.receive_date):
         incoming_message = incoming_call
-        
+
     if incoming_message is not None:
         last_message = {
             'message': incoming_message.message,
