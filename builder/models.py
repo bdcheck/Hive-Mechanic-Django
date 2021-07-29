@@ -327,7 +327,7 @@ class GameVersion(models.Model):
                     if integration.is_interrupt(interrupt['pattern'], payload):
                         print('INTERRUPT: ' + str(payload))
                         session.set_variable('hive_interrupted_location', session.current_node())
-                        
+
                         session.advance_to(interrupt['action'])
 
                         return True
@@ -451,9 +451,9 @@ class Session(models.Model):
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
         actions = self.game_version.process_incoming(self, payload, extras)
-        
+
         print('INTER: ' + str(integration))
-        
+
         if integration is not None:
             integration.execute_actions(self, actions)
         else:
@@ -472,13 +472,13 @@ class Session(models.Model):
     def fetch_variable(self, variable):
         if variable.startswith('[') and variable.endswith(']'):
             value = None
-            
+
             for game_integration in self.game_version.game.integrations.all():
                 if value is None:
                     value = game_integration.translate_value(variable, self)
-                    
+
             return value
-            
+
         if variable in self.session_state: # pylint: disable=unsupported-membership-test
             return self.session_state[variable]  # pylint: disable=unsubscriptable-object
 
@@ -543,7 +543,7 @@ class Session(models.Model):
 
     def advance_to(self, destination):
         actions = self.dialog().advance_to(destination)
-        
+
         print('ACTIONS: ' + str(actions))
 
         for game_integration in self.game_version.game.integrations.all():
@@ -605,14 +605,14 @@ class DataProcessor(models.Model):
     def update_data_processor(self):
         messages = []
 
-        if self.available_update() is not None:
+        if self.available_update() is not None: # pylint: disable=too-many-nested-blocks
             try:
                 processor_metadata = json.loads(self.repository_definition)
 
                 versions = sorted(processor_metadata['versions'], key=lambda version: version['version'])
 
                 latest_version = versions[-1]
-                    
+
                 implementation_content = requests.get(latest_version['implementation']).content
 
                 computed_hash = hashlib.sha512()
@@ -628,14 +628,14 @@ class DataProcessor(models.Model):
 
                     if 'required-metadata-keys' in latest_version:
                         metadata = {}
-                    
+
                         if self.metadata is not None:
                             metadata = json.loads(self.metadata)
-                        
+
                         for key in latest_version['required-metadata-keys']:
                             if (key in metadata) is False:
                                 metadata[key] = ''
-                            
+
                         self.metadata = json.dumps(metadata, indent=2)
 
                     self.save()
