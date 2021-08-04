@@ -23,7 +23,7 @@ from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
-from django_dialog_engine.models import Dialog
+from django_dialog_engine.models import Dialog, DialogStateTransition
 
 from . import card_issues
 
@@ -325,7 +325,6 @@ class GameVersion(models.Model):
             for interrupt in definition['interrupts']:
                 for integration in self.game.integrations.all():
                     if integration.is_interrupt(interrupt['pattern'], payload):
-                        print('INTERRUPT: ' + str(payload))
                         session.set_variable('hive_interrupted_location', session.current_node())
 
                         session.advance_to(interrupt['action'])
@@ -399,6 +398,38 @@ class GameVersion(models.Model):
 
         return snapshot
 
+    def complete_identifier(self, incomplete_id, dialog):
+        if '#' in incomplete_id:
+            return incomplete_id
+
+        last_transition = DialogStateTransition.objects.filter(dialog=dialog).order_by('-when').first()
+
+        dialog_definition = json.loads(self.definition)
+
+        # Look in last transition for partial ID...
+
+        if last_transition is not None: # pylint: disable=too-many-nested-blocks
+            last_state_id = last_transition.state_id
+
+            if '#' in last_state_id and last_state_id.startswith('#') is False:
+                tokens = last_state_id.split('#', 1)
+
+                for sequence in dialog_definition['sequences']:
+                    if sequence['id'] == tokens[0]:
+                        for item in sequence['items']:
+                            if item['id'] == incomplete_id:
+                                return sequence['id'] + '#' + incomplete_id
+
+        # Look in other sequences for partial ID...
+
+        for sequence in dialog_definition['sequences']:
+            for item in sequence['items']:
+                if item['id'] == incomplete_id:
+                    return sequence['id'] + '#' + incomplete_id
+
+        return incomplete_id
+
+
 @python_2_unicode_compatible
 class Player(models.Model):
     identifier = models.CharField(max_length=4096, unique=True)
@@ -444,6 +475,9 @@ class Session(models.Model):
 
     session_state = JSONField(default=dict)
 
+    def complete_identifier(self, incomplete_id):
+        return self.game_version.complete_identifier(incomplete_id, self.dialog())
+
     def process_incoming(self, integration, payload, extras=None):
         current_node = None # pylint: disable=unused-variable
 
@@ -452,14 +486,10 @@ class Session(models.Model):
 
         actions = self.game_version.process_incoming(self, payload, extras)
 
-        print('INTER: ' + str(integration))
-
         if integration is not None:
             integration.execute_actions(self, actions)
         else:
             for game_integration in self.game_version.game.integrations.all():
-                print('INTER LOOP: ' + str(game_integration))
-
                 game_integration.execute_actions(self, actions)
 
     def nudge(self):

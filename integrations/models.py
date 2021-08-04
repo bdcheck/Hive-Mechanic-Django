@@ -215,7 +215,7 @@ class Integration(models.Model):
         return None
 
 
-def execute_action(integration, session, action): # pylint: disable=unused-argument
+def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
@@ -240,6 +240,9 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         return True
     elif action['type'] == 'go-to':
         if 'destination' in action:
+            if ('#' in action['destination']) is False:
+                action['destination'] = session.complete_identifier(action['destination'])
+
             session.advance_to(action['destination'])
 
             return True
