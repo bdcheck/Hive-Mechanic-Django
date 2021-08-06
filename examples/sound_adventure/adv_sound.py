@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from hive_client import HiveClient,VariableScope, GotoCommand, TriggerInterruptCommand
-from HiveCache import HiveCache, PygameSoundCache
+from HiveCache import HiveCache, PygameSoundCache, PygameImageCache
 import json
 
 def cleanup(cache:HiveCache):
@@ -15,7 +15,8 @@ def reset():
 pygame.init()
 pygame.mixer.init()
 
-cache = PygameSoundCache.get_main_cache()
+soundcache = PygameSoundCache.get_sound_cache()
+imagecache = PygameImageCache.get_image_cache()
 NEXT_SCREEN =  USEREVENT + 1
 picks = [pygame.K_a, pygame.K_l, pygame.K_SPACE]
 token = "soundhello"
@@ -26,10 +27,11 @@ preload = client.fetch_variable("preload",VariableScope.game)
 
 if preload:
     for l in preload:
-        val = cache.get_value(l)
+        #val = soundcache.get_value(l)
+        pass
 
 choices = []
-client.issue_command(GotoCommand("s2#v2"),player="game")
+client.issue_command(GotoCommand("v1"),player="game")
 pygame.time.set_timer(NEXT_SCREEN,1000,True)
 
 while True:
@@ -39,20 +41,20 @@ while True:
 
     for event in pygame.event.get():
         if event.type == NEXT_SCREEN:
-            sound = client.fetch_variable("play_sound", player="game", scope=VariableScope.game)
+            #sound = client.fetch_variable("play_sound", player="game", scope=VariableScope.game)
             c = client.fetch_variable("choices", player="game", scope=VariableScope.game)
             if c:
                 choices = json.loads(c)
             else:
                 choices = []
                 error = True
-
+            sound = None
             reset = client.fetch_variable("reset", player="game", scope=VariableScope.game)
             if sound:
                 if playing_sound:
-                    cache.stop(playing_sound)
+                    soundcache.stop(playing_sound)
                 playing_sound = sound
-                cache.play(sound)
+                soundcache.play(sound)
 
             else:
                 error = True
@@ -61,7 +63,7 @@ while True:
             # quit game
             if event.key == "q":
                 reset()
-                cleanup(cache)
+                cleanup(soundcache)
                 break
             if event.key == pygame.K_d:
                 client.issue_command(GotoCommand("v1"), player="game")
