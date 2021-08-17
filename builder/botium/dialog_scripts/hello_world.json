@@ -1,12 +1,27 @@
-[{
-	"type": "sequence",
-	"id": "new-sequence",
-	"name": "New Sequence",
-	"items": [{
-		"name": "Hello World",
-		"context": "Start building your game here.",
-		"message": "Hello World",
-		"type": "send-message",
-		"id": "hello-world"
-	}]
-}]
+{
+  "sequences": [
+    {
+      "type": "sequence",
+      "id": "new-sequence",
+      "name": "New Sequence",
+      "items": [
+        {
+          "name": "Hello World",
+          "context": "Start building your game here.",
+          "message": "Hello World",
+          "type": "send-message",
+          "id": "hello-world",
+          "next": "game-over"
+        },
+        {
+          "name": "Game Over",
+          "type": "game-over",
+          "id": "game-over"
+        }
+      ]
+    }
+  ],
+  "interrupts": [],
+  "name": "",
+  "initial-card": null
+}

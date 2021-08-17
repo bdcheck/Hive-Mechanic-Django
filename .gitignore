@@ -108,3 +108,5 @@ local_settings.py
 /media/
 integrations/.DS_Store
 .DS_Store
+node_modules
+package-lock.json
