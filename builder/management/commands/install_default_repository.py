@@ -33,4 +33,4 @@ class Command(BaseCommand):
 
             RemoteRepository.objects.create(url=repo_url, name=repo_name)
 
-            call_command('refresh_card_repositories')
+            call_command('refresh_repositories')

@@ -29,7 +29,6 @@ class UserPermissionsTestCase(TestCase):
 
         call_command('initialize_permissions')
         call_command('install_default_repository')
-        call_command('refresh_repositories')
 
         InteractionCard.objects.all().update(enabled=True)
 
