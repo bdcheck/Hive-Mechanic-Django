@@ -14,24 +14,26 @@ from .models import Game, GameVersion
 
 def create_dialog_from_path(file_path):
     try:
-        base_name = os.path.basename(os.path.normpath(file_path))
-
-        game_slug = slugify(base_name)
-
-        game = Game.objects.filter(slug=game_slug).first()
-
-        if game is None:
-            game = Game.objects.create(slug=game_slug, name=base_name + ' Botium Test Game')
-
         definition = json.load(open(file_path))
 
-        new_version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
+        if isinstance(definition, dict) and 'sequences' in definition:
+            base_name = os.path.basename(os.path.normpath(file_path))
 
-        dialog_snapshot = new_version.dialog_snapshot()
+            game_slug = slugify(base_name)
 
-        new_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
+            game = Game.objects.filter(slug=game_slug).first()
 
-        return new_dialog
+            if game is None:
+                game = Game.objects.create(slug=game_slug, name=base_name + ' Botium Test Game')
+
+
+            new_version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
+
+            dialog_snapshot = new_version.dialog_snapshot()
+
+            new_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
+
+            return new_dialog
     except: # pylint: disable=bare-except
         traceback.print_exc()
 
