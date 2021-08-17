@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from hive_client import HiveClient,VariableScope, GotoCommand, TriggerInterruptCommand
-from HiveCache import HiveCache, PygameSoundCache
+from HiveCache import HiveCache, PygameSoundCache, PygameImageCache
 import json
 
 def cleanup(cache:HiveCache):
@@ -12,24 +12,40 @@ def reset():
     client.issue_command(GotoCommand("beginning"),player="game")
 
 
+IMAGE_RESOLUTION = (600,600)
+#pygame initialization
 pygame.init()
 pygame.mixer.init()
+screen = pygame.display.set_mode(IMAGE_RESOLUTION)
 
-cache = PygameSoundCache.get_main_cache()
+#cache imitialization
+sound_cache = PygameSoundCache.get_sound_cache()
+image_cache = PygameImageCache.get_image_cache()
 NEXT_SCREEN =  USEREVENT + 1
+#define the keys for picks
 picks = [pygame.K_a, pygame.K_l, pygame.K_SPACE]
+#token that is set in hivemechanic that links to correct activity
 token = "soundhello"
 url = 'http://localhost:8000/http/'
 client = HiveClient(api_url=url,token=token)
 playing_sound = None
 preload = client.fetch_variable("preload",VariableScope.game)
 
+#preload takes a variable on hive mechanic and downloads all the files
 if preload:
     for l in preload:
-        val = cache.get_value(l)
+        url_type = HiveCache.get_type(l)
+        if url_type == 'audio':
+            #val = sound_cache.get_value(l)
+            pass
+        elif url_type == 'image':
+            #val = image_cache.get_value(l)
+            pass
+
+
 
 choices = []
-client.issue_command(GotoCommand("s2#v2"),player="game")
+client.issue_command(GotoCommand("v1"),player="game")
 pygame.time.set_timer(NEXT_SCREEN,1000,True)
 
 while True:
@@ -39,20 +55,30 @@ while True:
 
     for event in pygame.event.get():
         if event.type == NEXT_SCREEN:
-            sound = client.fetch_variable("play_sound", player="game", scope=VariableScope.game)
+            #sound = client.fetch_variable("play_sound", player="game", scope=VariableScope.game)
+            image = client.fetch_variable("image", player="game",scope=VariableScope.game)
             c = client.fetch_variable("choices", player="game", scope=VariableScope.game)
             if c:
                 choices = json.loads(c)
             else:
                 choices = []
                 error = True
-
+            sound = None
             reset = client.fetch_variable("reset", player="game", scope=VariableScope.game)
+            #retrieve sound and play if there
             if sound:
                 if playing_sound:
-                    cache.stop(playing_sound)
+                    sound_cache.stop(playing_sound)
                 playing_sound = sound
-                cache.play(sound)
+                sound_cache.play(sound)
+            #retrieve image and show on screen if there
+            if image:
+                current_image = image_cache.get_image(image)
+                if current_image:
+                    screen.blit(current_image,(0,0))
+                    pygame.display.flip()
+                    pygame.display.update()
+
 
             else:
                 error = True
@@ -61,7 +87,7 @@ while True:
             # quit game
             if event.key == "q":
                 reset()
-                cleanup(cache)
+                cleanup(sound_cache)
                 break
             if event.key == pygame.K_d:
                 client.issue_command(GotoCommand("v1"), player="game")

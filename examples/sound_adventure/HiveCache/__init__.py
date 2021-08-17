@@ -1,1 +1,1 @@
-from .HiveCache import HiveCache, PygameSoundCache
+from .HiveCache import HiveCache, PygameSoundCache, PygameImageCache
