@@ -5,6 +5,7 @@ import json
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -25,6 +26,8 @@ class UserPermissionsTestCase(TestCase):
         self.editor_group = Group.objects.get(name='Hive Mechanic Game Editor')
         self.reader_group = Group.objects.get(name='Hive Mechanic Reader')
         self.manager_group = Group.objects.get(name='Hive Mechanic Manager')
+
+        call_command('initialize_permissions')
 
 
     def test_models_edit_view_permissions(self): # pylint: disable=invalid-name

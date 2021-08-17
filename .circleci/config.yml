@@ -42,6 +42,7 @@ jobs:
             git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
+            python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py test
             pylint quicksilver
@@ -103,6 +104,7 @@ jobs:
             git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
+            python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py test
             pylint quicksilver
