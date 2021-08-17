@@ -55,7 +55,7 @@ jobs:
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
             export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
-            botium-cli run -c builder/botium/botium.json -C builder/botium/convos/hello_world/
+            botium-cli run -c django_dialog_engine/botium/botium.json -C builder/botium/convos/hello_world/
       - run:
           name: Test dialog content (Django Dialog Engine)
           command: |
