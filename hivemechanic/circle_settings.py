@@ -21,7 +21,7 @@ DATABASES = {
         'NAME':     'circle_test',
         'USER':     'root',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': 'localhost',
     }
 }
 
