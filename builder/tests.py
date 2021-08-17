@@ -9,7 +9,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Game
+from .models import Game, InteractionCard
 
 class UserPermissionsTestCase(TestCase):
     fixtures = ['fixtures/groups.json']
@@ -28,7 +28,13 @@ class UserPermissionsTestCase(TestCase):
         self.manager_group = Group.objects.get(name='Hive Mechanic Manager')
 
         call_command('initialize_permissions')
+        call_command('install_default_repository')
+        call_command('refresh_repositories')
 
+        InteractionCard.objects.all().update(enabled=True)
+
+        for card in InteractionCard.objects.all():
+            card.update_card()
 
     def test_models_edit_view_permissions(self): # pylint: disable=invalid-name
         self.assertIsNotNone(self.test_game)
