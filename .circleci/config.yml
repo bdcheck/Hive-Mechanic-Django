@@ -41,6 +41,8 @@ jobs:
             git submodule init
             git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
+            python manage.py migrate
+            python manage.py test
             pylint quicksilver
             pylint passive_data_kit
             pylint builder
@@ -99,6 +101,8 @@ jobs:
             git submodule init
             git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
+            python manage.py migrate
+            python manage.py test
             pylint quicksilver
             pylint passive_data_kit
             pylint builder
