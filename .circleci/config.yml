@@ -43,7 +43,6 @@ jobs:
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
-            python manage.py list_permissions
             python manage.py initialize_permissions
             python manage.py install_default_repository
             python manage.py test
@@ -109,7 +108,6 @@ jobs:
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
-            python manage.py list_permissions
             python manage.py initialize_permissions
             python manage.py install_default_repository
             python manage.py test
