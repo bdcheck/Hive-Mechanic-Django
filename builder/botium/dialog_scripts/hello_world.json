@@ -1,0 +1,12 @@
+[{
+	"type": "sequence",
+	"id": "new-sequence",
+	"name": "New Sequence",
+	"items": [{
+		"name": "Hello World",
+		"context": "Start building your game here.",
+		"message": "Hello World",
+		"type": "send-message",
+		"id": "hello-world"
+	}]
+}]
