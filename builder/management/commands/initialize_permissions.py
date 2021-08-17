@@ -5,50 +5,66 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals
+        reader_permissions = ['builder_login']
+
         reader_group = Group.objects.get(name='Hive Mechanic Reader')
-        reader_group.permissions.add(Permission.objects.get(codename='builder_login'))
+
+        for codename in reader_permissions:
+            permission = Permission.objects.filter(codename=codename).first()
+
+            if permission is not None:
+                reader_group.permissions.add(permission)
+
+        editor_permissions = [
+            'add_game',
+            'change_game',
+            'delete_game',
+            'view_game',
+            'add_gameversion',
+            'change_gameversion',
+            'delete_gameversion',
+            'view_gameversion',
+        ]
+
+        editor_permissions.extend(reader_permissions)
 
         editor_group = Group.objects.get(name='Hive Mechanic Game Editor')
-        editor_group.permissions.add(Permission.objects.get(codename='builder_login'))
-        editor_group.permissions.add(Permission.objects.get(codename='add_game'))
-        editor_group.permissions.add(Permission.objects.get(codename='change_game'))
-        editor_group.permissions.add(Permission.objects.get(codename='delete_game'))
-        editor_group.permissions.add(Permission.objects.get(codename='view_game'))
-        editor_group.permissions.add(Permission.objects.get(codename='add_gameversion'))
-        editor_group.permissions.add(Permission.objects.get(codename='change_gameversion'))
-        editor_group.permissions.add(Permission.objects.get(codename='delete_gameversion'))
-        editor_group.permissions.add(Permission.objects.get(codename='view_gameversion'))
+
+        for codename in editor_permissions:
+            permission = Permission.objects.filter(codename=codename).first()
+
+            if permission is not None:
+                editor_group.permissions.add(permission)
+
+        manager_permissions = [
+            'view_group',
+            'add_user',
+            'change_user',
+            'delete_user',
+            'view_user',
+            'add_interactioncard',
+            'change_interactioncard',
+            'delete_interactioncard',
+            'view_interactioncard',
+            'view_integration',
+            'add_execution',
+            'change_execution',
+            'delete_execution',
+            'view_execution',
+            'add_task',
+            'change_task',
+            'delete_task',
+            'view_task',
+            'view_incomingmessage',
+            'view_incomingmessagemedia',
+            'view_outgoingcall',
+            'view_outgoingmessage',
+        ]
 
         manager_group = Group.objects.get(name='Hive Mechanic Manager')
-        manager_group.permissions.add(Permission.objects.get(codename='builder_login'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_group'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_user'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_user'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_user'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_user'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_game'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_game'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_game'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_game'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_game'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_gameversion'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_gameversion'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_gameversion'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_gameversion'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_interactioncard'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_interactioncard'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_interactioncard'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_interactioncard'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_integration'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_execution'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_execution'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_execution'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_execution'))
-        manager_group.permissions.add(Permission.objects.get(codename='add_task'))
-        manager_group.permissions.add(Permission.objects.get(codename='change_task'))
-        manager_group.permissions.add(Permission.objects.get(codename='delete_task'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_task'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_incomingmessage'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_incomingmessagemedia'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_outgoingcall'))
-        manager_group.permissions.add(Permission.objects.get(codename='view_outgoingmessage'))
+
+        for codename in manager_permissions:
+            permission = Permission.objects.filter(codename=codename).first()
+
+            if permission is not None:
+                manager_group.permissions.add(permission)
