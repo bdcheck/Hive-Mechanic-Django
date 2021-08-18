@@ -21,9 +21,7 @@ class Command(BaseCommand):
 
         repo = RemoteRepository.objects.filter(url=repo_url).first()
 
-        if repo is not None:
-            print('Repository with URL ' + repo_url + ' already exists. Skipping.')
-        else:
+        if repo is None:
             parsed_url = urlparse(repo_url)
 
             repo_name = parsed_url.netloc

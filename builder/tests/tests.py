@@ -9,7 +9,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Game, InteractionCard
+from ..models import Game, InteractionCard
 
 class UserPermissionsTestCase(TestCase):
     fixtures = ['fixtures/groups.json']
