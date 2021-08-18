@@ -19,7 +19,7 @@ class BasicBrowserTests(StaticLiveServerTestCase):
         cls.selenium = webdriver.Firefox(options=options)
         cls.selenium.implicitly_wait(10)
 
-        get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True)
+        get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True) # nosec
 
     @classmethod
     def tearDownClass(cls):
