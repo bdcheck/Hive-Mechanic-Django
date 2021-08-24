@@ -1,6 +1,8 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
+from builtins import super
+
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
@@ -11,7 +13,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 class BasicBrowserTests(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
-        super(cls).setUpClass()
+        super().setUpClass()
 
         options = Options()
         options.add_argument('-headless')
@@ -24,7 +26,7 @@ class BasicBrowserTests(StaticLiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.selenium.quit()
-        super(cls).tearDownClass()
+        super().tearDownClass()
 
     def test_login(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/accounts/login/'))
