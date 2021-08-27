@@ -13,7 +13,10 @@ from django.utils import timezone
 from ...models import RemoteRepository, InteractionCard, DataProcessor
 
 class Command(BaseCommand):
-    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements
+    def add_arguments(self, parser):
+        parser.add_argument('--silent', default=False, action='store_true')
+
+    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements, too-many-branches
         for repository in RemoteRepository.objects.order_by('priority'):
             response = requests.get(repository.url)
 
@@ -39,7 +42,8 @@ class Command(BaseCommand):
                     matched_card = InteractionCard.objects.filter(identifier=card_def['identifier']).first()
 
                     if matched_card is None:
-                        print('Adding new card: ' + card_def['name'] + '...')
+                        if cmd_options['silent'] is False:
+                            print('Adding new card: ' + card_def['name'] + '...')
                         matched_card = InteractionCard(identifier=card_def['identifier'], name=card_def['name'], enabled=False)
 
                         matched_card.entry_actions = requests.get(last_version['entry-actions']).content.decode("utf-8")
@@ -61,7 +65,8 @@ class Command(BaseCommand):
 
                         matched_card.save()
                     elif last_version['version'] != matched_card.version or matched_card.repository_definition != card_json:
-                        print('Update available for existing card: ' + card_def['name'] + '...')
+                        if cmd_options['silent'] is False:
+                            print('Update available for existing card: ' + card_def['name'] + '...')
 
                         matched_card.repository_definition = card_json
 
@@ -87,7 +92,8 @@ class Command(BaseCommand):
                     matched_processor = DataProcessor.objects.filter(identifier=processor_def['identifier']).first()
 
                     if matched_processor is None:
-                        print('Adding new data processor: ' + processor_def['name'] + '...')
+                        if cmd_options['silent'] is False:
+                            print('Adding new data processor: ' + processor_def['name'] + '...')
                         matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
 
                         matched_processor.processor_function = requests.get(last_version['implementation']).content.decode("utf-8")
@@ -102,7 +108,8 @@ class Command(BaseCommand):
 
                         matched_processor.save()
                     elif last_version['version'] != matched_processor.version or matched_processor.repository_definition != processor_json:
-                        print('Update available for existing data processor: ' + processor_def['name'] + '...')
+                        if cmd_options['silent'] is False:
+                            print('Update available for existing data processor: ' + processor_def['name'] + '...')
 
                         matched_processor.repository_definition = processor_json
 

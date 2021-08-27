@@ -15,6 +15,7 @@ DEFAULT_REPOSITORY_NAME = 'Main Hive Mechanic Repository'
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--repository_url', type=str, default=DEFAULT_REPOSITORY)
+        parser.add_argument('--silent', default=False, action='store_true')
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         repo_url = cmd_options['repository_url']
@@ -31,4 +32,4 @@ class Command(BaseCommand):
 
             RemoteRepository.objects.create(url=repo_url, name=repo_name)
 
-            call_command('refresh_repositories')
+            call_command('refresh_repositories', silent=cmd_options['silent'])

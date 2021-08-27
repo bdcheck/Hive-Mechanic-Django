@@ -507,7 +507,9 @@ define(modules, function (mdc, Node) {
 
                         var id = event.currentTarget.id;
 
-                        id = id.replace('choose_destination_item_', '')
+                        id = id.replace('choose_destination_item_', '');
+                        
+                        console.log('CLICKED ID: ' + id);
 
                         if (id == "add_card") {
                             me.addCard(window.dialogBuilder.chooseDestinationDialogCallback);
@@ -524,15 +526,24 @@ define(modules, function (mdc, Node) {
         addCard(callback) {
             $("#add-card-name-value").val("");
 
+
             // window.dialogBuilder.newCardSelect.value = '';
+
+            const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
 
             var me = this;
 
             var listener = {
                 handleEvent: function (event) {
                     if (event.detail.action == "add_card") {
-                        var cardName = $("#add-card-name-value").val();
+                        var cardName = nameField.value
                         var cardType = $("input[name='add-card-options']:checked").val(); //  window.dialogBuilder.newCardSelect.value;
+                        
+                        if (cardName.trim() == '') {
+							var selectedCard = $("input[name='add-card-options']:checked").parent().parent().parent().find('label').text();
+
+							cardName = 'New ' + selectedCard + ' Card';
+						}
 
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
 
@@ -549,6 +560,18 @@ define(modules, function (mdc, Node) {
                    }
                 }
             };
+
+			$('input[type=radio][name=add-card-options]').change(function() {
+				var cardName = nameField.value;
+				
+				if (cardName.trim() == '' || (cardName.startsWith('New ') && cardName.endsWith(' Card'))) {
+					var selectedCard = $(this).parent().parent().parent().find('label').text();
+				
+					cardName = 'New ' + selectedCard + ' Card';
+					
+					nameField.value = cardName;
+				}
+			});
 
             window.dialogBuilder.addCardDialog.listen('MDCDialog:closed', listener);
 

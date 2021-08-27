@@ -173,3 +173,9 @@ def FETCH_LOGGER(level=logging.DEBUG):
 
 from .local_settings import *
 
+# Suppress pygame notifications...
+
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
+import pygame  # it is important to import pygame after that

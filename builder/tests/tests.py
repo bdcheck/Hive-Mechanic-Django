@@ -28,7 +28,7 @@ class UserPermissionsTestCase(TestCase):
         self.manager_group = Group.objects.get(name='Hive Mechanic Manager')
 
         call_command('initialize_permissions')
-        call_command('install_default_repository')
+        call_command('install_default_repository', silent=True)
 
         InteractionCard.objects.all().update(enabled=True)
 
