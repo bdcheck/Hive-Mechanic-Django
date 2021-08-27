@@ -3,7 +3,11 @@
 
 from builtins import super # pylint: disable=redefined-builtin
 
+import six
+import sys
+
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -44,196 +48,197 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
         super(BrowserEmptyCardIdTests, cls).tearDownClass()
 
     def test_empty_card_ids(self): # pylint: disable=too-many-locals, too-many-statements
-        self.selenium.get('%s%s' % (self.live_server_url, '/accounts/login/'))
+        try:
+            self.selenium.get('%s%s' % (self.live_server_url, '/accounts/login/'))
 
-        self.assertEqual('Login | Hive Mechanic', self.selenium.title)
+            self.assertEqual('Login | Hive Mechanic', self.selenium.title)
 
-        username_input = self.selenium.find_element_by_name("username")
-        username_input.send_keys('selenium')
+            username_input = self.selenium.find_element_by_name("username")
+            username_input.send_keys('selenium')
 
-        password_input = self.selenium.find_element_by_name("password")
-        password_input.send_keys('browsertesting')
+            password_input = self.selenium.find_element_by_name("password")
+            password_input.send_keys('browsertesting')
 
-        self.selenium.find_element_by_xpath('//button[@type="submit"]').click()
+            self.selenium.find_element_by_xpath('//button[@type="submit"]').click()
 
-        WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_class_name('mdc-top-app-bar__title'))
+            WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_class_name('mdc-top-app-bar__title'))
 
-        WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_xpath('//li[@data-href="/builder/games"]'))
+            WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_xpath('//li[@data-href="/builder/games"]'))
 
-        # Investigate why unable to click this link in Selenium...
+            # Investigate why unable to click this link in Selenium...
 
-        self.selenium.get('%s%s' % (self.live_server_url, '/builder/games'))
+            self.selenium.get('%s%s' % (self.live_server_url, '/builder/games'))
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//a[@href="/builder/activity/empty-id-test"]'))
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//a[@href="/builder/activity/empty-id-test"]'))
 
-        self.selenium.find_element_by_xpath('//a[@href="/builder/activity/empty-id-test"]').click()
+            self.selenium.find_element_by_xpath('//a[@href="/builder/activity/empty-id-test"]').click()
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//span[@id="sequence_breadcrumbs"]'))
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//span[@id="sequence_breadcrumbs"]'))
 
-        self.assertEqual('Hive Mechanic', self.selenium.title)
+            self.assertEqual('Hive Mechanic', self.selenium.title)
 
-        next_nodes = self.selenium.find_element_by_xpath('//div[@id="builder_next_nodes"]')
+            next_nodes = self.selenium.find_element_by_xpath('//div[@id="builder_next_nodes"]')
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@data-node-id="response-test-2"]'))
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@data-node-id="response-test-2"]'))
 
-        next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
+            next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
 
-        current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
+            current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
 
-        current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
+            current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
 
-        # print(self.selenium.execute_script("return document.body.outerHTML;"))
+            name_input = current_card.find_element_by_css_selector('input[id$="_name_value"]')
 
-        name_input = current_card.find_element_by_css_selector('input[id$="_name_value"]')
+            self.assertEqual(name_input.get_attribute('value'), 'Response Test')
 
-        self.assertEqual(name_input.get_attribute('value'), 'Response Test')
+            first_link = current_card.find_element_by_css_selector('button[id$="_patterns__action__0_edit"]')
 
-        first_link = current_card.find_element_by_css_selector('button[id$="_patterns__action__0_edit"]')
+            first_link.click()
 
-        first_link.click()
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
+            add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
+            add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
 
-        add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
-        add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
+            add_item.click()
 
-        add_item.click()
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
+            new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
+            new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
 
-        new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
-        new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
+            self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
 
-        self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
+            card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
 
-        card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
+            self.assertEqual(card_title_name.get_attribute('value'), '')
 
-        self.assertEqual(card_title_name.get_attribute('value'), '')
+            send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
 
-        send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
+            send_message_radio.click()
 
-        send_message_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
+            branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
 
-        branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
+            branch_radio.click()
 
-        branch_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
+            send_message_radio.click()
 
-        send_message_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
+            add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
 
-        add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
+            add_button.click()
 
-        add_button.click()
+            new_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card"]/h6')
 
-        new_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card"]/h6')
+            self.assertEqual(new_send_title.text, 'New Send Message Card')
 
-        self.assertEqual(new_send_title.text, 'New Send Message Card')
+            # Testing second card
 
-        # Testing second card
+            current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
 
-        current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
+            second_link = current_card.find_element_by_css_selector('button[id$="_patterns__action__1_edit"]')
 
-        second_link = current_card.find_element_by_css_selector('button[id$="_patterns__action__1_edit"]')
+            second_link.click()
 
-        second_link.click()
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
+            add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
+            add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
 
-        add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
-        add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
+            add_item.click()
 
-        add_item.click()
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
+            new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
+            new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
 
-        new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
-        new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
+            self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
 
-        self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
+            card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
 
-        card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
+            self.assertEqual(card_title_name.get_attribute('value'), '')
 
-        self.assertEqual(card_title_name.get_attribute('value'), '')
+            send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
 
-        send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
+            branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
 
-        # send_message_radio.click()
+            branch_radio.click()
 
-        # self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
 
-        branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
+            send_message_radio.click()
 
-        branch_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
+            add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
 
-        send_message_radio.click()
+            add_button.click()
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
+            next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-1"]/h6')
 
-        add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
+            self.assertEqual(next_send_title.text, 'New Send Message Card')
 
-        add_button.click()
+            # Testing final card
 
-        next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-1"]/h6')
+            current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
 
-        self.assertEqual(next_send_title.text, 'New Send Message Card')
+            not_found_link = current_card.find_element_by_css_selector('button[id$="_not_found_action_edit"]')
 
-        # Testing final card
+            not_found_link.click()
 
-        current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
 
-        not_found_link = current_card.find_element_by_css_selector('button[id$="_not_found_action_edit"]')
+            add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
+            add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
 
-        not_found_link.click()
+            add_item.click()
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]'))
+            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
 
-        add_dialog = self.selenium.find_element_by_xpath('//div[@class="mdc-dialog mdc-dialog--open"]')
-        add_item = add_dialog.find_element_by_css_selector('li[id$="choose_destination_item_add_card"]')
+            new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
+            new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
 
-        add_item.click()
+            self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
 
-        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@id="add-card-dialog"]'))
+            card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
 
-        new_card_dialog = self.selenium.find_element_by_xpath('//div[@id="add-card-dialog"]')
-        new_card_dialog_title = new_card_dialog.find_element_by_xpath('//div[@id="add-card-dialog"]//h2')
+            self.assertEqual(card_title_name.get_attribute('value'), '')
 
-        self.assertEqual(new_card_dialog_title.get_attribute('innerHTML'), 'Add Card')
+            send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
 
-        card_title_name = new_card_dialog.find_element_by_xpath('//input[@id="add-card-name-value"]')
+            send_message_radio.click()
 
-        self.assertEqual(card_title_name.get_attribute('value'), '')
+            self.assertEqual(card_title_name.get_attribute('value'), '')
 
-        send_message_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="send-message"]')
+            branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
 
-        send_message_radio.click()
+            branch_radio.click()
 
-        self.assertEqual(card_title_name.get_attribute('value'), '')
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
 
-        branch_radio = new_card_dialog.find_element_by_xpath('//input[@type="radio"][@value="branch"]')
+            send_message_radio.click()
 
-        branch_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Branch Card')
+            card_title_name.clear()
 
-        send_message_radio.click()
+            self.assertEqual(card_title_name.get_attribute('value'), '')
 
-        self.assertEqual(card_title_name.get_attribute('value'), 'New Send Message Card')
+            add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
 
-        card_title_name.clear()
+            add_button.click()
 
-        self.assertEqual(card_title_name.get_attribute('value'), '')
+            next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-2"]/h6')
 
-        add_button = new_card_dialog.find_element_by_xpath('//button[@data-mdc-dialog-action="add_card"]')
+            self.assertEqual(next_send_title.text, 'New Send Message Card')
+        except TimeoutError:
+            print(self.selenium.execute_script("return document.body.outerHTML;"))
 
-        add_button.click()
+            ex_type, ex_value, ex_traceback = sys.exc_info()
 
-        next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-2"]/h6')
-
-        self.assertEqual(next_send_title.text, 'New Send Message Card')
+            six.reraise(ex_type, ex_value, ex_traceback)
