@@ -74,6 +74,8 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
         next_nodes = self.selenium.find_element_by_xpath('//div[@id="builder_next_nodes"]')
 
+        WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@data-node-id="response-test-2"]'))
+
         next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
 
         current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
