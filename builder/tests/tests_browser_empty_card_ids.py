@@ -236,7 +236,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
             next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-2"]/h6')
 
             self.assertEqual(next_send_title.text, 'New Send Message Card')
-        except TimeoutError:
+        except TimeoutException:
             print(self.selenium.execute_script("return document.body.outerHTML;"))
 
             ex_type, ex_value, ex_traceback = sys.exc_info()
