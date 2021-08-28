@@ -3,6 +3,7 @@
 
 from builtins import super # pylint: disable=redefined-builtin
 
+import json
 import sys
 
 import six
@@ -12,6 +13,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.management import call_command
@@ -23,16 +25,13 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
     def setUpClass(cls):
         super(BrowserEmptyCardIdTests, cls).setUpClass()
 
+        settings.DEBUG = True
+
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
 
-        firefox_profile = webdriver.FirefoxProfile()
-        firefox_profile.set_preference("devtools.console.stdout.content", True)
-
-        # cls.selenium = webdriver.Firefox(options=options, firefox_profile=firefox_profile)
-
-        cls.selenium = webdriver.Chrome(chrome_options=options) # , firefox_profile=firefox_profile)
+        cls.selenium = webdriver.Chrome(chrome_options=options)
         cls.selenium.implicitly_wait(10)
 
         get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True) # nosec
@@ -248,7 +247,9 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             print('--------')
 
-            print(self.selenium.get_log('browser'))
+            log_messages = self.selenium.get_log('browser')
+
+            print('LOG: ' + json.dumps(log_messages, indent=2))
 
             ex_type, ex_value, ex_traceback = sys.exc_info()
 
