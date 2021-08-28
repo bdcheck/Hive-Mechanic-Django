@@ -39,7 +39,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
         InteractionCard.objects.all().delete()
 
-        call_command('loaddata', '-v', '0', 'builder/fixtures/tests_browser_empty_card.json')
+        call_command('loaddata', 'builder/fixtures/tests_browser_empty_card.json')
 
     @classmethod
     def tearDownClass(cls):
