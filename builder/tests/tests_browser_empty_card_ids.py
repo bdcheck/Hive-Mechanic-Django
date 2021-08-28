@@ -3,12 +3,13 @@
 
 from builtins import super # pylint: disable=redefined-builtin
 
-import six
 import sys
+
+import six
 
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 
 from django.contrib.auth import get_user_model
@@ -23,12 +24,15 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
         super(BrowserEmptyCardIdTests, cls).setUpClass()
 
         options = Options()
-        options.add_argument('-headless')
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
 
         firefox_profile = webdriver.FirefoxProfile()
         firefox_profile.set_preference("devtools.console.stdout.content", True)
 
-        cls.selenium = webdriver.Firefox(options=options, firefox_profile=firefox_profile)
+        # cls.selenium = webdriver.Firefox(options=options, firefox_profile=firefox_profile)
+
+        cls.selenium = webdriver.Chrome(chrome_options=options) # , firefox_profile=firefox_profile)
         cls.selenium.implicitly_wait(10)
 
         get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True) # nosec
@@ -138,7 +142,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             new_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card"]/h6')
 
-            self.assertEqual(new_send_title.text, 'New Send Message Card')
+            self.assertIn('New Send Message Card', new_send_title.get_attribute('outerHTML'))
 
             # Testing second card
 
@@ -184,7 +188,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-1"]/h6')
 
-            self.assertEqual(next_send_title.text, 'New Send Message Card')
+            self.assertIn('New Send Message Card', next_send_title.get_attribute('outerHTML'))
 
             # Testing final card
 
@@ -238,7 +242,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             next_send_title = next_nodes.find_element_by_xpath('//div[@data-node-id="new-send-message-card-2"]/h6')
 
-            self.assertEqual(next_send_title.text, 'New Send Message Card')
+            self.assertIn('New Send Message Card', next_send_title.get_attribute('outerHTML'))
         except TimeoutException:
             print(self.selenium.execute_script("return document.body.outerHTML;"))
 
