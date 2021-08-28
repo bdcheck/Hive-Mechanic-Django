@@ -10,7 +10,7 @@ import six
 
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 
 from django.conf import settings
@@ -28,10 +28,9 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
         settings.DEBUG = True
 
         options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
+        options.add_argument('-headless')
 
-        cls.selenium = webdriver.Chrome(chrome_options=options)
+        cls.selenium = webdriver.Firefox(options=options)
         cls.selenium.implicitly_wait(10)
 
         get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True) # nosec
