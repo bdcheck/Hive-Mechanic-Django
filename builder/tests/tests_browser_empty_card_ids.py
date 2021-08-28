@@ -241,7 +241,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             print('--------')
 
-            print self.selenium.get_log('browser')
+            print(self.selenium.get_log('browser'))
 
             ex_type, ex_value, ex_traceback = sys.exc_info()
 
