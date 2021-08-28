@@ -3,6 +3,8 @@
 
 from builtins import super # pylint: disable=redefined-builtin
 
+from __future__ import print_function
+
 import json
 import sys
 
