@@ -39,7 +39,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
         InteractionCard.objects.all().delete()
 
-        call_command('loaddata', 'builder/fixtures/tests_browser_empty_card.json')
+        call_command('loaddata', '-v', '0', 'builder/fixtures/tests_browser_empty_card.json')
 
     @classmethod
     def tearDownClass(cls):
@@ -238,6 +238,10 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
             self.assertEqual(next_send_title.text, 'New Send Message Card')
         except TimeoutException:
             print(self.selenium.execute_script("return document.body.outerHTML;"))
+
+            print('--------')
+
+            print self.selenium.get_log('browser')
 
             ex_type, ex_value, ex_traceback = sys.exc_info()
 
