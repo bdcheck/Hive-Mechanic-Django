@@ -25,7 +25,10 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
         options = Options()
         options.add_argument('-headless')
 
-        cls.selenium = webdriver.Firefox(options=options)
+        firefox_profile = webdriver.FirefoxProfile()
+        firefox_profile.set_preference("devtools.console.stdout.content", True)
+
+        cls.selenium = webdriver.Firefox(options=options, firefox_profile=firefox_profile)
         cls.selenium.implicitly_wait(10)
 
         get_user_model().objects.create_user(username='selenium', email='selenium@example.com', password='browsertesting', is_superuser=True) # nosec
