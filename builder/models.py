@@ -66,13 +66,7 @@ def file_cleanup(sender, **kwargs):
                 inst = kwargs["instance"]
                 file_field = getattr(inst, fieldname)
                 field_manager = inst.__class__._default_manager # pylint: disable=protected-access
-                if (
-                    hasattr(file_field, "path")
-                    and os.path.exists(file_field.path)
-                    and not field_manager.filter(
-                        **{"%s__exact" % fieldname: getattr(inst, fieldname)}
-                    ).exclude(pk=inst._get_pk_val()) # pylint: disable=protected-access
-                ):
+                if (hasattr(file_field, "path") and os.path.exists(file_field.path) and not field_manager.filter(**{"%s__exact" % fieldname: getattr(inst, fieldname)}).exclude(pk=inst._get_pk_val())): # pylint: disable=protected-access
                     default_storage.delete(file_field.path)
 
 
