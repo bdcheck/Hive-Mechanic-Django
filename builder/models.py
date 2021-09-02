@@ -8,6 +8,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import difflib
 import hashlib
 import json
+import os
 import pkgutil
 
 from future import standard_library
@@ -19,7 +20,9 @@ from six import python_2_unicode_compatible
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import models
+from django.db.models.signals import post_delete
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -29,6 +32,49 @@ from django_dialog_engine.models import Dialog, DialogStateTransition
 from . import card_issues
 
 standard_library.install_aliases()
+
+def file_cleanup(sender, **kwargs):
+    """
+    File cleanup callback used to emulate the old delete
+    behavior using signals. Initially django deleted linked
+    files when an object containing a File/ImageField was deleted.
+
+    Usage:
+    >>> from django.db.models.signals import post_delete
+    >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid="mymodel.file_cleanup")
+
+    Adapted from https://timonweb.com/django/cleanup-files-and-images-on-model-delete-in-django/
+    """
+
+    do_cleanup = True
+
+    try:
+        do_cleanup = settings.HIVE_DELETE_CLIENT_IMPLEMENTATION_JS
+    except AttributeError:
+        pass
+
+    if do_cleanup:
+        fieldnames = [model_field.name for model_field in sender._meta.get_fields()] # pylint: disable=protected-access
+
+        for fieldname in fieldnames:
+            try:
+                field = sender._meta.get_field(fieldname) # pylint: disable=protected-access
+            except: # pylint: disable=bare-except
+                field = None
+
+            if field and isinstance(field, models.FileField):
+                inst = kwargs["instance"]
+                file_field = getattr(inst, fieldname)
+                field_manager = inst.__class__._default_manager # pylint: disable=protected-access
+                if (
+                    hasattr(file_field, "path")
+                    and os.path.exists(file_field.path)
+                    and not field_manager.filter(
+                        **{"%s__exact" % fieldname: getattr(inst, fieldname)}
+                    ).exclude(pk=inst._get_pk_val()) # pylint: disable=protected-access
+                ):
+                    default_storage.delete(file_field.path)
+
 
 class PermissionsSupport(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
@@ -203,6 +249,8 @@ class InteractionCard(models.Model):
                 print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
             print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+
+post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.interaction_card.file_cleanup')
 
 @python_2_unicode_compatible
 class Game(models.Model):
