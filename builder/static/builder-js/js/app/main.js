@@ -328,12 +328,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
         });
 
-
         $("#select-all-cards-items").html(allCardSelectContent);
 
         $(".all-cards-select-item").hide();
 
-        $("#select-all-cards .mdc-list-item").off("click");
+        $("#select-all-cards-items .mdc-list-item").off("click");
 
         const options = document.querySelectorAll('#select-all-cards-items .mdc-list-item');
 
@@ -641,29 +640,28 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         var me = this;
         var body = '';
 
-        body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
+        body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" style="padding: 0px;">';
 
         $.each(window.dialogBuilder.definition.sequences, function(index, value) {
-            body += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="' + identifier + '_destination_sequence_' + value['id'] + '">';
-            body += '        <span class="mdc-list-item__ripple"></span>';
-            body += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
-            body += '        <span class="mdc-list-item__end material-icons mdc-layout-grid--align-right destination_disclosure_icon">arrow_right</span>';
-            body += '      </li>';
+            body += '<li class="mdc-list-divider" role="separator"></li>';
+            body += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="' + identifier + '_destination_sequence_' + value['id'] + '">';
+            body += '  <span class="mdc-list-item__ripple"></span>';
+            body += '  <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
+            body += '  <span class="mdc-list-item__end mdc-layout-grid--align-right material-icons destination_disclosure_icon">arrow_right</span>';
+            body += '</li>';
 
             var items = value['items'];
 
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
 
-                body += '     <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item ' + identifier + '_destination_sequence_' + value['id'] + '_item" role="menuitem" id="' + identifier + '_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
-                body += '       <span class="mdc-list-item__ripple"></span>';
-                body += '       <span class="mdc-list-item__text">' + item["name"] + '</span>';
-                body += '     </li>';
+                body += '<li class="mdc-list-item mdc-list-item--with-one-line ' + identifier + '_destination_sequence_' + value['id'] + '_item builder-destination-item" role="menuitem" id="' + identifier + '_destination_sequence_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
+	            body += '  <span class="mdc-list-item__ripple"></span>';
+                body += '  <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
+                body += '</li>';
             }
-
-            body += '      <li class="mdc-list-divider" role="separator"></li>';
-        });
-
+		});
+		
         body += '    </ul>';
 
         return body;
@@ -848,7 +846,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
 
                     initializeDestinationMenu("select-interrupt", function(nodeId) {
+                    	console.log('SELECTED: ' + nodeId);
+                    
                         interrupt["action"] = nodeId;
+                        
+                        chooseDialog.close();
 
                         refreshSettingsInterrupts();
                     });

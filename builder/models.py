@@ -342,11 +342,12 @@ class GameVersion(models.Model):
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
-    def process_incoming(self, session, payload, extras=None):
+    def process_incoming(self, session, payload, extras=None, dialog=None):
         actions = []
 
         if self.interrupt(payload, session) is False:
-            dialog = session.dialog()
+            if dialog is None:
+                dialog = session.dialog()
 
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
@@ -363,10 +364,14 @@ class GameVersion(models.Model):
 
     def interrupt(self, payload, session):
         definition = json.loads(self.definition)
+        
+        print('HAS INTERS? ' + str('interrupts' in definition))
 
         if 'interrupts' in definition:
             for interrupt in definition['interrupts']:
                 for integration in self.game.integrations.all():
+                    print('TEST INTER: ' + str(interrupt['pattern']) + ' -- ' + str(payload))
+                    
                     if integration.is_interrupt(interrupt['pattern'], payload):
                         session.set_variable('hive_interrupted_location', session.current_node())
 
@@ -521,13 +526,13 @@ class Session(models.Model):
     def complete_identifier(self, incomplete_id):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
 
-    def process_incoming(self, integration, payload, extras=None):
+    def process_incoming(self, integration, payload, extras=None, dialog=None):
         current_node = None # pylint: disable=unused-variable
 
         if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
-        actions = self.game_version.process_incoming(self, payload, extras)
+        actions = self.game_version.process_incoming(self, payload, extras, dialog)
 
         if integration is not None:
             integration.execute_actions(self, actions)
@@ -576,7 +581,7 @@ class Session(models.Model):
         return dialog
 
     def current_node(self):
-        return self.dialog().current_node()
+        return self.dialog().current_state_id()
 
     def complete(self):
         self.dialog().finish()

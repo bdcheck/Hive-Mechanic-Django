@@ -67,7 +67,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-	        'debug': True
+            'debug': True
         },
     },
 ]
@@ -151,14 +151,14 @@ STATIC_URL = '/static/'
 
 def FETCH_LOGGER(level=logging.DEBUG):
     global SETTINGS_LOGGER
-    
+
     try:
         if SETTINGS_LOGGER is not None:
-        	pass
-        
+            pass
+
     except NameError:
         SETTINGS_LOGGER = None
-    
+
     if SETTINGS_LOGGER is None:
         SETTINGS_LOGGER = logging.getLogger('db')
 
@@ -169,8 +169,13 @@ def FETCH_LOGGER(level=logging.DEBUG):
         handler.setFormatter(formatter)
 
         SETTINGS_LOGGER.addHandler(handler)
-    
+
     return SETTINGS_LOGGER
+
+def DDE_BOTIUM_EXTRAS(player):
+    return {
+        'player': player
+    }
 
 from .local_settings import *
 
