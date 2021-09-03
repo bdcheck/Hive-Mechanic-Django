@@ -364,14 +364,10 @@ class GameVersion(models.Model):
 
     def interrupt(self, payload, session):
         definition = json.loads(self.definition)
-        
-        print('HAS INTERS? ' + str('interrupts' in definition))
 
         if 'interrupts' in definition:
             for interrupt in definition['interrupts']:
                 for integration in self.game.integrations.all():
-                    print('TEST INTER: ' + str(interrupt['pattern']) + ' -- ' + str(payload))
-                    
                     if integration.is_interrupt(interrupt['pattern'], payload):
                         session.set_variable('hive_interrupted_location', session.current_node())
 
@@ -621,8 +617,6 @@ class Session(models.Model):
 
     def advance_to(self, destination):
         actions = self.dialog().advance_to(destination)
-
-        print('ACTIONS: ' + str(actions))
 
         for game_integration in self.game_version.game.integrations.all():
             game_integration.execute_actions(self, actions)
