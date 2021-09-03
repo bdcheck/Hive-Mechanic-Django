@@ -14,6 +14,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from passive_data_kit.models import DataPoint
+
 from builder.models import Game, Player, Session
 
 INTEGRATION_TYPES = (
@@ -219,8 +221,19 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
+        payload = {
+            'variable': action['variable'],
+            'original_value': action['value'],
+            'scope': 'session',
+            'session': 'session-' + str(session.pk),
+            'game': str(session.game_version.game.slug),
+            'player': str(session.player.identifier),
+        }
+
         if 'scope' in action:
             scope = action['scope']
+
+            payload['scope'] = scope
 
             action['translated_value'] = integration.translate_value(action['value'], session, scope)
 
@@ -231,9 +244,15 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             elif scope == 'game':
                 session.game_version.game.set_variable(action['variable'], action['translated_value'])
         else:
-            action['translated_value'] = integration.translate_variable(action['variable'], session)
+            action['translated_value'] = integration.translate_value(action['variable'], session)
 
-            session.set_variable(action['variable'], action['translated_value'])
+            session.set_variable(action['value'], action['translated_value'])
+
+        payload['value'] = action['translated_value']
+
+        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
+        point.secondary_identifier = payload['variable']
+        point.save()
 
         return True
     elif action['type'] == 'continue':

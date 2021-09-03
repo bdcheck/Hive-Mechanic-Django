@@ -28,6 +28,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
+from passive_data_kit.models import DataPoint
 
 from . import card_issues
 
@@ -352,6 +353,7 @@ class GameVersion(models.Model):
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
+
                 actions.extend(new_actions)
 
                 new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
@@ -370,6 +372,20 @@ class GameVersion(models.Model):
                 for integration in self.game.integrations.all():
                     if integration.is_interrupt(interrupt['pattern'], payload):
                         session.set_variable('hive_interrupted_location', session.current_node())
+
+                        payload = {
+                            'variable': 'hive_interrupted_location',
+                            'value': session.current_node(),
+                            'original_value': session.current_node(),
+                            'scope': 'session',
+                            'session': 'session-' + str(session.pk),
+                            'game': str(session.game_version.game.slug),
+                            'player': str(session.player.identifier),
+                        }
+
+                        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
+                        point.secondary_identifier = payload['variable']
+                        point.save()
 
                         session.advance_to(interrupt['action'])
 
