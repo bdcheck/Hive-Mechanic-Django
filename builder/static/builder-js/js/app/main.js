@@ -165,7 +165,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         if (selectedSequence != null) {
             selectedSequence.removeChangeListener(onSequenceChanged);
         }
-
+        
         selectedSequence = sequence.loadSequence(definition);
 
         $(".mdc-top-app-bar__title").html(selectedSequence.name());
@@ -228,6 +228,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         });
 
         selectedSequence.selectInitialNode(initialId);
+        
+        return selectedSequence;
     };
 
     $("#action_save").hide();
@@ -393,11 +395,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     var item = sequence["items"][j];
 
                     if (item["id"] == cardId) {
-                        window.dialogBuilder.loadSequence(sequence, item['id']);
+                        var loadedSequence = window.dialogBuilder.loadSequence(sequence, item['id']);
 
 						$('#' + item['id'] + '-advanced-dialog').remove();
 
-                        var node = Node.createCard(item, sequence);
+                        var node = Node.createCard(item, loadedSequence);
 
                         var current = $("#builder_current_node");
 
@@ -846,8 +848,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
 
                     initializeDestinationMenu("select-interrupt", function(nodeId) {
-                    	console.log('SELECTED: ' + nodeId);
-                    
                         interrupt["action"] = nodeId;
                         
                         chooseDialog.close();
@@ -968,8 +968,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             refreshSettingsInterrupts();
         });
-        
-        console.log("SHOW ACTIVITY SETTINGS");
         
         $("#editor-view").hide();
         $("#settings-view").show();

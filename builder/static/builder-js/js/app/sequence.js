@@ -73,15 +73,25 @@ define(modules, function (mdc, Node) {
 
         loadNode(definition) {
             var me = this;
+            
+            var found = false;
 
             if (definition != undefined) {
-                for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
+				for (var j = 0; j < this.definition["items"].length; j++) {
+					var item = this.definition["items"][j];
+					
+					if (item["id"] == definition["id"]) {
+						found = true;
+					}
+				}
+				
+                for (var i = 0; found == false && i < window.dialogBuilder.definition.sequences.length; i++) {
                     var sequence = window.dialogBuilder.definition.sequences[i];
 
                     if (sequence["id"] != this.definition["id"]) {
                         for (var j = 0; j < sequence["items"].length; j++) {
                             var item = sequence["items"][j];
-
+                            
                             if (item["id"] == definition["id"]) {
                                 window.dialogBuilder.loadSequence(sequence, definition['id']);
 
@@ -509,8 +519,6 @@ define(modules, function (mdc, Node) {
 
                         id = id.replace('choose_destination_item_', '');
                         
-                        console.log('CLICKED ID: ' + id);
-
                         if (id == "add_card") {
                             me.addCard(window.dialogBuilder.chooseDestinationDialogCallback);
                         } else {
@@ -540,10 +548,10 @@ define(modules, function (mdc, Node) {
                         var cardType = $("input[name='add-card-options']:checked").val(); //  window.dialogBuilder.newCardSelect.value;
                         
                         if (cardName.trim() == '') {
-							var selectedCard = $("input[name='add-card-options']:checked").parent().parent().parent().find('label').text();
+                            var selectedCard = $("input[name='add-card-options']:checked").parent().parent().parent().find('label').text();
 
-							cardName = 'New ' + selectedCard + ' Card';
-						}
+                            cardName = 'New ' + selectedCard + ' Card';
+                        }
 
                         var cardClass = window.dialogBuilder.cardMapping[cardType];
 
@@ -561,17 +569,17 @@ define(modules, function (mdc, Node) {
                 }
             };
 
-			$('input[type=radio][name=add-card-options]').change(function() {
-				var cardName = nameField.value;
-				
-				if (cardName.trim() == '' || (cardName.startsWith('New ') && cardName.endsWith(' Card'))) {
-					var selectedCard = $(this).parent().parent().parent().find('label').text();
-				
-					cardName = 'New ' + selectedCard + ' Card';
-					
-					nameField.value = cardName;
-				}
-			});
+            $('input[type=radio][name=add-card-options]').change(function() {
+                var cardName = nameField.value;
+                
+                if (cardName.trim() == '' || (cardName.startsWith('New ') && cardName.endsWith(' Card'))) {
+                    var selectedCard = $(this).parent().parent().parent().find('label').text();
+                
+                    cardName = 'New ' + selectedCard + ' Card';
+                    
+                    nameField.value = cardName;
+                }
+            });
 
             window.dialogBuilder.addCardDialog.listen('MDCDialog:closed', listener);
 
@@ -584,7 +592,7 @@ define(modules, function (mdc, Node) {
             }
             
             if (nodeId.includes("#") == false) {
-            	nodeId = this.definition["id"] + "#" + nodeId;
+                nodeId = this.definition["id"] + "#" + nodeId;
             }
             
             if (nodeId.startsWith(this.definition["id"] + "#")) {
