@@ -52,8 +52,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         if (window.dialogBuilder.definition.sequences != undefined) {
             var issues = [];
 
-            $(".outstanding-issue-item").remove();
-
             for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
 
                 var loadedSequence = sequence.loadSequence(window.dialogBuilder.definition.sequences[i]);
@@ -62,19 +60,24 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                 issues = issues.concat(sequenceIssues);
             }
+            
+            $(".outstanding-issue-item").remove();
+            $(".outstanding-issue-item-divider").remove();
 
             if (issues.length > 0) {
                 for (var i = 0; i < issues.length; i++) {
                     var issue = issues[i];
 
-                    var item = '<li class="mdc-list-item prevent-menu-close outstanding-issue-item" role="menuitem" id="builder-outstanding-issues-dialog-' + issue[2] + '">';
-                    item +=    '  <span class="mdc-list-item__text">';
+                    var item = '<li role="separator" class="mdc-list-divider outstanding-issue-item-divider"></li>';
+                    item +=    '<li class="mdc-list-item mdc-list-item--with-two-lines prevent-menu-close outstanding-issue-item" id="builder-outstanding-issues-dialog-' + issue[2] + '">';
+                    item +=    '  <span class="mdc-list-item__ripple"></span>';
+                    item +=    '  <span class="mdc-list-item__content">';
                     item +=    '    <span class="mdc-list-item__primary-text">' + issue[0] + '</span>';
                     item +=    '    <span class="mdc-list-item__secondary-text">' + issue[3] + '</span>';
                     item +=    '  </span>';
                     item +=    '</li>';
 
-                    $(item).insertBefore(".outstanding-issue-items .mdc-list-divider");
+                    $(item).insertBefore("#builder-outstanding-issues-dialog-save-divider");
                 }
 
                 $("#action_save").text("warning");

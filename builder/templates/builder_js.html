@@ -302,19 +302,18 @@
             <div class="mdc-dialog__container">
                 <div class="mdc-dialog__surface">
                     <h2 class="mdc-dialog__title" id="builder-outstanding-issues-dialog-title">Outstanding Issues</h2>
-                    <div class="mdc-dialog__content" id="builder-outstanding-issues-dialog-content" style="padding: 0;">
-                        <ul class="mdc-list mdc-list--two-line mdc-dialog__content outstanding-issue-items" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-                            <li class="mdc-list-item outstanding-issue-item" role="menuitem" id="builder-outstanding-issues-dialog-1">
-                              <span class="mdc-list-item__text">Issue 1</span>
-                              <span class="mdc-list-item__meta material-icons">build</span>
-                            </li>
-                            <li class="mdc-list-divider" role="separator"></li>
-                            <li class="mdc-list-item prevent-menu-close" role="menuitem" id="builder-outstanding-issues-dialog-save">
-                                <span class="mdc-list-item__text">
+                    <div class="mdc-dialog__content" id="builder-outstanding-issues-dialog-content" style="padding: 0px;">
+                        <ul class="mdc-list mdc-list--two-line mdc-dialog__content outstanding-issue-items" style="padding: 0px;">
+							<li role="separator" class="mdc-list-divider" id="builder-outstanding-issues-dialog-save-divider"></li>
+                            <li class="mdc-list-item mdc-list-item--with-two-lines mdc-list-item--with-trailing-icon prevent-menu-close" id="builder-outstanding-issues-dialog-save">
+								<span class="mdc-list-item__ripple"></span>
+                                <span class="mdc-list-item__content">
                                     <span class="mdc-list-item__primary-text">Save With Issues</span>
                                     <span class="mdc-list-item__secondary-text">May exhibit unexpected behavior!</span>
                                 </span>
-                                <span class="mdc-list-item__meta material-icons">save</span>
+                                <span class="mdc-list-item__end">
+                                	<i class="material-icons">save</i>
+                                </span>
                             </li>
                         </ul>
                     </div>
@@ -398,9 +397,6 @@
             cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
             update: function(definition, success, failure) {
-            	console.log("UPDATE");
-            	console.log(definition);
-
                 var payload = {
                     'definition': JSON.stringify(definition, 2)
                 };
