@@ -76,7 +76,7 @@ class Integration(models.Model):
             return False
 
         if isinstance(pattern, str) and isinstance(value, str):
-            if re.match(pattern, value) is not None:
+            if re.match(pattern, value, re.IGNORECASE) is not None:
                 return True
 
         return False
