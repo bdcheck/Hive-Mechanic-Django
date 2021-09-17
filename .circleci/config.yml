@@ -55,24 +55,27 @@ jobs:
             pylint http_support
             pylint twilio_support
             bandit -r .
-#      - run:
-#          name: Test dialog content (Django Dialog Engine)
-#          command: |
-#            . /home/circleci/venv/bin/activate
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
-#            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
-#            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/hello_world/
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/prompt_test.json"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
-#      - run:
-#          name: Test dialog content (Hive Mechanic)
-#          command: |
-#            . /home/circleci/venv/bin/activate
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
-#            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
-#            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C builder/botium/convos/hello_world/
+      - run:
+          name: Test dialog content (Django Dialog Engine)
+          command: |
+            . /home/circleci/venv/bin/activate
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
+            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-core"
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
+            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/hello_world/
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/prompt_test.json"
+            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
+      - run:
+          name: Test dialog content (Hive Mechanic)
+          command: |
+            . /home/circleci/venv/bin/activate
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
+            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-hive-builder"
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
+            botium-cli run -c django_dialog_engine/botium/botium-extension.json -C builder/botium/convos/hello_world/
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-interrupts"
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/interrupt_test.json"
+            botium-cli run -c django_dialog_engine/botium/botium-extension.json -C builder/botium/convos/interrupt_test/
       - save_cache:
           key: venv-38-{{ .Branch }}-{{ checksum "/home/circleci/project/requirements.txt" }}
           paths:
@@ -126,24 +129,27 @@ jobs:
             pylint http_support
             pylint twilio_support
             bandit -r .
-#      - run:
-#          name: Test dialog content (Django Dialog Engine)
-#          command: |
-#            . /home/circleci/venv/bin/activate
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
-#            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
-#            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/hello_world/
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/prompt_test.json"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
-#      - run:
-#          name: Test dialog content (Hive Mechanic)
-#          command: |
-#            . /home/circleci/venv/bin/activate
-#            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
-#            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
-#            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
-#            botium-cli run -c django_dialog_engine/botium/botium.json -C builder/botium/convos/hello_world/
+      - run:
+          name: Test dialog content (Django Dialog Engine)
+          command: |
+            . /home/circleci/venv/bin/activate
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
+            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
+            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/hello_world/
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/prompt_test.json"
+            botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
+      - run:
+          name: Test dialog content (Hive Mechanic)
+          command: |
+            . /home/circleci/venv/bin/activate
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
+            export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-hive-builder"
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-hello-world"
+            botium-cli run -c django_dialog_engine/botium/botium-extension.json -C builder/botium/convos/hello_world/
+            export BOTIUM_DDE_DIALOG_ID="circle-ci-test-interrupts"
+            export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/interrupt_test.json"
+            botium-cli run -c django_dialog_engine/botium/botium-extension.json -C builder/botium/convos/interrupt_test/
       - save_cache:
           key: venv-27-{{ .Branch }}-{{ checksum "/home/circleci/project/requirements.txt" }}-v1
           paths:

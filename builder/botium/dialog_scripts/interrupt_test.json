@@ -1,0 +1,70 @@
+{
+  "sequences": [
+    {
+      "type": "sequence",
+      "id": "new-sequence",
+      "name": "New Sequence",
+      "items": [
+        {
+          "name": "Hello World",
+          "context": "Start building your game here.",
+          "message": "Hello World",
+          "type": "send-message",
+          "id": "hello-world",
+          "next": "pause-to-delay"
+        },
+        {
+          "name": "Pause to Delay",
+          "type": "pause",
+          "duration": "1",
+          "id": "pause-to-delay",
+          "next": "finish-message"
+        },
+        {
+          "name": "Finish Message",
+          "context": "(Context goes here...)",
+          "message": "Done pausing. Finishing.",
+          "type": "send-message",
+          "id": "finish-message",
+          "next": "end"
+        },
+        {
+          "name": "End",
+          "type": "game-over",
+          "id": "end"
+        }
+      ]
+    },
+    {
+      "id": "interrupt-sequence",
+      "type": "sequence",
+      "name": "Interrupt Sequence",
+      "items": [
+        {
+          "name": "Interrupt Hi",
+          "context": "(Context goes here...)",
+          "message": "Hi from interrupt!",
+          "type": "send-message",
+          "id": "interrupt-hi",
+          "next": "interrupt-bye"
+        },
+        {
+          "name": "Interrupt Bye",
+          "context": "(Context goes here...)",
+          "message": "Interrupt Bye!",
+          "type": "send-message",
+          "id": "interrupt-bye",
+          "next": "new-sequence#pause-to-delay"
+        }
+      ]
+    }
+  ],
+  "interrupts": [
+    {
+      "pattern": "^yolo$",
+      "action": "interrupt-sequence#interrupt-hi"
+    }
+  ],
+  "name": "Interrupt Test Activity",
+  "initial-card": "new-sequence#hello-world"
+}

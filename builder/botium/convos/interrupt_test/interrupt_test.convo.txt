@@ -1,0 +1,19 @@
+#me
+Hello
+
+#bot
+Hello world
+
+#me
+yolo
+
+#bot
+Hi from interrupt!
+Interrupt Bye!
+PAUSE 5000
+
+#me
+thanks
+
+#bot
+Done pausing. Finishing.

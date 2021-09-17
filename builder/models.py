@@ -343,17 +343,14 @@ class GameVersion(models.Model):
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
-    def process_incoming(self, session, payload, extras=None, dialog=None):
+    def process_incoming(self, session, payload, extras=None):
         actions = []
 
         if self.interrupt(payload, session) is False:
-            if dialog is None:
-                dialog = session.dialog()
-
+            dialog = session.dialog()
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
-
                 actions.extend(new_actions)
 
                 new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
@@ -538,13 +535,13 @@ class Session(models.Model):
     def complete_identifier(self, incomplete_id):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
 
-    def process_incoming(self, integration, payload, extras=None, dialog=None):
+    def process_incoming(self, integration, payload, extras=None):
         current_node = None # pylint: disable=unused-variable
 
         if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
-        actions = self.game_version.process_incoming(self, payload, extras, dialog)
+        actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
             integration.execute_actions(self, actions)
@@ -582,6 +579,9 @@ class Session(models.Model):
 
     def dialog(self):
         dialog_key = 'session-' + str(self.pk)
+
+        if 'dialog_key' in self.session_state: # pylint: disable=unsupported-membership-test
+            dialog_key = self.session_state['dialog_key'] # pylint: disable=unsubscriptable-object
 
         dialog = Dialog.objects.filter(key=dialog_key, finished=None).order_by('-started').first()
 
