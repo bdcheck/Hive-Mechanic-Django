@@ -1,6 +1,8 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 from builtins import str # pylint: disable=redefined-builtin
 
 import json

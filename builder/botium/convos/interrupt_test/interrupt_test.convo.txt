@@ -17,3 +17,6 @@ thanks
 
 #bot
 Done pausing. Finishing.
+
+#me
+goodbye
