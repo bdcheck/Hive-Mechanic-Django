@@ -16,8 +16,9 @@
 				<table class="mdc-data-table__table" aria-label="All Games" id="table_games">
 					<thead>
 						<tr class="mdc-data-table__header-row">
+							<th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
 							<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-							<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Slug</th>
+							<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Last Updated</th>
 							<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Versions</th>
 							<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Active Sessions</th>
 							<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Inactive Sessions</th>
@@ -27,8 +28,15 @@
 					<tbody class="mdc-data-table__content">
 						{% for game in games %}
 							<tr class="mdc-data-table__row">
-								<td class="mdc-data-table__cell"><a href="{% url 'builder_game' game.slug %}">{{ game.name }}</a></td>
-								<td class="mdc-data-table__cell">{{ game.slug }}</td>
+								<td class="mdc-data-table__cell">
+									<div class="builder_game_preview" id="builder_game_preview_{ game.pk }}" style="width: 100px; height: 100px; border: thin solid gray;" data-definition="{{ game.cytoscape_json }}" /></div>
+								</td>
+								<td class="mdc-data-table__cell">
+									<a href="{% url 'builder_game' game.slug %}"><strong>{{ game.name }}</strong></a>
+									<br />
+									ID: game.slug
+								</td>
+								<td class="mdc-data-table__cell">{{ game.latest_version.created }}</td>
 								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.versions.count }}</td>
 								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.active_session_count }}</td>
 								<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ game.inactive_session_count }}</td>
