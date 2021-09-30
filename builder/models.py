@@ -199,10 +199,10 @@ class InteractionCard(models.Model):
 
         return None
 
-    def update_card(self):
+    def update_card(self, force=False):
         messages = []
 
-        if self.available_update() is not None:
+        if force or self.available_update() is not None:
             try:
                 card_metadata = json.loads(self.repository_definition)
 
@@ -237,8 +237,14 @@ class InteractionCard(models.Model):
                     messages.append('[Error] ' + self.identifier + ': Unable to update to latest version. Remote hash does not match file contents.')
             except TypeError:
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
+            except json.decoder.JSONDecodeError:
+                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
         return messages
+
+    def refresh_card(self):
+        return self.update_card(force=True)
+
 
     def print_repository_diffs(self):
         try:
@@ -546,7 +552,7 @@ class GameVersion(models.Model):
                 return json.dumps(cytoscape_json, indent=indent)
 
             return json.dumps(cytoscape_json)
-        except: # pylint: disable=bare-except
+        except: # nosec # pylint: disable=bare-except
             pass
 
         return None
