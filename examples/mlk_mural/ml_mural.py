@@ -15,6 +15,8 @@ start_button = pygame.K_DOWN
 error_screen_file = "images/contacting-server.gif"
 token = "soundhello"
 url = 'https://dev.hivemechanic.org/http/'
+start_sequence = "start_start"
+intialize_sequence = "initial"
 timeout = 120000
 net_timeout = 4
 max_timeout = 10
@@ -41,10 +43,7 @@ class MlkMural():
         self.in_timeout = False
         self.net_requests = 0
         self.current_screen = ""
-        self.start_screen = ""
         self.initial_hive()
-
-
 
     def preload_cache(self):
         preload = self.fetch_variable("preload", scope=VariableScope.game)
@@ -60,15 +59,14 @@ class MlkMural():
 
 
     def goto_start_screen(self):
-        self.issue_command(GotoCommand("start_start"))
-        self.start_screen = "start"
+        self.issue_command(GotoCommand(start_sequence))
         self.current_screen = "start"
 
     def cleanup(self, cache: HiveCache):
         cache.clear()
 
     def initial_hive(self):
-        self.issue_command(GotoCommand("initial"), player="game")
+        self.issue_command(GotoCommand(intialize_sequence), player="game")
         self.preload_cache()
 
     def reset_system(self):
