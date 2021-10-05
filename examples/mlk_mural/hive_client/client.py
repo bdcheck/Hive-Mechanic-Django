@@ -77,6 +77,7 @@ class HiveClient(object): # pylint: disable=useless-object-inheritance
         self.api_url = kwargs['api_url']
         self.token = None
         self.timeout = None
+        self.max_timeout = None
 
         if self.api_url.endswith('/') is False:
             self.api_url = self.api_url + '/'
@@ -86,6 +87,9 @@ class HiveClient(object): # pylint: disable=useless-object-inheritance
 
         if 'timeout' in kwargs:
             self.timeout = kwargs['timeout']
+
+        if 'max_timeout' in kwargs:
+            self.max_timeout = kwargs['max_timeout']
 
         if 'logger' in kwargs:
             self.logger = kwargs['logger']
@@ -113,7 +117,8 @@ class HiveClient(object): # pylint: disable=useless-object-inheritance
 
         payload['commands'] = json.dumps(payload_commands, indent=2)
 
-        response = post_request_with_retries(self.command_url(), payload, self.logger, server_timeout=self.timeout)
+        response = post_request_with_retries(self.command_url(), payload, self.logger,
+                                             max_retry_duration=self.max_timeout, server_timeout=self.timeout)
 
         return response.json()
 
@@ -130,7 +135,7 @@ class HiveClient(object): # pylint: disable=useless-object-inheritance
         if player is not None:
             payload['player'] = player
 
-        response = post_request_with_retries(self.fetch_url(), payload, self.logger, server_timeout=self.timeout)
+        response = post_request_with_retries(self.fetch_url(), payload, self.logger, max_retry_duration=self.max_timeout, server_timeout=self.timeout)
 
         logging.info('%s = %s', self.fetch_url(), response.json())
 
