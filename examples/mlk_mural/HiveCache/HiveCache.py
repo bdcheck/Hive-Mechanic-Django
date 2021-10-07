@@ -22,7 +22,7 @@ class HiveCache(object):
         return HiveCache.__main_cache__
 
     @staticmethod
-    def get_type(key)->(str):
+    def get_type(key)->str:
         """
         returns the mimetype category for an url
         :param key:

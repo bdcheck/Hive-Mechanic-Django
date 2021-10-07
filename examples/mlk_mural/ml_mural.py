@@ -4,25 +4,32 @@ from hive_client import HiveClient, VariableScope, GotoCommand
 from HiveCache import HiveCache, PygameSoundCache, PygameImageCache
 from requests import exceptions
 import json
+import configparser
+from ast import literal_eval
 
-# Config
-DEBUG = True
-PRELOAD_ON = False
-FULLSCREEN = False
-IMAGE_RESOLUTION = (800, 600)
-keys = [pygame.K_LEFT, pygame.K_RIGHT]
-start_button = pygame.K_DOWN
-error_screen_file = "images/contacting-server.gif"
-token = "soundhello"
-url = 'https://dev.hivemechanic.org/http/'
-start_sequence = "start_start"
-intialize_sequence = "initial"
-timeout = 120000
+
 net_timeout = 4
 max_timeout = 10
 check_time = 100
+timeout = 120000
+keys = [pygame.K_LEFT, pygame.K_RIGHT]
+start_button = pygame.K_DOWN
 
-class MlkMural():
+config = configparser.ConfigParser()
+config.read("./config.ini")
+cd = config['Config']
+DEBUG = cd.getboolean('debug')
+PRELOAD_ON = cd.getboolean('preload_on')
+FULLSCREEN = cd.getboolean('fullscreen')
+error_screen_file = cd['error_screen_file']
+token = cd['token']
+url = cd['url']
+start_sequence = cd['start_sequence']
+intialize_sequence = cd["intial_sequence"]
+IMAGE_RESOLUTION = literal_eval(cd['image_resolution'])
+
+
+class MlkMural(object):
 
     def __init__(self):
         # pygame screen initialization
@@ -56,7 +63,6 @@ class MlkMural():
                     self.sound_cache.get_value(load)
                 elif url_type == 'image':
                     self.image_cache.get_value(load)
-
 
     def goto_start_screen(self):
         self.issue_command(GotoCommand(start_sequence))
