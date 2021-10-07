@@ -31,21 +31,56 @@ from django_dialog_engine.models import Dialog, DialogStateTransition
 from passive_data_kit.models import DataPoint
 
 from . import card_issues
+from .utils import fetch_cytoscape
 
 standard_library.install_aliases()
 
+CYTOSCAPE_DIALOG_PLACEHOLDER = [{
+    'data': {
+        'id': 'dialog-start',
+        'name': 'dialog-start',
+    },
+    'group': 'nodes'
+}, {
+    'data': {
+        'id': 'dialog-middle',
+        'name': 'dialog-middle',
+    },
+    'group': 'nodes'
+}, {
+    'data': {
+        'id': 'dialog-end',
+        'name': 'dialog-end',
+    },
+    'group': 'nodes'
+}, {
+    'data': {
+        'id': 'dialog-sm',
+        'source': 'dialog-start',
+        'target': 'dialog-middle',
+    },
+    'group': 'edges'
+}, {
+    'data': {
+        'id': 'dialog-me',
+        'source': 'dialog-start',
+        'target': 'dialog-end',
+    },
+    'group': 'edges'
+}]
+
 def file_cleanup(sender, **kwargs):
-    """
+    '''
     File cleanup callback used to emulate the old delete
     behavior using signals. Initially django deleted linked
     files when an object containing a File/ImageField was deleted.
 
     Usage:
     >>> from django.db.models.signals import post_delete
-    >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid="mymodel.file_cleanup")
+    >>> post_delete.connect(file_cleanup, sender=MyModel, dispatch_uid='mymodel.file_cleanup')
 
     Adapted from https://timonweb.com/django/cleanup-files-and-images-on-model-delete-in-django/
-    """
+    '''
 
     do_cleanup = True
 
@@ -64,10 +99,10 @@ def file_cleanup(sender, **kwargs):
                 field = None
 
             if field and isinstance(field, models.FileField):
-                inst = kwargs["instance"]
+                inst = kwargs['instance']
                 file_field = getattr(inst, fieldname)
                 field_manager = inst.__class__._default_manager # pylint: disable=protected-access
-                if (hasattr(file_field, "path") and os.path.exists(file_field.path) and not field_manager.filter(**{"%s__exact" % fieldname: getattr(inst, fieldname)}).exclude(pk=inst._get_pk_val())): # pylint: disable=protected-access
+                if (hasattr(file_field, 'path') and os.path.exists(file_field.path) and not field_manager.filter(**{'%s__exact' % fieldname: getattr(inst, fieldname)}).exclude(pk=inst._get_pk_val())): # pylint: disable=protected-access
                     default_storage.delete(file_field.path)
 
 
@@ -88,7 +123,7 @@ class PermissionsSupport(models.Model):
 
 class RemoteRepository(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
-        verbose_name_plural = "Remote Repositories"
+        verbose_name_plural = 'Remote Repositories'
 
     name = models.CharField(max_length=4096, unique=True)
     url = models.URLField(max_length=4096, unique=True)
@@ -124,10 +159,10 @@ class InteractionCard(models.Model):
     def issues(self):
         identified_issues = []
 
-        prefix = card_issues.__name__ + "."
+        prefix = card_issues.__name__ + '.'
 
         for importer, modname, ispkg in pkgutil.iter_modules(card_issues.__path__, prefix): # pylint: disable=unused-variable
-            module = __import__(modname, fromlist="dummy")
+            module = __import__(modname, fromlist='dummy')
 
             if self.entry_actions is not None:
                 for issue in module.evaluate(self.entry_actions):
@@ -164,10 +199,10 @@ class InteractionCard(models.Model):
 
         return None
 
-    def update_card(self):
+    def update_card(self, force=False):
         messages = []
 
-        if self.available_update() is not None:
+        if force or self.available_update() is not None:
             try:
                 card_metadata = json.loads(self.repository_definition)
 
@@ -188,8 +223,8 @@ class InteractionCard(models.Model):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash == latest_version['sha512-hash']:
-                    self.entry_actions = entry_content.decode("utf-8")
-                    self.evaluate_function = evaluate_content.decode("utf-8")
+                    self.entry_actions = entry_content.decode('utf-8')
+                    self.evaluate_function = evaluate_content.decode('utf-8')
 
                     self.version = latest_version['version']
 
@@ -202,8 +237,14 @@ class InteractionCard(models.Model):
                     messages.append('[Error] ' + self.identifier + ': Unable to update to latest version. Remote hash does not match file contents.')
             except TypeError:
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
+            except json.decoder.JSONDecodeError:
+                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
         return messages
+
+    def refresh_card(self):
+        return self.update_card(force=True)
+
 
     def print_repository_diffs(self):
         try:
@@ -239,11 +280,11 @@ class InteractionCard(models.Model):
                         print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
                         print('    ' + '\n    '.join(client_diff))
                 else:
-                    print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
+                    print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
             else:
-                print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
+                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [2]')
         except json.decoder.JSONDecodeError:
-            print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+            print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
 post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.interaction_card.file_cleanup')
 
@@ -333,6 +374,23 @@ class Game(models.Model):
 
         return False
 
+    def cytoscape_json(self, indent=0):
+        version = self.versions.order_by('-created').first()
+
+        if version is not None:
+            version_cyto = version.cytoscape_json(indent=indent)
+
+            if version_cyto is not None:
+                return version_cyto
+
+        if indent > 0:
+            return json.dumps(CYTOSCAPE_DIALOG_PLACEHOLDER, indent=indent)
+
+        return json.dumps(CYTOSCAPE_DIALOG_PLACEHOLDER)
+
+    def latest_version(self):
+        return self.versions.order_by('-created').first()
+
 @python_2_unicode_compatible
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)
@@ -343,17 +401,14 @@ class GameVersion(models.Model):
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
-    def process_incoming(self, session, payload, extras=None, dialog=None):
+    def process_incoming(self, session, payload, extras=None):
         actions = []
 
         if self.interrupt(payload, session) is False:
-            if dialog is None:
-                dialog = session.dialog()
-
+            dialog = session.dialog()
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
-
                 actions.extend(new_actions)
 
                 new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
@@ -489,6 +544,18 @@ class GameVersion(models.Model):
 
         return incomplete_id
 
+    def cytoscape_json(self, indent=0):
+        try:
+            cytoscape_json = fetch_cytoscape(json.loads(self.definition))
+
+            if indent > 0:
+                return json.dumps(cytoscape_json, indent=indent)
+
+            return json.dumps(cytoscape_json)
+        except: # nosec # pylint: disable=bare-except
+            pass
+
+        return None
 
 @python_2_unicode_compatible
 class Player(models.Model):
@@ -538,13 +605,13 @@ class Session(models.Model):
     def complete_identifier(self, incomplete_id):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
 
-    def process_incoming(self, integration, payload, extras=None, dialog=None):
+    def process_incoming(self, integration, payload, extras=None):
         current_node = None # pylint: disable=unused-variable
 
         if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
             current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
 
-        actions = self.game_version.process_incoming(self, payload, extras, dialog)
+        actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
             integration.execute_actions(self, actions)
@@ -582,6 +649,9 @@ class Session(models.Model):
 
     def dialog(self):
         dialog_key = 'session-' + str(self.pk)
+
+        if 'dialog_key' in self.session_state: # pylint: disable=unsupported-membership-test
+            dialog_key = self.session_state['dialog_key'] # pylint: disable=unsubscriptable-object
 
         dialog = Dialog.objects.filter(key=dialog_key, finished=None).order_by('-started').first()
 
@@ -710,7 +780,7 @@ class DataProcessor(models.Model):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash == latest_version['sha512-hash']:
-                    self.processor_function = implementation_content.decode("utf-8")
+                    self.processor_function = implementation_content.decode('utf-8')
 
                     self.version = latest_version['version']
 

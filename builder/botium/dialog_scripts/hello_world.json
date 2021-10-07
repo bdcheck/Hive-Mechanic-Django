@@ -23,5 +23,5 @@
   ],
   "interrupts": [],
   "name": "",
-  "initial-card": null
+  "initial-card": "new-sequence#hello-world"
 }

@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import json
 import os
-import sys
 import traceback
 
 from django.utils import timezone
@@ -34,13 +33,19 @@ def create_dialog_from_path(file_path, dialog_key=None):
             if game is None:
                 game = Game.objects.create(slug=game_slug, name=base_name + ' Botium Test Game')
 
-            new_version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
+            test_dialog = Dialog.objects.filter(key=game_slug, finished=None).order_by('-started').first()
 
-            dialog_snapshot = new_version.dialog_snapshot()
+            if test_dialog is None:
+                version = GameVersion.objects.filter(game=game).order_by('-created').first()
 
-            new_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
+                if version is None:
+                    version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
 
-            return new_dialog
+                dialog_snapshot = version.dialog_snapshot()
+
+                test_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
+
+            return test_dialog
     except: # pylint: disable=bare-except
         traceback.print_exc()
 
@@ -63,11 +68,11 @@ def process(dialog, response, extras):
 
     if session is None:
         session = Session(game_version=game.versions.order_by('-created').first(), player=player_match, started=timezone.now())
+        session.session_state['is_testing'] = True # pylint: disable=unsupported-assignment-operation
+        session.session_state['dialog_key'] = dialog.key # pylint: disable=unsupported-assignment-operation
         session.save()
 
         if extras is not None and 'last_message' in extras:
             del extras['last_message']
 
-    print('PROCESSING ' + str(response), file=sys.stderr)
-    session.process_incoming(integration, response, extras, dialog=dialog)
-    print('PROCESSED ' + str(response), file=sys.stderr)
+    return session.process_incoming(integration, response, extras)

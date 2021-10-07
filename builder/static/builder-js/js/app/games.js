@@ -4,10 +4,20 @@ requirejs.config({
             exports: "$"
         },
         cookie: {
-            exports: "Cookies"
-        },
-        bootstrap: {
+            exports: "Cookies",
             deps: ["jquery"]
+        },
+        klayjs: {
+            exports: "$klay"
+        },
+        dagre: {
+            exports: "dagre"
+        },
+        "cytoscape-klay": {
+            deps: ["klayjs"]
+        },
+        "cytoscape-dagre": {
+            deps: ["dagre"]
         },
     },
     baseUrl: "/static/builder-js/js/app",
@@ -15,19 +25,24 @@ requirejs.config({
         app: '/static/builder-js/js/app',
         material: "/static/builder-js/vendor/material-components-web.min",
         jquery: "/static/builder-js/vendor/jquery-3.4.0.min",
-        cookie: "/static/builder-js/vendor/js.cookie"
+        cookie: "/static/builder-js/vendor/js.cookie",
+        cytoscape: "/static/builder-js/vendor/cytoscape-3.19.1.min",
+        "cytoscape-klay": "/static/builder-js/vendor/cytoscape-klay",
+        "cytoscape-dagre": "/static/builder-js/vendor/cytoscape-dagre",
+        klayjs: '/static/builder-js/vendor/klay',
+        dagre: '/static/builder-js/vendor/dagre.min'
     }
 });
 
-requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
+requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, Cookies, cytoscape, cytoscape_dagre) {
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 
     const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
     itemsList.listen('MDCList:action', function(e) {
-    	const path = $(itemsList.listElements[e['detail']['index']]).attr("data-href");
+        const path = $(itemsList.listElements[e['detail']['index']]).attr("data-href");
 
-    	window.location = path;
+        window.location = path;
     });
 
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
@@ -40,62 +55,58 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
         drawer.open = !drawer.open;
     });
 
-	const baseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('base-dialog'));
+    const baseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('base-dialog'));
 
-	const fabRipple = mdc.ripple.MDCRipple.attachTo(document.getElementById('action_add_game'));
+    const fabRipple = mdc.ripple.MDCRipple.attachTo(document.getElementById('action_add_game'));
 
-	const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_add_game'));
+    const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_add_game'));
 
-	$("#action_add_game").click(function(eventObj) {
-		eventObj.preventDefault();
+    $("#action_add_game").click(function(eventObj) {
+        eventObj.preventDefault();
 
-		$("#field_add_game").val("");
-		addDialog.open();
-	});
+        $("#field_add_game").val("");
+        addDialog.open();
+    });
 
-	$(".action_clone_game").click(function(eventObj) {
-		eventObj.preventDefault();
-		
-		alert('TODO: Clone game #' + $(eventObj.target).attr('data-id'));
-	});
-	
-	$(".action_delete_game").click(function(eventObj) {
-		eventObj.preventDefault();
-		
-		alert('TODO: Remove game #' + $(eventObj.target).attr('data-id'));
-	});
+    $(".action_clone_game").click(function(eventObj) {
+        eventObj.preventDefault();
+        
+        alert('TODO: Clone game #' + $(eventObj.target).attr('data-id'));
+    });
+    
+    $(".action_delete_game").click(function(eventObj) {
+        eventObj.preventDefault();
+        
+        alert('TODO: Remove game #' + $(eventObj.target).attr('data-id'));
+    });
 
-	addDialog.listen('MDCDialog:closed', function() {
-		console.log("NEW GAME: " + $("#field_add_game").val());
-		
-		var name = $("#field_add_game").val();
-		
-		$.post('/builder/add-game.json', { 'name': name}, function(response) {
-			console.log("RESPONSE");
-			
-			if (response['success']) {
-				$("#dialog-title").html("Success");
-			} else {
-				$("#dialog-title").html("Failure");
-			}
-			
-			$("#dialog-content").html(response['message']);
+    addDialog.listen('MDCDialog:closed', function() {
+        var name = $("#field_add_game").val();
+        
+        $.post('/builder/add-game.json', { 'name': name}, function(response) {
+            if (response['success']) {
+                $("#dialog-title").html("Success");
+            } else {
+                $("#dialog-title").html("Failure");
+            }
+            
+            $("#dialog-content").html(response['message']);
 
-			console.log(response);
+            console.log(response);
 
-			baseDialog.listen('MDCDialog:closed', function() {
-				if (response['success']) {
-					if (response['redirect'] != undefined) {
-						location.href = response['redirect'];
-					}
-				}
-			});
-			
-			baseDialog.open();
-		});
-	});
+            baseDialog.listen('MDCDialog:closed', function() {
+                if (response['success']) {
+                    if (response['redirect'] != undefined) {
+                        location.href = response['redirect'];
+                    }
+                }
+            });
+            
+            baseDialog.open();
+        });
+    });
 
-	const gameName = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'));
+    const gameName = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'));
     
     var csrftoken = Cookies.get('csrftoken');
 
@@ -114,5 +125,24 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     
     drawer.open = true;
 
-	const dataTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_games'));
+    const dataTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_games'));
+    
+    cytoscape_dagre(cytoscape); // register extension
+    
+    $(".builder_game_preview" ).each(function(index) {
+		var definition = $(this).data("definition");
+
+		var cy = cytoscape({
+			'container': $(this),
+			'elements': definition,
+
+			'layout': {
+				name: 'dagre'
+			}
+		});
+
+		cy.ready(function(event){
+			cy.center();
+		});
+    });
 });

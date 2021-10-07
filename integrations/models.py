@@ -1,6 +1,8 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 from builtins import str # pylint: disable=redefined-builtin
 
 import json
@@ -217,7 +219,7 @@ class Integration(models.Model):
         return None
 
 
-def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches
+def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
@@ -270,6 +272,14 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             return session.game_version.interrupt(action['interrupt'], session)
     elif action['type'] == 'end-activity':
         session.complete()
+
+        return True
+    elif action['type'] == 'echo': # pylint: disable=no-else-return
+        print(integration.translate_value(action['message'], session))
+
+        return True
+    elif action['type'] == 'echo-image':
+        print(action['image-url'])
 
         return True
 
