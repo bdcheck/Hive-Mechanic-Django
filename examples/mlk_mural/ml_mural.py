@@ -8,8 +8,8 @@ import configparser
 from ast import literal_eval
 
 
-net_timeout = 4
-max_timeout = 10
+net_timeout = 5
+max_timeout = 20
 check_time = 100
 timeout = 120000
 keys = [pygame.K_LEFT, pygame.K_RIGHT]
@@ -166,8 +166,10 @@ class MlkMural(object):
                         self.cleanup(self.image_cache)
                         quit()
                     if event.key == start_button and self.current_screen != "start":
-                        self.goto_start_screen()
-                        pygame.time.set_timer(NEXT_SCREEN, check_time, True)
+                        if not pause:
+                            pause = True
+                            self.goto_start_screen()
+                            pygame.time.set_timer(NEXT_SCREEN, check_time, True)
                     elif event.key == start_button:
                         # this starts with any keypress
                         choice = choices[0]
