@@ -14,6 +14,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
+from integrations.models import Integration
+
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
 
 @login_required
@@ -22,23 +24,33 @@ def builder_home(request): # pylint: disable=unused-argument
         raise PermissionDenied('View permission required.')
 
     context = {}
+    
+    integration_types = {}
+    
+    for integration in Integration.objects.all():
+    	if (integration.type in integration_types) is False:
+    		integration_types[integration.type] = []
+    	
+    	integration_types[integration.type].append(integration.fetch_statistics())
+    	
+    context['integrations'] = integration_types
 
     return render(request, 'builder_home.html', context=context)
 
 @login_required
-def builder_games(request): # pylint: disable=unused-argument
+def builder_activities(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
     context = {}
 
-    context['games'] = []
+    context['activities'] = []
 
     for game in Game.objects.all():
         if game.can_edit(request.user):
-            context['games'].append(game)
+            context['activities'].append(game)
 
-    return render(request, 'builder_games.html', context=context)
+    return render(request, 'builder_activities.html', context=context)
 
 @login_required
 def builder_sessions(request): # pylint: disable=unused-argument

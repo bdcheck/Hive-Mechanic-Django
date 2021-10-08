@@ -12,10 +12,89 @@
 {% block 'main_content' %}
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
-			<div class="mdc-layout-grid__cell" style="padding-bottom: 16px;">
-				<span class="mdc-typography--subtitle2">DASHBOARD</span>
-				
-				<p>God-Eye View Here. What should live here?</p>
+			{% for type_name, type_integrations in integrations.items %}
+				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					<div class="mdc-card" style="padding: 16px;">
+						<div class="mdc-typography mdc-typography--headline5">Integrations: {{ type_integrations.0.type }}</div>
+					</div>
+				</div>
+				{% for integration in type_integrations %}
+					<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+						<div class="mdc-card" style="padding: 16px;">
+							<div class="mdc-typography mdc-typography--headline6">
+								{{ integration.name }}
+							</div>
+							<div class="mdc-typography mdc-typography--subtitle1">{{ integration.game }} ({{ integration.type }})</div>
+						
+							{% for detail in integration.details %}
+								<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
+							{% endfor %}
+						</div>
+					</div>
+				{% endfor %}	
+			{% endfor %}	
+		</div>
+	</div>
+	
+	
+	
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
+					<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Sessions</div>
+					<p class="mdc-typography mdc-typography--body1">Active Sessions: <strong>{{ active_sessions.count }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Completed Sessions: <strong>{{ completed_sessions.count }}</strong></p>
+					
+					{% if oldest_active_session %}
+						<p class="mdc-typography mdc-typography--body1">Oldest Session: <strong>{{ oldest_active_session.dialog }}</strong> (since {{ oldest_active_session.started }})</p>
+					{% endif %}
+
+					<p class="mdc-typography mdc-typography--body1">Average Session Duration: <strong>{{ average_session_duration_humanized }}</strong></p>
+				</div>
+
+				<div class="mdc-card" style="padding: 16px; margin-top: 24px;">
+					<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
+					<p class="mdc-typography mdc-typography--body1">Messages Received: <strong>{{ incoming_messages.count }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Messages Sent: <strong>{{ outgoing_messages_sent.count }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Messages Pending: <strong>{{ outgoing_messages_pending.count }}</strong></p>
+				</div>
+			</div>
+		</div>
+		<div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-card__media mdc-card__media--16-9">
+						<div class="mdc-card__media-content">
+							<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
+							<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-card__media mdc-card__media--16-9">
+						<div class="mdc-card__media-content">
+							<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-card__media mdc-card__media--16-9">
+						<div class="mdc-card__media-content">
+							<div class="mdc-typography mdc-typography--headline6">Completions</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

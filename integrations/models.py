@@ -218,6 +218,29 @@ class Integration(models.Model):
 
         return None
 
+    def fetch_statistics(self):
+        statistics = {
+            'name': self.name,
+            'type': self.type,
+            'game': self.game,
+            'details': []
+        }
+
+        if self.type == 'twilio':
+            from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
+
+            annotate_statistics(self, statistics)
+        elif self.type == 'http':
+            from http_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
+
+            annotate_statistics(self, statistics)
+        elif self.type == 'command_line':
+            from cli_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
+
+            annotate_statistics(self, statistics)
+
+        return statistics
+
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
     if action['type'] == 'set-variable': # pylint: disable=no-else-return

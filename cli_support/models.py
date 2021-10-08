@@ -27,3 +27,8 @@ def execute_action(integration, session, action):
         raise HiveActivityFinishedException('Activity finished normally')
 
     return False
+
+def annotate_statistics(integration, statistics):
+    statistics['type'] = 'Other Integration'
+
+    # TODO: stats

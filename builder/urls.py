@@ -3,12 +3,12 @@
 from django.conf.urls import url
 
 from .views import builder_game, builder_game_definition_json, builder_interaction_card, \
-                   builder_home, builder_games, builder_players, builder_sessions, \
+                   builder_home, builder_activities, builder_players, builder_sessions, \
                    builder_add_game, builder_data_processor_options
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
-    url(r'games$', builder_games, name='builder_games'),
+    url(r'activities$', builder_activities, name='builder_activities'),
     url(r'data-processor-options.json$', builder_data_processor_options, name='builder_data_processor_options'),
     url(r'sessions$', builder_sessions, name='builder_sessions'),
     url(r'players$', builder_players, name='builder_players'),

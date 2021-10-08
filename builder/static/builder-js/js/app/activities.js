@@ -68,18 +68,6 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
         addDialog.open();
     });
 
-    $(".action_clone_game").click(function(eventObj) {
-        eventObj.preventDefault();
-        
-        alert('TODO: Clone game #' + $(eventObj.target).attr('data-id'));
-    });
-    
-    $(".action_delete_game").click(function(eventObj) {
-        eventObj.preventDefault();
-        
-        alert('TODO: Remove game #' + $(eventObj.target).attr('data-id'));
-    });
-
     addDialog.listen('MDCDialog:closed', function() {
         var name = $("#field_add_game").val();
         
@@ -125,8 +113,39 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
     
     drawer.open = true;
 
-    const dataTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_games'));
-    
+	$(".activity_menu_open").click(function(eventObj) {
+		eventObj.preventDefault();
+
+		const menu = mdc.menu.MDCMenu.attachTo($(this).parent().find('.mdc-menu')[0]);
+        menu.setFixedPosition(true);
+
+        menu.listen("MDCMenu:selected", function (event) {
+        	var data = $(event.detail.item).data();
+        	
+        	console.log('ACTION: ' + data['action'] + '(' + data['id'] + ')');
+        });
+
+		menu.open = (menu.open == false);
+	});
+	
+	$(".toggle_integration_content").hide();
+	
+	$(".toggle_integration").click(function(eventObj) {
+		var visible = $(".toggle_integration_content:visible");
+		
+		$(".toggle_integration_content").hide();
+		$(".toggle_integration span.material-icons").text("add_circle");
+		
+		if (visible.length == 0) {
+			$(this).parent().find(".toggle_integration_content").show();
+			$(this).parent().find(".toggle_integration span.material-icons").text("cancel");
+		}
+	});
+	
+    $(".builder_game_preview").each(function() {
+		$(this).height($(this).parent().height());
+	});
+
     cytoscape_dagre(cytoscape); // register extension
     
     $(".builder_game_preview" ).each(function(index) {

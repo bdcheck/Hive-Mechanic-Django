@@ -3,6 +3,7 @@
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import datetime
 import time
 import traceback
 
@@ -66,6 +67,43 @@ def last_message_for_player(game, player):
             }
 
     return last_incoming
+
+def annotate_statistics(integration, statistics):
+    statistics['type'] = 'Twilio Phone Number'
+
+    phone_number = integration.configuration['phone_number']
+
+    statistics['details'].append(['Phone Number', phone_number])
+
+    today = timezone.now() - datetime.timedelta(days=1)
+    week = timezone.now() - datetime.timedelta(days=7)
+
+    all_count = OutgoingMessage.objects.filter(integration=integration).count() + IncomingMessage.objects.filter(integration=integration).count()
+
+    statistics['details'].append(['Message Count (All)', all_count])
+
+    week_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=week).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=week).count()
+
+    statistics['details'].append(['Message Count (Last 7 Days)', week_count])
+
+    today_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=today).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=today).count()
+
+    statistics['details'].append(['Message Count (Last 24 Hours)', today_count])
+    
+    recent_out = OutgoingMessage.objects.filter(integration=integration).order_by('sent_date').first()
+    
+    if recent_out is not None:
+        statistics['details'].append(['Most Recent Sent', recent_out.sent_date])
+    else:
+        statistics['details'].append(['Most Recent Sent', 'No messages sent yet'])
+
+    recent_in = IncomingMessage.objects.filter(integration=integration).order_by('receive_date').first()
+    
+    if recent_in is not None:
+        statistics['details'].append(['Most Recent Received', recent_in.receive_date])
+    else:
+        statistics['details'].append(['Most Recent Received', 'No messages received yet'])
+
 
 class PermissionsSupport(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
