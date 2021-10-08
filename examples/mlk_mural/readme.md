@@ -11,7 +11,7 @@ This system requires Hive Mechanic to be running with and activity that has http
 Create a virtual environment in the current directory
 ```
 python3 -m venv venv
-./venv/bin/activate
+source ./venv/bin/activate
 ```
 ```
 pip3 -r requiresents.txt
@@ -22,8 +22,12 @@ Let the system install all the required software.
 config.ini contains some information needed to connect and run the system
 For some advanced configuration options look at the top of ml_mural.py
 
-To run from current directory 
-
+###Executing
+make sure you have run
+```
+source ./venv/bin/activate
+```
+the nun using
 ```
 python3 ml_mural.py
 ```
