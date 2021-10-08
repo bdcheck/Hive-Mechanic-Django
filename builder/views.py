@@ -24,15 +24,15 @@ def builder_home(request): # pylint: disable=unused-argument
         raise PermissionDenied('View permission required.')
 
     context = {}
-    
+
     integration_types = {}
-    
+
     for integration in Integration.objects.all():
-    	if (integration.type in integration_types) is False:
-    		integration_types[integration.type] = []
-    	
-    	integration_types[integration.type].append(integration.fetch_statistics())
-    	
+        if (integration.type in integration_types) is False:
+            integration_types[integration.type] = []
+
+        integration_types[integration.type].append(integration.fetch_statistics())
+
     context['integrations'] = integration_types
 
     return render(request, 'builder_home.html', context=context)
