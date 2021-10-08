@@ -77,7 +77,6 @@ user-agents==2.2.0
 validators==0.14.2; python_version < '3.0'
 validators==0.18.2; python_version >= '3.0'
 whitenoise==4.1.2
-wrapt==1.13.1
 XlsxWriter==2.0.0; python_version < '3.4'
 XlsxWriter==3.0.1; python_version >= '3.4'
 zipstream==1.1.4
