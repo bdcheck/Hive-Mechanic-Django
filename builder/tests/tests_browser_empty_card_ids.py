@@ -70,11 +70,11 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_class_name('mdc-top-app-bar__title'))
 
-            WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_xpath('//li[@data-href="/builder/games"]'))
+            WebDriverWait(self.selenium, 5).until(lambda driver: driver.find_element_by_xpath('//li[@data-href="/builder/activities"]'))
 
             # Investigate why unable to click this link in Selenium...
 
-            self.selenium.get('%s%s' % (self.live_server_url, '/builder/games'))
+            self.selenium.get('%s%s' % (self.live_server_url, '/builder/activities'))
 
             WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//a[@href="/builder/activity/empty-id-test"]'))
 

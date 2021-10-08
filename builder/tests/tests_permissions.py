@@ -167,7 +167,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_home'))
         self.assertEqual(response.status_code, 302)
 
-        response = self.client.get(reverse('builder_games'))
+        response = self.client.get(reverse('builder_activities'))
         self.assertEqual(response.status_code, 302)
 
         response = self.client.get(reverse('builder_sessions'))
@@ -196,7 +196,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_home'))
         self.assertEqual(response.status_code, 403)
 
-        response = self.client.get(reverse('builder_games'))
+        response = self.client.get(reverse('builder_activities'))
         self.assertEqual(response.status_code, 403)
 
         response = self.client.get(reverse('builder_sessions'))
@@ -225,7 +225,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_home'))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(reverse('builder_games'))
+        response = self.client.get(reverse('builder_activities'))
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(reverse('builder_sessions'))
@@ -272,7 +272,7 @@ class UserPermissionsTestCase(TestCase):
         response = self.client.get(reverse('builder_home'))
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(reverse('builder_games'))
+        response = self.client.get(reverse('builder_activities'))
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(reverse('builder_sessions'))
