@@ -110,8 +110,8 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
                                 integration_match.game.game_state['mirror_emails'],
                             )
 
-                            for filename in media_objects:
-                                email.attach(filename, media_objects[filename]['content'], media_objects[filename]['mime-type'])
+                            for filename, file_content in media_objects.items():
+                                email.attach(filename, file_content['content'], file_content['mime-type'])
 
                             email.send()
 
