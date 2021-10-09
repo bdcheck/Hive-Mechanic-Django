@@ -153,11 +153,10 @@ def builder_interaction_card(request, card): # pylint: disable=unused-argument
         if card.client_implementation.path.endswith('.js'):
             content_type = 'application/javascript'
 
-        with open(card.client_implementation.path, 'rb') as client_file:
-            response = FileResponse(client_file, content_type=content_type)
-            response['Content-Length'] = os.path.getsize(card.client_implementation.path)
+        response = FileResponse(open(card.client_implementation.path, 'rb'), content_type=content_type) # pylint: disable=consider-using-with
+        response['Content-Length'] = os.path.getsize(card.client_implementation.path)
 
-            return response
+        return response
 
     raise Http404('Card implementation not found. Verify that a client implementation file is attached to the card definition.')
 
