@@ -262,23 +262,24 @@ class InteractionCard(models.Model):
                     repo_evaluate = requests.get(latest_version['evaluate-function']).text
                     repo_client = requests.get(latest_version['client-implementation']).text
 
-                    local_client = open(self.client_implementation.path).read()
+                    with open(self.client_implementation.path, encoding='utf-8') as client_file:
+                        local_client = client_file.read()
 
-                    entry_diff = list(difflib.unified_diff(repo_entry.splitlines(), self.entry_actions.splitlines(), lineterm=''))
-                    eval_diff = list(difflib.unified_diff(repo_evaluate.splitlines(), self.evaluate_function.splitlines(), lineterm=''))
-                    client_diff = list(difflib.unified_diff(repo_client.splitlines(), local_client.splitlines(), lineterm=''))
+                        entry_diff = list(difflib.unified_diff(repo_entry.splitlines(), self.entry_actions.splitlines(), lineterm=''))
+                        eval_diff = list(difflib.unified_diff(repo_evaluate.splitlines(), self.evaluate_function.splitlines(), lineterm=''))
+                        client_diff = list(difflib.unified_diff(repo_client.splitlines(), local_client.splitlines(), lineterm=''))
 
-                    if entry_diff:
-                        print('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                        print('    ' + '\n    '.join(entry_diff))
+                        if entry_diff:
+                            print('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            print('    ' + '\n    '.join(entry_diff))
 
-                    if eval_diff:
-                        print('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                        print('    ' + '\n    '.join(eval_diff))
+                        if eval_diff:
+                            print('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            print('    ' + '\n    '.join(eval_diff))
 
-                    if client_diff:
-                        print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                        print('    ' + '\n    '.join(client_diff))
+                        if client_diff:
+                            print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            print('    ' + '\n    '.join(client_diff))
                 else:
                     print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
             else:

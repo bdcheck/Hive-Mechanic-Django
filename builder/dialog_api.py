@@ -3,6 +3,7 @@
 from __future__ import print_function
 
 import json
+import io
 import os
 import traceback
 
@@ -18,34 +19,35 @@ from .models import Game, GameVersion, Player, Session
 
 def create_dialog_from_path(file_path, dialog_key=None):
     try:
-        definition = json.load(open(file_path))
+        with io.open(file_path, encoding='utf-8') as definition_file:
+            definition = json.load(definition_file)
 
-        if isinstance(definition, dict) and 'sequences' in definition:
-            base_name = os.path.basename(os.path.normpath(file_path))
+            if isinstance(definition, dict) and 'sequences' in definition:
+                base_name = os.path.basename(os.path.normpath(file_path))
 
-            game_slug = slugify(base_name)
+                game_slug = slugify(base_name)
 
-            if dialog_key is not None:
-                game_slug = dialog_key
+                if dialog_key is not None:
+                    game_slug = dialog_key
 
-            game = Game.objects.filter(slug=game_slug).first()
+                game = Game.objects.filter(slug=game_slug).first()
 
-            if game is None:
-                game = Game.objects.create(slug=game_slug, name=base_name + ' Botium Test Game')
+                if game is None:
+                    game = Game.objects.create(slug=game_slug, name=base_name + ' Botium Test Game')
 
-            test_dialog = Dialog.objects.filter(key=game_slug, finished=None).order_by('-started').first()
+                test_dialog = Dialog.objects.filter(key=game_slug, finished=None).order_by('-started').first()
 
-            if test_dialog is None:
-                version = GameVersion.objects.filter(game=game).order_by('-created').first()
+                if test_dialog is None:
+                    version = GameVersion.objects.filter(game=game).order_by('-created').first()
 
-                if version is None:
-                    version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
+                    if version is None:
+                        version = GameVersion.objects.create(game=game, created=timezone.now(), definition=json.dumps(definition, indent=2))
 
-                dialog_snapshot = version.dialog_snapshot()
+                    dialog_snapshot = version.dialog_snapshot()
 
-                test_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
+                    test_dialog = Dialog.objects.create(key=game_slug, dialog_snapshot=dialog_snapshot, started=timezone.now())
 
-            return test_dialog
+                return test_dialog
     except: # pylint: disable=bare-except
         traceback.print_exc()
 

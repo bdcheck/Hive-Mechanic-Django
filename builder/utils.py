@@ -1,4 +1,6 @@
 # pylint: disable=no-member
+
+import io
 import json
 
 from py_mini_racer import MiniRacer
@@ -15,23 +17,23 @@ def fetch_cytoscape(definition): # pylint: disable=too-many-locals
 
     js_context = MiniRacer()
 
-    with open(env_path, 'r') as env_file:
+    with io.open(env_path, 'r', encoding='utf-8') as env_file:
         env_source = ''.join(env_file.readlines())
 
         js_context.eval(env_source)
 
-    with open(node_path, 'r') as node_file:
+    with io.open(node_path, 'r', encoding='utf-8') as node_file:
         node_source = ''.join(node_file.readlines())
 
         js_context.eval(node_source)
 
-    with open(sequence_path, 'r') as sequence_file:
+    with io.open(sequence_path, 'r', encoding='utf-8') as sequence_file:
         sequence_source = ''.join(sequence_file.readlines())
 
         js_context.eval(sequence_source)
 
     for card in InteractionCard.objects.filter(enabled=True):
-        with open(card.client_implementation.path, 'r') as client_file:
+        with io.open(card.client_implementation.path, 'r', encoding='utf-8') as client_file:
             client_source = ''.join(client_file.readlines())
 
             js_context.eval(client_source)

@@ -1,6 +1,7 @@
 # pylint: disable=no-member, line-too-long
 
 import hashlib
+import io
 import json
 import zipfile
 
@@ -44,24 +45,23 @@ class Command(BaseCommand):
                         computed_hash.update(card.entry_actions.encode('utf-8'))
                         computed_hash.update(card.evaluate_function.encode('utf-8'))
 
-                        client_file = open(card.client_implementation.path)
+                        with io.open(card.client_implementation.path, encoding='utf-8') as client_file:
+                            computed_hash.update(client_file.read().encode('utf-8'))
 
-                        computed_hash.update(client_file.read().encode('utf-8'))
+                            version['sha512-hash'] = computed_hash.hexdigest()
 
-                        version['sha512-hash'] = computed_hash.hexdigest()
+                            card_entry['versions'].append(version)
 
-                        card_entry['versions'].append(version)
+                            file_identifier = card.identifier.replace('-', '_')
 
-                        file_identifier = card.identifier.replace('-', '_')
+                            export_stream.writestr(file_identifier + '/__init__.py', bytes('', 'utf-8'))
+                            export_stream.writestr(file_identifier + '/entry.py', bytes(card.entry_actions, 'utf-8'))
+                            export_stream.writestr(file_identifier + '/evaluate.py', bytes(card.evaluate_function, 'utf-8'))
 
-                        export_stream.writestr(file_identifier + '/__init__.py', bytes('', 'utf-8'))
-                        export_stream.writestr(file_identifier + '/entry.py', bytes(card.entry_actions, 'utf-8'))
-                        export_stream.writestr(file_identifier + '/evaluate.py', bytes(card.evaluate_function, 'utf-8'))
+                            if card.client_implementation is not None:
+                                export_stream.write(card.client_implementation.path, file_identifier + '/client.js')
 
-                        if card.client_implementation is not None:
-                            export_stream.write(card.client_implementation.path, file_identifier + '/client.js')
-
-                        manifest[card.identifier] = card_entry
+                            manifest[card.identifier] = card_entry
 
                     export_stream.writestr('manifest.json', bytes(json.dumps(manifest, indent=2), 'utf-8'))
 
