@@ -49,4 +49,6 @@ def annotate_statistics(integration, statistics):
 
     statistics['details'].append(['API Client Count', ApiClient.objects.filter(integration=integration).count()])
 
-    # HTTP integration metrics: most recent contact date, number of contacts from a Raspberry pi etc: (a) today, (b) past week; (c) life of site
+    # HTTP integration metrics: most recent contact date, number of contacts
+    # from a Raspberry pi etc:
+    # (a) today, (b) past week; (c) life of site
