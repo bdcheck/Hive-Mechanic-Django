@@ -181,6 +181,8 @@ def DDE_BOTIUM_EXTRAS(player):
         'player': player
     }
 
+SILENCED_SYSTEM_CHECKS = ['fields.W904']
+
 from .local_settings import *
 
 # Suppress pygame notifications...
