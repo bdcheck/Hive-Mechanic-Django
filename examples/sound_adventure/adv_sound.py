@@ -25,7 +25,7 @@ NEXT_SCREEN =  USEREVENT + 1
 #define the keys for picks
 picks = [pygame.K_a, pygame.K_l, pygame.K_SPACE]
 #token that is set in hivemechanic that links to correct activity
-token = "soundhello"
+token = "soundhello" # nosec
 url = 'http://localhost:8000/http/'
 client = HiveClient(api_url=url,token=token)
 playing_sound = None
