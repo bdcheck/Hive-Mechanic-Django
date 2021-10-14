@@ -316,10 +316,17 @@ def execute_action(integration, session, action):
 
         return True
     elif action['type'] == 'echo-voice':
-        unsent = OutgoingCall.objects.filter(destination=player.player_state['twilio_player'], sent_date=None)
+        last_sent = OutgoingCall.objects.filter(destination=player.player_state['twilio_player']).order_by('-send_date').first()
 
         outgoing = OutgoingCall(destination=player.player_state['twilio_player'])
-        outgoing.start_call = unsent.count() == 0
+
+        if last_sent is None:
+            outgoing.start_call = True
+        elif last_sent.next_action == 'hangup':
+            outgoing.start_call = True
+        else:
+            outgoing.start_call = False
+
         outgoing.send_date = timezone.now()
         outgoing.message = integration.translate_value(action['message'], session)
         outgoing.next_action = action['next_action']
