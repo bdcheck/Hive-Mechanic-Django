@@ -71,9 +71,10 @@ def last_message_for_player(game, player):
 def annotate_statistics(integration, statistics):
     statistics['type'] = 'Twilio Phone Number'
 
-    phone_number = integration.configuration['phone_number']
+    if 'phone_number' in integration.configuration:
+        phone_number = integration.configuration['phone_number']
 
-    statistics['details'].append(['Phone Number', phone_number])
+        statistics['details'].append(['Phone Number', phone_number])
 
     today = timezone.now() - datetime.timedelta(days=1)
     week = timezone.now() - datetime.timedelta(days=7)
