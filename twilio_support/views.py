@@ -165,22 +165,22 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
         if integration_match is not None:
             integration_match.process_incoming(request.POST.dict())
 
-        for call in OutgoingCall.objects.filter(destination=destination, sent_date=None, send_date__lte=timezone.now()).order_by('send_date'):
-            if call.message is not None and call.message != '':
-                response.say(call.message)
-            elif call.file is not None and call.file != '':
-                pass
+            for call in OutgoingCall.objects.filter(destination=destination, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date'):
+                if call.message is not None and call.message != '':
+                    response.say(call.message)
+                elif call.file is not None and call.file != '':
+                    pass
 
-            call.sent_date = timezone.now()
-            call.save()
+                call.sent_date = timezone.now()
+                call.save()
 
-            if call.next_action == 'pause':
-                response.pause(length=call.pause_length)
-            elif call.next_action == 'gather':
-                response.gather(input=call.gather_input, speech_timeout=call.gather_speech_timeout, finish_on_key=call.gather_finish_on_key) # + more
-                break
-            elif call.next_action == 'hangup':
-                response.hangup()
-                break
+                if call.next_action == 'pause':
+                    response.pause(length=call.pause_length)
+                elif call.next_action == 'gather':
+                    response.gather(input=call.gather_input, speech_timeout=call.gather_speech_timeout, finish_on_key=call.gather_finish_on_key) # + more
+                    break
+                elif call.next_action == 'hangup':
+                    response.hangup()
+                    break
 
     return HttpResponse(str(response), content_type='text/xml')
