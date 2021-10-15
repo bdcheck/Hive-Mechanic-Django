@@ -51,7 +51,7 @@ Create a local superuser:
 
 Install the local card repository:
 
-    ./manage.py install_default_card_repository
+    ./manage.py install_default_repository
 
 At this point, you should set up Hive Mechanic to work with your local web server to access the web interface (Apache directions are below). To launch Django's built-in server:
 
