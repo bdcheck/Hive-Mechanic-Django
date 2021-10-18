@@ -19,21 +19,24 @@ requirejs.config({
     }
 });
 
-requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], function(mdc, sequence, Cookies, Node) {
+requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], function (mdc, sequence, Cookies, Node) {
+    let self = this;
+
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
 
     const warningDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-outstanding-issues-dialog'));
-
+    const iconButtonRipple = new mdc.ripple.MDCRipple(document.querySelector('.mdc-icon-button'));
+    iconButtonRipple.unbounded = true;
     window.dialogBuilder.selectCardsDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-select-card-dialog'));
 
     window.dialogBuilder.restartGameDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-reset-game-dialog'));
 
     window.dialogBuilder.restartGameDialog.listen('MDCDialog:closed', (result) => {
-    	console.log("ACTION: ");
-    	console.log(result);
-	});
+        console.log("ACTION: ");
+        console.log(result);
+    });
 
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
     var initialCardSelect = null;
@@ -60,7 +63,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                 issues = issues.concat(sequenceIssues);
             }
-            
+
             $(".outstanding-issue-item").remove();
             $(".outstanding-issue-item-divider").remove();
 
@@ -69,13 +72,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     var issue = issues[i];
 
                     var item = '<li role="separator" class="mdc-list-divider outstanding-issue-item-divider"></li>';
-                    item +=    '<li class="mdc-list-item mdc-list-item--with-two-lines prevent-menu-close outstanding-issue-item" id="builder-outstanding-issues-dialog-' + issue[2] + '">';
-                    item +=    '  <span class="mdc-list-item__ripple"></span>';
-                    item +=    '  <span class="mdc-list-item__content">';
-                    item +=    '    <span class="mdc-list-item__primary-text">' + issue[0] + '</span>';
-                    item +=    '    <span class="mdc-list-item__secondary-text">' + issue[3] + '</span>';
-                    item +=    '  </span>';
-                    item +=    '</li>';
+                    item += '<li class="mdc-list-item mdc-list-item--with-two-lines prevent-menu-close outstanding-issue-item" id="builder-outstanding-issues-dialog-' + issue[2] + '">';
+                    item += '  <span class="mdc-list-item__ripple"></span>';
+                    item += '  <span class="mdc-list-item__content">';
+                    item += '    <span class="mdc-list-item__primary-text">' + issue[0] + '</span>';
+                    item += '    <span class="mdc-list-item__secondary-text">' + issue[3] + '</span>';
+                    item += '  </span>';
+                    item += '</li>';
 
                     $(item).insertBefore("#builder-outstanding-issues-dialog-save-divider");
                 }
@@ -113,7 +116,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $("#action_save").show();
     }
 
-    function slugify(text){
+    function slugify(text) {
         return text.toString().toLowerCase()
             .replace(/\s+/g, '-')           // Replace spaces with -
             .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
@@ -122,8 +125,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             .replace(/-+$/, '');            // Trim - from end of text
     }
 
-    window.dialogBuilder.removeSequence = function(sequenceDefinition) {
-        window.dialogBuilder.definition.sequences = window.dialogBuilder.definition.sequences.filter(function(value) {
+    window.dialogBuilder.removeSequence = function (sequenceDefinition) {
+        window.dialogBuilder.definition.sequencesdefinition.sequences = window.dialogBuilder.definition.sequences.filter(function (value) {
             return value != sequenceDefinition;
         });
 
@@ -135,40 +138,40 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     }
 
     function cleanDefinition(definition) {
-    	if (definition == null) {
-    		return null;
-    	} else if (Array.isArray(definition)) {
-    		var cleanArray = [];
+        if (definition == null) {
+            return null;
+        } else if (Array.isArray(definition)) {
+            var cleanArray = [];
 
-            $.each(definition, function(index, item) {
+            $.each(definition, function (index, item) {
                 cleanArray.push(cleanDefinition(item));
             });
 
             return cleanArray;
-    	} else if (typeof definition === 'object') {
-    		var cleanObject = {};
+        } else if (typeof definition === 'object') {
+            var cleanObject = {};
 
-            $.each(Object.keys(definition), function(index, key) {
-            	if (key.indexOf('__') == -1) {
-	            	cleanObject[key] = cleanDefinition(definition[key])
-            	}
+            $.each(Object.keys(definition), function (index, key) {
+                if (key.indexOf('__') == -1) {
+                    cleanObject[key] = cleanDefinition(definition[key])
+                }
             });
 
-    		return cleanObject;
-    	}
+            return cleanObject;
+        }
 
-    	return definition;
+        return definition;
     }
 
     var editListener = undefined;
 
     var removeListener = undefined;
 
-    window.dialogBuilder.loadSequence = function(definition, initialId) {
+    window.dialogBuilder.loadSequence = function (definition, initialId) {
         if (selectedSequence != null) {
             selectedSequence.removeChangeListener(onSequenceChanged);
         }
-        
+
         selectedSequence = sequence.loadSequence(definition);
 
         $(".mdc-top-app-bar__title").html(selectedSequence.name());
@@ -177,7 +180,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#action_edit_sequence").off("click");
 
-        $("#action_edit_sequence").click(function(eventObj) {
+        $("#action_edit_sequence").click(function (eventObj) {
             eventObj.preventDefault();
 
             $("#edit-sequence-name-value").val(selectedSequence.name());
@@ -197,7 +200,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                         $("#action_save").show();
 
                         window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this);
-                   }
+                    }
                 }
             };
 
@@ -206,7 +209,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             window.dialogBuilder.editSequenceDialog.open()
         });
 
-        $("#action_remove_sequence").click(function(eventObj) {
+        $("#action_remove_sequence").click(function (eventObj) {
             eventObj.preventDefault();
 
             $("#remove-sequence-name-value").html(selectedSequence.name());
@@ -221,7 +224,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                         window.dialogBuilder.removeSequence(definition);
 
                         window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this);
-                   }
+                    }
                 }
             };
 
@@ -231,21 +234,55 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         });
 
         selectedSequence.selectInitialNode(initialId);
-        
+
         return selectedSequence;
     };
 
     $("#action_save").hide();
 
-    window.dialogBuilder.reloadSequences = function() {
+
+    window.dialogBuilder.reloadSequences = function () {
         var items = [];
 
-        $.each(window.dialogBuilder.definition.sequences, function(index, value) {
-            items.push('<li class="mdc-list-item mdc-list-item--with-one-line select_sequence" href="#" data-index="' + index +'">');
+        $.each(window.dialogBuilder.definition.sequences, function (index, value) {
+            items.push('<li class="mdc-list-item mdc-ripple-upgraded select_sequence" tabindex="' + index + '" data-index="' + index + '">');
+            items.push('<div class="mdc-menu mdc-menu-surface"></div>');
+            items.push('<span class="mdc-list-item__graphic material-icons" aria-hidden="true">view_module</span>');
+
+            items.push('<span class="mdc-list-item__text">')
+            items.push(value["name"])
+            items.push('</span>');
+
+            items.push('<span aria-hidden="true" class="mdc-list-item__meta">');
+            items.push('<div class="mdc-menu-surface--anchor" style="float: right;">');
+            items.push('<button class="mdc-icon-button material-icons mdc-ripple-upgraded--unbounded mdc-ripple-upgraded sequence-menu-open"  tabindex="-1">');
+            items.push('more_vert');
+            items.push('</button>');
+            items.push('<div class="mdc-menu mdc-menu-surface">');
+            items.push('<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabIndex="-1">');
+            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="move_up">')
             items.push('<span class="mdc-list-item__ripple"></span>');
-            items.push('<span class="material-icons mdc-list-item__start" aria-hidden="true">view_module</span>');
-            items.push('<span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">' + value['name'] + '</span>');
+            items.push('<span class="mdc-list-item__text mdc-list-item__start">Move Up</span>');
             items.push('</li>');
+            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="move_down">')
+            items.push('<span class="mdc-list-item__ripple"></span>');
+            items.push('<span class="mdc-list-item__text mdc-list-item__start">Move Down</span>');
+            items.push('</li>');
+            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="rename">')
+            items.push('<span class="mdc-list-item__ripple"></span>');
+            items.push('<span class="mdc-list-item__text mdc-list-item__start">Rename</span>');
+            items.push('</li>');
+            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="delete">')
+            items.push('<span class="mdc-list-item__ripple"></span>');
+            items.push('<span class="mdc-list-item__text mdc-list-item__start">Delete</span>');
+            items.push('</li>');
+            items.push('</ul>')
+            items.push('</div>')
+            items.push('</div>');
+            items.push('</span>');
+            items.push('</li>')
+
+
         });
 
         items.push('<li class="mdc-list-item mdc-list-item--with-one-line add_sequence" href="#" style="margin-top: 2em;">');
@@ -264,18 +301,80 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#sequences_list").html(items.join(""));
 
-		const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
+        const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
+        $('.sequence-menu-open').off();
+        $('.sequence-menu-open').on('click', (event) => {
+            console.log('sequence clicked');
+            let s = event.currentTarget;
+            let parent = s.parentElement;
+
+            let anchor = $(parent).find('.mdc-menu')[0]
+            event.preventDefault();
+            event.stopPropagation()
+            const menu = mdc.menu.MDCMenu.attachTo(sa);
+            menu.setAnchorElement(anchor);
+
+            menu.listen("MDCMenu:selected", function (event) {
+                var data = $(event.detail.item).data();
+                console.log('ACTION: ' + data['action'] + '(' + data['index'] + ')');
+            });
+            menu.open = (menu.open == false);
+
+        });
+
+        $(".down-sequence").off('click');
+        $(".down-sequence").on('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            let target = event.currentTarget;
+
+            let index = parseInt(target.getAttribute('data-index'));
+            console.log("down " + index)
+
+            let seq = window.dialogBuilder.definition.sequences
+            let last = seq.length - 1
+            let next = index + 1
+            if (index < last) {
+                temp = seq[next]
+                seq[next] = seq[index]
+                seq[index] = temp
+                window.dialogBuilder.definition.sequences = seq
+                window.dialogBuilder.reloadSequences()
+                $("#action_save").show();
+
+            }
+        });
+        $(".up-sequence").off('click');
+        $(".up-sequence").on('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log("up " + index)
+            seq = window.dialogBuilder.definition.sequences
+            last = seq.length - 1
+            prev = index - 1
+            if (index > 0) {
+                temp = seq[prev]
+                seq[prev] = seq[index]
+                seq[index] = temp
+                window.dialogBuilder.definition.sequences = seq
+                window.dialogBuilder.reloadSequences()
+                $("#action_save").show();
+            }
+        });
         $(".select_sequence").off("click");
-        $(".select_sequence").click(function(eventObj) {
-			$("#settings-view").hide();
-			$("#editor-view").show();
-
-            window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[$(eventObj.target).data("index")], null);
+        $(".select_sequence").click(function (eventObj) {
+            $("#settings-view").hide();
+            $("#editor-view").show();
+            let seq = window.dialogBuilder.definition.sequences;
+            let target = eventObj.currentTarget;
+            let index = parseInt(target.getAttribute('data-index'));
+            window.dialogBuilder.loadSequence(seq[index], null);
+            //window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[$(eventObj.target).data("index")], null);
         });
 
         $(".add_sequence").off("click");
-        $(".add_sequence").click(function(eventObj) {
+        $(".add_sequence").click(function (eventObj) {
             var listener = {
                 handleEvent: function (event) {
                     if (event.detail.action == "add_sequence") {
@@ -297,7 +396,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                         window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[last], null);
 
                         window.dialogBuilder.addSequenceDialog.unlisten('MDCDialog:closed', this);
-                   }
+                    }
                 }
             };
 
@@ -307,13 +406,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         });
 
         $(".go_home").off("click");
-        $(".go_home").click(function(eventObj) {
+        $(".go_home").click(function (eventObj) {
             location.href = '/builder/';
         });
 
-        var allCardSelectContent =  '';
+        var allCardSelectContent = '';
 
-        $.each(window.dialogBuilder.definition.sequences, function(index, value) {
+        $.each(window.dialogBuilder.definition.sequences, function (index, value) {
             allCardSelectContent += '<li class="mdc-list-divider" role="separator"></li>';
             allCardSelectContent += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="all_cards_destination_sequence_' + value['id'] + '">';
             allCardSelectContent += '  <span class="mdc-list-item__ripple"></span>';
@@ -327,7 +426,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 var item = items[i];
 
                 allCardSelectContent += '<li class="mdc-list-item mdc-list-item--with-one-line all-cards-select-item all_cards_destination_sequence_' + value['id'] + '_item" role="menuitem" id="all_cards_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
-	            allCardSelectContent += '  <span class="mdc-list-item__ripple"></span>';
+                allCardSelectContent += '  <span class="mdc-list-item__ripple"></span>';
                 allCardSelectContent += '  <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
                 allCardSelectContent += '</li>';
             }
@@ -387,7 +486,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
     }
 
-    window.dialogBuilder.loadNodeById = function(cardId) {
+    window.dialogBuilder.loadNodeById = function (cardId) {
         var me = this;
 
         for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
@@ -400,7 +499,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     if (item["id"] == cardId) {
                         var loadedSequence = window.dialogBuilder.loadSequence(sequence, item['id']);
 
-						$('#' + item['id'] + '-advanced-dialog').remove();
+                        $('#' + item['id'] + '-advanced-dialog').remove();
 
                         var node = Node.createCard(item, loadedSequence);
 
@@ -419,7 +518,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
     };
 
-    $.getJSON(window.dialogBuilder.source, function(data) {
+    $.getJSON(window.dialogBuilder.source, function (data) {
         window.dialogBuilder.definition = data;
 
         if (window.dialogBuilder.definition['interrupts'] != undefined) {
@@ -442,18 +541,18 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#action_save").off("click");
 
-        $("#action_save").click(function(eventObj) {
+        $("#action_save").click(function (eventObj) {
             eventObj.preventDefault();
 
             if (window.dialogBuilder.update != undefined) {
                 if ($("#action_save").text() == "warning") {
                     warningDialog.open();
                 } else {
-                	var clean = cleanDefinition(window.dialogBuilder.definition);
+                    var clean = cleanDefinition(window.dialogBuilder.definition);
 
-                    window.dialogBuilder.update(clean, function() {
+                    window.dialogBuilder.update(clean, function () {
                         $("#action_save").hide();
-                    }, function(error) {
+                    }, function (error) {
                         console.log(error);
                     });
                 }
@@ -462,7 +561,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#action_select_card").off("click");
 
-        $("#action_select_card").click(function(eventObj) {
+        $("#action_select_card").click(function (eventObj) {
             eventObj.preventDefault();
 
             window.dialogBuilder.selectCardsDialog.open();
@@ -470,7 +569,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#action_reset_game").off("click");
 
-        $("#action_reset_game").click(function(eventObj) {
+        $("#action_reset_game").click(function (eventObj) {
             eventObj.preventDefault();
 
             window.dialogBuilder.restartGameDialog.open();
@@ -478,19 +577,19 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         var keys = Object.keys(window.dialogBuilder.cardMapping);
 
-        keys.sort(function(one, two) {
+        keys.sort(function (one, two) {
             var oneNodeClass = window.dialogBuilder.cardMapping[one];
             var oneName = oneNodeClass.cardName();
 
             var twoNodeClass = window.dialogBuilder.cardMapping[two];
             var twoName = twoNodeClass.cardName();
-            
+
             if (oneName < twoName) {
                 return -1;
             } else if (oneName > twoName) {
                 return 1;
             }
-            
+
             return 0;
         });
 
@@ -512,18 +611,18 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             var cardItem = '';
 
-			cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
-			cardItem += '  <span class="mdc-list-item__graphic">';
-			cardItem += '    <div class="mdc-radio">';
-			cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
-			cardItem += '      <div class="mdc-radio__background">';
-			cardItem += '        <div class="mdc-radio__outer-circle"></div>';
-			cardItem += '        <div class="mdc-radio__inner-circle"></div>';
-			cardItem += '      </div>';
-			cardItem += '    </div>';
-			cardItem += '  </span>';
-			cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
-			cardItem += '</li>';
+            cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
+            cardItem += '  <span class="mdc-list-item__graphic">';
+            cardItem += '    <div class="mdc-radio">';
+            cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
+            cardItem += '      <div class="mdc-radio__background">';
+            cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+            cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+            cardItem += '      </div>';
+            cardItem += '    </div>';
+            cardItem += '  </span>';
+            cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
+            cardItem += '</li>';
 
             $("#add-card-select-widget").append(cardItem);
         }
@@ -544,19 +643,25 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         window.dialogBuilder.helpToggle = mdc.switchControl.MDCSwitch.attachTo(document.getElementById('hive-help-switch'));
 
-		$('#hive-help-switch-toggle').change(function() {
-			if (window.dialogBuilder.helpToggle.checked) {
-				$(".hive_mechanic_help_filler").hide()
-				$(".hive_mechanic_help").show()
-			} else {
-				$(".hive_mechanic_help").hide()
-				$(".hive_mechanic_help_filler").show()
-			}
-		});
+        //advanced mode on turns off help
+        $('#hive-help-switch-toggle').change(function () {
+            if (!window.dialogBuilder.helpToggle.checked) {
+                $(".hive_mechanic_help_filler").hide()
+                $(".hive_mechanic_help").show()
+            } else {
+                $(".hive_mechanic_help").hide()
+                $(".hive_mechanic_help_filler").show()
+            }
+        });
+        $('.hive_mechanic_help_filler').hide();
+        $(".hive_mechanic_help").show();
+        //load help after start
+        $(document).ready(function () {
+            $('.hive_mechanic_help_filler').hide();
+            $(".hive_mechanic_help").show();
+        });
 
-		$(".hive_mechanic_help").hide();
-
-	    window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
+        window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
 
         if (Array.isArray(window.dialogBuilder.definition)) {
             var game_def = {
@@ -574,13 +679,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         const warning = document.getElementById('builder-outstanding-issues-dialog-save');
 
         warning.addEventListener('click', (event) => {
-			var clean = cleanDefinition(window.dialogBuilder.definition);
+            var clean = cleanDefinition(window.dialogBuilder.definition);
 
-            window.dialogBuilder.update(clean, function() {
+            window.dialogBuilder.update(clean, function () {
                 $("#action_save").hide();
 
                 warningDialog.close();
-            }, function(error) {
+            }, function (error) {
                 console.log(error);
             });
 
@@ -592,7 +697,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
     $("#action_open_settings").off("click");
 
-    var updatePattern = function(action, operation, pattern) {
+    var updatePattern = function (action, operation, pattern) {
         if (pattern.value == "") {
             action["pattern"] = "";
         } else if (operation == "begins_with") {
@@ -610,7 +715,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
     };
 
-    var updateViews = function(pattern, operationField, patternField) {
+    var updateViews = function (pattern, operationField, patternField) {
         var patternValue = "";
         var operationValue = "";
 
@@ -641,13 +746,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         }
     };
 
-    var chooseDestinationMenu = function(identifier) {
+    var chooseDestinationMenu = function (identifier) {
         var me = this;
         var body = '';
 
         body += '    <ul class="mdc-list mdc-dialog__content dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" style="padding: 0px;">';
 
-        $.each(window.dialogBuilder.definition.sequences, function(index, value) {
+        $.each(window.dialogBuilder.definition.sequences, function (index, value) {
             body += '<li class="mdc-list-divider" role="separator"></li>';
             body += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="' + identifier + '_destination_sequence_' + value['id'] + '">';
             body += '  <span class="mdc-list-item__ripple"></span>';
@@ -661,18 +766,18 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 var item = items[i];
 
                 body += '<li class="mdc-list-item mdc-list-item--with-one-line ' + identifier + '_destination_sequence_' + value['id'] + '_item builder-destination-item" role="menuitem" id="' + identifier + '_destination_sequence_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
-	            body += '  <span class="mdc-list-item__ripple"></span>';
+                body += '  <span class="mdc-list-item__ripple"></span>';
                 body += '  <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
                 body += '</li>';
             }
-		});
-		
+        });
+
         body += '    </ul>';
 
         return body;
     };
 
-    var initializeDestinationMenu = function(identifier, onSelect) {
+    var initializeDestinationMenu = function (identifier, onSelect) {
         var me = this;
 
         const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item');
@@ -716,10 +821,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".builder-destination-item").hide();
     }
 
-    $("#action_open_settings").click(function(eventObj) {
+    $("#action_open_settings").click(function (eventObj) {
         eventObj.preventDefault();
 
-        var refreshSettingsInterrupts = function() {
+        var refreshSettingsInterrupts = function () {
             $("#activity_settings_interrupts").empty();
 
             for (var i = 0; i < window.dialogBuilder.definition.interrupts.length; i++) {
@@ -762,36 +867,36 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 interruptBody += '    </div>';
                 interruptBody += '    <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">';
                 interruptBody += '      <ul class="mdc-list" role="listbox" aria>';
-                
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="begins_with">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Begins with&#8230;</span>';
-				interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="ends_with">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Ends with&#8230;</span>';
-				interruptBody += '      </li>';
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="begins_with">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Begins with&#8230;</span>';
+                interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="equals">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Equals&#8230;</span>';
-				interruptBody += '      </li>';
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="ends_with">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Ends with&#8230;</span>';
+                interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_equals">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not equal&#8230;</span>';
-				interruptBody += '      </li>';
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="equals">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Equals&#8230;</span>';
+                interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="contains">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Contains&#8230;</span>';
-				interruptBody += '      </li>';
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_equals">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not equal&#8230;</span>';
+                interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_contains">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not contain&#8230;</span>';
-				interruptBody += '      </li>';
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="contains">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Contains&#8230;</span>';
+                interruptBody += '      </li>';
+
+                interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_contains">';
+                interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+                interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not contain&#8230;</span>';
+                interruptBody += '      </li>';
 
                 interruptBody += '      </ul>';
                 interruptBody += '    </div>';
@@ -820,7 +925,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_click">';
                     interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">search</i>';
                     interruptBody += '  </button>';
-                   }
+                }
 
                 interruptBody += '</div>';
 
@@ -829,7 +934,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 const patternField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_interrupt_pattern_' + i + '_response'));
                 const operationSelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_interrupt_pattern_' + i));
 
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     updateViews(interrupt["pattern"], operationSelect, patternField);
 
                     operationSelect.listen('MDCSelect:change', () => {
@@ -839,20 +944,20 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     });
                 });
 
-                $("#" + identifier).on("change keyup paste", function() {
+                $("#" + identifier).on("change keyup paste", function () {
                     updatePattern(interrupt, operationSelect.value, patternField.value);
 
                     $("#action_save").show();
                 });
 
-                $('#activity_interrupt_pattern_' + i + '_response_choose').on("click", function() {
+                $('#activity_interrupt_pattern_' + i + '_response_choose').on("click", function () {
                     const chooseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-interrupt-dialog'));
 
                     $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
 
-                    initializeDestinationMenu("select-interrupt", function(nodeId) {
+                    initializeDestinationMenu("select-interrupt", function (nodeId) {
                         interrupt["action"] = nodeId;
-                        
+
                         chooseDialog.close();
 
                         refreshSettingsInterrupts();
@@ -861,11 +966,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     chooseDialog.open();
                 });
 
-                $('#activity_interrupt_pattern_' + i + '_response_click').on("click", function() {
+                $('#activity_interrupt_pattern_' + i + '_response_click').on("click", function () {
                     window.dialogBuilder.loadNodeById(interrupt["action"].split("#")[1]);
-                    
-					$("#settings-view").hide();
-					$("#editor-view").show();
+
+                    $("#settings-view").hide();
+                    $("#editor-view").show();
                 });
             }
         };
@@ -874,26 +979,26 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         var initialCardList = '    <ul class="mdc-list mdc-dialog__content initial_dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 
-        $.each(window.dialogBuilder.definition.sequences, function(index, value) {
-        	if (index > 0) {
-  	            initialCardList += '      <li class="mdc-list-divider" role="separator"></li>';
-			}
+        $.each(window.dialogBuilder.definition.sequences, function (index, value) {
+            if (index > 0) {
+                initialCardList += '      <li class="mdc-list-divider" role="separator"></li>';
+            }
 
-			initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '">';
-			initialCardList += '        <span class="mdc-list-item__ripple"></span>';
-			initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
-			initialCardList += '        <span class="mdc-layout-grid--align-right mdc-list-item__end material-icons destination_disclosure_icon">arrow_right</span>';
-			initialCardList += '      </li>';
+            initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '">';
+            initialCardList += '        <span class="mdc-list-item__ripple"></span>';
+            initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
+            initialCardList += '        <span class="mdc-layout-grid--align-right mdc-list-item__end material-icons destination_disclosure_icon">arrow_right</span>';
+            initialCardList += '      </li>';
 
             var items = value['items'];
 
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
 
-				initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item builder-activity-setting-initial-card-list-sequence-' + value['id'] + '-item" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '" id="builder-activity-setting-initial-card-list-destination-item-' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '" data-value="' + value['id'] + '#' + item['id'] + '">';
-				initialCardList += '        <span class="mdc-list-item__ripple"></span>';
-				initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
-				initialCardList += '      </li>';
+                initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item builder-activity-setting-initial-card-list-sequence-' + value['id'] + '-item" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '" id="builder-activity-setting-initial-card-list-destination-item-' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '" data-value="' + value['id'] + '#' + item['id'] + '">';
+                initialCardList += '        <span class="mdc-list-item__ripple"></span>';
+                initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
+                initialCardList += '      </li>';
             }
 
         });
@@ -938,7 +1043,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             });
         }
 
-        window.setTimeout(function() {
+        window.setTimeout(function () {
             if (initialCardSelect == null) {
                 initialCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('builder-activity-setting-initial-card'));
 
@@ -954,14 +1059,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             initialCardSelect.value = window.dialogBuilder.definition["initial-card"];
             activityName.value = window.dialogBuilder.definition["name"];
 
-            $("#builder-activity-setting-activity-name").on("change keyup paste", function() {
+            $("#builder-activity-setting-activity-name").on("change keyup paste", function () {
                 window.dialogBuilder.definition["name"] = activityName.value;
 
                 $("#action_save").show();
             });
         }, 50);
 
-        $("#builder-activity-setting-add-keyword").click(function(eventObj) {
+        $("#builder-activity-setting-add-keyword").click(function (eventObj) {
             eventObj.preventDefault();
 
             window.dialogBuilder.definition.interrupts.push({
@@ -971,7 +1076,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             refreshSettingsInterrupts();
         });
-        
+
         $("#editor-view").hide();
         $("#settings-view").show();
     });
@@ -984,7 +1089,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     }
 
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
