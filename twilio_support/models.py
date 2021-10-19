@@ -4,6 +4,7 @@
 from builtins import str # pylint: disable=redefined-builtin
 
 import datetime
+import json
 import time
 import traceback
 
@@ -247,6 +248,8 @@ class IncomingCallResponse(models.Model):
 def process_incoming(integration, payload):
     message_type = 'text'
 
+    print('1: ' + json.dumps(payload, indent=2))
+
     if ('Body' in payload) is False:
         if 'Digits' in payload:
             payload['Body'] = payload['Digits']
@@ -256,15 +259,17 @@ def process_incoming(integration, payload):
             payload['Body'] = ''
 
     if 'CallStatus' in payload:
-        from_ = payload['From']
-
-        payload['From'] = payload['To']
-
-        payload['To'] = from_
-
+#        from_ = payload['From']
+#
+#        payload['From'] = payload['To']
+#
+#        payload['To'] = from_
+#
         message_type = 'call'
 
     last_message = None
+
+    print('2: ' + json.dumps(payload, indent=2))
 
     incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
 
@@ -273,21 +278,33 @@ def process_incoming(integration, payload):
     if incoming_message is None or (incoming_call is not None and incoming_call.receive_date > incoming_message.receive_date):
         incoming_message = incoming_call
 
+    print('3: ' + str(incoming_message))
+
     if incoming_message is not None:
         last_message = {
             'message': incoming_message.message,
             'received': incoming_message.receive_date
         }
 
-    if payload['Body'] or incoming_message.media.count() > 0:
+    print('4: ' + json.dumps(payload, indent=2))
+
+    if ('CallStatus' in payload) or payload['Body'] or incoming_message.media.count() > 0: # TODO: May require revision if voice recordings come in...
+        print('4.1')
         payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
+
+        print('4.2')
 
         integration.process_player_incoming('twilio_player', payload['From'], payload_body, {
             'last_message': last_message,
             'message_type': message_type,
+            'payload': payload,
         })
 
+        print('4.3')
+
         return []
+
+    print('5')
 
     return ['No content provided.']
 

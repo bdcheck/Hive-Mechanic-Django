@@ -132,30 +132,39 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
         now = timezone.now()
 
         integration_match = None
+        
+        post_dict = request.POST.dict()
 
-        destination = request.POST['To']
-        source = request.POST['From']
+        destination = post_dict['To']
+        source = post_dict['From']
 
         for integration in Integration.objects.filter(type='twilio'):
-            if 'phone_number' in integration.configuration and source == integration.configuration['phone_number']:
+            if 'phone_number' in integration.configuration and (source == integration.configuration['phone_number'] or destination == integration.configuration['phone_number']):
                 integration_match = integration
 
-        if 'Digits' in request.POST or 'SpeechResult' in request.POST:
-            incoming = IncomingCallResponse(source=source)
+                if destination == integration.configuration['phone_number']:
+                    destination = post_dict['From']
+                    source = post_dict['To']
+
+                    post_dict['From'] = source
+                    post_dict['To'] = destination
+
+        if 'Digits' in post_dict or 'SpeechResult' in post_dict:
+            incoming = IncomingCallResponse(source=source) # TODO: Swap if this is integration number
             incoming.receive_date = now
 
             incoming.message = ''
 
-            if 'Digits' in request.POST:
-                incoming.message = request.POST['Digits'].strip()
+            if 'Digits' in post_dict:
+                incoming.message = post_dict['Digits'].strip()
 
-            if 'SpeechResult' in request.POST:
+            if 'SpeechResult' in post_dict:
                 if incoming.message:
                     incoming.message += ' | '
 
-                incoming.message += request.POST['SpeechResult'].strip()
+                incoming.message += post_dict['SpeechResult'].strip()
 
-            incoming.transmission_metadata = request.POST
+            incoming.transmission_metadata = post_dict
 
             if integration_match is not None:
                 incoming.integration = integration_match
@@ -163,7 +172,9 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
             incoming.save()
 
         if integration_match is not None:
-            integration_match.process_incoming(request.POST.dict())
+            print('INT PROCESS[1]')
+            integration_match.process_incoming(post_dict)
+            print('INT PROCESS[2]')
 
             for call in OutgoingCall.objects.filter(destination=destination, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date'):
                 if call.message is not None and call.message != '':
