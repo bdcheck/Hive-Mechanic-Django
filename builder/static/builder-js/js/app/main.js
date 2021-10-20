@@ -245,44 +245,16 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         var items = [];
 
         $.each(window.dialogBuilder.definition.sequences, function (index, value) {
-            items.push('<li class="mdc-list-item mdc-ripple-upgraded select_sequence" tabindex="' + index + '" data-index="' + index + '">');
-            items.push('<div class="mdc-menu mdc-menu-surface"></div>');
-            items.push('<span class="mdc-list-item__graphic material-icons" aria-hidden="true">view_module</span>');
-
-            items.push('<span class="mdc-list-item__text">')
-            items.push(value["name"])
-            items.push('</span>');
-
-            items.push('<span aria-hidden="true" class="mdc-list-item__meta">');
-            items.push('<div class="mdc-menu-surface--anchor" style="float: right;">');
-            items.push('<button class="mdc-icon-button material-icons mdc-ripple-upgraded--unbounded mdc-ripple-upgraded sequence-menu-open"  tabindex="-1">');
-            items.push('more_vert');
-            items.push('</button>');
-            items.push('<div class="mdc-menu mdc-menu-surface">');
-            items.push('<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabIndex="-1">');
-            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="move_up">')
-            items.push('<span class="mdc-list-item__ripple"></span>');
-            items.push('<span class="mdc-list-item__text mdc-list-item__start">Move Up</span>');
-            items.push('</li>');
-            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="move_down">')
-            items.push('<span class="mdc-list-item__ripple"></span>');
-            items.push('<span class="mdc-list-item__text mdc-list-item__start">Move Down</span>');
-            items.push('</li>');
-            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="rename">')
-            items.push('<span class="mdc-list-item__ripple"></span>');
-            items.push('<span class="mdc-list-item__text mdc-list-item__start">Rename</span>');
-            items.push('</li>');
-            items.push('<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="' + index + '" data-action="delete">')
-            items.push('<span class="mdc-list-item__ripple"></span>');
-            items.push('<span class="mdc-list-item__text mdc-list-item__start">Delete</span>');
-            items.push('</li>');
-            items.push('</ul>')
-            items.push('</div>')
-            items.push('</div>');
-            items.push('</span>');
+            items.push('<li class="mdc-list-item mdc-list-item--with-one-line select_sequence" tabindex="' + index + '" data-index="' + index + '" style="padding-right: 0; align-items: center;">');
+            // items.push('  <span class="mdc-list-item__ripple"></span>');
+            items.push('  <span class="mdc-list-item__start material-icons" aria-hidden="true">view_module</span>');
+            items.push('  <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px; flex-grow: 100;">' + value["name"] + '</span>'); //  mdc-list-item__end mdc-menu-surface--anchor
+			items.push('  <span class="mdc-menu-surface--anchor">');
+            items.push('    <button class="sequence-menu-open mdc-icon-button material-icons" data-index="' + index + '" tabindex="-1">');
+            items.push('      more_vert');
+            items.push('    </button>');
+            items.push('  </span>');
             items.push('</li>')
-
-
         });
 
         items.push('<li class="mdc-list-item mdc-list-item--with-one-line add_sequence" href="#" style="margin-top: 2em;">');
@@ -303,24 +275,31 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
-        $('.sequence-menu-open').off();
-        $('.sequence-menu-open').on('click', (event) => {
-            console.log('sequence clicked');
-            let s = event.currentTarget;
-            let parent = s.parentElement;
-
-            let anchor = $(parent).find('.mdc-menu')[0]
+        $('button.sequence-menu-open').off();
+        
+        var selectedSequenceOption = -1;
+        
+        let menuListener = function (event) {
+			var data = $(event.detail.item).data();
+			console.log('ACTION: ' + data['action'] + '(' + selectedSequenceOption + ')');
+		}
+		
+        $('button.sequence-menu-open').on('click', (event) => {
             event.preventDefault();
             event.stopPropagation()
-            const menu = mdc.menu.MDCMenu.attachTo(sa);
-            menu.setAnchorElement(anchor);
 
-            menu.listen("MDCMenu:selected", function (event) {
-                var data = $(event.detail.item).data();
-                console.log('ACTION: ' + data['action'] + '(' + data['index'] + ')');
-            });
+            const menu = mdc.menu.MDCMenu.attachTo(document.getElementById('sequence_menu'));
+            menu.setAnchorElement(event.currentTarget.parentElement);
+            menu.setFixedPosition(true);
+            
+            let rowData = $(event.currentTarget).data();
+            
+            selectedSequenceOption = rowData['index'];
+            
+            menu.unlisten("MDCMenu:selected", menuListener)
+
+            menu.listen("MDCMenu:selected", menuListener);
             menu.open = (menu.open == false);
-
         });
 
         $(".down-sequence").off('click');
@@ -362,8 +341,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 $("#action_save").show();
             }
         });
+
         $(".select_sequence").off("click");
         $(".select_sequence").click(function (eventObj) {
+            console.log('sequence clicked');
             $("#settings-view").hide();
             $("#editor-view").show();
             let seq = window.dialogBuilder.definition.sequences;
