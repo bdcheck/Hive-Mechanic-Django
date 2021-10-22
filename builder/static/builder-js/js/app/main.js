@@ -269,7 +269,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         items.push('<li class="mdc-list-item mdc-list-item--with-one-line go_home" href="#" style="margin-top: 1em;">');
         items.push('<span class="mdc-list-item__ripple"></span>');
         items.push('<span class="material-icons mdc-list-item__start" aria-hidden="true">home</span>');
-        items.push('<span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Return to Home</span>');
+        items.push('<span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Return to Home/Dashboard</span>');
         items.push('</li>');
 
         $("#sequences_list").html(items.join(""));
