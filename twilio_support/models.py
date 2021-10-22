@@ -7,6 +7,8 @@ import datetime
 import time
 import traceback
 
+import six
+
 from twilio.rest import Client
 
 from django.conf import settings
@@ -278,7 +280,7 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
             else:
                 player_identifier = payload['From']
         else:
-            raise RuntimeError('Twilio integration is missing phone number.') from None
+            six.raise_from(RuntimeError('Twilio integration is missing phone number.'), None)
 
         message_type = 'call'
     else:
