@@ -175,7 +175,12 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         selectedSequence = sequence.loadSequence(definition);
 
-        $(".mdc-top-app-bar__title").html(selectedSequence.name());
+        //TODO change this once activityName has a value in it
+
+        //let ac = activityName.value;
+        //let title = window.dialogBuilder.definition["name"] + "(Sequence: "+selectedSequence.name() + ")";
+        let title = selectedSequence.name();
+        $(".mdc-top-app-bar__title").html(title);
 
         selectedSequence.addChangeListener(onSequenceChanged);
 
@@ -527,6 +532,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                     window.dialogBuilder.loadNodeById(id);
                 }
+                window.dialogBuilder.setHelpCardStatus()
+
             });
         }
     }
@@ -688,9 +695,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         window.dialogBuilder.helpToggle = mdc.switchControl.MDCSwitch.attachTo(document.getElementById('hive-help-switch'));
 
-        //advanced mode on turns off help
-        $('#hive-help-switch-toggle').change(function () {
-            if (!window.dialogBuilder.helpToggle.checked) {
+        window.dialogBuilder.setHelpCardStatus = function() {
+             if (!window.dialogBuilder.helpToggle.checked) {
                 $('#hive-help-switch-label').text("Basic: ")
                 $(".hive_mechanic_help_filler").hide()
                 $(".hive_mechanic_help").show()
@@ -699,6 +705,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 $(".hive_mechanic_help").hide()
                 $(".hive_mechanic_help_filler").show()
             }
+        }
+        //advanced mode on turns off help
+        $('#hive-help-switch-toggle').change(function () {
+            window.dialogBuilder.setHelpCardStatus()
         });
         $('.hive_mechanic_help_filler').hide();
         $(".hive_mechanic_help").show();

@@ -110,7 +110,7 @@ define(modules, function (mdc, Node) {
                 current.html(html);
 
                 node.initialize();
-
+                window.dialogBuilder.setHelpCardStatus()
                 if ($("#sequence_breadcrumbs").children("#breadcrumb-" + node.id).length > 0) {
                     var match = $("#sequence_breadcrumbs").children("#breadcrumb-" + node.id);
                     var last = $("#sequence_breadcrumbs").children().last();
