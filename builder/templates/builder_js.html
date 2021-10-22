@@ -88,8 +88,6 @@
 
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" id="action_reset_game">restart_alt</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card" style="margin-left: 11px;">collections</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence" style="margin-left: 11px;">edit</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
                 </section>
             </div>
@@ -405,19 +403,19 @@
 
 		<div class="mdc-menu mdc-menu-surface" id="sequence_menu">
 			<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabIndex="-1">
-				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="X" data-action="move_up">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line up-sequence" role="menuitem" data-index="X" data-action="move_up">
 					<span class="mdc-list-item__ripple"></span>
 					<span class="mdc-list-item__text mdc-list-item__start">Move Up</span>
 				</li>
-				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="X" data-action="move_down">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line down-sequence" role="menuitem" data-index="X" data-action="move_down">
 					<span class="mdc-list-item__ripple"></span>
 					<span class="mdc-list-item__text mdc-list-item__start">Move Down</span>
 				</li>
-				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="X" data-action="rename">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line rename-sequence" role="menuitem" data-index="X" data-action="rename">
 					<span class="mdc-list-item__ripple"></span>
 					<span class="mdc-list-item__text mdc-list-item__start">Rename</span>
 				</li>
-				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-index="X" data-action="delete">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line delete-sequence" role="menuitem" data-index="X" data-action="delete">
 					<span class="mdc-list-item__ripple"></span>
 					<span class="mdc-list-item__text mdc-list-item__start">Delete</span>
 				</li>

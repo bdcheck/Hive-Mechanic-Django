@@ -137,6 +137,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $("#action_save").show();
     }
 
+
     function cleanDefinition(definition) {
         if (definition == null) {
             return null;
@@ -295,7 +296,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             let rowData = $(event.currentTarget).data();
             
             selectedSequenceOption = rowData['index'];
-            
+
+            menu.items.forEach((item) => {
+                item.setAttribute("data-index",selectedSequenceOption)
+            })
             menu.unlisten("MDCMenu:selected", menuListener)
 
             menu.listen("MDCMenu:selected", menuListener);
@@ -305,7 +309,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".down-sequence").off('click');
         $(".down-sequence").on('click', (event) => {
             event.preventDefault();
-            event.stopPropagation();
             let target = event.currentTarget;
 
             let index = parseInt(target.getAttribute('data-index'));
@@ -327,7 +330,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".up-sequence").off('click');
         $(".up-sequence").on('click', (event) => {
             event.preventDefault();
-            event.stopPropagation();
+            let target = event.currentTarget;
+            let index = parseInt(target.getAttribute('data-index'));
+
             console.log("up " + index)
             seq = window.dialogBuilder.definition.sequences
             last = seq.length - 1
@@ -342,6 +347,65 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
         });
 
+        $(".rename-sequence").off('click');
+        $(".rename-sequence").on('click', (event) => {
+            event.preventDefault();
+            let target = event.currentTarget;
+            let index = parseInt(target.getAttribute('data-index'));
+            let seq = window.dialogBuilder.definition.sequences;
+            let menu_sequence = seq[index];
+            $("#edit-sequence-name-value").val(menu_sequence.name);
+
+            window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', editListener);
+
+            editListener = {
+                handleEvent: function (event) {
+                    if (event.detail.action == "update_sequence") {
+                        var name = $("#edit-sequence-name-value").val();
+                        seq[index].name = name
+                        window.dialogBuilder.definition.sequences = seq;
+                        //$(".mdc-top-app-bar__title").html(name);
+
+                        window.dialogBuilder.reloadSequences();
+
+                        $("#action_save").show();
+
+                        window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this);
+                    }
+                }
+            };
+
+            window.dialogBuilder.editSequenceDialog.listen('MDCDialog:closed', editListener);
+
+            window.dialogBuilder.editSequenceDialog.open()
+
+        });
+        $(".delete-sequence").off('click');
+        $(".delete-sequence").click(function (event) {
+            let target = event.currentTarget;
+            let index = parseInt(target.getAttribute('data-index'));
+            let seq = window.dialogBuilder.definition.sequences;
+            let menu_sequence = seq[index];
+            $("#remove-sequence-name-value").html(menu_sequence);
+
+            window.dialogBuilder.removeSequenceDialog.unlisten('MDCDialog:closed', removeListener);
+
+            removeListener = {
+                handleEvent: function (event) {
+                    if (event.detail.action == "remove_sequence") {
+                        seq.splice(index,1)
+                        window.dialogBuilder.definition.sequences = seq;
+                        window.dialogBuilder.reloadSequences();
+                        window.dialogBuilder.loadSequence(seq[0],null)
+                        window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this);
+                    }
+                }
+            };
+
+            window.dialogBuilder.removeSequenceDialog.listen('MDCDialog:closed', removeListener);
+
+            window.dialogBuilder.removeSequenceDialog.open()
+        });
         $(".select_sequence").off("click");
         $(".select_sequence").click(function (eventObj) {
             console.log('sequence clicked');
