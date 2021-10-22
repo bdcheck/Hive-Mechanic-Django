@@ -691,9 +691,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         //advanced mode on turns off help
         $('#hive-help-switch-toggle').change(function () {
             if (!window.dialogBuilder.helpToggle.checked) {
+                $('#hive-help-switch-label').text("Basic: ")
                 $(".hive_mechanic_help_filler").hide()
                 $(".hive_mechanic_help").show()
             } else {
+                $('#hive-help-switch-label').text("Advanced: ")
                 $(".hive_mechanic_help").hide()
                 $(".hive_mechanic_help_filler").show()
             }
