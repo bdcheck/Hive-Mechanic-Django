@@ -56,7 +56,6 @@ class Integration(models.Model):
         return self.name + ' (' + self.game.slug + ')'
 
     def process_incoming(self, payload):
-        print('process_incoming: ' + json.dumps(payload, indent=2))
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
 
@@ -85,7 +84,6 @@ class Integration(models.Model):
         return False
 
     def process_player_incoming(self, player_lookup_key, player_lookup_value, payload, extras=None):
-        print('process_player_incoming: ' + str(payload) + ' -- ' + json.dumps(extras, indent=2))
         player_match = None
 
         for player in Player.objects.all():
@@ -109,7 +107,10 @@ class Integration(models.Model):
                 if extras is not None and 'last_message' in extras:
                     del extras['last_message']
 
-                session.process_incoming(self, None, extras)
+                if extras is not None and ('message_type' in extras) and extras['message_type'] == 'call':
+                    pass
+                else:
+                    session.process_incoming(self, None, extras)
 
             if isinstance(payload, list):
                 actions = payload

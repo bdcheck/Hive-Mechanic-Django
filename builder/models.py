@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import pkgutil
+import traceback
 
 from future import standard_library
 
@@ -405,7 +406,7 @@ class GameVersion(models.Model):
     def process_incoming(self, session, payload, extras=None):
         actions = []
 
-        if self.interrupt(payload, session) is False:
+        if self.interrupt(payload, session, extras) is False:
             dialog = session.dialog()
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
@@ -420,8 +421,36 @@ class GameVersion(models.Model):
 
         return actions
 
-    def interrupt(self, payload, session):
+    def interrupt(self, payload, session, extras):
+        if extras is None:
+            extras = {}
+
         definition = json.loads(self.definition)
+
+        if 'message_type' in extras and extras['message_type'] == 'call':
+            if 'payload' in extras and 'CallStatus' in extras['payload']:
+                if extras['payload']['CallStatus'] == 'ringing':
+                    if 'incoming_call_interrupt' in definition:
+                        payload = {
+                            'variable': 'hive_interrupted_location',
+                            'value': session.current_node(),
+                            'original_value': session.current_node(),
+                            'scope': 'session',
+                            'session': 'session-' + str(session.pk),
+                            'game': str(session.game_version.game.slug),
+                            'player': str(session.player.identifier),
+                        }
+
+                        point = DataPoint.objects.create_data_point('hive-incoming-call', session.player.identifier, payload, user_agent='Hive Mechanic')
+                        point.save()
+
+                        traceback.print_stack()
+
+                        session.advance_to(definition['incoming_call_interrupt'])
+
+                        session.nudge()
+
+                        return True
 
         if 'interrupts' in definition:
             for interrupt in definition['interrupts']:
@@ -446,7 +475,6 @@ class GameVersion(models.Model):
                         session.advance_to(interrupt['action'])
 
                         return True
-
         return False
 
     def dialog_snapshot(self):
@@ -607,11 +635,6 @@ class Session(models.Model):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
 
     def process_incoming(self, integration, payload, extras=None):
-        current_node = None # pylint: disable=unused-variable
-
-        if 'session_current_node' in self.session_state: # pylint: disable=unsupported-membership-test
-            current_node = self.session_state['session_current_node'] # pylint: disable=unsubscriptable-object
-
         actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
