@@ -7,21 +7,26 @@ This system requires Hive Mechanic to be running with and activity that has http
 - pip
 
 You can confirm your Python version by typing:
+```
 python3 --version
-...if you see something 3.8 or less, you should update Python. For example, one tutorial on this: https://raspberrytips.com/install-latest-python-raspberry-pi/
+```
+...if you see that the version is 3.8 or less, you should update Python. For example, one tutorial on this: https://raspberrytips.com/install-latest-python-raspberry-pi/ (hint: we tend to assume you will name this install 'python3' below... so if you instead name it for all of 'python' just be consistent below -- so all python3 or all python without the 3)
 
 You can see if pip is installed by typing:
+```
 python -m pip --version
-
+```
 ###Installation Instructions
 
-Create a virtual environment in the current directory
+Change to the directory where you installed the code for this demo (you might be there already)
+
+Then create a virtual environment in the directory you are in:
 ```
 python3 -m venv venv
 source ./venv/bin/activate
 ```
 ```
-pip3 -r requirements.txt
+pip3 install -r requirements.txt
 ```
 Let the system install all the required software.
 
