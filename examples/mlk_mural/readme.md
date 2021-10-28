@@ -7,20 +7,17 @@ This system requires Hive Mechanic to be running with and activity that has http
 - pip
 
 You can confirm your Python version by typing:
-```
+
 python3 --version
-```
+
 ...if you see that the version is 3.8 or less, you should update Python. For example, one tutorial on this: https://raspberrytips.com/install-latest-python-raspberry-pi/ (hint: we tend to assume you will name this install 'python3' below... so if you instead name it for all of 'python' just be consistent below -- so all python3 or all python without the 3)
 
 You can see if pip is installed by typing:
-```
 python -m pip --version
-```
+
 ###Installation Instructions
 
-Change to the directory where you installed the code for this demo (you might be there already)
-
-Then create a virtual environment in the directory you are in:
+Create a virtual environment in the current directory
 ```
 python3 -m venv venv
 source ./venv/bin/activate
@@ -35,11 +32,11 @@ config.ini contains some information needed to connect and run the system
 For some advanced configuration options look at the top of ml_mural.py
 
 ###Executing
-make sure you have run
+make sure you have run:
 ```
 source ./venv/bin/activate
 ```
-the nun using
+then run using:
 ```
 python3 ml_mural.py
 ```
