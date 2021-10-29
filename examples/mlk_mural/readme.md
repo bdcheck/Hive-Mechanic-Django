@@ -1,11 +1,11 @@
 This system requires Hive Mechanic to be running with and activity that has http integration and an api client setup.
 
 
-###Required Software
+### Required Software
 
 - Python > 3.7.3
 - pip
-- LibSDL 2.0 with libSDL-Image 2.0 and LibSDL-mixer 2.0 
+- LibSDL 2.0 with libSDL-Image 2.0 and LibSDL-mixer 2.0
 
 ### Installation Instructions
 
@@ -31,4 +31,11 @@ source ./venv/bin/activate
 the nun using
 ```
 python3 ml_mural.py
+```
+
+### Common Problems on raspian 
+Raspian contains older versions of SDL Mixer and SDL Image
+These can be installed by running
+```
+sudo apt install libsdl2-image-2.0-0 libsdl2-mixer-2.0.0
 ```
