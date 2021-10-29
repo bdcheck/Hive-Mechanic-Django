@@ -122,7 +122,13 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
         menu.listen("MDCMenu:selected", function (event) {
         	var data = $(event.detail.item).data();
         	
-        	console.log('ACTION: ' + data['action'] + '(' + data['id'] + ')');
+        	if (data['action'] == "delete") {
+        		if (confirm("Are you sure you want to delete " + data['name'] + "?")) {
+        			window.location = "/builder/activity/" + data['id'] + "/delete";
+        		}
+        	} else {
+	        	alert('ACTION: ' + data['action'] + '(' + data['id'] + ')');
+        	}
         });
 
 		menu.open = (menu.open == false);

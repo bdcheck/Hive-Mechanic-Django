@@ -51,7 +51,7 @@ reset_call.description = 'Reset outgoing calls'
 
 @admin.register(OutgoingCall)
 class OutgoingCallAdmin(admin.ModelAdmin):
-    list_display = ('destination', 'send_date', 'sent_date', 'start_call', 'message', 'file', 'next_action', 'errored')
+    list_display = ('destination', 'send_date', 'sent_date', 'message', 'file', 'next_action', 'errored')
     search_fields = ('destination', 'message', 'transmission_metadata', 'next_action',)
     list_filter = ('errored', 'send_date', 'sent_date', 'next_action',)
     actions = [initiate_call, reset_call]
@@ -62,7 +62,6 @@ class OutgoingCallAdmin(admin.ModelAdmin):
                 'destination',
                 'send_date',
                 'sent_date',
-                'start_call',
                 'message',
                 'file',
                 'transmission_metadata',

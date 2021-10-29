@@ -31,9 +31,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     window.dialogBuilder.restartGameDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-reset-game-dialog'));
 
     window.dialogBuilder.restartGameDialog.listen('MDCDialog:closed', (result) => {
-    	console.log("ACTION: ");
-    	console.log(result);
-	});
+        console.log("ACTION: ");
+        console.log(result);
+    });
 
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
     var initialCardSelect = null;
@@ -60,7 +60,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                 issues = issues.concat(sequenceIssues);
             }
-            
+
             $(".outstanding-issue-item").remove();
             $(".outstanding-issue-item-divider").remove();
 
@@ -135,29 +135,29 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     }
 
     function cleanDefinition(definition) {
-    	if (definition == null) {
-    		return null;
-    	} else if (Array.isArray(definition)) {
-    		var cleanArray = [];
+        if (definition == null) {
+            return null;
+        } else if (Array.isArray(definition)) {
+            var cleanArray = [];
 
             $.each(definition, function(index, item) {
                 cleanArray.push(cleanDefinition(item));
             });
 
             return cleanArray;
-    	} else if (typeof definition === 'object') {
-    		var cleanObject = {};
+        } else if (typeof definition === 'object') {
+            var cleanObject = {};
 
             $.each(Object.keys(definition), function(index, key) {
-            	if (key.indexOf('__') == -1) {
-	            	cleanObject[key] = cleanDefinition(definition[key])
-            	}
+                if (key.indexOf('__') == -1) {
+                    cleanObject[key] = cleanDefinition(definition[key])
+                }
             });
 
-    		return cleanObject;
-    	}
+            return cleanObject;
+        }
 
-    	return definition;
+        return definition;
     }
 
     var editListener = undefined;
@@ -168,7 +168,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         if (selectedSequence != null) {
             selectedSequence.removeChangeListener(onSequenceChanged);
         }
-        
+
         selectedSequence = sequence.loadSequence(definition);
 
         $(".mdc-top-app-bar__title").html(selectedSequence.name());
@@ -231,7 +231,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         });
 
         selectedSequence.selectInitialNode(initialId);
-        
+
         return selectedSequence;
     };
 
@@ -264,12 +264,12 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $("#sequences_list").html(items.join(""));
 
-		const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
+        const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
         $(".select_sequence").off("click");
         $(".select_sequence").click(function(eventObj) {
-			$("#settings-view").hide();
-			$("#editor-view").show();
+            $("#settings-view").hide();
+            $("#editor-view").show();
 
             window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[$(eventObj.target).data("index")], null);
         });
@@ -327,7 +327,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 var item = items[i];
 
                 allCardSelectContent += '<li class="mdc-list-item mdc-list-item--with-one-line all-cards-select-item all_cards_destination_sequence_' + value['id'] + '_item" role="menuitem" id="all_cards_destination_item_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
-	            allCardSelectContent += '  <span class="mdc-list-item__ripple"></span>';
+                allCardSelectContent += '  <span class="mdc-list-item__ripple"></span>';
                 allCardSelectContent += '  <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
                 allCardSelectContent += '</li>';
             }
@@ -400,7 +400,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     if (item["id"] == cardId) {
                         var loadedSequence = window.dialogBuilder.loadSequence(sequence, item['id']);
 
-						$('#' + item['id'] + '-advanced-dialog').remove();
+                        $('#' + item['id'] + '-advanced-dialog').remove();
 
                         var node = Node.createCard(item, loadedSequence);
 
@@ -449,7 +449,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 if ($("#action_save").text() == "warning") {
                     warningDialog.open();
                 } else {
-                	var clean = cleanDefinition(window.dialogBuilder.definition);
+                    var clean = cleanDefinition(window.dialogBuilder.definition);
 
                     window.dialogBuilder.update(clean, function() {
                         $("#action_save").hide();
@@ -484,13 +484,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             var twoNodeClass = window.dialogBuilder.cardMapping[two];
             var twoName = twoNodeClass.cardName();
-            
+
             if (oneName < twoName) {
                 return -1;
             } else if (oneName > twoName) {
                 return 1;
             }
-            
+
             return 0;
         });
 
@@ -506,24 +506,24 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
 
 //            var cardItem = '<li class="mdc-list-item" data-value="' + key + '" role="option">' +
-//						   ' <span class="mdc-list-item__ripple"></span>' +
-//						   ' <span class="mdc-list-item__text">' + name + '<span>' +
-//						   '</li>';
+//                         ' <span class="mdc-list-item__ripple"></span>' +
+//                         ' <span class="mdc-list-item__text">' + name + '<span>' +
+//                         '</li>';
 
             var cardItem = '';
 
-			cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
-			cardItem += '  <span class="mdc-list-item__graphic">';
-			cardItem += '    <div class="mdc-radio">';
-			cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
-			cardItem += '      <div class="mdc-radio__background">';
-			cardItem += '        <div class="mdc-radio__outer-circle"></div>';
-			cardItem += '        <div class="mdc-radio__inner-circle"></div>';
-			cardItem += '      </div>';
-			cardItem += '    </div>';
-			cardItem += '  </span>';
-			cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
-			cardItem += '</li>';
+            cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
+            cardItem += '  <span class="mdc-list-item__graphic">';
+            cardItem += '    <div class="mdc-radio">';
+            cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
+            cardItem += '      <div class="mdc-radio__background">';
+            cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+            cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+            cardItem += '      </div>';
+            cardItem += '    </div>';
+            cardItem += '  </span>';
+            cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
+            cardItem += '</li>';
 
             $("#add-card-select-widget").append(cardItem);
         }
@@ -544,19 +544,19 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         window.dialogBuilder.helpToggle = mdc.switchControl.MDCSwitch.attachTo(document.getElementById('hive-help-switch'));
 
-		$('#hive-help-switch-toggle').change(function() {
-			if (window.dialogBuilder.helpToggle.checked) {
-				$(".hive_mechanic_help_filler").hide()
-				$(".hive_mechanic_help").show()
-			} else {
-				$(".hive_mechanic_help").hide()
-				$(".hive_mechanic_help_filler").show()
-			}
-		});
+        $('#hive-help-switch-toggle').change(function() {
+            if (window.dialogBuilder.helpToggle.checked) {
+                $(".hive_mechanic_help_filler").hide()
+                $(".hive_mechanic_help").show()
+            } else {
+                $(".hive_mechanic_help").hide()
+                $(".hive_mechanic_help_filler").show()
+            }
+        });
 
-		$(".hive_mechanic_help").hide();
+        $(".hive_mechanic_help").hide();
 
-	    window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
+        window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
 
         if (Array.isArray(window.dialogBuilder.definition)) {
             var game_def = {
@@ -574,7 +574,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         const warning = document.getElementById('builder-outstanding-issues-dialog-save');
 
         warning.addEventListener('click', (event) => {
-			var clean = cleanDefinition(window.dialogBuilder.definition);
+            var clean = cleanDefinition(window.dialogBuilder.definition);
 
             window.dialogBuilder.update(clean, function() {
                 $("#action_save").hide();
@@ -661,12 +661,12 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 var item = items[i];
 
                 body += '<li class="mdc-list-item mdc-list-item--with-one-line ' + identifier + '_destination_sequence_' + value['id'] + '_item builder-destination-item" role="menuitem" id="' + identifier + '_destination_sequence_' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '">';
-	            body += '  <span class="mdc-list-item__ripple"></span>';
+                body += '  <span class="mdc-list-item__ripple"></span>';
                 body += '  <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
                 body += '</li>';
             }
-		});
-		
+        });
+
         body += '    </ul>';
 
         return body;
@@ -716,184 +716,190 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".builder-destination-item").hide();
     }
 
-    $("#action_open_settings").click(function(eventObj) {
-        eventObj.preventDefault();
+    var refreshSettingsInterrupts = function() {
+        $("#activity_settings_interrupts").empty();
 
-        var refreshSettingsInterrupts = function() {
-            $("#activity_settings_interrupts").empty();
+        for (var i = 0; i < window.dialogBuilder.definition.interrupts.length; i++) {
+            const interrupt = window.dialogBuilder.definition.interrupts[i];
+            const identifier = 'activity_interrupt_pattern_' + i + '_response_value';
 
-            for (var i = 0; i < window.dialogBuilder.definition.interrupts.length; i++) {
-                const interrupt = window.dialogBuilder.definition.interrupts[i];
-                const identifier = 'activity_interrupt_pattern_' + i + '_response_value';
+            var interruptBody = '';
 
-                var interruptBody = '';
+            interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5">';
+            interruptBody += '  <div class="mdc-select mdc-select--outlined" id="activity_interrupt_pattern_' + i + '" style="width: 100%;">';
+            interruptBody += '    <div class="mdc-select__anchor">';
+            interruptBody += '      <span class="mdc-notched-outline">';
+            interruptBody += '        <span class="mdc-notched-outline__leading"></span>';
+            interruptBody += '        <span class="mdc-notched-outline__notch">';
+            interruptBody += '          <span id="outlined-select-label" class="mdc-floating-label">Incoming Response&#8230;</span>';
+            interruptBody += '        </span>';
+            interruptBody += '        <span class="mdc-notched-outline__trailing"></span>';
+            interruptBody += '      </span>';
+            interruptBody += '      <span class="mdc-select__selected-text-container">';
+            interruptBody += '        <span class="mdc-select__selected-text"></span>';
+            interruptBody += '      </span>';
+            interruptBody += '      <span class="mdc-select__dropdown-icon">';
+            interruptBody += '        <svg';
+            interruptBody += '            class="mdc-select__dropdown-icon-graphic"';
+            interruptBody += '            viewBox="7 10 10 5" focusable="false">';
+            interruptBody += '          <polygon';
+            interruptBody += '              class="mdc-select__dropdown-icon-inactive"';
+            interruptBody += '              stroke="none"';
+            interruptBody += '              fill-rule="evenodd"';
+            interruptBody += '              points="7 10 12 15 17 10">';
+            interruptBody += '          </polygon>';
+            interruptBody += '          <polygon';
+            interruptBody += '              class="mdc-select__dropdown-icon-active"';
+            interruptBody += '              stroke="none"';
+            interruptBody += '              fill-rule="evenodd"';
+            interruptBody += '              points="7 15 12 10 17 15">';
+            interruptBody += '          </polygon>';
+            interruptBody += '        </svg>';
+            interruptBody += '      </span>';
+            interruptBody += '    </div>';
+            interruptBody += '    <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">';
+            interruptBody += '      <ul class="mdc-list" role="listbox" aria>';
 
-                interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5">';
-                interruptBody += '  <div class="mdc-select mdc-select--outlined" id="activity_interrupt_pattern_' + i + '" style="width: 100%;">';
-                interruptBody += '    <div class="mdc-select__anchor">';
-                interruptBody += '      <span class="mdc-notched-outline">';
-                interruptBody += '        <span class="mdc-notched-outline__leading"></span>';
-                interruptBody += '        <span class="mdc-notched-outline__notch">';
-                interruptBody += '      	<span id="outlined-select-label" class="mdc-floating-label">Incoming Response&#8230;</span>';
-                interruptBody += '        </span>';
-                interruptBody += '        <span class="mdc-notched-outline__trailing"></span>';
-                interruptBody += '      </span>';
-                interruptBody += '      <span class="mdc-select__selected-text-container">';
-                interruptBody += '        <span class="mdc-select__selected-text"></span>';
-                interruptBody += '      </span>';
-                interruptBody += '      <span class="mdc-select__dropdown-icon">';
-                interruptBody += '        <svg';
-                interruptBody += '      	  class="mdc-select__dropdown-icon-graphic"';
-                interruptBody += '      	  viewBox="7 10 10 5" focusable="false">';
-                interruptBody += '      	<polygon';
-                interruptBody += '      		class="mdc-select__dropdown-icon-inactive"';
-                interruptBody += '      		stroke="none"';
-                interruptBody += '      		fill-rule="evenodd"';
-                interruptBody += '      		points="7 10 12 15 17 10">';
-                interruptBody += '      	</polygon>';
-                interruptBody += '      	<polygon';
-                interruptBody += '      		class="mdc-select__dropdown-icon-active"';
-                interruptBody += '      		stroke="none"';
-                interruptBody += '      		fill-rule="evenodd"';
-                interruptBody += '      		points="7 15 12 10 17 15">';
-                interruptBody += '      	</polygon>';
-                interruptBody += '        </svg>';
-                interruptBody += '      </span>';
-                interruptBody += '    </div>';
-                interruptBody += '    <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">';
-                interruptBody += '      <ul class="mdc-list" role="listbox" aria>';
-                
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="begins_with">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Begins with&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="begins_with">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Begins with&#8230;</span>';
+            interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="ends_with">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Ends with&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="ends_with">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Ends with&#8230;</span>';
+            interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="equals">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Equals&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="equals">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Equals&#8230;</span>';
+            interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_equals">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not equal&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_equals">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not equal&#8230;</span>';
+            interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="contains">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Contains&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="contains">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Contains&#8230;</span>';
+            interruptBody += '      </li>';
 
-				interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_contains">';
-				interruptBody += '        <span class="mdc-list-item__ripple"></span>';
-				interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not contain&#8230;</span>';
-				interruptBody += '      </li>';
+            interruptBody += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-value="not_contains">';
+            interruptBody += '        <span class="mdc-list-item__ripple"></span>';
+            interruptBody += '        <span class="mdc-list-item__text mdc-list-item__start">Does not contain&#8230;</span>';
+            interruptBody += '      </li>';
 
-                interruptBody += '      </ul>';
-                interruptBody += '    </div>';
-                interruptBody += '  </div>';
-                interruptBody += '</div>';
+            interruptBody += '      </ul>';
+            interruptBody += '    </div>';
+            interruptBody += '  </div>';
+            interruptBody += '</div>';
 
-                interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">';
-                interruptBody += '  <div class="mdc-text-field mdc-text-field--outlined" id="activity_interrupt_pattern_' + i + '_response">';
-                interruptBody += '    <input type="text" class="mdc-text-field__input" id="activity_interrupt_pattern_' + i + '_response_value">';
-                interruptBody += '    <div class="mdc-notched-outline">';
-                interruptBody += '      <div class="mdc-notched-outline__leading"></div>';
-                interruptBody += '      <div class="mdc-notched-outline__notch">';
-                interruptBody += '        <label for="activity_interrupt_pattern_' + i + '_response_value" class="mdc-floating-label">Value</label>';
-                interruptBody += '      </div>';
-                interruptBody += '      <div class="mdc-notched-outline__trailing"></div>';
-                interruptBody += '    </div>';
-                interruptBody += '  </div>';
-                interruptBody += '</div>';
+            interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">';
+            interruptBody += '  <div class="mdc-text-field mdc-text-field--outlined" id="activity_interrupt_pattern_' + i + '_response">';
+            interruptBody += '    <input type="text" class="mdc-text-field__input" id="activity_interrupt_pattern_' + i + '_response_value">';
+            interruptBody += '    <div class="mdc-notched-outline">';
+            interruptBody += '      <div class="mdc-notched-outline__leading"></div>';
+            interruptBody += '      <div class="mdc-notched-outline__notch">';
+            interruptBody += '        <label for="activity_interrupt_pattern_' + i + '_response_value" class="mdc-floating-label">Value</label>';
+            interruptBody += '      </div>';
+            interruptBody += '      <div class="mdc-notched-outline__trailing"></div>';
+            interruptBody += '    </div>';
+            interruptBody += '  </div>';
+            interruptBody += '</div>';
 
-                interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" style="text-align: right;">';
-                interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_choose">';
-                interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">link</i>';
+            interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" style="text-align: right;">';
+            interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_choose">';
+            interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">link</i>';
+            interruptBody += '  </button>';
+
+            if (interrupt["action"] != undefined && interrupt["action"] != "") {
+                interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_click">';
+                interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">search</i>';
                 interruptBody += '  </button>';
+            }
 
-                if (interrupt["action"] != undefined && interrupt["action"] != "") {
-                    interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_click">';
-                    interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">search</i>';
-                    interruptBody += '  </button>';
-                   }
+            interruptBody += '</div>';
 
-                interruptBody += '</div>';
+            $("#activity_settings_interrupts").append(interruptBody);
 
-                $("#activity_settings_interrupts").append(interruptBody);
+            const patternField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_interrupt_pattern_' + i + '_response'));
+            const operationSelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_interrupt_pattern_' + i));
 
-                const patternField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_interrupt_pattern_' + i + '_response'));
-                const operationSelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_interrupt_pattern_' + i));
+            window.setTimeout(function() {
+                updateViews(interrupt["pattern"], operationSelect, patternField);
 
-                window.setTimeout(function() {
-                    updateViews(interrupt["pattern"], operationSelect, patternField);
-
-                    operationSelect.listen('MDCSelect:change', () => {
-                        updatePattern(interrupt, operationSelect.value, patternField.value);
-
-                        $("#action_save").show();
-                    });
-                });
-
-                $("#" + identifier).on("change keyup paste", function() {
+                operationSelect.listen('MDCSelect:change', () => {
                     updatePattern(interrupt, operationSelect.value, patternField.value);
 
                     $("#action_save").show();
                 });
+            });
 
-                $('#activity_interrupt_pattern_' + i + '_response_choose').on("click", function() {
-                    const chooseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-interrupt-dialog'));
+            $("#" + identifier).on("change keyup paste", function() {
+                updatePattern(interrupt, operationSelect.value, patternField.value);
 
-                    $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
+                $("#action_save").show();
+            });
 
-                    initializeDestinationMenu("select-interrupt", function(nodeId) {
-                        interrupt["action"] = nodeId;
-                        
-                        chooseDialog.close();
+            $('#activity_interrupt_pattern_' + i + '_response_choose').on("click", function() {
+                const chooseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-interrupt-dialog'));
 
-                        refreshSettingsInterrupts();
-                    });
+                $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
 
-                    chooseDialog.open();
+                initializeDestinationMenu("select-interrupt", function(nodeId) {
+                    interrupt["action"] = nodeId;
+
+                    chooseDialog.close();
+
+                    refreshSettingsInterrupts();
                 });
 
-                $('#activity_interrupt_pattern_' + i + '_response_click').on("click", function() {
-                    window.dialogBuilder.loadNodeById(interrupt["action"].split("#")[1]);
-                    
-					$("#settings-view").hide();
-					$("#editor-view").show();
-                });
-            }
-        };
+                chooseDialog.open();
+            });
+
+            $('#activity_interrupt_pattern_' + i + '_response_click').on("click", function() {
+                window.dialogBuilder.loadNodeById(interrupt["action"].split("#")[1]);
+
+                $("#settings-view").hide();
+                $("#editor-view").show();
+            });
+        }
+
+        if (window.dialogBuilder.definition['incoming_call_interrupt'] != undefined) {
+            $('#activity_interrupt_pattern_voice_call_click').show();
+        } else {
+            $('#activity_interrupt_pattern_voice_call_click').hide();
+        }
+    };
+
+    $("#action_open_settings").click(function(eventObj) {
+        eventObj.preventDefault();
 
         refreshSettingsInterrupts();
 
         var initialCardList = '    <ul class="mdc-list mdc-dialog__content initial_dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 
         $.each(window.dialogBuilder.definition.sequences, function(index, value) {
-        	if (index > 0) {
-  	            initialCardList += '      <li class="mdc-list-divider" role="separator"></li>';
-			}
+            if (index > 0) {
+                initialCardList += '      <li class="mdc-list-divider" role="separator"></li>';
+            }
 
-			initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '">';
-			initialCardList += '        <span class="mdc-list-item__ripple"></span>';
-			initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
-			initialCardList += '        <span class="mdc-layout-grid--align-right mdc-list-item__end material-icons destination_disclosure_icon">arrow_right</span>';
-			initialCardList += '      </li>';
+            initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '">';
+            initialCardList += '        <span class="mdc-list-item__ripple"></span>';
+            initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + value['name'] + '</span>';
+            initialCardList += '        <span class="mdc-layout-grid--align-right mdc-list-item__end material-icons destination_disclosure_icon">arrow_right</span>';
+            initialCardList += '      </li>';
 
             var items = value['items'];
 
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
 
-				initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item builder-activity-setting-initial-card-list-sequence-' + value['id'] + '-item" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '" id="builder-activity-setting-initial-card-list-destination-item-' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '" data-value="' + value['id'] + '#' + item['id'] + '">';
-				initialCardList += '        <span class="mdc-list-item__ripple"></span>';
-				initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
-				initialCardList += '      </li>';
+                initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line builder-destination-item builder-activity-setting-initial-card-list-sequence-' + value['id'] + '-item" role="menuitem" id="builder-activity-setting-initial-card-list-sequence-' + value['id'] + '" id="builder-activity-setting-initial-card-list-destination-item-' + item['id'] + '" data-node-id="' + value['id'] + '#' + item['id'] + '" data-value="' + value['id'] + '#' + item['id'] + '">';
+                initialCardList += '        <span class="mdc-list-item__ripple"></span>';
+                initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">' + item["name"] + '</span>';
+                initialCardList += '      </li>';
             }
 
         });
@@ -971,10 +977,34 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             refreshSettingsInterrupts();
         });
-        
+
         $("#editor-view").hide();
         $("#settings-view").show();
     });
+
+    $('#activity_interrupt_pattern_voice_call_click').on("click", function() {
+        window.dialogBuilder.loadNodeById(window.dialogBuilder.definition['incoming_call_interrupt'].split("#")[1]);
+
+        $("#settings-view").hide();
+        $("#editor-view").show();
+    });
+
+    $('#activity_interrupt_pattern_voice_call_choose').on("click", function() {
+        const chooseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-interrupt-dialog'));
+
+        $("#select-interrupt-dialog-content").html(chooseDestinationMenu("select-interrupt"));
+
+        initializeDestinationMenu("select-interrupt", function(nodeId) {
+            window.dialogBuilder.definition['incoming_call_interrupt'] = nodeId;
+
+            chooseDialog.close();
+
+            refreshSettingsInterrupts();
+        });
+
+        chooseDialog.open();
+    });
+
 
     var csrftoken = Cookies.get('csrftoken');
 

@@ -99,13 +99,14 @@ define(modules, function (mdc) {
             }
 
             var destinations = this.destinationNodes(sequence);
+            
 
             for (var i = 0; i < destinations.length; i++) {
                 var destination = destinations[i];
 
                 if (destination == null || destination == undefined) {
                     issues.push(['Empty destination node.', 'node', this.definition['id'], this.cardName()]);
-                } else if (this.id == destination.id) {
+                } else if (this.sequence.definition.id == destination.sequence.definition.id && this.id == destination.id) {
                     issues.push(['Node references self in destination.', 'node', this.definition['id'], this.cardName()]);
                 }
             }
@@ -1108,7 +1109,7 @@ define(modules, function (mdc) {
                         for (var k = 0; k < destinations.length && isSource == false; k++) {
                             var destination = destinations[k];
 
-                            if (this.id == destination.id) {
+                            if (this.sequence.definition.id == destination.sequence.definition.id && this.id == destination.id) {
                                 isSource = true;
                             }
                         }

@@ -7,6 +7,8 @@ import datetime
 import time
 import traceback
 
+import six
+
 from twilio.rest import Client
 
 from django.conf import settings
@@ -184,8 +186,6 @@ class OutgoingCall(models.Model):
     send_date = models.DateTimeField()
     sent_date = models.DateTimeField(null=True, blank=True)
 
-    start_call = models.BooleanField(default=False)
-
     message = models.TextField(max_length=1024, null=True, blank=True)
     file = models.URLField(max_length=(1024 * 1024), null=True, blank=True)
 
@@ -216,15 +216,31 @@ class OutgoingCall(models.Model):
         try:
             client = Client(self.integration.configuration['client_id'], self.integration.configuration['auth_token'])
 
-            call = client.calls.create(
-                url=(settings.SITE_URL + reverse('incoming_twilio_call')),
-                to=self.destination,
-                from_=self.integration.configuration['phone_number']
-            )
+            ongoing = False
 
-            self.transmission_metadata['twilio_sid'] = call.sid
-            self.errored = False
-            self.save()
+            incoming_call_records = client.calls.list(to=self.destination)
+
+            for call_record in incoming_call_records:
+                if call_record.status in ('ringing', 'in-progress', 'queued'):
+                    ongoing = True
+
+            outgoing_call_records = client.calls.list(from_=self.destination)
+
+            for call_record in outgoing_call_records:
+                if call_record.status in ('ringing', 'in-progress', 'queued'):
+                    ongoing = True
+
+            if ongoing is False:
+                call = client.calls.create(
+                    url=(settings.SITE_URL + reverse('incoming_twilio_call')),
+                    to=self.destination,
+                    from_=self.integration.configuration['phone_number']
+                )
+
+                self.transmission_metadata['twilio_sid'] = call.sid
+
+                self.errored = False
+                self.save()
 
         except: # pylint: disable=bare-except
             self.errored = True
@@ -238,14 +254,16 @@ class IncomingCallResponse(models.Model):
 
     receive_date = models.DateTimeField()
 
-    message = models.TextField(max_length=1024)
+    message = models.TextField(max_length=1024, null=True, blank=True)
 
     transmission_metadata = JSONField(default=dict, blank=True, null=True)
 
     integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
-def process_incoming(integration, payload):
+def process_incoming(integration, payload): # pylint: disable=too-many-branches
     message_type = 'text'
+
+    player_identifier = None
 
     if ('Body' in payload) is False:
         if 'Digits' in payload:
@@ -256,19 +274,25 @@ def process_incoming(integration, payload):
             payload['Body'] = ''
 
     if 'CallStatus' in payload:
-        from_ = payload['From']
-
-        payload['From'] = payload['To']
-
-        payload['To'] = from_
+        if 'phone_number' in integration.configuration:
+            if payload['From'] == integration.configuration['phone_number']:
+                player_identifier = payload['To']
+            else:
+                player_identifier = payload['From']
+        else:
+            six.raise_from(RuntimeError('Twilio integration is missing phone number.'), None)
 
         message_type = 'call'
+    else:
+        message_type = 'text'
+
+        player_identifier = payload['From']
 
     last_message = None
 
-    incoming_message = IncomingMessage.objects.filter(source=payload['From']).order_by('-receive_date').first()
+    incoming_message = IncomingMessage.objects.filter(source=player_identifier).order_by('-receive_date').first()
 
-    incoming_call = IncomingCallResponse.objects.filter(source=payload['From']).order_by('-receive_date').first()
+    incoming_call = IncomingCallResponse.objects.filter(source=player_identifier).order_by('-receive_date').first()
 
     if incoming_message is None or (incoming_call is not None and incoming_call.receive_date > incoming_message.receive_date):
         incoming_message = incoming_call
@@ -279,12 +303,16 @@ def process_incoming(integration, payload):
             'received': incoming_message.receive_date
         }
 
-    if payload['Body'] or incoming_message.media.count() > 0:
-        payload_body = smart_text(payload['Body']) # ['Body'].encode(encoding='UTF-8', errors='strict')
+    if ('CallStatus' in payload) or payload['Body'] or incoming_message.media.count() > 0: # May require revision if voice recordings come in...
+        payload_body = smart_text(payload['Body'])
 
-        integration.process_player_incoming('twilio_player', payload['From'], payload_body, {
+        if payload_body == '':
+            payload_body = None
+
+        integration.process_player_incoming('twilio_player', player_identifier, payload_body, {
             'last_message': last_message,
             'message_type': message_type,
+            'payload': payload,
         })
 
         return []
@@ -317,16 +345,7 @@ def execute_action(integration, session, action):
 
         return True
     elif action['type'] == 'echo-voice':
-        last_sent = OutgoingCall.objects.filter(destination=player.player_state['twilio_player']).order_by('-send_date').first()
-
         outgoing = OutgoingCall(destination=player.player_state['twilio_player'])
-
-        if last_sent is None:
-            outgoing.start_call = True
-        elif last_sent.next_action == 'hangup':
-            outgoing.start_call = True
-        else:
-            outgoing.start_call = False
 
         outgoing.send_date = timezone.now()
         outgoing.message = integration.translate_value(action['message'], session)
@@ -336,8 +355,7 @@ def execute_action(integration, session, action):
 
         outgoing.save()
 
-        if outgoing.start_call is True:
-            outgoing.transmit()
+        outgoing.transmit()
 
         return True
 

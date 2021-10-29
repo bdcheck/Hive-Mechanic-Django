@@ -9,7 +9,7 @@ import os
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, FileResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -211,3 +211,18 @@ def builder_data_processor_options(request):  # pylint: disable=unused-argument
         })
 
     return HttpResponse(json.dumps(options, indent=2), content_type='application/json', status=200)
+
+
+@login_required
+def builder_activity_delete(request, slug): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.delete_game') is False:
+        raise PermissionDenied('Delete game permission required.')
+
+    activity = get_object_or_404(Game, slug=slug)
+
+    if activity.can_edit(request.user):
+        activity.delete()
+
+        return redirect('builder_activities')
+
+    raise PermissionDenied('Delete game permission required.')
