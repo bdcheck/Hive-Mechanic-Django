@@ -1,5 +1,7 @@
 # pylint: disable=no-member, line-too-long
 
+from __future__ import print_function
+
 import json
 import os
 
@@ -28,8 +30,8 @@ class Command(BaseCommand):
 
         print(json.dumps(files, indent=2))
 
-        for file in files:
-            js_path = os.path.join(card_path, file)
+        for js_file in files:
+            js_path = os.path.join(card_path, js_file)
 
             if (js_path in in_use) is False:
                 print('Clearing %s...' % js_path)

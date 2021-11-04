@@ -134,64 +134,124 @@
 								<h2 class="mdc-typography--headline6" style="margin-top: 0px;">Activity Settings</h2>
 								<div class="mdc-layout-grid" id="builder-activity-setting-dialog-content" style="margin: 0; padding: 0;">
 									<div class="mdc-layout-grid__inner">
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-text-field mdc-text-field--outlined" id="builder-activity-setting-activity-name">
-											<input type="text" id="tf-outlined" class="mdc-text-field__input">
-											<div class="mdc-notched-outline">
-												<div class="mdc-notched-outline__leading"></div>
-												<div class="mdc-notched-outline__notch">
-													<label for="tf-outlined" class="mdc-floating-label">Activity Name</label>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-9">
+											<div class="mdc-typography--subtitle1">Basic Settings</div>
+											<div class="mdc-layout-grid__inner">
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-text-field mdc-text-field--outlined" id="builder-activity-setting-activity-name" style="width: 100%; margin-top: 12px;">
+														<input type="text" id="tf-outlined" class="mdc-text-field__input">
+														<div class="mdc-notched-outline">
+															<div class="mdc-notched-outline__leading"></div>
+															<div class="mdc-notched-outline__notch">
+																<label for="tf-outlined" class="mdc-floating-label">Activity Name</label>
+															</div>
+															<div class="mdc-notched-outline__trailing"></div>
+														</div>
+													</div>
 												</div>
-												<div class="mdc-notched-outline__trailing"></div>
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-text-field mdc-text-field--outlined" id="builder-activity-setting-activity-identifier" style="width: 100%; margin-top: 12px;">
+														<input type="text" id="tf-outlined" class="mdc-text-field__input">
+														<div class="mdc-notched-outline">
+															<div class="mdc-notched-outline__leading"></div>
+															<div class="mdc-notched-outline__notch">
+																<label for="tf-outlined" class="mdc-floating-label">Activity Identifier</label>
+															</div>
+															<div class="mdc-notched-outline__trailing"></div>
+														</div>
+													</div>
+												</div>
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-select mdc-select--outlined" id="builder-activity-setting-initial-card" style="width: 100%">
+														<div class="mdc-select__anchor" style="width: 100%;">
+															<span class="mdc-notched-outline">
+																<span class="mdc-notched-outline__leading"></span>
+																<span class="mdc-notched-outline__notch">
+																	<span id="outlined-select-label" class="mdc-floating-label">General Start Card</span>
+																</span>
+																<span class="mdc-notched-outline__trailing"></span>
+															</span>
+															<span class="mdc-select__selected-text-container">
+																<span id="demo-selected-text" class="mdc-select__selected-text"></span>
+															</span>
+															<span class="mdc-select__dropdown-icon">
+																<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+																	<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+																	<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+																</svg>
+															</span>
+														</div>
+														<div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox" id="builder-activity-setting-initial-card-list"></div>
+													</div>
+												</div>
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-select mdc-select--outlined" id="builder-activity-setting-voice-card" style="width: 100%">
+														<div class="mdc-select__anchor" style="width: 100%;">
+															<span class="mdc-notched-outline">
+																<span class="mdc-notched-outline__leading"></span>
+																<span class="mdc-notched-outline__notch">
+																	<span id="outlined-select-label" class="mdc-floating-label">Voice Call Start Card</span>
+																</span>
+																<span class="mdc-notched-outline__trailing"></span>
+															</span>
+															<span class="mdc-select__selected-text-container">
+																<span id="demo-selected-text" class="mdc-select__selected-text"></span>
+															</span>
+															<span class="mdc-select__dropdown-icon">
+																<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+																	<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+																	<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+																</svg>
+															</span>
+														</div>
+														<div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox" id="builder-activity-setting-voice-card-list"></div>
+													</div>
+												</div>
 											</div>
 										</div>
-										<div class="mdc-select mdc-select--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="builder-activity-setting-initial-card" style="width: 100%;">
-											<div class="mdc-select__anchor" style="width: 100%;">
-												<span class="mdc-notched-outline">
-													<span class="mdc-notched-outline__leading"></span>
-													<span class="mdc-notched-outline__notch">
-														<span id="outlined-select-label" class="mdc-floating-label">Initial Card</span>
-													</span>
-													<span class="mdc-notched-outline__trailing"></span>
-												</span>
-												<span class="mdc-select__selected-text-container">
-													<span id="demo-selected-text" class="mdc-select__selected-text"></span>
-												</span>
-												<span class="mdc-select__dropdown-icon">
-													<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
-														<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
-														<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
-													</svg>
-												</span>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+											<center class="mdc-typography--subtitle1">Icon</center>
+											<a href="#" id="icon_activity_click">
+												<center><img id="icon_activity" style="background-color: #808080; max-height: 120px; margin-left: auto; margin-right: auto; margin-top: 8px;" {% if game.icon %}src="{{ game.icon.url }}"{% endif %} /></center>
+												<br />
+												<center class="mdc-typography--caption">Tap to update activity icon</center>
+											</a>
+											<form enctype="multipart/form-data" style="display: none;" id="icon_activity_form" method="post" action="{% url 'builder_update_icon' %}">
+												{% csrf_token %}
+												<input name="activity_pk" type="hidden" value="{{ game.pk }}" />
+												<input name="icon_file" id="icon_activity_file" type="file" accept="image/*" />
+											</form>											
+										</div>
+									</div>
+									<div class="mdc-layout-grid__inner" style="border-top: thin solid #9e9e9e; margin-top: 16px; padding-top: 16px;">
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">
+											<div class="mdc-layout-grid__inner">
+												<div class="mdc-typography--subtitle1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top">Activity & Session Variables</div>
+												<div id="activity_variables" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top mdc-layout-grid__inner">
+													<div class="mdc-typography--subtitle1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top"><em>None set.</em></div>
+												</div>
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top">
+													<button type="button" class="mdc-button mdc-button--raised" id="builder-activity-setting-add-variable">
+														<span class="mdc-button__ripple"></span>
+														<span class="mdc-button__label">Add Variable</span>
+													</button>
+												</div>
 											</div>
-											<div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox" id="builder-activity-setting-initial-card-list">
+										</div>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">
+											<div class="mdc-layout-grid__inner">
+												<div class="mdc-typography--subtitle1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top">Interrupt Keywords</div>
+												<div id="activity_settings_interrupts" class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top mdc-layout-grid__inner">
+													<div class="mdc-typography--subtitle1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top"><em>None specified.</em></div>
+												</div>
+												<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top">
+													<div id="activity_settings_interrupts" class="mdc-layout-grid__inner"></div>
+													<button type="button" class="mdc-button mdc-button--raised" id="builder-activity-setting-add-keyword">
+														<span class="mdc-button__ripple"></span>
+														<span class="mdc-button__label">Add Keyword</span>
+													</button>
+												</div>
 											</div>
-										</div>
-										<div class="mdc-select mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="width: 100%;">
-											<h1 class="mdc-typography--button" style="margin-bottom: 0px;">Interrupt Keywords</h1>
-										</div>
-										<div class="mdc-layout-grid__cell--span-12">
-											<div id="activity_settings_interrupts" class="mdc-layout-grid__inner"></div>
-										</div>
-										<div class="mdc-layout-grid__cell--span-12">
-											<button type="button" class="mdc-button" id="builder-activity-setting-add-keyword">
-												<span class="mdc-button__label">Add Keyword</span>
-											</button>
-										</div>
-										<div class="mdc-select mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="width: 100%;">
-											<h1 class="mdc-typography--button" style="margin-bottom: 0px;">Incoming Phone Call Interrupt</h1>
-										</div>
-
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8 mdc-typography--body1 " style="display: flex; align-items: center;">
-											<div>Incoming Voice Call:</div>
-										</div>
-										
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4" style="text-align: right;">
-											<button class="mdc-icon-button" id="activity_interrupt_pattern_voice_call_choose">
-												<i class="material-icons mdc-icon-button__icon" aria-hidden="true">link</i>
-											</button>
-											<button class="mdc-icon-button" id="activity_interrupt_pattern_voice_call_click">
-												<i class="material-icons mdc-icon-button__icon" aria-hidden="true">search</i>
-											</button>
 										</div>
 									</div>
 								</div>

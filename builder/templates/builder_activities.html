@@ -17,7 +17,11 @@
 					<div class="mdc-card" style="padding: 16px;">
 						<div class="mdc-layout-grid__inner">
 							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-								<div class="builder_game_preview" id="builder_game_preview_{ activity.pk }}" style="width: 100%;" data-definition="{{ activity.cytoscape_json }}" /></div>
+								{% if activity.icon %}
+									<img style="width: 100%;" src="{{ activity.icon.url }}" />
+								{% else %}
+									<div class="builder_game_preview" id="builder_game_preview_{ activity.pk }}" style="width: 100%;" data-definition="{{ activity.cytoscape_json }}" /></div>
+								{% endif %}
 							</div>
 							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
 								<div class="mdc-layout-grid__inner">

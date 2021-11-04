@@ -302,6 +302,8 @@ class Game(models.Model):
     editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_editables')
     viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_viewables')
 
+    icon = models.ImageField(null=True, blank=True, upload_to='activity_icons')
+
     def __str__(self):
         return str(self.name)
 

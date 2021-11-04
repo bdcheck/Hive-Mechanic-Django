@@ -36,7 +36,10 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     });
 
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
+    const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'));
+
     var initialCardSelect = null;
+    var voiceCardSelect = null;
 
     var selectedSequence = null;
 
@@ -719,8 +722,12 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     var refreshSettingsInterrupts = function() {
         $("#activity_settings_interrupts").empty();
 
+		console.log("IS: ");
+		console.log(window.dialogBuilder.definition.interrupts);
+
         for (var i = 0; i < window.dialogBuilder.definition.interrupts.length; i++) {
             const interrupt = window.dialogBuilder.definition.interrupts[i];
+            
             const identifier = 'activity_interrupt_pattern_' + i + '_response_value';
 
             var interruptBody = '';
@@ -808,14 +815,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             interruptBody += '  </div>';
             interruptBody += '</div>';
 
-            interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3" style="text-align: right;">';
+            interruptBody += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-layout-grid__cell--align-middle">';
             interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_choose">';
             interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">link</i>';
             interruptBody += '  </button>';
 
             if (interrupt["action"] != undefined && interrupt["action"] != "") {
                 interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_click">';
-                interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">search</i>';
+                interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">keyboard_arrow_right</i>';
                 interruptBody += '  </button>';
             }
 
@@ -826,15 +833,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             const patternField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_interrupt_pattern_' + i + '_response'));
             const operationSelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_interrupt_pattern_' + i));
 
-            window.setTimeout(function() {
-                updateViews(interrupt["pattern"], operationSelect, patternField);
+			updateViews(interrupt["pattern"], operationSelect, patternField);
 
-                operationSelect.listen('MDCSelect:change', () => {
-                    updatePattern(interrupt, operationSelect.value, patternField.value);
+			operationSelect.listen('MDCSelect:change', () => {
+				updatePattern(interrupt, operationSelect.value, patternField.value);
 
-                    $("#action_save").show();
-                });
-            });
+				$("#action_save").show();
+			});
 
             $("#" + identifier).on("change keyup paste", function() {
                 updatePattern(interrupt, operationSelect.value, patternField.value);
@@ -865,11 +870,116 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 $("#editor-view").show();
             });
         }
+    };
 
-        if (window.dialogBuilder.definition['incoming_call_interrupt'] != undefined) {
-            $('#activity_interrupt_pattern_voice_call_click').show();
-        } else {
-            $('#activity_interrupt_pattern_voice_call_click').hide();
+    var refreshSettingsVariables = function() {
+        $("#activity_variables").empty();
+
+        if (window.dialogBuilder.definition['variables'] == undefined) {
+        	window.dialogBuilder.definition['variables'] = [];
+        }
+
+        for (var i = 0; i < window.dialogBuilder.definition['variables'].length; i++) {
+            const variable = window.dialogBuilder.definition['variables'][i];
+            const identifier = 'activity_variable_' + i + '_response_value';
+
+            var itemHtml = '';
+
+            itemHtml += '<div class="mdc-select mdc-select--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-4" id="activity_variable_' + i + '_scope" style="width: 100%" class="mdc-layout-grid__cell">';
+            itemHtml += '	<div class="mdc-select__anchor" style="width: 100%;">';
+            itemHtml += '		<span class="mdc-notched-outline">';
+            itemHtml += '			<span class="mdc-notched-outline__leading"></span>';
+            itemHtml += '			<span class="mdc-notched-outline__notch">';
+            itemHtml += '				<span id="outlined-select-label" class="mdc-floating-label">Scope</span>';
+            itemHtml += '			</span>';
+            itemHtml += '			<span class="mdc-notched-outline__trailing"></span>';
+            itemHtml += '		</span>';
+            itemHtml += '		<span class="mdc-select__selected-text-container">';
+            itemHtml += '			<span id="demo-selected-text" class="mdc-select__selected-text"></span>';
+            itemHtml += '		</span>';
+            itemHtml += '		<span class="mdc-select__dropdown-icon">';
+            itemHtml += '			<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">';
+            itemHtml += '				<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>';
+            itemHtml += '				<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>';
+            itemHtml += '			</svg>';
+            itemHtml += '		</span>';
+            itemHtml += '	</div>';
+            itemHtml += '	<div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox">';
+            itemHtml += '	  <ul class="mdc-list mdc-dialog__content" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
+            itemHtml += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" data-value="session">';
+            itemHtml += '        <span class="mdc-list-item__ripple"></span>';
+            itemHtml += '        <span class="mdc-list-item__text mdc-list-item__start">Session</span>';
+            itemHtml += '      </li>';
+            itemHtml += '      <li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="menuitem" data-value="game">';
+            itemHtml += '        <span class="mdc-list-item__ripple"></span>';
+            itemHtml += '        <span class="mdc-list-item__text mdc-list-item__start">Game</span>';
+            itemHtml += '      </li>';
+            itemHtml += '     </ul>';
+            itemHtml += '  </div>';
+            itemHtml += '</div>';
+
+            itemHtml += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4 mdc-layout-grid__cell--align-top">';
+            itemHtml += '  <div class="mdc-text-field mdc-text-field--outlined" id="activity_variable_' + i + '_name">';
+            itemHtml += '    <input type="text" class="mdc-text-field__input" id="activity_variable_' + i + '_name_value" value="' + variable['name'] + '">';
+            itemHtml += '    <div class="mdc-notched-outline">';
+            itemHtml += '      <div class="mdc-notched-outline__leading"></div>';
+            itemHtml += '      <div class="mdc-notched-outline__notch">';
+            itemHtml += '        <label for="activity_variable_' + i + '_name_value" class="mdc-floating-label">Name</label>';
+            itemHtml += '      </div>';
+            itemHtml += '      <div class="mdc-notched-outline__trailing"></div>';
+            itemHtml += '    </div>';
+            itemHtml += '  </div>';
+            itemHtml += '</div>';
+
+            itemHtml += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4 mdc-layout-grid__cell--align-top">';
+            itemHtml += '  <div class="mdc-text-field mdc-text-field--outlined" id="activity_variable_' + i + '_value">';
+            itemHtml += '    <input type="text" class="mdc-text-field__input" id="activity_variable_' + i + '_value_value" value="' + variable['value'] + '">';
+            itemHtml += '    <div class="mdc-notched-outline">';
+            itemHtml += '      <div class="mdc-notched-outline__leading"></div>';
+            itemHtml += '      <div class="mdc-notched-outline__notch">';
+            itemHtml += '        <label for="activity_variable_' + i + '_value_value" class="mdc-floating-label">Value</label>';
+            itemHtml += '      </div>';
+            itemHtml += '      <div class="mdc-notched-outline__trailing"></div>';
+            itemHtml += '    </div>';
+            itemHtml += '  </div>';
+            itemHtml += '</div>';
+
+            $("#activity_variables").append(itemHtml);
+            
+            let itemIndex = i;
+
+		    const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_variable_' + i + '_name'));
+		    const nameFieldIdentifier = 'activity_variable_' + i + '_name_value'
+
+            $("#" + nameFieldIdentifier).on("change keyup paste", function() {
+            	if (variable['name'] == "" && nameField.value == "") {
+            		window.dialogBuilder.definition['session-variables'].splice(itemIndex, 1);
+            		refreshSettingsSessionVariables();
+            	} else {
+	            	variable['name'] = nameField.value;
+	            }
+
+                $("#action_save").show();
+            });
+
+		    const valueField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_variable_' + i + '_value'));
+		    const valueFieldIdentifier = 'activity_variable_' + i + '_value_value'
+
+            $("#" + valueFieldIdentifier).on("change keyup paste", function() {
+            	variable['value'] = valueField.value;
+            	
+                $("#action_save").show();
+            });
+
+			const valueScope = mdc.select.MDCSelect.attachTo(document.getElementById('activity_variable_' + i + '_scope'));
+			
+			valueScope.value = variable['scope'];
+
+			valueScope.listen('MDCSelect:change', () => {
+            	variable['scope'] = valueScope.value;
+            	
+                $("#action_save").show();
+			});
         }
     };
 
@@ -877,10 +987,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         eventObj.preventDefault();
 
         refreshSettingsInterrupts();
-
+		refreshSettingsVariables();
+				
         var initialCardList = '    <ul class="mdc-list mdc-dialog__content initial_dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 
         $.each(window.dialogBuilder.definition.sequences, function(index, value) {
+        	var itemHtml = '';
+        	
             if (index > 0) {
                 initialCardList += '      <li class="mdc-list-divider" role="separator"></li>';
             }
@@ -907,6 +1020,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         initialCardList += '    </ul>';
 
         $("#builder-activity-setting-initial-card-list").html(initialCardList);
+
+        $("#builder-activity-setting-voice-card-list").html(initialCardList);
 
         $(".builder-destination-item").hide();
 
@@ -957,7 +1072,21 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 });
             }
 
+            if (voiceCardSelect == null) {
+                voiceCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('builder-activity-setting-voice-card'));
+
+                voiceCardSelect.listen('MDCSelect:change', () => {
+                    window.dialogBuilder.voiceCard = voiceCardSelect.value;
+
+                    window.dialogBuilder.definition["incoming_call_interrupt"] = voiceCardSelect.value
+
+                    $("#action_save").show();
+                });
+            }
+
             initialCardSelect.value = window.dialogBuilder.definition["initial-card"];
+            voiceCardSelect.value = window.dialogBuilder.definition["incoming_call_interrupt"];
+            
             activityName.value = window.dialogBuilder.definition["name"];
 
             $("#builder-activity-setting-activity-name").on("change keyup paste", function() {
@@ -965,7 +1094,20 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                 $("#action_save").show();
             });
-        }, 50);
+            
+            console.log("ID FIELD");
+            console.log(activityIdentifier);
+            
+            if (window.dialogBuilder.definition["identifier"] != undefined) {
+	            activityIdentifier.value =window.dialogBuilder.definition["identifier"];
+	        }
+
+            $("#builder-activity-setting-activity-identifier").on("change keyup paste", function() {
+                window.dialogBuilder.definition["identifier"] = activityIdentifier.value;
+
+                $("#action_save").show();
+            });
+        }, 100);
 
         $("#builder-activity-setting-add-keyword").click(function(eventObj) {
             eventObj.preventDefault();
@@ -976,6 +1118,24 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             });
 
             refreshSettingsInterrupts();
+        });
+
+        $("#builder-activity-setting-add-variable").click(function(eventObj) {
+            eventObj.preventDefault();
+            
+            if (window.dialogBuilder.definition['variables'] == undefined) {
+            	window.dialogBuilder.definition['variables'] = [];
+            }
+
+            window.dialogBuilder.definition['variables'].push({
+                "name": "new-variable",
+                "value": "new-value",
+                "scope": "session",
+            });
+
+            $("#action_save").show();
+
+            refreshSettingsVariables();
         });
 
         $("#editor-view").hide();
@@ -1005,7 +1165,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         chooseDialog.open();
     });
 
-
     var csrftoken = Cookies.get('csrftoken');
 
     function csrfSafeMethod(method) {
@@ -1020,6 +1179,42 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             }
         }
     });
+    
+    $("#icon_activity_click").click(function(event) {
+    	event.preventDefault();
+    	
+    	$("#icon_activity_file").click();
+    });
+
+	$("#icon_activity_file").change(function() {
+		$("#icon_activity_form").submit();
+	});    	
+
+	$('#icon_activity_form').submit(function() { // catch the form's submit event
+		var fileData = new FormData();
+		fileData.append('activity_pk', $('input[name="activity_pk"]').val());
+
+		fileData.append('icon_file', $('#icon_activity_file').get(0).files[0]);
+
+		$.ajax({
+			url: $(this).attr('action'),
+			type: $(this).attr('method'),
+			data: fileData,
+			async: true,
+			cache: false,
+			processData: false,
+			contentType: false,
+			enctype: 'multipart/form-data',
+			success: function(response){
+				console.log("RESP");
+				console.log(response);
+				
+				$("#icon_activity").attr("src", response["url"]);
+			}
+		});
+
+		return false;
+	});
 
     var viewportHeight = $(window).height();
 

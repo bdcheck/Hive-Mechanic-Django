@@ -226,3 +226,27 @@ def builder_activity_delete(request, slug): # pylint: disable=unused-argument
         return redirect('builder_activities')
 
     raise PermissionDenied('Delete game permission required.')
+
+@login_required
+def builder_update_icon(request):
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    if request.method == 'POST':
+        activity = Game.objects.filter(pk=int(request.POST.get('activity_pk'))).first()
+
+        if activity is not None: #  and activity.can_view(request.user):
+            activity.icon = request.FILES["icon_file"]
+
+            activity.save()
+
+            icon_details = {
+                'url': activity.icon.url
+            }
+            response = HttpResponse(json.dumps(icon_details, indent=2), content_type='application/json', status=200)
+
+            response['X-Hive-Mechanic-Editable'] = activity.can_edit(request.user)
+
+            return response
+
+    raise PermissionDenied('View permission required.')

@@ -809,7 +809,7 @@ define(modules, function (mdc) {
                     }
                 });
 
-                if (definition[field['field']] == null || definition[field['field']] == undefined) {
+                if (definition[field['field']] == null || definition[field['field']] == undefined || definition[field['field']] == '') {
                     $('#' + me.cardId + '_' + fieldName + '_goto').hide();
                 } else {
                     $('#' + me.cardId + '_' + fieldName + '_goto').show();

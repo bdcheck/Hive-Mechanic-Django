@@ -4,7 +4,8 @@ from django.conf.urls import url
 
 from .views import builder_game, builder_game_definition_json, builder_interaction_card, \
                    builder_home, builder_activities, builder_players, builder_sessions, \
-                   builder_add_game, builder_data_processor_options, builder_activity_delete
+                   builder_add_game, builder_data_processor_options, builder_activity_delete, \
+                   builder_update_icon
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
@@ -16,5 +17,6 @@ urlpatterns = [
     url(r'^card/(?P<card>.+)', builder_interaction_card, name='builder_interaction_card'),
     url(r'^activity/(?P<slug>.+)/delete', builder_activity_delete, name='builder_activity_delete'),
     url(r'^activity/(?P<game>.+)', builder_game, name='builder_game'),
+    url(r'^update-icon.json', builder_update_icon, name='builder_update_icon'),
     url(r'^', builder_home, name='builder_home'),
 ]
