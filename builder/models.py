@@ -10,7 +10,6 @@ import hashlib
 import json
 import os
 import pkgutil
-import traceback
 
 from future import standard_library
 
