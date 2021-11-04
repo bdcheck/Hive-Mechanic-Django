@@ -180,7 +180,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
             for call in OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date'):
                 if call.message is not None and call.message != '':
                     if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
-                        response.play(call.message.split(' ')[0])
+                        response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
                     else:
                         response.say(call.message)
                 elif call.file is not None and call.file != '':
