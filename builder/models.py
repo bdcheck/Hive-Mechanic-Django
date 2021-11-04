@@ -410,6 +410,7 @@ class GameVersion(models.Model):
 
         if self.interrupt(payload, session, extras) is False:
             dialog = session.dialog()
+
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
@@ -445,8 +446,6 @@ class GameVersion(models.Model):
 
                         point = DataPoint.objects.create_data_point('hive-incoming-call', session.player.identifier, payload, user_agent='Hive Mechanic')
                         point.save()
-
-                        traceback.print_stack()
 
                         session.advance_to(definition['incoming_call_interrupt'])
 
