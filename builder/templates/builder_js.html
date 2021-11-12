@@ -42,6 +42,17 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
+            .mdc-icon-button {
+
+            }
+            .mdc-icon-button.small {
+                width: 32px;
+                height: 32px;
+
+            }
+            .material-icons.small {
+                font-size: 16px;
+            }
 
             a {
                 text-decoration: none;
@@ -66,7 +77,7 @@
                     <span class="mdc-top-app-bar__title">Hive Mechanic</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-					<label for="hive-help-switch-toggle">Help: </label>
+					<label for="hive-help-switch-toggle" id="hive-help-switch-label">Basic: </label>
 					<div class="mdc-switch" id="hive-help-switch" style="margin-left: 11px; margin-right: 44px;">
 						<div class="mdc-switch__track"></div>
 						<div class="mdc-switch__thumb-underlay">
@@ -77,8 +88,6 @@
 
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" id="action_reset_game">restart_alt</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card" style="margin-left: 11px;">collections</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence" style="margin-left: 11px;">edit</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
                 </section>
             </div>
@@ -466,6 +475,27 @@
             </div>
             <div class="mdc-dialog__scrim"></div>
         </div>
+
+		<div class="mdc-menu mdc-menu-surface" id="sequence_menu">
+			<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabIndex="-1">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line up-sequence" role="menuitem" data-index="X" data-action="move_up">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Move Up</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line down-sequence" role="menuitem" data-index="X" data-action="move_down">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Move Down</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line rename-sequence" role="menuitem" data-index="X" data-action="rename">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Rename</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line delete-sequence" role="menuitem" data-index="X" data-action="delete">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Delete</span>
+				</li>
+			</ul>
+		</div>
 
     </body>
     <script>
