@@ -44,12 +44,12 @@ def builder_site_login_banner():
     settings = SiteSettings.objects.all().order_by('-last_updated').first()
 
     if settings is None:
-        return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">Hive Mechanic</h1>')
+        return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">Hive Mechanic</h1>') # nosec
 
     if settings.banner is None:
-        return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">%s</h1>' % settings.name)
+        return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">%s</h1>' % settings.name) # nosec
 
-    return mark_safe('<img src="%s" style="max_width: 100%%;" alt="%s" />' % (settings.banner.url, settings.name))
+    return mark_safe('<img src="%s" style="max_width: 100%%;" alt="%s" />' % (settings.banner.url, settings.name)) # nosec
 
 @register.filter
 def obfuscate_identifier(raw_identifier):
