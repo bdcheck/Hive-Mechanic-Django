@@ -16,7 +16,7 @@ from django.utils.text import slugify
 
 from integrations.models import Integration
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
 @login_required
 def builder_home(request): # pylint: disable=unused-argument
@@ -250,3 +250,40 @@ def builder_update_icon(request):
             return response
 
     raise PermissionDenied('View permission required.')
+
+@login_required
+def builder_settings(request): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    context = {}
+
+    settings = SiteSettings.objects.all().order_by('-last_updated').first()
+
+    now = timezone.now()
+
+    if request.method == 'POST':
+        if settings is None:
+            settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
+
+        banner_file = request.FILES["site_banner"]
+
+        if banner_file is not None:
+            settings.banner = request.FILES["site_banner"]
+
+        settings.name = request.POST.get('site_name', 'Hive Mechanic')
+        settings.last_updated = now
+        settings.save()
+
+        response_payload = {
+            'url': settings.banner.url
+        }
+
+        response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+        return response
+
+    if settings is not None:
+        context['settings'] = settings
+
+    return render(request, 'builder_settings.html', context=context)

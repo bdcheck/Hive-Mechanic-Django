@@ -853,3 +853,9 @@ class DataProcessor(models.Model):
                 print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
             print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+
+class SiteSettings(models.Model):
+    name = models.CharField(max_length=1024)
+    banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
+    created = models.DateTimeField()
+    last_updated = models.DateTimeField()

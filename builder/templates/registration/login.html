@@ -1,4 +1,5 @@
 {% load static %}
+{% load builder_tags %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -59,7 +60,7 @@
 							<div class="mdc-layout-grid">
 								<div class="mdc-layout-grid__inner">
 									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-										<h1 style="margin-top: 0px;" class="mdc-typography--headline5">Hive Mechanic</h1>
+										{% builder_site_login_banner %}
 										<label class="mdc-text-field mdc-text-field--outlined" id="field_username" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
 											<span class="mdc-notched-outline">
 												<span class="mdc-notched-outline__leading"></span>

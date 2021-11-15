@@ -1,0 +1,59 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+
+{% block 'page_title' %}All Players | Interaction Builder{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'navigation_title' %}All Players{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<h1 class="mdc-typography--headline5">Site Settings</h1>
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+							<label class="mdc-text-field mdc-text-field--outlined" style="width: 100%;">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__notch">
+										<span class="mdc-floating-label" id="site_name_id">Site Name</span>
+									</span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<input type="text" id="site_name" class="mdc-text-field__input" aria-labelledby="site_name_id" value="{% if settings %}{{ settings.name }}{% endif %}">
+							</label>
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+							<a href="#" id="icon_activity_click">
+								<center><img id="banner_image" style="background-color: #808080; max-height: 120px; margin-left: auto; margin-right: auto; max-width: 100%;"" src="{% if settings %}{{ settings.banner.url }}{% else %}https://via.placeholder.com/468x60?text=Upload+Image{% endif %}"></center>
+								<br>
+								<center class="mdc-typography--caption">Tap to update site banner</center>
+							</a>
+							<form enctype="multipart/form-data" style="display: none;" id="site_settings_form" method="post" action="{% url 'builder_settings' %}">
+								{% csrf_token %}
+								<input name="banner_file" id="banner_file" type="file" accept="image/*" onchange="document.getElementById('banner_image').src = window.URL.createObjectURL(this.files[0]);">
+							</form>											
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<button class="mdc-button mdc-button--raised" id="update_button">
+								<span class="mdc-button__ripple"></span>
+								<span class="mdc-button__label">Update Site Settings</span>
+							</button>			
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/settings.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

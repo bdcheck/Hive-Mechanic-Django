@@ -10,9 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.urls import reverse
 
-from integrations.models import Integration
+from passive_data_kit.models import DataPoint
 
 from builder.models import Player
+from integrations.models import Integration
 
 from .models import ApiClient
 
@@ -97,9 +98,15 @@ def incoming_http(request, slug):
 
                 payload['sessions'].append(session_def)
 
+                point = DataPoint.objects.create_data_point('hive-http-get', session.player.identifier, dict(request.GET), user_agent='Hive Mechanic Client Library')
+
         response['game'] = payload
 
     elif request.method == 'POST':
+        player = request.POST.get('player', 'unknown-player')
+        
+        point = DataPoint.objects.create_data_point('hive-http-post', player, dict(request.POST), user_agent='Hive Mechanic Client Library')
+
         issues = integration_match.process_incoming(request.POST)
     else:
         issues = ['Unsupported HTTP verb: ' + request.method + '.']

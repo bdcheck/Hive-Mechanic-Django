@@ -4,7 +4,7 @@
 from django.contrib import messages
 from django.contrib.gis import admin
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository, DataProcessor
+from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository, DataProcessor, SiteSettings
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
@@ -88,6 +88,10 @@ class SessionAdmin(admin.OSMGeoAdmin):
 @admin.register(RemoteRepository)
 class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'url', 'priority', 'last_updated')
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.OSMGeoAdmin):
+    list_display = ('name', 'created', 'last_updated')
 
 @admin.register(DataProcessor)
 class DataProcessorAdmin(admin.OSMGeoAdmin):

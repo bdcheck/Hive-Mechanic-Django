@@ -66,6 +66,8 @@
 					{% block 'page_help' %}
 						<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 					{% endblock %}
+
+					<a href="{% url 'logout' %}" class="material-icons mdc-top-app-bar__action-item" aria-label="Logout" id="action_logout" style="margin-left: 11px;">exit_to_app</a>
                 </section>
             </div>
         </header>
@@ -114,12 +116,12 @@
 						</i>
 	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">My Account</span>
 					</li>
-					<li class="mdc-list-item mdc-list-item--with-one-line" data-href="{% url 'logout' %}">
+					<li class="mdc-list-item mdc-list-item--with-one-line" data-href="{% url 'builder_settings' %}">
    						<span class="mdc-list-item__ripple"></span>
 						<i class="mdc-list-item__start material-icons" aria-hidden="true">
-							exit_to_app
+							settings
 						</i>
-	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Logout</span>
+	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Site Settings</span>
 					</li>
 				</ul>
             </div>
