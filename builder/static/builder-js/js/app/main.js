@@ -1413,5 +1413,4 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 		
 		});
 	});
-
 });

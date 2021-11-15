@@ -98,13 +98,13 @@ def incoming_http(request, slug):
 
                 payload['sessions'].append(session_def)
 
-                point = DataPoint.objects.create_data_point('hive-http-get', session.player.identifier, dict(request.GET), user_agent='Hive Mechanic Client Library')
+                DataPoint.objects.create_data_point('hive-http-get', session.player.identifier, dict(request.GET), user_agent='Hive Mechanic Client Library')
 
         response['game'] = payload
 
     elif request.method == 'POST':
         player = request.POST.get('player', 'unknown-player')
-        
+
         point = DataPoint.objects.create_data_point('hive-http-post', player, dict(request.POST), user_agent='Hive Mechanic Client Library')
 
         issues = integration_match.process_incoming(request.POST)
