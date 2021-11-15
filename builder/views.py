@@ -141,6 +141,30 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
     raise PermissionDenied('View permission required.')
 
 @login_required
+def builder_game_variables(request, game): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    matched_game = Game.objects.filter(slug=game).first()
+
+    if matched_game.can_view(request.user):
+        variables = []
+
+        for variable_name in matched_game.game_state.keys():
+            variables.append({
+                'name': variable_name,
+                'value': matched_game.game_state[variable_name]
+            })
+
+        response = HttpResponse(json.dumps(variables, indent=2), content_type='application/json', status=200)
+
+        response['X-Hive-Mechanic-Editable'] = matched_game.can_edit(request.user)
+
+        return response
+
+    raise PermissionDenied('View permission required.')
+
+@login_required
 def builder_interaction_card(request, card): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')

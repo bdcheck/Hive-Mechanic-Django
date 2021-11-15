@@ -29,11 +29,11 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
 
     const warningDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-outstanding-issues-dialog'));
-//    const iconButtonRipple = new mdc.ripple.MDCRipple(document.querySelector('.mdc-icon-button'));
-//    iconButtonRipple.unbounded = true;
     window.dialogBuilder.selectCardsDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-select-card-dialog'));
 
     window.dialogBuilder.restartGameDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-reset-game-dialog'));
+
+    window.dialogBuilder.gameVariablesDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-game-variables-dialog'));
 
     window.dialogBuilder.restartGameDialog.listen('MDCDialog:closed', (result) => {
         console.log("ACTION: ");
@@ -248,7 +248,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         $.each(window.dialogBuilder.definition.sequences, function (index, value) {
             items.push('<li class="mdc-list-item mdc-list-item--with-one-line select_sequence" tabindex="' + index + '" data-index="' + index + '" style="padding-right: 0; align-items: center;">');
-            // items.push('  <span class="mdc-list-item__ripple"></span>');
             items.push('  <span class="mdc-list-item__start material-icons" aria-hidden="true">view_module</span>');
             items.push('  <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px; flex-grow: 100;">' + value["name"] + '</span>'); //  mdc-list-item__end mdc-menu-surface--anchor
             items.push('  <span class="mdc-menu-surface--anchor">');
@@ -277,15 +276,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         const sequencesList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
 
-/*
-    // OLD VERSION
-        $(".select_sequence").off("click");
-        $(".select_sequence").click(function(eventObj) {
-            $("#settings-view").hide();
-            $("#editor-view").show();
-
-    // Start new below
-*/
         $('button.sequence-menu-open').off();
 
         var selectedSequenceOption = -1;
@@ -311,7 +301,7 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             });
 
             menu.unlisten("MDCMenu:selected", menuListener)
-// End New
+
             menu.listen("MDCMenu:selected", menuListener);
             menu.open = (menu.open == false);
         });
@@ -600,6 +590,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $("#action_save").off("click");
 
         $("#action_save").click(function (eventObj) {
+	        $("#action_save").text("pending");
+        
             eventObj.preventDefault();
 
             if (window.dialogBuilder.update != undefined) {
@@ -609,7 +601,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                     var clean = cleanDefinition(window.dialogBuilder.definition);
 
                     window.dialogBuilder.update(clean, function () {
-                        $("#action_save").text('save');
+                    	window.setTimeout(function() {
+	                        $("#action_save").text('save');
+	                    }, 1000);
 
                         dialogIsDirty = false;
                     }, function (error) {
@@ -663,11 +657,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             if (name == Node.cardName()) {
                 name = key;
             }
-
-//            var cardItem = '<li class="mdc-list-item" data-value="' + key + '" role="option">' +
-//                         ' <span class="mdc-list-item__ripple"></span>' +
-//                         ' <span class="mdc-list-item__text">' + name + '<span>' +
-//                         '</li>';
 
             var cardItem = '';
 
@@ -1403,4 +1392,26 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         delete e['returnValue'];
     });
+    
+	$("#action_list_variables").off("click");
+
+	$("#action_list_variables").click(function (eventObj) {
+		eventObj.preventDefault();
+		
+		$("#builder-game-variables-dialog-content").html('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top"><em>Fetching variables&#8230;</em></div>');
+
+		window.dialogBuilder.gameVariablesDialog.open();
+		
+		window.dialogBuilder.fetchVariables(function(variables) {
+			$("#builder-game-variables-dialog-content").html('');
+
+            $.each(variables, function (index, item) {
+				$("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">' + item['name'] + '</div>');
+				$("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">= <strong>' + item['value'] + '</strong></div>');
+            });
+		
+		
+		});
+	});
+
 });

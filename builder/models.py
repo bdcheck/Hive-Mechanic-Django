@@ -586,6 +586,18 @@ class GameVersion(models.Model):
 
         return None
 
+    def initialize_variables(self, session):
+        definition = json.loads(self.definition)
+
+        for variable in definition.get('variables', []):
+            if variable['scope'] == 'session':
+                session.set_variable(variable['name'], variable['value'])
+            elif variable['scope'] == 'player':
+                session.player.set_variable(variable['name'], variable['value'])
+            else:
+                self.game.set_variable(variable['name'], variable['value'])
+
+
 @python_2_unicode_compatible
 class Player(models.Model):
     identifier = models.CharField(max_length=4096, unique=True)
@@ -683,6 +695,8 @@ class Session(models.Model):
             dialog = Dialog(key=dialog_key, started=timezone.now())
             dialog.dialog_snapshot = self.game_version.dialog_snapshot()
             dialog.save()
+
+            self.game_version.initialize_variables(self)
 
         return dialog
 

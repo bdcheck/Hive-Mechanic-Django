@@ -87,6 +87,7 @@
 					</div>
 
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" id="action_reset_game">restart_alt</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="List Game Variables" id="action_list_variables" style="margin-left: 11px;">list_alt</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card" style="margin-left: 11px;">collections</a>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
                 </section>
@@ -497,6 +498,21 @@
 			</ul>
 		</div>
 
+        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="builder-game-variables-dialog"  aria-labelledby="builder-game-variables-dialog-title" aria-describedby="builder-game-variables-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface">
+                    <h2 class="mdc-dialog__title" id="builder-game-variables-dialog-title">Game Variables</h2>
+                    <div class="mdc-dialog__content mdc-layout-grid__inner" style="row-gap: 8px" id="builder-game-variables-dialog-content"></div>
+                    <footer class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+                            <span class="mdc-button__label">Close</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+
     </body>
     <script>
         window.dialogBuilder = {
@@ -509,6 +525,11 @@
 
                 $.post("{% url 'builder_game' game.slug %}", payload, function(data) {
                     success();
+                });
+            },
+            fetchVariables(fetched) {
+                $.get("{% url 'builder_game_variables' game.slug %}", function(data) {
+                    fetched(data);
                 });
             }
         };

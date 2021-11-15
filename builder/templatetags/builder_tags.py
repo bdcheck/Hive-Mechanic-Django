@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, no-member
 
 import re
 
@@ -44,13 +44,32 @@ def setvar(parser, token): # pylint: disable=unused-argument
 @register.simple_tag
 def builder_site_login_banner():
     settings = SiteSettings.objects.all().order_by('-last_updated').first()
-    
+
     if settings is None:
         now = timezone.now()
-        
-        settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
-        
+
+        settings = SiteSettings.objects.create(name='Hive Mechanic', created=now, last_updated=now)
+
     if settings.banner is None:
         return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">%s</h1>' % settings.name)
-        
+
     return mark_safe('<img src="%s" style="max_width: 100%%;" alt="%s" />' % (settings.banner.url, settings.name))
+
+@register.filter
+def obfuscate_identifier(raw_identifier):
+    obfuscated = ''
+
+    number_count = 0
+
+    for character in raw_identifier[::-1]:
+        if character.isdigit():
+            if number_count < 4:
+                obfuscated = character + obfuscated
+
+                number_count += 1
+            else:
+                obfuscated = 'X' + obfuscated
+        else:
+            obfuscated = character + obfuscated
+
+    return obfuscated
