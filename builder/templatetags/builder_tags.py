@@ -46,9 +46,7 @@ def builder_site_login_banner():
     settings = SiteSettings.objects.all().order_by('-last_updated').first()
 
     if settings is None:
-        now = timezone.now()
-
-        settings = SiteSettings.objects.create(name='Hive Mechanic', created=now, last_updated=now)
+        return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">Hive Mechanic</h1>')
 
     if settings.banner is None:
         return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">%s</h1>' % settings.name)
