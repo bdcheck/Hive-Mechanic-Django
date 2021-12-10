@@ -6,6 +6,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import json
 import os
 
+import django.views.defaults
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, FileResponse
@@ -13,10 +14,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from integrations.models import Integration
-
+import json
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
+from filer.models import filemodels
+from filer.admin.clipboardadmin import ajax_upload
+import filer.templatetags.filer_admin_tags
 
 @login_required
 def builder_home(request): # pylint: disable=unused-argument
@@ -250,3 +255,30 @@ def builder_update_icon(request):
             return response
 
     raise PermissionDenied('View permission required.')
+
+@login_required
+def builder_media(request):
+    context = {}
+    page = request.GET.get('page', 1)
+
+    media = filemodels.File.objects.order_by('uploaded_at')
+    paginator = Paginator(media,30)
+
+    try:
+        media = paginator.page(page)
+    except PageNotAnInteger:
+        media = paginator.page(1)
+    except EmptyPage:
+        media = paginator.page(paginator.num_pages)
+
+    context['media'] = media
+    return render(request, 'builder_media.html', context=context)
+
+@login_required
+def builder_media_upload(request):
+    if request.method == 'POST':
+        response = ajax_upload(request)
+        res = json.loads(response.content)
+        if 'error' in res:
+            return redirect(django.views.defaults.HttpResponseServerError)
+    return redirect('builder_media')
