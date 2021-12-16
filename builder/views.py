@@ -260,18 +260,19 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
-
-    media = filemodels.File.objects.order_by('uploaded_at')
+    filter = request.GET.get('filter')
+    media = filemodels.File.objects.order_by('-uploaded_at')
     paginator = Paginator(media,30)
 
     try:
-        media = paginator.page(page)
+        pages = paginator.page(page)
     except PageNotAnInteger:
-        media = paginator.page(1)
+        pages = paginator.page(1)
     except EmptyPage:
-        media = paginator.page(paginator.num_pages)
+        pages = paginator.page(paginator.num_pages)
 
     context['media'] = media
+    context['pages'] = pages
     return render(request, 'builder_media.html', context=context)
 
 @login_required
