@@ -5,44 +5,70 @@
 {% block 'page_title' %}All Media| Hive Mechanic{% endblock %}
 
 {% block 'main_content' %}
-    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+    <script>
+    let copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(function () {
+            alert("Url copied")
+        }).catch(function () {
+            alert("Error copying")
+        });
+    }
+        $(document).ready(function() {
+            $("#image-filter").on("keyup", function() {
+            let val = $(this).val().toLowerCase()
+            console.log(val)
+            $(".image-grid").filter(function() {
+                console.log(val)
+                $(this).toggle($(this).data("name").toLowerCase().indexOf(val) > -1)
+            });
+        });
+    });
+
+    </script>
+    <div id="clipboard-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+        <div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
+            Copy to clipboard
+        </div>
+    </div>
+    <div class="mdc-layout-grid mdc-layout-grid__cell--span-12">
+    <div class="mdc-layout-grid__inner">
+    <div class="mdc-layout-grid__cell--span-6">
     <div class="mdc-layout-grid">
         <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
                    {% csrf_token %}
             <input class="mdc-form-field" type="file" name="file" onchange="this.form.submit()"/>
         </form>
     </div>
-	<div class="mdc-layout-grid">
-		<div class="mdc-layout-grid__inner">
+    </div>
+    <div class="mdc-layout-grid__cell--span-6">
+    Filter: <input class="mdc-text-field" id="image-filter" placeholder="Search..">
+    </div>
+    </div>
+    </div>
+    <div>
+	<ul class="mdc-list">
 			{% for m in media %}
-				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-					<div class="mdc-card" style="padding: 16px;">
-						<div class="mdc-layout-grid__inner">
-							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-                                {% file_icon m %}
-							</div>
-                            <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-                                {% absolute_uri m.url request %}
-							</div>
-                            <div class="mdc-layout-grid__cell">
-                                <button onclick=" navigator.clipboard.writeText('{% absolute_uri m.url request %}'); alert('copied');">Copy url to clipboard</button>
-                            </div>
-                    </div>
-                </div>
+				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list  image-grid" data-name="{{ m.owner }}" >
+							<span class="mdc-list-item mdc-list-item__graphic">
+                               {% file_icon m %}
+							</span>
+                            <span class="mdc-deprecated-list-item__text">
+                            <span class="mdc-list-item__secondary-text">
+                               Owner: {{ m.owner }}
+                            </span>
+                            <span class="mdc-list-item__secondary-text" style="font-size: 75%">
+                                URL: {% absolute_uri m.url request %}
+							</span>
+                            </span>
+                            <span class="mdc-list-item mdc-deprecated-list-item__meta">
+                                <button class="material-icons mdc-button" aria-describedby="clipboard-tooltip-id" onclick="copyToClipboard('{% absolute_uri m.url request %}')">content_copy</button>
+                            </span>
+
             {%  endfor %}
-        </div>
-    </div>
+
+        </li>
+    </ul>
     </div>
 
-<ul class="paginator">
-    {% for page in media.paginator.page_range %}
-        {% if page == media.number %}
-            <li>{{ page }}</li>
-        {%  else %}
-            <li><a href="?page={{ page }}">{{ page }}</a></li>
-
-        {% endif %}
-    {% endfor %}
-</ul>
 {%  endblock %}
