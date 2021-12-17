@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.core import serializers
 from integrations.models import Integration
 import json
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
@@ -78,6 +78,8 @@ def builder_players(request): # pylint: disable=unused-argument
     context['players'] = Player.objects.all()
 
     return render(request, 'builder_players.html', context=context)
+
+
 
 @login_required
 def builder_game(request, game): # pylint: disable=unused-argument
@@ -145,6 +147,14 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
     raise PermissionDenied('View permission required.')
 
+
+@login_required
+def builder_game_templates(request):
+    context = {}
+    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug','id')
+    context['games'] = list(games)
+    return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
+
 @login_required
 def builder_interaction_card(request, card): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -177,6 +187,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
 
     if request.method == 'POST' and 'name' in request.POST:
         name = request.POST['name'].strip()
+        template = request.POST['template'].strip()
 
         if name:
             slug = slugify(name)
@@ -189,14 +200,25 @@ def builder_add_game(request): # pylint: disable=unused-argument
                 index += 1
 
             new_game = Game(name=name, slug=slug)
-
             new_game.save()
 
-            for card in InteractionCard.objects.filter(enabled=True):
-                new_game.cards.add(card)
+            if template and template != "none":
+                old_game = Game.objects.filter(id=template).first()
+                for card in old_game.cards.all():
+                    new_game.cards.add(card)
 
-            new_game.save()
+                # latest version
+                version = old_game.latest_version()
+                version.pk = None
+                version.game = new_game
+                version.save()
+                new_game.save()
+            # default
+            else:
+                for card in InteractionCard.objects.filter(enabled=True):
+                    new_game.cards.add(card)
 
+                new_game.save()
             response['success'] = True
             response['message'] = 'Game added.'
             response['redirect'] = reverse('builder_game', args=[new_game.slug])
