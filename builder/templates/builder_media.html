@@ -31,7 +31,7 @@
             Copy to clipboard
         </div>
     </div>
-    <div class="mdc-typography--headline4">
+    <div class="mdc-typography--headline5">
     Media Library
     </div>
     <div class="mdc-layout-grid mdc-layout-grid__cell--span-12">
@@ -53,7 +53,7 @@
     <div>
 	<ul class="mdc-list">
 			{% for m in media %}
-				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list  image-grid" data-name="{{ m.owner }}" >
+				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" data-name="{{ m.owner}} {{ m.uploaded_at }}"  >
 							<span class="mdc-list-item mdc-list-item__graphic">
                                {% file_icon m %}
 							</span>
@@ -65,7 +65,7 @@
                                     Uploaded at: {{ m.uploaded_at }}
                                 </span>
                             <span class="mdc-list-item__secondary-text" style="font-size: 75%">
-                                URL: {% absolute_uri m.url request %}
+                                {% absolute_uri m.url request %}
 							</span>
                             </span>
                             <span class="mdc-list-item mdc-deprecated-list-item__meta">
