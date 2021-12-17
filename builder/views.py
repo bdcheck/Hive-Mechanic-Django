@@ -15,9 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core import serializers
 from integrations.models import Integration
-import json
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
 from filer.models import filemodels
 from filer.admin.clipboardadmin import ajax_upload
