@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('builder', '0016_game_icon'),
+        ('builder', '0017_sitesettings'),
     ]
 
     operations = [
