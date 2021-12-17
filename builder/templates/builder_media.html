@@ -2,8 +2,8 @@
 {% load static %}
 {% load filer_admin_tags %}
 {% load absolute_uri_tags %}
-{% block 'page_title' %}All Media| Hive Mechanic{% endblock %}
-
+{% block 'page_title' %}All Media | Hive Mechanic{% endblock %}
+{% block 'navigation_title' %}Hive Mechanic - Media Library{% endblock %}
 {% block 'main_content' %}
 
     <script>
@@ -31,13 +31,17 @@
             Copy to clipboard
         </div>
     </div>
+    <div class="mdc-typography--headline4">
+    Media Library
+    </div>
     <div class="mdc-layout-grid mdc-layout-grid__cell--span-12">
     <div class="mdc-layout-grid__inner">
     <div class="mdc-layout-grid__cell--span-6">
     <div class="mdc-layout-grid">
+        <label for="upload-field">Upload your file</label>
         <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
                    {% csrf_token %}
-            <input class="mdc-form-field" type="file" name="file" onchange="this.form.submit()"/>
+            <input class="mdc-form-field" id="upload-field" type="file" name="file" onchange="this.form.submit()"/>
         </form>
     </div>
     </div>
@@ -54,9 +58,12 @@
                                {% file_icon m %}
 							</span>
                             <span class="mdc-deprecated-list-item__text">
-                            <span class="mdc-list-item__secondary-text">
+                            <span class="mdc-list-item__overline-text">
                                Owner: {{ m.owner }}
                             </span>
+                                <span class="mdc-list-item__secondary-text">
+                                    Uploaded at: {{ m.uploaded_at }}
+                                </span>
                             <span class="mdc-list-item__secondary-text" style="font-size: 75%">
                                 URL: {% absolute_uri m.url request %}
 							</span>
