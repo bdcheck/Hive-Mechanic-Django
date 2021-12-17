@@ -87,7 +87,7 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
     addDialog.listen('MDCDialog:closed', function() {
         var name = $("#field_add_game").val();
         let selected = $('#template-list option:selected').val()
-        $.post('/builder/add-game.json', { 'name': name, template: selected}, function(response) {
+        $.post('/builder/add-game.json', { 'name': name, 'template': selected}, function(response) {
             if (response['success']) {
                 $("#dialog-title").html("Success");
             } else {
