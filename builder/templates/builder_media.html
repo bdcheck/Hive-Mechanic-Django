@@ -41,7 +41,11 @@
         <label for="upload-field">Upload your file</label>
         <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
                    {% csrf_token %}
-            <input class="mdc-form-field" id="upload-field" type="file" name="file" onchange="this.form.submit()"/>
+            <input class="mdc-form-field" id="upload-field" type="file" name="file"/>
+            <div>
+            Description (optional): <input class="mdc-form-field" type="text" id = "description" name="description" >
+            </div>
+            <input type="submit" class="mdc-form-field">
         </form>
     </div>
     </div>
@@ -53,19 +57,25 @@
     <div>
 	<ul class="mdc-list">
 			{% for m in media %}
-				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" data-name="{{ m.owner}} {{ m.uploaded_at }}"  >
+				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" data-name="{{ m.owner}} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}"  >
 							<span class="mdc-list-item mdc-list-item__graphic">
                                {% file_icon m %}
 							</span>
                             <span class="mdc-deprecated-list-item__text">
+                            {% if m.description %}
+                            <span class="mdc-list-item__overline-text">
+                                {{ m.description }}
+                            </span>
+                            {% endif %}
                             <span class="mdc-list-item__overline-text">
                                Owner: {{ m.owner }}
                             </span>
+
                                 <span class="mdc-list-item__secondary-text">
                                     Uploaded at: {{ m.uploaded_at }}
                                 </span>
                             <span class="mdc-list-item__secondary-text" style="font-size: 75%">
-                                {% absolute_uri m.url request %}
+                                <a href="{% absolute_uri m.url request %}">{% absolute_uri m.url request %}</a>
 							</span>
                             </span>
                             <span class="mdc-list-item mdc-deprecated-list-item__meta">

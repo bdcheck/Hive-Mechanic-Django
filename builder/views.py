@@ -328,6 +328,11 @@ def builder_media_upload(request):
         res = json.loads(response.content)
         if 'error' in res:
             return redirect(django.views.defaults.HttpResponseServerError)
+        description = request.POST.get("description")
+        if description:
+            file = filemodels.File.objects.filter(id= res["file_id"]).first()
+            file.description = description
+            file.save()
     return redirect('builder_media')
 
 @login_required
