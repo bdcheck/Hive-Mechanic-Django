@@ -303,6 +303,7 @@ class Game(models.Model):
     viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_viewables', blank=True)
 
     icon = models.ImageField(null=True, blank=True, upload_to='activity_icons')
+    is_template = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name)

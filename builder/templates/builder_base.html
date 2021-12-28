@@ -13,6 +13,8 @@
         <link rel="manifest" href="{% static 'builder-react' %}/manifest.json">
 
         <link rel="stylesheet" href="{% static 'builder-js/vendor/material-components-web-11.0.0.css' %}" />
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
         <title>{% block 'page_title' %}Hive Mechanic{% endblock %}</title>
@@ -108,6 +110,13 @@
 							supervisor_account
 						</i>
 	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Authors</span>
+					</li>
+                    <li class="mdc-list-item mdc-list-item--with-one-line" data-href="{% url 'builder_media' %}">
+   						<span class="mdc-list-item__ripple"></span>
+						<i class="mdc-list-item__start material-icons" aria-hidden="true">
+							upload_file
+						</i>
+	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Media</span>
 					</li>
 					<li class="mdc-list-item mdc-list-item--with-one-line" data-href="#">
    						<span class="mdc-list-item__ripple"></span>

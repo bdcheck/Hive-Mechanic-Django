@@ -6,6 +6,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import json
 import os
 
+import django.views.defaults
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, FileResponse
@@ -13,8 +14,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from integrations.models import Integration
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
+from filer.models import filemodels
+from filer.admin.clipboardadmin import ajax_upload
+import filer.templatetags.filer_admin_tags
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
@@ -73,6 +78,8 @@ def builder_players(request): # pylint: disable=unused-argument
     context['players'] = Player.objects.all()
 
     return render(request, 'builder_players.html', context=context)
+
+
 
 @login_required
 def builder_game(request, game): # pylint: disable=unused-argument
@@ -164,6 +171,14 @@ def builder_game_variables(request, game): # pylint: disable=unused-argument
 
     raise PermissionDenied('View permission required.')
 
+
+@login_required
+def builder_game_templates(request):
+    context = {}
+    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug','id')
+    context['games'] = list(games)
+    return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
+
 @login_required
 def builder_interaction_card(request, card): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -196,6 +211,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
 
     if request.method == 'POST' and 'name' in request.POST:
         name = request.POST['name'].strip()
+        template = request.POST['template'].strip()
 
         if name:
             slug = slugify(name)
@@ -208,14 +224,25 @@ def builder_add_game(request): # pylint: disable=unused-argument
                 index += 1
 
             new_game = Game(name=name, slug=slug)
-
             new_game.save()
 
-            for card in InteractionCard.objects.filter(enabled=True):
-                new_game.cards.add(card)
+            if template and template != "none":
+                old_game = Game.objects.filter(id=template).first()
+                for card in old_game.cards.all():
+                    new_game.cards.add(card)
 
-            new_game.save()
+                # latest version
+                version = old_game.latest_version()
+                version.pk = None
+                version.game = new_game
+                version.save()
+                new_game.save()
+            # default
+            else:
+                for card in InteractionCard.objects.filter(enabled=True):
+                    new_game.cards.add(card)
 
+                new_game.save()
             response['success'] = True
             response['message'] = 'Game added.'
             response['redirect'] = reverse('builder_game', args=[new_game.slug])
@@ -274,6 +301,34 @@ def builder_update_icon(request):
             return response
 
     raise PermissionDenied('View permission required.')
+
+@login_required
+def builder_media(request):
+    context = {}
+    page = request.GET.get('page', 1)
+    filter = request.GET.get('filter')
+    media = filemodels.File.objects.order_by('-uploaded_at')
+    paginator = Paginator(media,30)
+
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    context['media'] = media
+    context['pages'] = pages
+    return render(request, 'builder_media.html', context=context)
+
+@login_required
+def builder_media_upload(request):
+    if request.method == 'POST':
+        response = ajax_upload(request)
+        res = json.loads(response.content)
+        if 'error' in res:
+            return redirect(django.views.defaults.HttpResponseServerError)
+    return redirect('builder_media')
 
 @login_required
 def builder_settings(request): # pylint: disable=unused-argument

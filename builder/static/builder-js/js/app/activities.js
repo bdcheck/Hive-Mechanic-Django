@@ -67,15 +67,33 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
 
     $("#action_add_game").click(function(eventObj) {
         eventObj.preventDefault();
-
+        // get a list of all games that are templates
+        $.ajax({
+            url: '/builder/activity-templates',
+            data: {},
+            success: function(response) {
+                console.log(response)
+                let games = response.games
+                const templates = $("#template-list");
+                templates.empty();
+                templates.append($('<option/>').text("none").val("none").select())
+                for(let g in games) {
+                    let v = games[g]
+                    templates.append($('<option/>').text(v.name).val(v.id))
+                }
+            },
+            dataType: "json"
+        })
         $("#field_add_game").val("");
         addDialog.open();
     });
 
     addDialog.listen('MDCDialog:closed', function() {
-        var name = $("#field_add_game").val();
+        let name = $("#field_add_game").val();
 
-        $.post('/builder/add-game.json', { 'name': name}, function(response) {
+        let selected = $('#template-list option:selected').val()
+
+        $.post('/builder/add-game.json', { 'name': name, 'template': selected}, function(response) {
             if (response['success']) {
                 $("#dialog-title").html("Success");
             } else {
