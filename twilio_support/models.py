@@ -203,8 +203,8 @@ class OutgoingCall(models.Model):
     gather_num_digits = models.IntegerField(default=4)
     gather_timeout = models.IntegerField(default=5)
     gather_speech_timeout = models.IntegerField(default=5)
-    gather_speech_profanity_filter = models.BooleanField(default=False)
     gather_speech_model = models.CharField(max_length=64, choices=GATHER_SPEECH_MODELS, default='default')
+    gather_loop = models.IntegerField(default=1)
 
     def transmit(self):
         if self.transmission_metadata is None:

@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <body  style="padding: 0px; margin: 0px;">
+		<div id="cytoscape_canvas" style="padding: 0px; margin: 0px; background-color: #eeeeee;">
+    </body>
+    
+    <script>
+        window.visualizationOptions = {
+            name: "{{ dialog.name }}",
+            source: {{ activity.cytoscape_json|safe }},
+            container: "#cytoscape_canvas"
+        };
+    </script>
+
+    <script data-main="{% static 'builder-js/js/app/view.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+</html>

@@ -311,3 +311,22 @@ def builder_settings(request): # pylint: disable=unused-argument
         context['settings'] = settings
 
     return render(request, 'builder_settings.html', context=context)
+
+@login_required
+def builder_activity_view(request, slug): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    matched_activity = Game.objects.filter(slug=slug).first()
+
+    if matched_activity.can_view(request.user):
+        context = {}
+
+        context['activity'] = matched_activity
+
+        response = render(request, 'builder_view.html', context=context)
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+
+        return response
+
+    raise PermissionDenied('View permission required.')

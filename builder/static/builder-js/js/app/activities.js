@@ -35,6 +35,8 @@ requirejs.config({
 });
 
 requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, Cookies, cytoscape, cytoscape_dagre) {
+    console.log(mdc)
+
     const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
 
     const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
@@ -46,7 +48,7 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
     });
 
     const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    
+
     var selectedSequence = null;
 
     topAppBar.setScrollTarget(document.getElementById('main-content'));
@@ -61,6 +63,8 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
 
     const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_add_game'));
 
+    const viewStructureDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('preview-dialog'))
+
     $("#action_add_game").click(function(eventObj) {
         eventObj.preventDefault();
 
@@ -70,14 +74,14 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
 
     addDialog.listen('MDCDialog:closed', function() {
         var name = $("#field_add_game").val();
-        
+
         $.post('/builder/add-game.json', { 'name': name}, function(response) {
             if (response['success']) {
                 $("#dialog-title").html("Success");
             } else {
                 $("#dialog-title").html("Failure");
             }
-            
+
             $("#dialog-content").html(response['message']);
 
             console.log(response);
@@ -89,13 +93,13 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
                     }
                 }
             });
-            
+
             baseDialog.open();
         });
     });
 
     const gameName = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'));
-    
+
     var csrftoken = Cookies.get('csrftoken');
 
     function csrfSafeMethod(method) {
@@ -110,64 +114,87 @@ requirejs(["material", "cookie", "cytoscape", "cytoscape-dagre"], function(mdc, 
             }
         }
     });
-    
+
     drawer.open = true;
 
-	$(".activity_menu_open").click(function(eventObj) {
-		eventObj.preventDefault();
+    $(".activity_menu_open").click(function(eventObj) {
+        eventObj.preventDefault();
 
-		const menu = mdc.menu.MDCMenu.attachTo($(this).parent().find('.mdc-menu')[0]);
+        const menu = mdc.menu.MDCMenu.attachTo($(this).parent().find('.mdc-menu')[0]);
         menu.setFixedPosition(true);
 
         menu.listen("MDCMenu:selected", function (event) {
-        	var data = $(event.detail.item).data();
-        	
-        	if (data['action'] == "delete") {
-        		if (confirm("Are you sure you want to delete " + data['name'] + "?")) {
-        			window.location = "/builder/activity/" + data['id'] + "/delete";
-        		}
-        	} else {
-	        	alert('ACTION: ' + data['action'] + '(' + data['id'] + ')');
-        	}
+            var data = $(event.detail.item).data();
+
+            if (data['action'] == "delete") {
+                if (confirm("Are you sure you want to delete " + data['name'] + "?")) {
+                    window.location = "/builder/activity/" + data['id'] + "/delete";
+                }
+            } else {
+                alert('ACTION: ' + data['action'] + '(' + data['id'] + ')');
+            }
         });
 
-		menu.open = (menu.open == false);
-	});
-	
-	$(".toggle_integration_content").hide();
-	
-	$(".toggle_integration").click(function(eventObj) {
-		var visible = $(".toggle_integration_content:visible");
-		
-		$(".toggle_integration_content").hide();
-		$(".toggle_integration span.material-icons").text("add_circle");
-		
-		if (visible.length == 0) {
-			$(this).parent().find(".toggle_integration_content").show();
-			$(this).parent().find(".toggle_integration span.material-icons").text("cancel");
-		}
-	});
-	
+        menu.open = (menu.open == false);
+    });
+
+    $(".toggle_integration_content").hide();
+
+    $(".toggle_integration").click(function(eventObj) {
+        var visible = $(".toggle_integration_content:visible");
+
+        $(".toggle_integration_content").hide();
+        $(".toggle_integration span.material-icons").text("add_circle");
+
+        if (visible.length == 0) {
+            $(this).parent().find(".toggle_integration_content").show();
+            $(this).parent().find(".toggle_integration span.material-icons").text("cancel");
+        }
+    });
+
     $(".builder_game_preview").each(function() {
-		$(this).height($(this).parent().height());
-	});
+        $(this).height($(this).parent().parent().height());
+    });
 
     cytoscape_dagre(cytoscape); // register extension
-    
+
     $(".builder_game_preview" ).each(function(index) {
-		var definition = $(this).data("definition");
+        var definition = $(this).data("definition");
 
-		var cy = cytoscape({
-			'container': $(this),
-			'elements': definition,
+        var cy = cytoscape({
+            'container': $(this),
+            'elements': definition,
+            'userZoomingEnabled': false,
+            'userPanningEnabled': false,
+            'boxSelectionEnabled': false,
+            'layout': {
+                name: 'dagre'
+            }
+        });
 
-			'layout': {
-				name: 'dagre'
-			}
-		});
-
-		cy.ready(function(event){
-			cy.center();
-		});
+        cy.ready(function(event){
+            cy.center();
+            cy.autolock(true);
+        });
     });
+
+    $('.preview_icon_button').click(function(eventObj) {
+      eventObj.preventDefault()
+
+      console.log("click: " + $(this).attr('data-preview-url'));
+
+      $('#preview-dialog-canvas').height(parseInt($(window).height() * 0.9))
+      $('#preview-dialog-canvas').width(parseInt($(window).width() * 0.9))
+
+      $('#preview-dialog-content').height($('#preview-dialog-canvas').height())
+      $('#preview-dialog-content').css('overflow', 'hidden')
+
+      viewStructureDialog.open()
+
+      $('#preview-dialog-canvas').attr('src', $(this).attr('data-preview-url'))
+    })
+
+    window.setTimeout(function () {
+        $('.preview_icon_button').show()
+    }, 500)
 });

@@ -534,7 +534,6 @@ define(modules, function (mdc, Node) {
         addCard(callback) {
             $("#add-card-name-value").val("");
 
-
             // window.dialogBuilder.newCardSelect.value = '';
 
             const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));

@@ -21,8 +21,26 @@ define(modules, function (mdc) {
             return this.definition['type'];
         }
 
+        cardCategory() {
+            return 'Uncategorized';
+        }
+
+        cardTypeSlug() {
+            return Node.slugify(this.definition['type']);
+        }
+
         cardIcon() {
             return '<i class="fas fa-question" style="margin-right: 16px; font-size: 20px; "></i>';
+        }
+        
+        visualizationStyle() {
+            return {
+                'shape': 'round-rectangle',
+            }        
+        }
+
+        destinationDescription(nodeId) {
+            return 'Go to...'
         }
 
         editHtml() {
