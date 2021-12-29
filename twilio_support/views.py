@@ -210,9 +210,6 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     if call.gather_speech_timeout is not None:
                         args['speech_timeout'] = call.gather_speech_timeout
 
-                    if call.gather_speech_profanity_filter is not None:
-                        args['speech_profanity_filter'] = call.gather_speech_profanity_filter
-
                     if call.gather_speech_model is not None:
                         args['speech_model'] = call.gather_speech_model
 
