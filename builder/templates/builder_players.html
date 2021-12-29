@@ -1,5 +1,6 @@
 {% extends 'builder_base.html' %}
 {% load static %}
+{% load builder_tags %}
 
 {% block 'page_title' %}All Players | Interaction Builder{% endblock %}
 
@@ -28,7 +29,7 @@
 						<tbody class="mdc-data-table__content">
 							{% for player in players %}
 								<tr class="mdc-data-table__row">
-									<td class="mdc-data-table__cell">{{ player.identifier }}</a></td>
+									<td class="mdc-data-table__cell">{{ player.identifier|obfuscate_identifier }}</a></td>
 									<td class="mdc-data-table__cell">{{ player.most_recent_game }}</a></td>
 									<td class="mdc-data-table__cell">{{ player.earliest_session.started }}</a></td>
 									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.active_session_count }}</td>

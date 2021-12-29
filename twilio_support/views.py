@@ -124,10 +124,10 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
     return HttpResponse(response, content_type='text/xml')
 
 @csrf_exempt
-def incoming_twilio_call(request): # pylint: disable=too-many-branches
+def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements
     response = VoiceResponse()
 
-    if request.method == 'POST':
+    if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         now = timezone.now()
 
         integration_match = None
@@ -220,9 +220,9 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
 
                     if call.message is not None and call.message != '':
                         if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
-                            gather.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
+                            gather.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0], loop=call.gather_loop)
                         else:
-                            gather.say(call.message)
+                            gather.say(call.message, loop=call.gather_loop)
                     elif call.file is not None and call.file != '':
                         pass
 

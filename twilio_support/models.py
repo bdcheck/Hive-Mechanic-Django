@@ -199,12 +199,12 @@ class OutgoingCall(models.Model):
     pause_length = models.IntegerField(default=5)
 
     gather_input = models.CharField(max_length=64, choices=GATHER_INPUT_OPTIONS, default='dtmf speech')
-    gather_finish_on_key = models.CharField(max_length=64, null=True, blank=True)
-    gather_num_digits = models.IntegerField(null=True, blank=True)
-    gather_timeout = models.IntegerField(null=True, blank=True)
-    gather_speech_timeout = models.IntegerField(null=True, blank=True)
-    gather_speech_profanity_filter = models.BooleanField(default=False)
+    gather_finish_on_key = models.CharField(max_length=64, default='#')
+    gather_num_digits = models.IntegerField(default=4)
+    gather_timeout = models.IntegerField(default=5)
+    gather_speech_timeout = models.IntegerField(default=5)
     gather_speech_model = models.CharField(max_length=64, choices=GATHER_SPEECH_MODELS, default='default')
+    gather_loop = models.IntegerField(default=1)
 
     def transmit(self):
         if self.transmission_metadata is None:

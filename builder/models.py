@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import pkgutil
+import traceback
 
 from future import standard_library
 
@@ -296,12 +297,13 @@ class Game(models.Model):
 
     cards = models.ManyToManyField(InteractionCard, related_name='games')
 
-    game_state = JSONField(default=dict)
+    game_state = JSONField(default=dict, blank=True)
 
-    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_editables')
-    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_viewables')
+    editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_editables', blank=True)
+    viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='builder_game_viewables', blank=True)
 
     icon = models.ImageField(null=True, blank=True, upload_to='activity_icons')
+    is_template = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.name)
@@ -377,11 +379,14 @@ class Game(models.Model):
 
         return False
 
-    def cytoscape_json(self, indent=0):
+    def cytoscape_json_simple(self, indent=0):
+        return self.cytoscape_json(indent=indent, simplify=True)
+
+    def cytoscape_json(self, indent=0, simplify=False):
         version = self.versions.order_by('-created').first()
 
         if version is not None:
-            version_cyto = version.cytoscape_json(indent=indent)
+            version_cyto = version.cytoscape_json(indent=indent, simplify=simplify)
 
             if version_cyto is not None:
                 return version_cyto
@@ -399,7 +404,7 @@ class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)
     created = models.DateTimeField()
 
-    definition = models.TextField(max_length=(1024 * 1024 * 1024))
+    definition = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
 
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
@@ -573,24 +578,36 @@ class GameVersion(models.Model):
 
         return incomplete_id
 
-    def cytoscape_json(self, indent=0):
+    def cytoscape_json(self, indent=0, simplify=False):
         try:
-            cytoscape_json = fetch_cytoscape(json.loads(self.definition))
+            cytoscape_json = fetch_cytoscape(json.loads(self.definition), simplify=simplify)
 
             if indent > 0:
                 return json.dumps(cytoscape_json, indent=indent)
 
             return json.dumps(cytoscape_json)
         except: # nosec # pylint: disable=bare-except
-            pass
+            traceback.print_exc()
 
         return None
+
+    def initialize_variables(self, session):
+        definition = json.loads(self.definition)
+
+        for variable in definition.get('variables', []):
+            if variable['scope'] == 'session':
+                session.set_variable(variable['name'], variable['value'])
+            elif variable['scope'] == 'player':
+                session.player.set_variable(variable['name'], variable['value'])
+            else:
+                self.game.set_variable(variable['name'], variable['value'])
+
 
 @python_2_unicode_compatible
 class Player(models.Model):
     identifier = models.CharField(max_length=4096, unique=True)
 
-    player_state = JSONField(default=dict)
+    player_state = JSONField(default=dict, blank=True)
 
     def set_variable(self, variable, value):
         self.player_state[variable] = value # pylint: disable=unsupported-assignment-operation
@@ -629,7 +646,7 @@ class Session(models.Model):
     started = models.DateTimeField()
     completed = models.DateTimeField(null=True, blank=True)
 
-    session_state = JSONField(default=dict)
+    session_state = JSONField(default=dict, blank=True)
 
     def complete_identifier(self, incomplete_id):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
@@ -683,6 +700,8 @@ class Session(models.Model):
             dialog = Dialog(key=dialog_key, started=timezone.now())
             dialog.dialog_snapshot = self.game_version.dialog_snapshot()
             dialog.save()
+
+            self.game_version.initialize_variables(self)
 
         return dialog
 
@@ -853,3 +872,9 @@ class DataProcessor(models.Model):
                 print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
             print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+
+class SiteSettings(models.Model):
+    name = models.CharField(max_length=1024)
+    banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
+    created = models.DateTimeField()
+    last_updated = models.DateTimeField()

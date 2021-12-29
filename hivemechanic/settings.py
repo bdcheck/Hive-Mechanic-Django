@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'twilio_support',
     'http_support',
     'cli_support',
+    'easy_thumbnails',
+    'filer',
+    'mptt',
     'django.contrib.admin',
 ]
 

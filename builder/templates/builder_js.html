@@ -42,6 +42,17 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
+            .mdc-icon-button {
+
+            }
+            .mdc-icon-button.small {
+                width: 32px;
+                height: 32px;
+
+            }
+            .material-icons.small {
+                font-size: 16px;
+            }
 
             a {
                 text-decoration: none;
@@ -66,20 +77,39 @@
                     <span class="mdc-top-app-bar__title">Hive Mechanic</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-					<label for="hive-help-switch-toggle">Help: </label>
-					<div class="mdc-switch" id="hive-help-switch" style="margin-left: 11px; margin-right: 44px;">
+					
+                    <label for="hive-help-switch-toggle" id="hive-help-switch-label">Basic: </label>
+					<div class="mdc-switch" id="hive-help-switch" style="margin-left: 11px; margin-right: 44px;" aria-describedby="action_toggle_mode">
 						<div class="mdc-switch__track"></div>
 						<div class="mdc-switch__thumb-underlay">
 							<div class="mdc-switch__thumb"></div>
 							<input type="checkbox" id="hive-help-switch-toggle" class="mdc-switch__native-control" role="switch" aria-checked="false">
 						</div>
 					</div>
+					<div id="action_toggle_mode" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Toggle interface mode (basic or advanced)</div>
+					</div>                    
 
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" id="action_reset_game">restart_alt</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" id="action_select_card" style="margin-left: 11px;">collections</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Edit Sequence" id="action_edit_sequence" style="margin-left: 11px;">edit</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Remove Sequence" id="action_remove_sequence" style="margin-left: 11px;">delete</a>
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" id="action_save" style="margin-left: 11px;">save</a>
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="View Structure" aria-describedby="action_view_structure_tip" id="action_view_structure" style="margin-left: 22px;">schema</a>
+					<div id="action_view_structure_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View activity structure</div>
+					</div>                    
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" aria-describedby="action_reset_activity_tip" id="action_reset_activity" style="margin-left: 11px;">update</a>
+					<div id="action_reset_activity_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Reset activity</div>
+					</div>                    
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="List Game Variables" aria-describedby="action_list_variables_tip" id="action_list_variables" style="margin-left: 11px;">subscript</a>
+					<div id="action_list_variables_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">List activity variables</div>
+					</div>                    
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" aria-describedby="action_select_card_tip" id="action_select_card" style="margin-left: 11px;">toc</a>
+					<div id="action_select_card_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Advance to selected card</div>
+					</div>                    
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" aria-describedby="action_save_tip" id="action_save" style="margin-left: 11px;">save</a>
+					<div id="action_save_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Save activity</div>
+					</div>                    
                 </section>
             </div>
         </header>
@@ -263,22 +293,27 @@
         </div>
 
         <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="add-card-dialog"  aria-labelledby="add-card-dialog-title" aria-describedby="add-card-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface">
+            <div class="mdc-dialog__container" style="width: 75%;">
+                <div class="mdc-dialog__surface" style="width: 100%; max-width: 800px;">
                     <h2 class="mdc-dialog__title" id="add-card-dialog-title">Add Card</h2>
                     <div class="mdc-dialog__content" id="add-card-dialog-content">
-                        <div class="mdc-text-field mdc-text-field--outlined" id="add-card-name" style="width: 100%; margin-top: 8px;">
-                            <input type="text" class="mdc-text-field__input" id="add-card-name-value">
-                            <div class="mdc-notched-outline">
-                                <div class="mdc-notched-outline__leading"></div>
-                                <div class="mdc-notched-outline__notch">
-                                    <label for="add-card-name-value" class="mdc-floating-label">Action Name</label>
-                                </div>
-                                <div class="mdc-notched-outline__trailing"></div>
-                            </div>
-                        </div>
-
-						<ul class="mdc-list" id="add-card-select-widget" role="radiogroup"></ul>
+						<div class="mdc-layout-grid__inner" id="add-card-select-widget">
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
+								<div class="mdc-text-field mdc-text-field--outlined" id="add-card-name" style="width: 100%; margin-top: 8px;">
+									<input type="text" class="mdc-text-field__input" id="add-card-name-value">
+									<div class="mdc-notched-outline">
+										<div class="mdc-notched-outline__leading"></div>
+										<div class="mdc-notched-outline__notch">
+											<label for="add-card-name-value" class="mdc-floating-label">Action Name</label>
+										</div>
+										<div class="mdc-notched-outline__trailing"></div>
+									</div>
+								</div>
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
+								(Context here...)
+							</div>
+						</div>
                     </div>
                     <footer class="mdc-dialog__actions">
                         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
@@ -467,11 +502,65 @@
             <div class="mdc-dialog__scrim"></div>
         </div>
 
+		<div class="mdc-menu mdc-menu-surface" id="sequence_menu">
+			<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabIndex="-1">
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line up-sequence" role="menuitem" data-index="X" data-action="move_up">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Move Up</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line down-sequence" role="menuitem" data-index="X" data-action="move_down">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Move Down</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line rename-sequence" role="menuitem" data-index="X" data-action="rename">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Rename</span>
+				</li>
+				<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line delete-sequence" role="menuitem" data-index="X" data-action="delete">
+					<span class="mdc-list-item__ripple"></span>
+					<span class="mdc-list-item__text mdc-list-item__start">Delete</span>
+				</li>
+			</ul>
+		</div>
+
+        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="builder-game-variables-dialog"  aria-labelledby="builder-game-variables-dialog-title" aria-describedby="builder-game-variables-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface">
+                    <h2 class="mdc-dialog__title" id="builder-game-variables-dialog-title">Game Variables</h2>
+                    <div class="mdc-dialog__content mdc-layout-grid__inner" style="row-gap: 8px" id="builder-game-variables-dialog-content"></div>
+                    <footer class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+                            <span class="mdc-button__label">Close</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+
+        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface" style="max-width: none;">
+					<div class="mdc-dialog__header">
+						<h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
+						<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
+					</div>
+                    <div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
+						<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe> 
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="mdc-dialog__scrim"></div> -->
+        </div>
+
+
     </body>
     <script>
         window.dialogBuilder = {
             cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
+            visualization: "{% url 'builder_activity_view' game.slug %}",
+
             update: function(definition, success, failure) {
                 var payload = {
                     'definition': JSON.stringify(definition, 2)
@@ -479,6 +568,11 @@
 
                 $.post("{% url 'builder_game' game.slug %}", payload, function(data) {
                     success();
+                });
+            },
+            fetchVariables(fetched) {
+                $.get("{% url 'builder_game_variables' game.slug %}", function(data) {
+                    fetched(data);
                 });
             }
         };

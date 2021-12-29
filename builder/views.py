@@ -6,6 +6,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import json
 import os
 
+import django.views.defaults
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, FileResponse
@@ -13,10 +14,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from filer.admin.clipboardadmin import ajax_upload
+from filer.models import filemodels
 
 from integrations.models import Integration
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
 @login_required
 def builder_home(request): # pylint: disable=unused-argument
@@ -73,6 +78,8 @@ def builder_players(request): # pylint: disable=unused-argument
     context['players'] = Player.objects.all()
 
     return render(request, 'builder_players.html', context=context)
+
+
 
 @login_required
 def builder_game(request, game): # pylint: disable=unused-argument
@@ -141,6 +148,38 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
     raise PermissionDenied('View permission required.')
 
 @login_required
+def builder_game_variables(request, game): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    matched_game = Game.objects.filter(slug=game).first()
+
+    if matched_game.can_view(request.user):
+        variables = []
+
+        for variable_name in matched_game.game_state.keys():
+            variables.append({
+                'name': variable_name,
+                'value': matched_game.game_state[variable_name]
+            })
+
+        response = HttpResponse(json.dumps(variables, indent=2), content_type='application/json', status=200)
+
+        response['X-Hive-Mechanic-Editable'] = matched_game.can_edit(request.user)
+
+        return response
+
+    raise PermissionDenied('View permission required.')
+
+
+@login_required
+def builder_game_templates(request): # pylint: disable=unused-argument
+    context = {}
+    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug', 'id')
+    context['games'] = list(games)
+    return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
+
+@login_required
 def builder_interaction_card(request, card): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
@@ -172,6 +211,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
 
     if request.method == 'POST' and 'name' in request.POST:
         name = request.POST['name'].strip()
+        template = request.POST['template'].strip()
 
         if name:
             slug = slugify(name)
@@ -184,14 +224,25 @@ def builder_add_game(request): # pylint: disable=unused-argument
                 index += 1
 
             new_game = Game(name=name, slug=slug)
-
             new_game.save()
 
-            for card in InteractionCard.objects.filter(enabled=True):
-                new_game.cards.add(card)
+            if template and template != "none":
+                old_game = Game.objects.filter(id=template).first()
+                for card in old_game.cards.all():
+                    new_game.cards.add(card)
 
-            new_game.save()
+                # latest version
+                version = old_game.latest_version()
+                version.pk = None
+                version.game = new_game
+                version.save()
+                new_game.save()
+            # default
+            else:
+                for card in InteractionCard.objects.filter(enabled=True):
+                    new_game.cards.add(card)
 
+                new_game.save()
             response['success'] = True
             response['message'] = 'Game added.'
             response['redirect'] = reverse('builder_game', args=[new_game.slug])
@@ -248,5 +299,88 @@ def builder_update_icon(request):
             response['X-Hive-Mechanic-Editable'] = activity.can_edit(request.user)
 
             return response
+
+    raise PermissionDenied('View permission required.')
+
+@login_required
+def builder_media(request):
+    context = {}
+    page = request.GET.get('page', 1)
+    media = filemodels.File.objects.order_by('-uploaded_at')
+    paginator = Paginator(media, 30)
+
+    try:
+        pages = paginator.page(page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    context['media'] = media
+    context['pages'] = pages
+    return render(request, 'builder_media.html', context=context)
+
+@login_required
+def builder_media_upload(request):
+    if request.method == 'POST':
+        response = ajax_upload(request)
+        res = json.loads(response.content)
+        if 'error' in res:
+            return redirect(django.views.defaults.HttpResponseServerError)
+    return redirect('builder_media')
+
+@login_required
+def builder_settings(request): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    context = {}
+
+    settings = SiteSettings.objects.all().order_by('-last_updated').first()
+
+    now = timezone.now()
+
+    if request.method == 'POST':
+        if settings is None:
+            settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
+
+        banner_file = request.FILES["site_banner"]
+
+        if banner_file is not None:
+            settings.banner = request.FILES["site_banner"]
+
+        settings.name = request.POST.get('site_name', 'Hive Mechanic')
+        settings.last_updated = now
+        settings.save()
+
+        response_payload = {
+            'url': settings.banner.url
+        }
+
+        response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+        return response
+
+    if settings is not None:
+        context['settings'] = settings
+
+    return render(request, 'builder_settings.html', context=context)
+
+@login_required
+def builder_activity_view(request, slug): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    matched_activity = Game.objects.filter(slug=slug).first()
+
+    if matched_activity.can_view(request.user):
+        context = {}
+
+        context['activity'] = matched_activity
+
+        response = render(request, 'builder_view.html', context=context)
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+
+        return response
 
     raise PermissionDenied('View permission required.')

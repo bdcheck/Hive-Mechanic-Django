@@ -16,14 +16,32 @@
 				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 					<div class="mdc-card" style="padding: 16px;">
 						<div class="mdc-layout-grid__inner">
-							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-								{% if activity.icon %}
-									<img style="width: 100%;" src="{{ activity.icon.url }}" />
-								{% else %}
-									<div class="builder_game_preview" id="builder_game_preview_{ activity.pk }}" style="width: 100%;" data-definition="{{ activity.cytoscape_json }}" /></div>
-								{% endif %}
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+							{% if activity.icon %}
+									<img class="tab_content" style="width: 100%; z-index:1;" src="{{ activity.icon.url }}" data-tab-index="1" />
+									<!-- <div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div> -->
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+								<div style="position: relative;">
+									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; z-index:100; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+										<span class="mdc-button__ripple"></span>
+										<i class="material-icons" aria-hidden="true">schema</i>
+									</button>
+									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+								</div>
+							</div>
+							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+							{% else %}
+								<div style="position: relative;">
+									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; z-index:100; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+										<span class="mdc-button__ripple"></span>
+										<i class="material-icons" aria-hidden="true">schema</i>
+									</button>
+									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+								</div>
 							</div>
 							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
+							{% endif %}
 								<div class="mdc-layout-grid__inner">
 									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 										<div class="mdc-typography mdc-typography--headline6">
@@ -91,8 +109,15 @@
 	</button>
 	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="dialog_add_game">
 		<div class="mdc-dialog__container">
+
 			<div class="mdc-dialog__surface">
 				<h2 class="mdc-dialog__title" id="my-dialog-title">Add New Game</h2>
+
+                <div class="mdc-dialog__content" >
+                <label for="template-list">Templates</label>
+                    <select class="mdc-list" name="template-list" id="template-list">
+                    </select>
+                </div>
 				<div class="mdc-dialog__content" id="my-dialog-content">
 					<div class="mdc-text-field mdc-text-field--outlined" id="textfield_add_game" style="margin-top: 8px; width: 100%;">
 						<input type="text" class="mdc-text-field__input" id="field_add_game">
@@ -117,6 +142,22 @@
 		</div>
 		<div class="mdc-dialog__scrim"></div>
 	</div>
+
+	<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content" style="z-index: 9999;">
+		<div class="mdc-dialog__container">
+			<div class="mdc-dialog__surface" style="max-width: none;">
+				<div class="mdc-dialog__header">
+					<h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
+					<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
+				</div>
+				<div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
+					<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe> 
+				</div>
+			</div>
+		</div>
+		<!-- <div class="mdc-dialog__scrim"></div> -->
+	</div>
+
 {% endblock %}
 
 {% block 'js_init' %}

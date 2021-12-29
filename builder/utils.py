@@ -8,7 +8,7 @@ from py_mini_racer import MiniRacer
 from django.contrib.staticfiles import finders
 from django.template.loader import render_to_string
 
-def fetch_cytoscape(definition): # pylint: disable=too-many-locals
+def fetch_cytoscape(definition, simplify=False): # pylint: disable=too-many-locals
     from .models import InteractionCard # pylint: disable=import-outside-toplevel, cyclic-import
 
     env_path = finders.find('builder-js/vendor/racer_env.js')
@@ -39,7 +39,8 @@ def fetch_cytoscape(definition): # pylint: disable=too-many-locals
             js_context.eval(client_source)
 
     context = {
-        'definition': json.dumps(definition)
+        'definition': json.dumps(definition),
+        'simplify': simplify
     }
 
     script_source = render_to_string('utils/cytoscape_convert.js', context)
