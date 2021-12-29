@@ -15,11 +15,11 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from integrations.models import Integration
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
-from filer.models import filemodels
+
 from filer.admin.clipboardadmin import ajax_upload
-import filer.templatetags.filer_admin_tags
+from filer.models import filemodels
+
+from integrations.models import Integration
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
@@ -173,7 +173,7 @@ def builder_game_variables(request, game): # pylint: disable=unused-argument
 
 
 @login_required
-def builder_game_templates(request):
+def builder_game_templates(request): # pylint: disable=unused-argument
     context = {}
     games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug','id')
     context['games'] = list(games)
@@ -306,7 +306,6 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
-    filter = request.GET.get('filter')
     media = filemodels.File.objects.order_by('-uploaded_at')
     paginator = Paginator(media,30)
 
