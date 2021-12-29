@@ -16,7 +16,7 @@ from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.voice_response import VoiceResponse, Gather
 
 from integrations.models import Integration
 
@@ -125,10 +125,10 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
     return HttpResponse(response, content_type='text/xml')
 
 @csrf_exempt
-def incoming_twilio_call(request): # pylint: disable=too-many-branches
+def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements
     response = VoiceResponse()
 
-    if request.method == 'POST':
+    if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         now = timezone.now()
 
         integration_match = None
