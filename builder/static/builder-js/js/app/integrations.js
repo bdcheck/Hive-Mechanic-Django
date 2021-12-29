@@ -39,7 +39,7 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     topAppBar.listen('MDCTopAppBar:nav', () => {
         drawer.open = !drawer.open;
     });
-
+    drawer.open = true
     const editDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_edit_integration'));
 
     //Button click to open integration dialog using
@@ -51,7 +51,7 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
 		let int_id = tg.attr('data-id');
         let int_name = tg.attr('data-name');
         let game_name = tg.attr('data-game');
-        let radios = $('input[name=game_name]');
+        let radios = $('input[name=game_id]');
 
         let radio = radios.filter(function() {
             return $(this).val() === game_name
@@ -63,7 +63,7 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
         editDialog.open()
     });
     editDialog.listen('MDCDialog:closed', function() {
-        let radios = $('input[name=game_name]');
+        let radios = $('input[name=game_id]');
         let tx_in = $("#integration_name");
         let tx_id = $('#integration_id')
         radios.prop("checked", false)
