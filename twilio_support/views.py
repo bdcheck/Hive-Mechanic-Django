@@ -9,14 +9,13 @@ from io import BytesIO
 
 import requests
 
-
 from django.conf import settings
 from django.core import files
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.voice_response import VoiceResponse, Gather
 
 from integrations.models import Integration
 
@@ -178,13 +177,14 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
             integration_match.process_incoming(post_dict)
 
             for call in OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date'):
-                if call.message is not None and call.message != '':
-                    if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
-                        response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
-                    else:
-                        response.say(call.message)
-                elif call.file is not None and call.file != '':
-                    pass
+                if call.next_action != 'gather':
+                    if call.message is not None and call.message != '':
+                        if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
+                            response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
+                        else:
+                            response.say(call.message)
+                    elif call.file is not None and call.file != '':
+                        pass
 
                 call.sent_date = timezone.now()
                 call.save()
@@ -192,7 +192,42 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches
                 if call.next_action == 'pause':
                     response.pause(length=call.pause_length)
                 elif call.next_action == 'gather':
-                    response.gather(input=call.gather_input, speech_timeout=call.gather_speech_timeout, finish_on_key=call.gather_finish_on_key) # + more
+                    args = {
+                        'input': call.gather_input,
+                        'barge_in': True,
+                        'num_digits': 1
+                    }
+
+                    if call.gather_timeout is not None:
+                        args['timeout'] = call.gather_timeout
+
+                    if call.gather_finish_on_key is not None:
+                        args['finish_on_key'] = call.gather_finish_on_key
+
+                    if call.gather_num_digits is not None:
+                        args['num_digits'] = call.gather_num_digits
+
+                    if call.gather_speech_timeout is not None:
+                        args['speech_timeout'] = call.gather_speech_timeout
+
+                    if call.gather_speech_profanity_filter is not None:
+                        args['speech_profanity_filter'] = call.gather_speech_profanity_filter
+
+                    if call.gather_speech_model is not None:
+                        args['speech_model'] = call.gather_speech_model
+
+                    gather = Gather(**args)
+
+                    if call.message is not None and call.message != '':
+                        if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
+                            gather.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
+                        else:
+                            gather.say(call.message)
+                    elif call.file is not None and call.file != '':
+                        pass
+
+                    response.append(gather)
+
                     break
                 elif call.next_action == 'hangup':
                     response.hangup()

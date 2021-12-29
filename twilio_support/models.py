@@ -199,10 +199,10 @@ class OutgoingCall(models.Model):
     pause_length = models.IntegerField(default=5)
 
     gather_input = models.CharField(max_length=64, choices=GATHER_INPUT_OPTIONS, default='dtmf speech')
-    gather_finish_on_key = models.CharField(max_length=64, default='#')
-    gather_num_digits = models.IntegerField(default=4)
-    gather_timeout = models.IntegerField(default=5)
-    gather_speech_timeout = models.IntegerField(default=5)
+    gather_finish_on_key = models.CharField(max_length=64, null=True, blank=True)
+    gather_num_digits = models.IntegerField(null=True, blank=True)
+    gather_timeout = models.IntegerField(null=True, blank=True)
+    gather_speech_timeout = models.IntegerField(null=True, blank=True)
     gather_speech_profanity_filter = models.BooleanField(default=False)
     gather_speech_model = models.CharField(max_length=64, choices=GATHER_SPEECH_MODELS, default='default')
 
@@ -300,7 +300,8 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
     if incoming_message is not None:
         last_message = {
             'message': incoming_message.message,
-            'received': incoming_message.receive_date
+            'received': incoming_message.receive_date,
+            'raw_object': incoming_message
         }
 
     if ('CallStatus' in payload) or payload['Body'] or incoming_message.media.count() > 0: # May require revision if voice recordings come in...
