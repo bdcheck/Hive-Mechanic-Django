@@ -547,7 +547,10 @@ define(modules, function (mdc, Node) {
                         var cardType = $("input[name='add-card-options']:checked").val(); //  window.dialogBuilder.newCardSelect.value;
                         
                         if (cardName.trim() == '') {
-                            var selectedCard = $("input[name='add-card-options']:checked").parent().parent().parent().find('label').text();
+                            var selectedCard = $("input[name='add-card-options']:checked").parent().parent().find('label').text();
+                            
+                            console.log("SELECTED")
+                            console.log(selectedCard)
 
                             cardName = 'New ' + selectedCard + ' Card';
                         }
@@ -572,7 +575,7 @@ define(modules, function (mdc, Node) {
                 var cardName = nameField.value;
                 
                 if (cardName.trim() == '' || (cardName.startsWith('New ') && cardName.endsWith(' Card'))) {
-                    var selectedCard = $(this).parent().parent().parent().find('label').text();
+                    var selectedCard = $(this).parent().parent().find('label').text();
                 
                     cardName = 'New ' + selectedCard + ' Card';
                     
