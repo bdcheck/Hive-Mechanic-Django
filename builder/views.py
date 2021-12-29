@@ -175,7 +175,7 @@ def builder_game_variables(request, game): # pylint: disable=unused-argument
 @login_required
 def builder_game_templates(request): # pylint: disable=unused-argument
     context = {}
-    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug','id')
+    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug', 'id')
     context['games'] = list(games)
     return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
 
@@ -307,7 +307,7 @@ def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
     media = filemodels.File.objects.order_by('-uploaded_at')
-    paginator = Paginator(media,30)
+    paginator = Paginator(media, 30)
 
     try:
         pages = paginator.page(page)

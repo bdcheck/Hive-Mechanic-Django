@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^activity/(?P<game>.+).json$', builder_game_definition_json, name='builder_game_definition_json'),
     url(r'^activity/(?P<game>.+)', builder_game, name='builder_game'),
     url(r'^update-icon.json', builder_update_icon, name='builder_update_icon'),
-    url(r'^media$',builder_media, name='builder_media'),
+    url(r'^media$', builder_media, name='builder_media'),
     url(r'^media_upload$', builder_media_upload, name='builder_media_upload'),
     url(r'^', builder_home, name='builder_home'),
 ]
