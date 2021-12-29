@@ -399,8 +399,8 @@ def builder_integrations(request):
     context["games"] = games
     return render(request, 'builder_integration.html', context=context)
 
+@login_required
 def builder_integrations_update(request):
-    context = {}
     if request.method == 'POST':
         int_id = request.POST.get("integration_id")
         int_name = request.POST.get("integration_name")
