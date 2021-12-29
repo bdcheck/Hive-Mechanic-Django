@@ -203,8 +203,8 @@ class OutgoingCall(models.Model):
     gather_num_digits = models.IntegerField(default=4)
     gather_timeout = models.IntegerField(default=5)
     gather_speech_timeout = models.IntegerField(default=5)
-    gather_speech_profanity_filter = models.BooleanField(default=False)
     gather_speech_model = models.CharField(max_length=64, choices=GATHER_SPEECH_MODELS, default='default')
+    gather_loop = models.IntegerField(default=1)
 
     def transmit(self):
         if self.transmission_metadata is None:
@@ -300,7 +300,8 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
     if incoming_message is not None:
         last_message = {
             'message': incoming_message.message,
-            'received': incoming_message.receive_date
+            'received': incoming_message.receive_date,
+            'raw_object': incoming_message
         }
 
     if ('CallStatus' in payload) or payload['Body'] or incoming_message.media.count() > 0: # May require revision if voice recordings come in...

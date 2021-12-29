@@ -21,7 +21,9 @@ for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
         
         nodes.push({
             'id': nodeId,
-            'name': cardNode.cardName()
+            'name': cardNode.cardName(),
+            'hive_node_type': cardNode.cardTypeSlug(),
+            'hive_node_style': cardNode.visualizationStyle()
         });
         
         var destNodes = cardNode.destinationNodes(gameSequence);
@@ -38,7 +40,9 @@ for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
             edges.push({
                 'id': nodeId + '__' + destId,
                 'source': nodeId,
-                'target': destId
+                'target': destId,
+                'isdirected': true,
+                'hive_edge_description': cardNode.destinationDescription(destId)
             });
         }
     }
@@ -47,21 +51,26 @@ for (var i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
 var cyto = [];
 
 for (var i = 0; i < nodes.length; i++) {
-	let node = nodes[i];
-	
-	cyto.push({
-		'data': node,
-		'group': 'nodes'
-	});
+    let node = nodes[i];
+    
+    cyto.push({
+        'data': node,
+        'group': 'nodes',
+        'style': node['hive_node_style'],
+        'classes': [
+            'node_' + node['hive_node_type']
+        ]
+    });
 }
 
 for (var i = 0; i < edges.length; i++) {
-	let edge = edges[i];
-	
-	cyto.push({
-		'data': edge,
-		'group': 'edges'
-	});
+    let edge = edges[i];
+    
+    cyto.push({
+        'data': edge,
+        'classes': ['node_group'],
+        'group': 'edges'
+    });
 }
 
 JSON.stringify(cyto, null, 2);

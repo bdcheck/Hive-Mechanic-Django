@@ -15,11 +15,10 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from integrations.models import Integration
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor
-from filer.models import filemodels
+
 from filer.admin.clipboardadmin import ajax_upload
-import filer.templatetags.filer_admin_tags
+from filer.models import filemodels
+
 from integrations.models import Integration
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
@@ -174,9 +173,9 @@ def builder_game_variables(request, game): # pylint: disable=unused-argument
 
 
 @login_required
-def builder_game_templates(request):
+def builder_game_templates(request): # pylint: disable=unused-argument
     context = {}
-    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug','id')
+    games = Game.objects.filter(is_template=True).order_by('name').values("name", 'slug', 'id')
     context['games'] = list(games)
     return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
 
@@ -307,9 +306,8 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
-    filter = request.GET.get('filter')
     media = filemodels.File.objects.order_by('-uploaded_at')
-    paginator = Paginator(media,30)
+    paginator = Paginator(media, 30)
 
     try:
         pages = paginator.page(page)
@@ -372,6 +370,25 @@ def builder_settings(request): # pylint: disable=unused-argument
         context['settings'] = settings
 
     return render(request, 'builder_settings.html', context=context)
+
+@login_required
+def builder_activity_view(request, slug): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    matched_activity = Game.objects.filter(slug=slug).first()
+
+    if matched_activity.can_view(request.user):
+        context = {}
+
+        context['activity'] = matched_activity
+
+        response = render(request, 'builder_view.html', context=context)
+        response['X-Frame-Options'] = 'SAMEORIGIN'
+
+        return response
+
+    raise PermissionDenied('View permission required.')
 
 @login_required
 def builder_integrations(request):

@@ -1,5 +1,4 @@
 from django.template import Library
-from django.http.request import HttpRequest
 
 register = Library()
 

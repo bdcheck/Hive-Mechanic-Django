@@ -40,6 +40,32 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         console.log(result);
     });
 
+    window.dialogBuilder.viewStructureDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('preview-dialog'))
+
+    $('#action_view_structure').click(function (eventObj) {
+      eventObj.preventDefault()
+
+      $('#preview-dialog-canvas').height(parseInt($(window).height() * 0.9))
+      $('#preview-dialog-canvas').width(parseInt($(window).width() * 0.9))
+
+      $('#preview-dialog-content').height($('#preview-dialog-canvas').height())
+      $('#preview-dialog-content').css('overflow', 'hidden')
+
+      window.dialogBuilder.viewStructureDialog.open()
+
+      window.setTimeout(function () {
+        $('#preview-dialog-canvas').attr('src', window.dialogBuilder.visualization)
+      }, 100)
+    })
+
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_view_structure_tip'))
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_reset_activity_tip'))
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
+
+	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
+    
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
     const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'));
 
@@ -621,9 +647,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             window.dialogBuilder.selectCardsDialog.open();
         });
 
-        $("#action_reset_game").off("click");
+        $("#action_reset_activity").off("click");
 
-        $("#action_reset_game").click(function (eventObj) {
+        $("#action_reset_activity").click(function (eventObj) {
             eventObj.preventDefault();
 
             window.dialogBuilder.restartGameDialog.open();
@@ -646,6 +672,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             return 0;
         });
+        
+        let cardItem = '';
+
+        cardItem += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+        cardItem += '      <strong>(Card Category Name)</strong>'
+        cardItem += '    </div>'
+
+        $("#add-card-select-widget").append(cardItem);
 
         for (var i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -658,10 +692,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 name = key;
             }
 
-            var cardItem = '';
+            cardItem = '';
 
-            cardItem += '<li class="mdc-list-item mdc-list-item--with-one-line prevent-menu-close" role="radio" tabindex="' + i + '" style="padding-left: 0; padding-right: 0;">';
-            cardItem += '  <span class="mdc-list-item__graphic">';
+            cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-4">'
             cardItem += '    <div class="mdc-radio">';
             cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
             cardItem += '      <div class="mdc-radio__background">';
@@ -669,9 +702,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             cardItem += '        <div class="mdc-radio__inner-circle"></div>';
             cardItem += '      </div>';
             cardItem += '    </div>';
-            cardItem += '  </span>';
-            cardItem += '  <label id="add-card-option-' + i + '-label" for="add-card-option-' + i + '" class="mdc-list-item__text" style="padding-top: 8px;">' + name + '</label>';
-            cardItem += '</li>';
+            cardItem += '    <label for="add-card-option-' + i + '">' + name + '</label>';
+            cardItem += '  </div>';
 
             $("#add-card-select-widget").append(cardItem);
         }

@@ -82,7 +82,6 @@ class OutgoingCallAdmin(admin.ModelAdmin):
                 'gather_num_digits',
                 'gather_timeout',
                 'gather_speech_timeout',
-                'gather_speech_profanity_filter',
                 'gather_speech_model',
             ],
             'classes': ['collapse']
