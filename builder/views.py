@@ -20,6 +20,7 @@ from .models import Game, GameVersion, InteractionCard, Player, Session, DataPro
 from filer.models import filemodels
 from filer.admin.clipboardadmin import ajax_upload
 import filer.templatetags.filer_admin_tags
+from integrations.models import Integration
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
@@ -371,3 +372,28 @@ def builder_settings(request): # pylint: disable=unused-argument
         context['settings'] = settings
 
     return render(request, 'builder_settings.html', context=context)
+
+@login_required
+def builder_integrations(request):
+    context = {}
+    integration = Integration.objects.order_by("name")
+    games = Game.objects.order_by("name")
+    context["integrations"] = integration
+    context["games"] = games
+    return render(request, 'builder_integration.html', context=context)
+
+def builder_integrations_update(request):
+    context = {}
+    if request.method == 'POST':
+        int_id = request.POST.get("integration_id")
+        int_name = request.POST.get("integration_name")
+        game_id = request.POST.get("game_id")
+
+        if not int_name:
+            raise("Name cannot be blank.")
+        integration = Integration.objects.get(pk=int_id)
+        game = Game.objects.get(pk=game_id)
+        integration.game = game
+        integration.name = int_name
+        integration.save()
+    return redirect('builder_integrations')

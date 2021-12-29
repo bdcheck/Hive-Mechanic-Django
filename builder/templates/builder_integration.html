@@ -1,0 +1,94 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+{% load filer_admin_tags %}
+{% load absolute_uri_tags %}
+{% block 'page_title' %}Integration | Hive Mechanic{% endblock %}
+{% block 'navigation_title' %}Hive Mechanic - Integrations{% endblock %}
+{% block 'main_content' %}
+
+
+
+<div class="mdc-layout-grid">
+    <div class="mdc-layout-grid__inner"></div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+    <div class="mdc-data-table">
+					<table class="mdc-data-table__table" aria-label="All Games" id="table_players">
+						<thead>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Slug</th>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Game</th>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Type</th>
+                        </thead>
+                        {% for i in integrations %}
+                        <tr class="mdc-data-table__header-row">
+                            <td class="mdc-data-table__cell">
+                                {{ i.name }}
+                            </td>
+                              <td class="mdc-data-table__cell">
+                                {{ i.url_slug }}
+                            </td>
+                            <td class="mdc-data-table__cell">
+                                {{ i.game.name }}
+                            </td>
+                            <td class="mdc-data-table__cell">
+                                {{ i.type }}
+                            </td>
+                            <td class="mdc-data-table__cell">
+                                <button class="edit_integration" data-id="{{ i.pk }}" data-name="{{ i.name }}" data-game="{{ i.game.id }}"> Edit</button>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+
+</div>
+    </div>
+</div>
+
+<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-content" id="dialog_edit_integration">
+
+        <div class="mdc-dialog__container">
+
+				<div class="mdc-dialog__surface">
+                    <form method="POST" action="{% url 'builder_integrations_update' %}">
+                               {% csrf_token %}
+
+					<h2 class="mdc-dialog__title" id="dialog-title">Change Integration</h2>
+					<div class="mdc-dialog__content" id="dialog-content">
+                    <div class="mdc-dialog__content mdc-layout-grid">
+                    <div class="mdc-layout-grid mdc-layout-grid__inner">
+                        {% for g in games %}
+
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                    <div class=" mdc-layout-grid__cell--span-3">
+                        <input type="radio" class="mdc-form-field" name="game_id" value="{{ g.id }}">
+                    </div>
+                        <div class="mdc-layout-grid__cell--span-3">
+                            {{ g.name }}
+
+                        </div>
+                    </div>
+                        {% endfor %}
+                    <div class="mdc-layout-grid__cell">
+                    <input type="text" name="integration_name" id="integration_name"/>
+                        <input type="hidden" name="integration_id" id="integration_id">
+                    </div>
+                    </div>
+                    </div>
+					</div>
+					<footer class="mdc-dialog__actions">
+						<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+							<span class="mdc-button__label">Cancel</span>
+						</button>
+                        <button type="submit" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="save">
+                            <span class="mdc-button__label">Save</span>
+                        </button>
+					</footer>
+                </form>
+				</div>
+			</div>
+			<div class="mdc-dialog__scrim"></div>
+		</div>
+{% endblock %}
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/integrations.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}
