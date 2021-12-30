@@ -70,7 +70,7 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
         tx_in.val("")
         tx_id.val("")
     });
-    $("#builder_integration_form").onsubmit(function() {
+    $("#builder_integration_form").on('submit',function() {
         const tx_in = $("#integration_name");
         let int_name_val = tx_in.val();
         if (int_name_val === '') {
