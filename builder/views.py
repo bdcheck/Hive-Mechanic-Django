@@ -405,9 +405,6 @@ def builder_integrations_update(request):
         int_id = request.POST.get("integration_id")
         int_name = request.POST.get("integration_name")
         game_id = request.POST.get("game_id")
-
-        if not int_name:
-            raise("Name cannot be blank.")
         integration = Integration.objects.get(pk=int_id)
         game = Game.objects.get(pk=game_id)
         integration.game = game
