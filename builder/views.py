@@ -23,6 +23,7 @@ from integrations.models import Integration
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
+
 @login_required
 def builder_home(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -57,6 +58,7 @@ def builder_activities(request): # pylint: disable=unused-argument
 
     return render(request, 'builder_activities.html', context=context)
 
+
 @login_required
 def builder_sessions(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -68,6 +70,7 @@ def builder_sessions(request): # pylint: disable=unused-argument
 
     return render(request, 'builder_sessions.html', context=context)
 
+
 @login_required
 def builder_players(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -78,7 +81,6 @@ def builder_players(request): # pylint: disable=unused-argument
     context['players'] = Player.objects.all()
 
     return render(request, 'builder_players.html', context=context)
-
 
 
 @login_required
@@ -107,6 +109,7 @@ def builder_game(request, game): # pylint: disable=unused-argument
         return render(request, 'builder_js.html', context=context)
 
     raise PermissionDenied('View permission required.')
+
 
 @login_required
 def builder_game_definition_json(request, game): # pylint: disable=unused-argument
@@ -147,6 +150,7 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
     raise PermissionDenied('View permission required.')
 
+
 @login_required
 def builder_game_variables(request, game): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -179,6 +183,7 @@ def builder_game_templates(request): # pylint: disable=unused-argument
     context['games'] = list(games)
     return HttpResponse(json.dumps(context, indent=2), content_type='application/json', status=200)
 
+
 @login_required
 def builder_interaction_card(request, card): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -198,6 +203,7 @@ def builder_interaction_card(request, card): # pylint: disable=unused-argument
         return response
 
     raise Http404('Card implementation not found. Verify that a client implementation file is attached to the card definition.')
+
 
 @login_required
 def builder_add_game(request): # pylint: disable=unused-argument
@@ -249,6 +255,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
 
     return HttpResponse(json.dumps(response, indent=2), content_type='application/json', status=200)
 
+
 @login_required
 def builder_data_processor_options(request):  # pylint: disable=unused-argument
     options = []
@@ -278,6 +285,7 @@ def builder_activity_delete(request, slug): # pylint: disable=unused-argument
 
     raise PermissionDenied('Delete game permission required.')
 
+
 @login_required
 def builder_update_icon(request):
     if request.user.has_perm('builder.builder_login') is False:
@@ -301,6 +309,7 @@ def builder_update_icon(request):
             return response
 
     raise PermissionDenied('View permission required.')
+
 
 @login_required
 def builder_media(request):
@@ -329,10 +338,11 @@ def builder_media_upload(request):
             return redirect(django.views.defaults.HttpResponseServerError)
         description = request.POST.get("description")
         if description:
-            file = filemodels.File.objects.filter(id= res["file_id"]).first()
+            file = filemodels.File.objects.filter(id=res["file_id"]).first()
             file.description = description
             file.save()
     return redirect('builder_media')
+
 
 @login_required
 def builder_settings(request): # pylint: disable=unused-argument
@@ -371,6 +381,7 @@ def builder_settings(request): # pylint: disable=unused-argument
 
     return render(request, 'builder_settings.html', context=context)
 
+
 @login_required
 def builder_activity_view(request, slug): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
@@ -390,6 +401,7 @@ def builder_activity_view(request, slug): # pylint: disable=unused-argument
 
     raise PermissionDenied('View permission required.')
 
+
 @login_required
 def builder_integrations(request):
     context = {}
@@ -398,6 +410,7 @@ def builder_integrations(request):
     context["integrations"] = integration
     context["games"] = games
     return render(request, 'builder_integration.html', context=context)
+
 
 @login_required
 def builder_integrations_update(request):
