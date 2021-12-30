@@ -45,13 +45,13 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
     //Button click to open integration dialog using
     $(".edit_integration").click(function(eventObj) {
         eventObj.preventDefault();
-        let tg = $(eventObj.target);
-        let tx_in = $("#integration_name");
-        let tx_id = $('#integration_id')
-		let int_id = tg.attr('data-id');
-        let int_name = tg.attr('data-name');
-        let game_name = tg.attr('data-game');
-        let radios = $('input[name=game_id]');
+        const tg = $(eventObj.target);
+        const tx_in = $("#integration_name");
+        const tx_id = $('#integration_id')
+		const int_id = tg.attr('data-id');
+        const int_name = tg.attr('data-name');
+        const game_name = tg.attr('data-game');
+        const radios = $('input[name=game_id]');
 
         let radio = radios.filter(function() {
             return $(this).val() === game_name
@@ -63,12 +63,21 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
         editDialog.open()
     });
     editDialog.listen('MDCDialog:closed', function() {
-        let radios = $('input[name=game_id]');
-        let tx_in = $("#integration_name");
-        let tx_id = $('#integration_id')
+        const radios = $('input[name=game_id]');
+        const tx_in = $("#integration_name");
+        const tx_id = $('#integration_id')
         radios.prop("checked", false)
         tx_in.val("")
         tx_id.val("")
+    });
+    $("#builder_integration_form").onsubmit(function() {
+        const tx_in = $("#integration_name");
+        let int_name_val = tx_in.val();
+        if (int_name_val === '') {
+            alert("Name Required");
+            return false;
+        }
+
     });
 
 

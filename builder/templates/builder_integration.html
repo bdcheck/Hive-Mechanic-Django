@@ -52,7 +52,7 @@
         <div class="mdc-dialog__container">
 
             <div class="mdc-dialog__surface">
-                <form method="POST" action="{% url 'builder_integrations_update' %}">
+                <form method="POST" action="{% url 'builder_integrations_update' %}" id="builder_integration_form">
                     {% csrf_token %}
 
                     <h2 class="mdc-dialog__title" id="dialog-title">Change Integration</h2>
