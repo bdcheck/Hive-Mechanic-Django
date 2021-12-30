@@ -408,6 +408,7 @@ def builder_integrations_update(request):
         integration = Integration.objects.get(pk=int_id)
         game = Game.objects.get(pk=game_id)
         integration.game = game
-        integration.name = int_name
+        if int_name:
+            integration.name = int_name
         integration.save()
     return redirect('builder_integrations')
