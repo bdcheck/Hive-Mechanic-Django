@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^data/', include('passive_data_kit.urls')),
     url(r'^builder/', include('builder.urls')),
+    url(r'^quicksilver/', include('quicksilver.urls')),
     url(r'^twilio/', include('twilio_support.urls')),
     url(r'^http/', include('http_support.urls')),
     url(r'^filer/', include('filer.urls')),
