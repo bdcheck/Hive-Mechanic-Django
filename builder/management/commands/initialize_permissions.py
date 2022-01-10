@@ -7,7 +7,10 @@ class Command(BaseCommand):
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals
         reader_permissions = ['builder_login']
 
-        reader_group = Group.objects.get(name='Hive Mechanic Reader')
+        reader_group = Group.objects.filter(name='Hive Mechanic Reader').first()
+
+        if reader_group is None:
+            reader_group = Group.objects.create(name='Hive Mechanic Reader')
 
         for codename in reader_permissions:
             permission = Permission.objects.filter(codename=codename).first()
@@ -28,7 +31,10 @@ class Command(BaseCommand):
 
         editor_permissions.extend(reader_permissions)
 
-        editor_group = Group.objects.get(name='Hive Mechanic Game Editor')
+        editor_group = Group.objects.filter(name='Hive Mechanic Game Editor').first()
+
+        if editor_group is None:
+            editor_group = Group.objects.create(name='Hive Mechanic Game Editor')
 
         for codename in editor_permissions:
             permission = Permission.objects.filter(codename=codename).first()
@@ -61,7 +67,10 @@ class Command(BaseCommand):
             'view_outgoingmessage',
         ]
 
-        manager_group = Group.objects.get(name='Hive Mechanic Manager')
+        manager_group = Group.objects.filter(name='Hive Mechanic Manager').first()
+
+        if manager_group is None:
+            manager_group = Group.objects.create(name='Hive Mechanic Manager')
 
         for codename in manager_permissions:
             permission = Permission.objects.filter(codename=codename).first()
