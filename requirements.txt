@@ -38,7 +38,7 @@ packaging==20.9; python_version < '3.0'
 paramiko==2.6.0; python_version < '3.0'
 paramiko==2.7.2; python_version >= '3.0'
 pbr==5.8.0
-Pillow==8.4.0; python_version >= '3.0'
+Pillow==9.0.0; python_version >= '3.0'
 Pillow==6.2.2; python_version < '3.0'
 prompt-toolkit==2.0.10; python_version < '3.0'
 prompt-toolkit==3.0.20; python_version >= '3.0'
