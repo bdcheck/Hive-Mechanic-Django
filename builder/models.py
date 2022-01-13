@@ -136,9 +136,18 @@ class RemoteRepository(models.Model):
     last_updated = models.DateTimeField(null=True, blank=True)
 
 @python_2_unicode_compatible
+class InteractionCardCategory(models.Model):
+    name = models.CharField(max_length=4096, unique=True)
+    priority = models.IntegerField(default=1)
+
+    def __str__(self):
+        return '%s (%d)' % (self.name, int(self.priority))
+
+@python_2_unicode_compatible
 class InteractionCard(models.Model):
     name = models.CharField(max_length=4096, unique=True)
     identifier = models.SlugField(max_length=4096, unique=True)
+    category = models.ForeignKey(InteractionCardCategory, null=True, blank=True, on_delete=models.SET_NULL)
 
     description = models.TextField(max_length=16384, null=True, blank=True)
 
@@ -318,6 +327,32 @@ class Game(models.Model):
             modules.append(reverse('builder_interaction_card', args=[card.identifier]))
 
         return mark_safe(json.dumps(modules)) # nosec
+
+    def interaction_card_categories_json(self): # pylint: disable=invalid-name
+        categories = {}
+
+        for card in self.cards.all():
+            category_name = 'Hive Mechanic Card'
+            category_priority = 0
+
+            if card.category is not None:
+                category_name = card.category.name
+                category_priority = card.category.priority
+
+            if (category_name in categories) is False:
+                categories[category_name] = {
+                    'name': category_name,
+                    'priority': category_priority,
+                    'cards': []
+                }
+
+            categories[category_name]['cards'].append(card.identifier)
+
+        cat_list = list(categories.values())
+
+        cat_list.sort(key=lambda category: category['priority'], reverse=True)
+
+        return mark_safe(json.dumps(cat_list)) # nosec
 
     def current_active_session(self, player):
         session = None

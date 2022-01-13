@@ -672,41 +672,52 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
             return 0;
         });
-        
-        let cardItem = '';
 
-        cardItem += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-        cardItem += '      <strong>(Card Category Name)</strong>'
-        cardItem += '    </div>'
+		$.each(window.dialogBuilder.categories, function(index, category) {
+			if (category.cards.length > 0) {
+				let cardItem = '';
+			
+				let groupSpan = 12
+				let itemSpan = 3
+			
+				if (category.cards.length <= 2) {
+					groupSpan = 6
+					itemSpan = 6
+				}
 
-        $("#add-card-select-widget").append(cardItem);
+				cardItem += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + groupSpan + '">'
+				cardItem += '      <strong>' + category.name + '</strong>'
+				cardItem += '      <div class="mdc-layout-grid__inner" style="grid-gap: 0px;">'
 
-        for (var i = 0; i < keys.length; i++) {
-            var key = keys[i];
+				$.each(category.cards, function(card_index, card_identifier) {
+					var nodeClass = window.dialogBuilder.cardMapping[card_identifier];
 
-            var nodeClass = window.dialogBuilder.cardMapping[key];
+					var name = nodeClass.cardName();
 
-            var name = nodeClass.cardName();
+					if (name == Node.cardName()) {
+						name = key;
+					}
 
-            if (name == Node.cardName()) {
-                name = key;
-            }
+					cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-' + itemSpan + '">'
+					cardItem += '    <div class="mdc-radio">';
+					cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + index + '-' + card_index + '" name="add-card-options" value="' + card_identifier + '">';
+					cardItem += '      <div class="mdc-radio__background">';
+					cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+					cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+					cardItem += '      </div>';
+					cardItem += '    </div>';
+					cardItem += '    <label for="add-card-option-' + index + '-' + card_index + '">' + name + '</label>';
+					cardItem += '  </div>';
+				});
 
-            cardItem = '';
 
-            cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-4">'
-            cardItem += '    <div class="mdc-radio">';
-            cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + i + '" name="add-card-options" value="' + key + '">';
-            cardItem += '      <div class="mdc-radio__background">';
-            cardItem += '        <div class="mdc-radio__outer-circle"></div>';
-            cardItem += '        <div class="mdc-radio__inner-circle"></div>';
-            cardItem += '      </div>';
-            cardItem += '    </div>';
-            cardItem += '    <label for="add-card-option-' + i + '">' + name + '</label>';
-            cardItem += '  </div>';
+				cardItem += '      </div>'
+				cardItem += '    </div>'
 
-            $("#add-card-select-widget").append(cardItem);
-        }
+				$("#add-card-select-widget").append(cardItem);
+
+			}
+		});        
 
         window.dialogBuilder.addCardDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-card-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
