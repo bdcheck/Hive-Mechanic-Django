@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'quicksilver',
     'passive_data_kit',
     'django_dialog_engine',
+    'user_creation',
     'builder',
     'integrations',
     'twilio_support',
