@@ -81,3 +81,42 @@ def user_request_access(request): # pylint: disable=unused-argument
             return render(request, 'user_request_access_complete.html', context=context)
 
     return render(request, 'user_request_access.html', context=context)
+
+@login_required
+def user_account(request): # pylint: disable=unused-argument
+    context = {}
+
+    context['password_requirements'] = password_validators_help_texts()
+
+    context['messages'] = []
+
+    if request.method == 'POST':
+        email = request.POST.get('email', '')
+
+        if email != request.user.email:
+            request.user.email = email
+            request.user.username = email
+
+            request.user.save()
+
+            context['messages'].append('E-mail address updated successfully.')
+
+        current_password = request.POST.get('current-password', None)
+        new_password = request.POST.get('new-password', None)
+
+        if new_password is not None and new_password != '': # nosec
+            if request.user.check_password(current_password) is True:
+                try:
+                    validate_password(new_password, user=request.user)
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    context['messages'].append('Password updated successfully.')
+                except ValidationError as error:
+                    for validation_error in error.messages:
+                        context['messages'].append('Unable to update password: ' + str(validation_error))
+            else:
+                context['messages'].append('Unable to update password, invalid current password provided.')
+
+    context['user'] = request.user
+
+    return render(request, 'user_account.html', context=context)
