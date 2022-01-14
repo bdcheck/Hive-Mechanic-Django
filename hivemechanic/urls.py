@@ -29,10 +29,10 @@ urlpatterns = [
     url(r'^twilio/', include('twilio_support.urls')),
     url(r'^http/', include('http_support.urls')),
     url(r'^http/', include('http_support.urls')),
-    url(r'^terms/', include('user_creation.urls')),
+    url(r'^access/', include('user_creation.urls')),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
+urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]

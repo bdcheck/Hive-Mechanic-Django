@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="{% static 'builder-js/vendor/material-components-web-11.0.0.css' %}" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-        <title>Login | Hive Mechanic</title>
+        <title>Request Access | Hive Mechanic</title>
 
         <style>
             body {
@@ -55,21 +55,41 @@
 				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
 				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-2-phone">
 					<div class="mdc-card">
-						<form method="post" action="{% url 'login' %}">
+						<form method="post" action="{% url 'user_request_access' %}">
 							{% csrf_token %}
 							<div class="mdc-layout-grid">
 								<div class="mdc-layout-grid__inner">
-									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
 										{% builder_site_login_banner %}
-										<label class="mdc-text-field mdc-text-field--outlined" id="field_username" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
+										
+										<h1 class="mdc-typography--headline5">Request Access</h1>
+										
+										<p>
+											To obtain access to this Hive Mechanic instance, please complete the requested fields below.
+											A manager will review your request and grant access as appropriate.
+										</p>
+										
+										{% if errors %}
+											<h6 class="mdc-typography--headline6" style="margin: 0; color: #B71C1C;">Errors encountered!</h6>
+
+											<ul style="color: #B71C1C;">
+											{% for error in errors %}
+												<li>{{ error }}</li>
+											{% endfor %}
+											</ul>
+											
+											<p style="color: #B71C1C;">Please correct the issue(s) and try again.</p>
+										{% endif %}
+										
+										<label class="mdc-text-field mdc-text-field--outlined" id="field_email" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
 											<span class="mdc-notched-outline">
 												<span class="mdc-notched-outline__leading"></span>
 												<span class="mdc-notched-outline__notch">
-													<span class="mdc-floating-label" id="my-label-id">Username</span>
+													<span class="mdc-floating-label" id="my-label-id">E-Mail Address</span>
 												</span>
 												<span class="mdc-notched-outline__trailing"></span>
 											</span>
-											<input type="text" name="username" class="mdc-text-field__input" aria-labelledby="my-label-id">
+											<input type="text" name="email" class="mdc-text-field__input" value="{{ request.POST.email }}" aria-labelledby="my-label-id">
 										</label>
 									</div>
 								</div>
@@ -79,7 +99,7 @@
 											<span class="mdc-notched-outline">
 												<span class="mdc-notched-outline__leading"></span>
 												<span class="mdc-notched-outline__notch">
-													<span class="mdc-floating-label" id="my-password-id">Password</span>
+													<span class="mdc-floating-label" id="my-password-id">Initial Password</span>
 												</span>
 												<span class="mdc-notched-outline__trailing"></span>
 											</span>
@@ -87,27 +107,41 @@
 										</label>
 									</div>
 								</div>
-								{% if form.errors %}
-									<div class="mdc-layout-grid__inner">
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-											<p>Your username and password didn't match. Please try again.</p>
-										</div>
-									</div>
-								{% endif %}									
 								<div class="mdc-layout-grid__inner">
-									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+										<label class="mdc-text-field mdc-text-field--outlined"  id="field_password_confirm" style="width: 100%; margin-bottom: 16px;">
+											<span class="mdc-notched-outline">
+												<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+													<span class="mdc-floating-label" id="my-password-id">Confirm Password</span>
+												</span>
+												<span class="mdc-notched-outline__trailing"></span>
+											</span>
+											<input type="password" name="confirm_password" class="mdc-text-field__input" aria-labelledby="my-password-id">
+										</label>
+									</div>
+								</div>
+								<div class="mdc-layout-grid__inner">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+										<h6 class="mdc-typography--headline6" style="margin: 0px;">Password Requirements</h6>
+										
+										<ul>
+											{% for requirement in password_requirements %}
+												<li style="margin-bottom: 8px;">{{ requirement }}</li>
+											{% endfor %}
+										</ul>
+										
+										<p>
+											Your request will be sent to an administrator for approval.
+										</p>
+									</div>
+								</div>
+								<div class="mdc-layout-grid__inner">
+									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 										<button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit">
 											<div class="mdc-button__ripple"></div>
-											<span class="mdc-button__label">Continue</span>
+											<span class="mdc-button__label">Request Access</span>
 										</button>
-									</div>
-									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-										<a href="{% url 'user_request_access' %}" class="mdc-button mdc-card__action mdc-card__action--button" id="button_request_access" type="button" style="float: right;">
-											Request Access
-										</a>
-									</div>
-									<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-										<center><a href="#" class="mdc-typography mdc-typography--caption">Forgot Password?</a></center>
 									</div>
 								</div>
 							</div>
@@ -116,10 +150,10 @@
 				</div>
 				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
 			</div>
-			</div>
+		</div>
 
 		{% block 'js_init' %}
-			<script data-main="{% static 'builder-js/js/app/login.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+			<script data-main="{% static 'user/js/app/request_access.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
 		{% endblock %}
     </body>
 </html>
