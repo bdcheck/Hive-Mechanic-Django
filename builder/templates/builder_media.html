@@ -3,7 +3,7 @@
 {% load filer_admin_tags %}
 {% load absolute_uri_tags %}
 {% block 'page_title' %}All Media | Hive Mechanic{% endblock %}
-{% block 'navigation_title' %}Hive Mechanic - Media Library{% endblock %}
+{% block 'navigation_title' %}Hive Mechanic{% endblock %}
 {% block 'main_content' %}
 
     <script>
@@ -50,41 +50,48 @@
     </div>
     </div>
     <div class="mdc-layout-grid__cell--span-6">
-    Filter: <input class="mdc-text-field" id="image-filter" placeholder="Search..">
+      <div class="mdc-card">
+    Search: <input class="mdc-text-field" id="image-filter" placeholder="Search..">
+      </div>
     </div>
     </div>
     </div>
     <div>
 	<ul class="mdc-list">
 			{% for m in media %}
-				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" data-name="{{ m.owner}} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}"  >
+        <div class="mdc-card" style="padding: 16px">
+				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" style="padding: 16px" data-name="{{ m.owner}} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}"  >
 							<span class="mdc-list-item mdc-list-item__graphic">
                                {% file_icon m %}
 							</span>
                             <span class="mdc-deprecated-list-item__text">
-                            {% if m.description %}
-                            <span class="mdc-list-item__overline-text">
-                                {{ m.description }}
+                             <span class="mdc-list-item__secondary-text">
+                               Filename: <a href="{% absolute_uri m.url request %}">{{ m.original_filename }}</a>
+
                             </span>
-                            {% endif %}
-                            <span class="mdc-list-item__overline-text">
+                            <span class="mdc-list-item__secondary-text">
                                Owner: {{ m.owner }}
                             </span>
-
-                                <span class="mdc-list-item__secondary-text">
+                            <div class="mdc-list-item__secondary-text">
+                               Description: {% if m.description %} {{ m.description }} {% endif %}
+                            </div>
+                              <span class="mdc-list-item__secondary-text">
                                     Uploaded at: {{ m.uploaded_at }}
-                                </span>
+                              </span>
                             <span class="mdc-list-item__secondary-text" style="font-size: 75%">
                                 <a href="{% absolute_uri m.url request %}">{% absolute_uri m.url request %}</a>
 							</span>
-                            </span>
+
                             <span class="mdc-list-item mdc-deprecated-list-item__meta">
                                 <button class="material-icons mdc-button" aria-describedby="clipboard-tooltip-id" onclick="copyToClipboard('{% absolute_uri m.url request %}')">content_copy</button>
                             </span>
-
-            {%  endfor %}
-
+                            </span>
+        </div>
         </li>
+                <span class="mdc-list-divider mdc-list-divider--padded"></span>
+
+              {%  endfor %}
+
     </ul>
     </div>
 
