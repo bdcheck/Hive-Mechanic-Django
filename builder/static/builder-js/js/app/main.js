@@ -616,14 +616,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $("#action_save").off("click");
 
         $("#action_save").click(function (eventObj) {
-	        $("#action_save").text("pending");
-        
             eventObj.preventDefault();
 
             if (window.dialogBuilder.update != undefined) {
                 if ($("#action_save").text() == "warning") {
                     warningDialog.open();
                 } else {
+			        $("#action_save").text("pending");
+
                     var clean = cleanDefinition(window.dialogBuilder.definition);
 
                     window.dialogBuilder.update(clean, function () {
