@@ -293,8 +293,8 @@
         </div>
 
         <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="add-card-dialog"  aria-labelledby="add-card-dialog-title" aria-describedby="add-card-dialog-content">
-            <div class="mdc-dialog__container" style="width: 75%;">
-                <div class="mdc-dialog__surface" style="width: 100%; max-width: 800px;">
+            <div class="mdc-dialog__container" style="width: 95%;">
+                <div class="mdc-dialog__surface" style="width: 100%; max-width: 100%;">
                     <h2 class="mdc-dialog__title" id="add-card-dialog-title">Add Card</h2>
                     <div class="mdc-dialog__content" id="add-card-dialog-content">
 						<div class="mdc-layout-grid__inner" id="add-card-select-widget">
@@ -560,7 +560,7 @@
             cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
             visualization: "{% url 'builder_activity_view' game.slug %}",
-
+            categories: {{ game.interaction_card_categories_json }},
             update: function(definition, success, failure) {
                 var payload = {
                     'definition': JSON.stringify(definition, 2)

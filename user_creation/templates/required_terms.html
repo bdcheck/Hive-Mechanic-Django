@@ -1,0 +1,70 @@
+{% load static %}
+{% load builder_tags %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+		<link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+		<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+		<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+		<link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+
+        <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
+        <link rel="stylesheet" href="{% static 'builder-js/vendor/material-components-web-11.0.0.css' %}" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <title>{{ terms.name }} | Hive Mechanic</title>
+
+        <style>
+            body {
+                display: flex;
+                height: 100vh;
+                margin: 0px;
+            }
+
+            .main-content {
+                overflow: auto;
+                height: 100%;
+            }
+
+            .app-bar {
+                position: absolute;
+                z-index: 10;
+            }
+
+            .mdc-top-app-bar {
+                z-index: 7;
+            }
+            
+            a {
+            	text-decoration: none;
+            }
+        </style>
+    </head>
+    <body class="mdc-typography" style="background-color: #BDBDBD;">
+		<div class="mdc-layout-grid" style="width: 100%;">
+			<div class="mdc-layout-grid__inner">
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8 mdc-layout-grid__cell--span-4-tablet mdc-layout-grid__cell--span-2-phone">
+					<form method="post" action="{% url 'user_required_terms' %}">
+						{% csrf_token %}
+						<input type="hidden" name="terms_id" value="{{ terms.pk }}" />
+						<iframe src="{{ terms.terms_html.url }}" title="{{ terms.name }}" style="width: 100%; height: 80vh; background-color: #fff; border: thin solid black;"></iframe> 
+						
+						<p class="mdc-typography--body1">I have read and agree to comply with the terms above.</p>	
+						
+						<button class="mdc-button mdc-button--raised" type="submit">
+							<span class="mdc-button__ripple"></span>
+							<span class="mdc-button__focus-ring"></span>
+							<span class="mdc-button__label">Agree and Continue</span>
+						</button>					
+					</form>
+				</div>
+				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2 mdc-layout-grid__cell--span-2-tablet mdc-layout-grid__cell--span-1-phone"></div>
+			</div>
+		</div>
+    </body>
+    <script>
+</html>

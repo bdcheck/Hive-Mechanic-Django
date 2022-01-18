@@ -1,0 +1,148 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+{% load builder_tags %}
+
+{% block 'page_title' %}Update Account | Hive Mechanic{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'navigation_title' %}Update Account{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner">
+						{% if messages %}
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+								<div class="mdc-card" style="padding: 16px;">
+									{% for message in messages %}
+										<span class="mdc-typography mdc-typography--headline6">
+											{{ message }}
+										</span>
+					
+									{% endfor %}
+								</div>
+							</div>
+						{% endif %}
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+							<span class="mdc-typography mdc-typography--headline6">
+								Account Details
+							</span>
+							<p class="mdc-typography mdc-typography--body1">
+								<strong>Created</strong><br />
+								{{ user.date_joined }}
+							</p>
+							<p class="mdc-typography mdc-typography--body1">
+								<strong>Last Login</strong><br />
+								{{ user.last_login }}
+							</p>
+
+							<p class="mdc-typography mdc-typography--body1">
+								<strong>Status</strong>
+								{% if user.is_superuser %}
+									<br />Is Superuser
+								{% endif %}
+								{% if user.is_staff %}
+									<br />Is Staff
+								{% endif %}
+								{% if user.is_active %}
+									<br />Is Active
+								{% else %}
+									<br />Is Inactive
+								{% endif %}
+							</p>
+
+							<div class="mdc-typography mdc-typography--subtitle1" style="padding-top: 2em;">
+								<strong>Password Requirements</strong>
+							</div>
+							
+							{% for requirement in password_requirements %}
+								<p class="mdc-typography mdc-typography--body2">
+									{{ requirement }}
+								</p>
+							{% endfor %}
+							
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+							<form class="mdc-layout-grid__inner" action="" method="POST" id="update-form">
+								{% csrf_token %}
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<span class="mdc-typography mdc-typography--headline6">
+										Update Details
+									</span>
+								</div>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<label class="mdc-text-field mdc-text-field--outlined" id="email-field" style="width: 100%;">
+										<span class="mdc-notched-outline">
+											<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+												<span class="mdc-floating-label" id="username-label">E-Mail Address</span>
+											</span>
+											<span class="mdc-notched-outline__trailing"></span>
+										</span>
+										<input type="email" class="mdc-text-field__input" name="email" value="{{ user.email }}" aria-labelledby="email-label">
+									</label>
+								</div>
+
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<span class="mdc-typography mdc-typography--subtitle1">
+										Update Password
+									</span>
+									<label class="mdc-text-field mdc-text-field--outlined"  id="current-password-field" style="width: 100%;">
+										<span class="mdc-notched-outline">
+											<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+												<span class="mdc-floating-label" id="current-password-label">Current Password</span>
+											</span>
+											<span class="mdc-notched-outline__trailing"></span>
+										</span>
+										<input type="password" class="mdc-text-field__input" name="current-password" aria-labelledby="current-password-label">
+									</label>
+									<span class="mdc-typography--caption">Provide the current password to create a new password.</span>
+								</div>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<label class="mdc-text-field mdc-text-field--outlined" id="new-password-field" style="width: 100%;">
+										<span class="mdc-notched-outline">
+											<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+												<span class="mdc-floating-label" id="new-password-label">New Password</span>
+											</span>
+											<span class="mdc-notched-outline__trailing"></span>
+										</span>
+										<input type="password" class="mdc-text-field__input" name="new-password" aria-labelledby="new-password-label">
+									</label>
+								</div>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<label class="mdc-text-field mdc-text-field--outlined" id="confirm-password-field" style="width: 100%;">
+										<span class="mdc-notched-outline">
+											<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+												<span class="mdc-floating-label" id="confirm-password-label">New Password (Confirm)</span>
+											</span>
+											<span class="mdc-notched-outline__trailing"></span>
+										</span>
+										<input type="password" class="mdc-text-field__input" name="confirm-password" aria-labelledby="confirm-password-label">
+									</label>
+								</div>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<button type="submit" class="mdc-button mdc-button--raised">
+										<span class="mdc-button__ripple"></span>
+										<span class="mdc-button__label">Update Account</span>
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'user/js/app/account.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

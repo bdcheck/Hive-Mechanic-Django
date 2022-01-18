@@ -10,14 +10,14 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from ...models import RemoteRepository, InteractionCard, DataProcessor
+from ...models import RemoteRepository, InteractionCard, InteractionCardCategory, DataProcessor
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--silent', default=False, action='store_true')
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements, too-many-branches
-        for repository in RemoteRepository.objects.order_by('priority'):
+        for repository in RemoteRepository.objects.order_by('priority'): # pylint: disable=too-many-nested-blocks
             response = requests.get(repository.url)
 
             repository_content = response.content
@@ -79,6 +79,18 @@ class Command(BaseCommand):
                         matched_card.metadata = json.dumps(metadata, indent=2)
 
                         matched_card.save()
+
+                    if matched_card.category is None:
+                        category_name = card_def.get('category', None)
+
+                        if category_name is not None:
+                            category = InteractionCardCategory.objects.filter(name=category_name).first()
+
+                            if category is None:
+                                category = InteractionCardCategory.objects.create(name=category_name)
+
+                            matched_card.category = category
+                            matched_card.save()
 
                 for key in repository_def['data_processors'].keys():
                     processor_def = repository_def['data_processors'][key]

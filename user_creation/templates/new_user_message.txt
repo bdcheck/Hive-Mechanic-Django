@@ -1,0 +1,9 @@
+{{ user.email }} has requested access to the Hive Mechanic site at {{ settings.SITE_URL }}.
+
+To approve the request and assign the appropropriate permissions, go to
+
+    {{ settings.SITE_URL }}{{ update_url }}
+
+You may also delete the pending user account if access should not be granted.
+
+-Hive Mechanic

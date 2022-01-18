@@ -21,15 +21,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    url('^accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^data/', include('passive_data_kit.urls')),
     url(r'^builder/', include('builder.urls')),
     url(r'^quicksilver/', include('quicksilver.urls')),
     url(r'^twilio/', include('twilio_support.urls')),
     url(r'^http/', include('http_support.urls')),
-    url(r'^filer/', include('filer.urls')),
+    url(r'^http/', include('http_support.urls')),
+    url(r'^access/', include('user_creation.urls')),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

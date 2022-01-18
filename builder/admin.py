@@ -4,7 +4,7 @@
 from django.contrib import messages
 from django.contrib.gis import admin
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, RemoteRepository, DataProcessor, SiteSettings
+from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, Session, RemoteRepository, DataProcessor, SiteSettings
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
@@ -14,9 +14,17 @@ class GameAdmin(admin.OSMGeoAdmin):
 class GameVersionAdmin(admin.OSMGeoAdmin):
     list_display = ('game', 'created',)
 
+@admin.register(InteractionCardCategory)
+class InteractionCardCategoryAdmin(admin.OSMGeoAdmin):
+    list_display = ('name', 'priority',)
+
+    search_fields = ['name']
+
 @admin.register(InteractionCard)
 class InteractionCardAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'identifier', 'enabled', 'version', 'issues', 'available_update',)
+    list_display = ('name', 'identifier', 'category', 'enabled', 'version', 'issues', 'available_update',)
+    list_filter = ('enabled', 'category',)
+    search_fields = ['name', 'identifier']
 
     fieldsets = (
         (None, {
