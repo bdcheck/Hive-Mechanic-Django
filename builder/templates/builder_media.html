@@ -6,93 +6,132 @@
 {% block 'navigation_title' %}Hive Mechanic{% endblock %}
 {% block 'main_content' %}
 
-    <script>
-    let copyToClipboard = function(text) {
-        navigator.clipboard.writeText(text).then(function () {
-            alert("Url copied")
-        }).catch(function () {
-            alert("Error copying")
-        });
+  <script>
+    let copyToClipboard = function (text) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert("Url copied")
+      }).catch(function () {
+        alert("Error copying")
+      });
     }
-        $(document).ready(function() {
-            $("#image-filter").on("keyup", function() {
-            let val = $(this).val().toLowerCase()
-            console.log(val)
-            $(".image-grid").filter(function() {
-                console.log(val)
-                $(this).toggle($(this).data("name").toLowerCase().indexOf(val) > -1)
-            });
+    $(document).ready(function () {
+      $("#image-filter").on("keyup", function () {
+        let val = $(this).val().toLowerCase()
+        console.log(val)
+        $(".image-grid").filter(function () {
+          $(this).toggle($(this).data("name").toLowerCase().indexOf(val) > -1)
         });
+      });
     });
 
-    </script>
-    <div id="clipboard-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
-        <div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
-            Copy to clipboard
-        </div>
+  </script>
+  <div id="clipboard-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+    <div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
+      Copy to clipboard
     </div>
-    <div class="mdc-typography--headline5">
+  </div>
+  <div class="mdc-typography--headline5">
     Media Library
-    </div>
-    <div class="mdc-layout-grid mdc-layout-grid__cell--span-12">
+  </div>
+  <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
-    <div class="mdc-layout-grid__cell--span-6">
+    <div class="mdc-layout-grid__cell--span-12">
     <div class="mdc-layout-grid">
-        <label for="upload-field">Upload your file</label>
-        <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
-                   {% csrf_token %}
-            <input class="mdc-form-field" id="upload-field" type="file" name="file"/>
-            <div>
-            Description (optional): <input class="mdc-form-field" type="text" id = "description" name="description" >
+    <div class="mdc-layout-grid__inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-card" style="padding: 16px">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+            <div class="mdc-layout-grid">
+              <div class="mdc-layout-grid__inner">
+              <div class="mdc-layout-grid__cell--span-12">
+              <label for="upload-field" class="mdc-typography--body1">Upload new media:</label>
+              <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
+                {% csrf_token %}
+                <input class="mdc-form-field" id="upload-field" type="file" name="file"/>
+                <div class="mdc-typography--body2">
+                  Description (optional): <input class="mdc-form-field" type="text" id="description" name="description">
+                </div>
+                <input type="submit" class="mdc-form-field">
+              </form>
+              </div>
+              </div>
             </div>
-            <input type="submit" class="mdc-form-field">
-        </form>
-    </div>
-    </div>
-    <div class="mdc-layout-grid__cell--span-6">
-      <div class="mdc-card">
-    Search: <input class="mdc-text-field" id="image-filter" placeholder="Search..">
+          </div>
+        </div>
       </div>
     </div>
     </div>
     </div>
-    <div>
-	<ul class="mdc-list">
-			{% for m in media %}
+
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-layout-grid">
+          <div class="mdc-layout-grid__inner">
+            <div class="mdc-layout-grid__cell--span-12">
         <div class="mdc-card" style="padding: 16px">
-				<li class="mdc-list--two-line mdc-list-item mdc-list--thumbnail-list -card image-grid" style="padding: 16px" data-name="{{ m.owner}} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}"  >
-							<span class="mdc-list-item mdc-list-item__graphic">
-                               {% file_icon m %}
-							</span>
-                            <span class="mdc-deprecated-list-item__text">
-                             <span class="mdc-list-item__secondary-text">
-                               Filename: <a href="{% absolute_uri m.url request %}">{{ m.original_filename }}</a>
-
-                            </span>
-                            <span class="mdc-list-item__secondary-text">
-                               Owner: {{ m.owner }}
-                            </span>
-                            <div class="mdc-list-item__secondary-text">
-                               Description: {% if m.description %} {{ m.description }} {% endif %}
-                            </div>
-                              <span class="mdc-list-item__secondary-text">
-                                    Uploaded at: {{ m.uploaded_at }}
-                              </span>
-                            <span class="mdc-list-item__secondary-text" style="font-size: 75%">
-                                <a href="{% absolute_uri m.url request %}">{% absolute_uri m.url request %}</a>
-							</span>
-
-                            <span class="mdc-list-item mdc-deprecated-list-item__meta">
-                                <button class="material-icons mdc-button" aria-describedby="clipboard-tooltip-id" onclick="copyToClipboard('{% absolute_uri m.url request %}')">content_copy</button>
-                            </span>
-                            </span>
+            <div class=" mdc-layout-grid__cell--span-3">
+              Browse Prior Uploads
+            </div>
+            <div class="mdc-layout-grid__cell--span-6">
+              Search (owner, filename, details, uploaded at): <input class="mdc-text-field" id="image-filter" placeholder="Search..">
+            </div>
+        </div></div>
+          </div>
         </div>
-        </li>
-                <span class="mdc-list-divider mdc-list-divider--padded"></span>
 
-              {%  endfor %}
+      </div>
 
-    </ul>
+        {% for m in media %}
+          <div class="mdc-layout-grid__cell--span-12">
+          <div class="mdc-layout-grid">
+          <div class="mdc-layout-grid__inner">
+          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+
+            <div class="mdc-card image-grid" style="padding: 16px"
+            data-name="{{ m.owner }} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}">
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+
+            <div class= "mdc-layout-grid__cell--span-2 mdc-layout-grid--align-left">
+              <button class="mdc-button mdc-button--outlined">
+                {% file_icon m %}
+              </button>
+            </div>
+            <div class= mdc-layout-grid__cell--span-10">
+              <div class="mdc-typography--body2">
+                Filename: <a href="{% absolute_uri m.url request %}">{{ m.original_filename }}</a>
+
+              </div>
+              <div class="mdc-typography--body2">
+                Owner: {{ m.owner }}
+              </div>
+              <div class="mdc-typography--body2">
+                Description: {% if m.description %} {{ m.description }} {% endif %}
+              </div>
+              <div class="mdc-typography--body2">
+                Uploaded at: {{ m.uploaded_at }}
+              </div>
+              <div class="mdc-typography--body2">
+                <a href="{% absolute_uri m.url request %}">{% absolute_uri m.url request %}</a>
+              </div>
+
+
+            </div>
+            <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-2 mdc-layout-grid--align-left">
+              <label for="copyclipboard{{ forloop.counter }}" class="mdc-typography--body2">Copy URL to clipboard</label>
+              <button class="material-icons mdc-button" aria-describedby="clipboard-tooltip-id"
+                      onclick="copyToClipboard('{% absolute_uri m.url request %}')" id="copyclipboard{{ forloop.counter }}">content_copy
+
+              </button>
+            </div>
+              </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
 
-{%  endblock %}
+
+
+{% endblock %}
