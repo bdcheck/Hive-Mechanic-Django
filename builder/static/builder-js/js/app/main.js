@@ -20,6 +20,21 @@ requirejs.config({
 });
 
 requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], function (mdc, sequence, Cookies, Node) {
+    var csrftoken = Cookies.get('csrftoken');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
     let self = this;
 
     let dialogIsDirty = false;
@@ -36,8 +51,27 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
     window.dialogBuilder.gameVariablesDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('builder-game-variables-dialog'));
 
     window.dialogBuilder.restartGameDialog.listen('MDCDialog:closed', (result) => {
-        console.log("ACTION: ");
-        console.log(result);
+    	if (result.detail.action === 'reset_game') {
+			let selectedAction = $('input[name="builder_reset_game"]:checked').val()
+			let actionUrl = $('input[name="builder_reset_game"]:checked').attr('data-url')
+		
+			console.log("ACTION: ");
+			console.log(selectedAction);
+			console.log(actionUrl);
+		
+			let payload = {
+				'action': selectedAction
+			};
+
+	        $.post(actionUrl, payload, function(data) {
+	            console.log("response")
+	            console.log(data)
+	            
+	            if (data.message != undefined) {
+	            	alert(data.message)
+	            }
+	        });
+		}
     });
 
     window.dialogBuilder.viewStructureDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('preview-dialog'))
@@ -58,13 +92,13 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
       }, 100)
     })
 
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_view_structure_tip'))
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_reset_activity_tip'))
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_view_structure_tip'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_reset_activity_tip'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
 
-	mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
     
     const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'));
     const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'));
@@ -622,14 +656,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 if ($("#action_save").text() == "warning") {
                     warningDialog.open();
                 } else {
-			        $("#action_save").text("pending");
+                    $("#action_save").text("pending");
 
                     var clean = cleanDefinition(window.dialogBuilder.definition);
 
                     window.dialogBuilder.update(clean, function () {
-                    	window.setTimeout(function() {
-	                        $("#action_save").text('save');
-	                    }, 1000);
+                        window.setTimeout(function() {
+                            $("#action_save").text('save');
+                        }, 1000);
 
                         dialogIsDirty = false;
                     }, function (error) {
@@ -673,51 +707,51 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
             return 0;
         });
 
-		$.each(window.dialogBuilder.categories, function(index, category) {
-			if (category.cards.length > 0) {
-				let cardItem = '';
-			
-				let groupSpan = 12
-				let itemSpan = 3
-			
-				if (category.cards.length <= 2) {
-					groupSpan = 6
-					itemSpan = 6
-				}
+        $.each(window.dialogBuilder.categories, function(index, category) {
+            if (category.cards.length > 0) {
+                let cardItem = '';
+            
+                let groupSpan = 12
+                let itemSpan = 3
+            
+                if (category.cards.length <= 2) {
+                    groupSpan = 6
+                    itemSpan = 6
+                }
 
-				cardItem += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + groupSpan + '">'
-				cardItem += '      <strong>' + category.name + '</strong>'
-				cardItem += '      <div class="mdc-layout-grid__inner" style="grid-gap: 0px;">'
+                cardItem += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + groupSpan + '">'
+                cardItem += '      <strong>' + category.name + '</strong>'
+                cardItem += '      <div class="mdc-layout-grid__inner" style="grid-gap: 0px;">'
 
-				$.each(category.cards, function(card_index, card_identifier) {
-					var nodeClass = window.dialogBuilder.cardMapping[card_identifier];
+                $.each(category.cards, function(card_index, card_identifier) {
+                    var nodeClass = window.dialogBuilder.cardMapping[card_identifier];
 
-					var name = nodeClass.cardName();
+                    var name = nodeClass.cardName();
 
-					if (name == Node.cardName()) {
-						name = key;
-					}
+                    if (name == Node.cardName()) {
+                        name = key;
+                    }
 
-					cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-' + itemSpan + '">'
-					cardItem += '    <div class="mdc-radio">';
-					cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + index + '-' + card_index + '" name="add-card-options" value="' + card_identifier + '">';
-					cardItem += '      <div class="mdc-radio__background">';
-					cardItem += '        <div class="mdc-radio__outer-circle"></div>';
-					cardItem += '        <div class="mdc-radio__inner-circle"></div>';
-					cardItem += '      </div>';
-					cardItem += '    </div>';
-					cardItem += '    <label for="add-card-option-' + index + '-' + card_index + '">' + name + '</label>';
-					cardItem += '  </div>';
-				});
+                    cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-' + itemSpan + '">'
+                    cardItem += '    <div class="mdc-radio">';
+                    cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + index + '-' + card_index + '" name="add-card-options" value="' + card_identifier + '">';
+                    cardItem += '      <div class="mdc-radio__background">';
+                    cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+                    cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+                    cardItem += '      </div>';
+                    cardItem += '    </div>';
+                    cardItem += '    <label for="add-card-option-' + index + '-' + card_index + '">' + name + '</label>';
+                    cardItem += '  </div>';
+                });
 
 
-				cardItem += '      </div>'
-				cardItem += '    </div>'
+                cardItem += '      </div>'
+                cardItem += '    </div>'
 
-				$("#add-card-select-widget").append(cardItem);
+                $("#add-card-select-widget").append(cardItem);
 
-			}
-		});        
+            }
+        });        
 
         window.dialogBuilder.addCardDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add-card-dialog'));
         mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'));
@@ -1358,21 +1392,6 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         chooseDialog.open();
     });
 
-    var csrftoken = Cookies.get('csrftoken');
-
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-
-    $.ajaxSetup({
-        beforeSend: function (xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
     $("#icon_activity_click").click(function(event) {
         event.preventDefault();
 
@@ -1436,24 +1455,24 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         delete e['returnValue'];
     });
     
-	$("#action_list_variables").off("click");
+    $("#action_list_variables").off("click");
 
-	$("#action_list_variables").click(function (eventObj) {
-		eventObj.preventDefault();
-		
-		$("#builder-game-variables-dialog-content").html('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top"><em>Fetching variables&#8230;</em></div>');
+    $("#action_list_variables").click(function (eventObj) {
+        eventObj.preventDefault();
+        
+        $("#builder-game-variables-dialog-content").html('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--align-top"><em>Fetching variables&#8230;</em></div>');
 
-		window.dialogBuilder.gameVariablesDialog.open();
-		
-		window.dialogBuilder.fetchVariables(function(variables) {
-			$("#builder-game-variables-dialog-content").html('');
+        window.dialogBuilder.gameVariablesDialog.open();
+        
+        window.dialogBuilder.fetchVariables(function(variables) {
+            $("#builder-game-variables-dialog-content").html('');
 
             $.each(variables, function (index, item) {
-				$("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">' + item['name'] + '</div>');
-				$("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">= <strong>' + item['value'] + '</strong></div>');
+                $("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">' + item['name'] + '</div>');
+                $("#builder-game-variables-dialog-content").append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">= <strong>' + item['value'] + '</strong></div>');
             });
-		
-		
-		});
-	});
+        
+        
+        });
+    });
 });
