@@ -75,6 +75,31 @@ def builder_sessions(request): # pylint: disable=unused-argument
 
     return render(request, 'builder_sessions.html', context=context)
 
+@login_required
+@user_accepted_all_terms
+def builder_sessions_action(request):
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    if request.method == 'POST':
+        session = Session.objects.filter(pk=int(request.POST.get('session', -1))).first()
+        action = request.POST.get('action', None)
+
+        if session is not None:
+            matched_game = session.game_version.game
+
+            if matched_game.can_edit(request.user):
+                if action == 'delete':
+                    session.complete()
+                    session.delete()
+                elif action == 'cancel':
+                    session.complete()
+
+                return HttpResponse(json.dumps({'success': True}, indent=2), content_type='application/json', status=200)
+
+            raise PermissionDenied('Edit permission required.')
+
+    raise PermissionDenied('View permission required.')
 
 @login_required
 @user_accepted_all_terms
@@ -446,3 +471,54 @@ def builder_integrations_update(request):
             integration.name = int_name
         integration.save()
     return redirect('builder_integrations')
+
+
+@login_required
+@user_accepted_all_terms
+def builder_activity_actions_json(request, activity): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('Edit permission required.')
+
+    matched_game = Game.objects.filter(slug=activity).first()
+
+    if matched_game.can_edit(request.user):
+        context = {}
+
+        context['game'] = matched_game
+
+        response_payload = {
+            'result': 'error',
+            'message': 'No action specified'
+        }
+
+        if request.method == 'POST':
+            action = request.POST.get('action', None)
+
+            if action is not None:
+                if action == 'reset-game-variables':
+                    matched_game.reset_variables()
+
+                    response_payload['result'] = 'success'
+                    response_payload['message'] = 'Game variables have been cleared.'
+                elif action == 'reset-active-session-variables':
+                    matched_game.reset_active_session_variables()
+
+                    response_payload['result'] = 'success'
+                    response_payload['message'] = 'Game session variables have been cleared.'
+                elif action == 'close-active-sessions':
+                    matched_game.close_active_sessions()
+
+                    response_payload['result'] = 'success'
+                    response_payload['message'] = 'Active sessions have been closed.'
+                else:
+                    response_payload['message'] = 'Undefined action: %s' % action
+            else:
+                response_payload['message'] = 'No action provided.'
+
+        response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+        response['X-Hive-Mechanic-Editable'] = matched_game.can_edit(request.user)
+
+        return response
+
+    raise PermissionDenied('Edit permission required.')

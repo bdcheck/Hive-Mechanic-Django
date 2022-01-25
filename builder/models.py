@@ -363,6 +363,23 @@ class Game(models.Model):
 
         return session
 
+    def reset_active_session_variables(self):
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is None:
+                    session.session_state = {}
+                    session.save()
+
+    def close_active_sessions(self):
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if session.completed is None:
+                    session.complete()
+
+    def reset_variables(self):
+        self.game_state = {} # pylint: disable=unsupported-assignment-operation
+        self.save()
+
     def set_variable(self, variable, value):
         self.game_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()

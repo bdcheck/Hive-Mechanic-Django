@@ -1,5 +1,6 @@
 {% extends 'builder_base.html' %}
 {% load static %}
+{% load builder_tags %}
 
 {% block 'page_title' %}Sessions | Interaction Builder{% endblock %}
 
@@ -27,12 +28,17 @@
 						<tbody class="mdc-data-table__content">
 							{% for session in sessions %}
 								<tr class="mdc-data-table__row">
-									<td class="mdc-data-table__cell">{{ session.player }}</td>
-									<td class="mdc-data-table__cell"><a href="{% url 'builder_game' session.game_version.game.slug %}">{{ session.game_version.game.name }}</a></td>
+									<td class="mdc-data-table__cell">{{ session.player.identifier|obfuscate_identifier }}</td>
+									<td class="mdc-data-table__cell"><a href="{% url 'builder_game' session.game_version.game.slug %}">{{ session.game_version.game.name }}</a> ({{ session.pk }})</td>
 									<td class="mdc-data-table__cell">{{ session.started }}</td>
 									<td class="mdc-data-table__cell">{{ session.completed }}</td>
 									<td class="mdc-data-table__cell">
-										<a href="#" class="material-icons" aria-hidden="true">delete_forever</a>
+										{% if session.completed %}
+											<span class="material-icons" aria-hidden="true">check_circle</span>
+										{% else %}
+											<a href="#" class="material-icons session-action" data-session-id="{{ session.pk }}" data-action="cancel" aria-hidden="true">cancel</a>
+										{% endif %}
+										<a href="#" class="material-icons session-action" data-session-id="{{ session.pk }}" data-action="delete" aria-hidden="true">delete_forever</a>
 									</td>
 								</tr>
 							{% endfor %}

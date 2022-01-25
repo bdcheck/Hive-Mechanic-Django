@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_dialog_engine',
     'user_creation',
     'builder',
+    'activity_logger',
     'integrations',
     'twilio_support',
     'http_support',
