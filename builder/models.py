@@ -19,7 +19,9 @@ import requests
 from six import python_2_unicode_compatible
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import JSONField
+from django.core.checks import Warning, register # pylint: disable=redefined-builtin
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
@@ -69,6 +71,19 @@ CYTOSCAPE_DIALOG_PLACEHOLDER = [{
     },
     'group': 'edges'
 }]
+
+@register()
+def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
+        warnings.append(Warning(
+            'Missing required Hive Mechanic groups',
+            hint='Run the "initialize_permissions" command to set up required permissions',
+            id='builder.W001',
+        ))
+
+    return warnings
 
 def file_cleanup(sender, **kwargs):
     '''

@@ -8,7 +8,9 @@ import os
 
 import django.views.defaults
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.http import HttpResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -24,7 +26,6 @@ from user_creation.decorators import user_accepted_all_terms
 
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
-
 
 @login_required
 @user_accepted_all_terms
@@ -74,6 +75,94 @@ def builder_sessions(request): # pylint: disable=unused-argument
     context['sessions'] = Session.objects.all()
 
     return render(request, 'builder_sessions.html', context=context)
+
+@login_required
+@user_accepted_all_terms
+def builder_authors(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    if request.method == 'POST':
+        response_payload = {
+            'message': 'No matching author located.'
+        }
+
+        action = request.POST.get('action', None)
+        email = request.POST.get('email', None)
+
+        user = get_user_model().objects.filter(email=email).first()
+
+        if user is not None:
+            if action == 'delete_user':
+                user.delete()
+
+                response_payload['message'] = '%s removed from the system.' % email
+            elif action == 'activate_user':
+                user.is_active = True
+                user.save()
+
+                response_payload['message'] = '%s activated.' % email
+            elif action == 'deactivate_user':
+                user.is_active = False
+                user.save()
+
+                response_payload['message'] = '%s deactivated.' % email
+            elif action == 'promote_user':
+                current_group = user.groups.all().first()
+
+                if current_group is None:
+                    reader_group = Group.objects.filter(name='Hive Mechanic Reader').first()
+                    user.groups.clear()
+                    user.groups.add(reader_group)
+                    user.save()
+                elif current_group.name == 'Hive Mechanic Reader':
+                    editor_group = Group.objects.filter(name='Hive Mechanic Game Editor').first()
+                    user.groups.clear()
+                    user.groups.add(editor_group)
+                    user.save()
+                elif current_group.name == 'Hive Mechanic Game Editor':
+                    manager_group = Group.objects.filter(name='Hive Mechanic Manager').first()
+                    user.groups.clear()
+                    user.groups.add(manager_group)
+                    user.save()
+
+                response_payload['message'] = '%s promoted.' % email
+            elif action == 'demote_user':
+                current_group = user.groups.all().first()
+
+                if current_group is None:
+                    pass
+                elif current_group.name == 'Hive Mechanic Manager':
+                    editor_group = Group.objects.filter(name='Hive Mechanic Game Editor').first()
+                    user.groups.clear()
+                    user.groups.add(editor_group)
+                    user.save()
+                elif current_group.name == 'Hive Mechanic Game Editor':
+                    reader_group = Group.objects.filter(name='Hive Mechanic Reader').first()
+                    user.groups.clear()
+                    user.groups.add(reader_group)
+                    user.save()
+                else:
+                    user.groups.clear()
+                    user.save()
+
+                response_payload['message'] = '%s demoted.' % email
+            else:
+                response_payload['message'] = 'Unknown action: %s' % action
+
+        return HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+    context = {}
+
+    context['pending'] = list(get_user_model().objects.filter(is_active=False))
+    context['active'] = get_user_model().objects.filter(is_active=True).order_by('email')
+
+    context['is_manager'] = (request.user.groups.all().filter(name='Hive Mechanic Manager').first() is not None)
+
+    if context['is_manager'] is False:
+        context['pending'] = []
+
+    return render(request, 'builder_authors.html', context=context)
 
 @login_required
 @user_accepted_all_terms

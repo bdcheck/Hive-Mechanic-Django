@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
 from django.core.mail import send_mail
 from django.core.validators import validate_email, ValidationError
@@ -63,20 +64,28 @@ def user_request_access(request): # pylint: disable=unused-argument
             new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
 
             to_addrs = []
+            
+            admins_group = Group.objects.filter(name='Hive Mechanic Manager').first()
+            
+            if admins_group is not None:
+                for user in admins_group.user_set.all():
+                    if user.has_perm('auth.change_user') and user.email is not None:
+                        to_addrs.append(user.email)
+            else:
+                for user in get_user_model().objects.all():
+                    if user.has_perm('auth.change_user') and user.email is not None:
+                        to_addrs.append(user.email)
+                        
+            if to_addrs:
+                subject = 'New Hive Mechanic Access Request (' + settings.ALLOWED_HOSTS[0] + ')'
 
-            for user in get_user_model().objects.all():
-                if user.has_perm('auth.change_user') and user.email is not None:
-                    to_addrs.append(user.email)
+                message = render_to_string('new_user_message.txt', {
+                    'user': new_user,
+                    'settings': settings,
+                    'update_url': reverse('builder_authors')
+                })
 
-            subject = 'New Hive Mechanic Access Request (' + settings.ALLOWED_HOSTS[0] + ')'
-
-            message = render_to_string('new_user_message.txt', {
-                'user': new_user,
-                'settings': settings,
-                'update_url': reverse('admin:auth_user_change', args=(new_user.id,))
-            })
-
-            send_mail(subject, message, settings.DEFAULT_FROM_MAIL_ADDRESS, to_addrs, fail_silently=False)
+                send_mail(subject, message, settings.DEFAULT_FROM_MAIL_ADDRESS, to_addrs, fail_silently=False)
 
             return render(request, 'user_request_access_complete.html', context=context)
 

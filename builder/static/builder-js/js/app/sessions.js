@@ -83,8 +83,6 @@ requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
         const sessionId = $(this).attr('data-session-id')
         const action = $(this).attr('data-action')
 
-        console.log(action + ' -> ' + sessionId)
-
         let data = {
             'action': action,
             'session': sessionId

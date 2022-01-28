@@ -1,0 +1,117 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+{% load builder_tags %}
+
+{% block 'page_title' %}Authors | Interaction Builder{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'navigation_title' %}Authors{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			{% if pending and is_manager %}
+				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					<div class="mdc-card" style="padding: 16px;">
+						<div class="mdc-typography mdc-typography--headline6">Authors: Pending or Inactive</div>
+					</div>
+				</div>
+				<div class="mdc-data-table mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					<table class="mdc-data-table__table" aria-label="All Games" id="table_players">
+						<thead>
+							<tr class="mdc-data-table__header-row">
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">E-Mail</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col" style="text-align: right;">Actions</th>
+							</tr>
+						</thead>
+						<tbody class="mdc-data-table__content">
+							{% for user in pending %}
+								<tr class="mdc-data-table__row">
+									<td class="mdc-data-table__cell">{{ user.email }}</a></td>
+									<td class="mdc-data-table__cell">
+										{% if user.first_name and user.last_name %}
+											{{ user.first_name }} {{ user.last_name }}
+										{% else %}
+											<em>No name provided&#8230;</em>
+										{% endif %}
+									</td>
+									<td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+										<a href="#" class="material-icons action_approve_user" data-id="{{ user.email }}" aria-hidden="true">person_add</a>
+										<a href="#" class="material-icons action_delete_user" data-id="{{ user.email }}" aria-hidden="true">delete_forever</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					&nbsp;
+				</div>
+			{% endif %}
+
+			{% if active %}
+				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					<div class="mdc-card" style="padding: 16px;">
+						<div class="mdc-typography mdc-typography--headline6">Authors: Active</div>
+					</div>
+				</div>
+				<div class="mdc-data-table mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+					<table class="mdc-data-table__table" aria-label="All Games" id="table_players">
+						<thead>
+							<tr class="mdc-data-table__header-row">
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">E-Mail</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Last Login</th>
+								<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Role</th>
+								{% if is_manager %}<th class="mdc-data-table__header-cell" role="columnheader" scope="col" style="text-align: right;">Actions</th>{% endif %}
+							</tr>
+						</thead>
+						<tbody class="mdc-data-table__content">
+							{% for user in active %}
+								<tr class="mdc-data-table__row">
+									<td class="mdc-data-table__cell">{{ user.email }}</a></td>
+									<td class="mdc-data-table__cell">
+										{% if user.first_name and user.last_name %}
+											{{ user.first_name }} {{ user.last_name }}
+										{% else %}
+											<em>No name provided&#8230;</em>
+										{% endif %}
+									</td>
+									<td class="mdc-data-table__cell">
+										{{ user.last_login.date }}
+									</td>
+									{% with user.groups.all.first as group %}
+										<td class="mdc-data-table__cell">
+											{{ group }}
+										</td>
+										{% if is_manager %}
+											<td class="mdc-data-table__cell mdc-data-table__cell--numeric">
+												{% if group %}
+													<a href="#" class="material-icons action_decrease_access" data-id="{{ user.email }}" aria-hidden="true">keyboard_arrow_down</a>
+												{% endif %} 
+												{% if group is None or group.name != 'Hive Mechanic Manager' %}
+													<a href="#" class="material-icons action_increase_access" data-id="{{ user.email }}" aria-hidden="true">keyboard_arrow_up</a>
+												{% endif %}
+
+												<a href="#" class="material-icons action_deactivate_user" data-id="{{ user.email }}" aria-hidden="true">person_remove</a>
+											</td>
+										{% endif %}
+									{% endwith %}
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			{% endif %}
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/authors.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

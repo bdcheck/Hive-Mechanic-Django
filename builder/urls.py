@@ -7,7 +7,7 @@ from .views import builder_game, builder_game_definition_json, builder_interacti
                    builder_add_game, builder_data_processor_options, builder_activity_delete, \
                    builder_update_icon, builder_media, builder_media_upload, builder_game_templates, \
                    builder_settings, builder_game_variables, builder_integrations, builder_integrations_update, \
-                   builder_activity_view, builder_activity_actions_json, builder_sessions_action
+                   builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'data-processor-options.json$', builder_data_processor_options, name='builder_data_processor_options'),
     url(r'session/actions$', builder_sessions_action, name='builder_sessions_action'),
     url(r'sessions$', builder_sessions, name='builder_sessions'),
+    url(r'authors$', builder_authors, name='builder_authors'),
     url(r'players$', builder_players, name='builder_players'),
     url(r'settings$', builder_settings, name='builder_settings'),
     url(r'^card/(?P<card>.+)', builder_interaction_card, name='builder_interaction_card'),
