@@ -7,10 +7,12 @@ from .views import builder_game, builder_game_definition_json, builder_interacti
                    builder_add_game, builder_data_processor_options, builder_activity_delete, \
                    builder_update_icon, builder_media, builder_media_upload, builder_game_templates, \
                    builder_settings, builder_game_variables, builder_integrations, builder_integrations_update, \
-                   builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors
+                   builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors, \
+                   builder_activity_logger
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
+    url(r'log$', builder_activity_logger, name='builder_activity_logger'),
     url(r'activities$', builder_activities, name='builder_activities'),
     url(r'data-processor-options.json$', builder_data_processor_options, name='builder_data_processor_options'),
     url(r'session/actions$', builder_sessions_action, name='builder_sessions_action'),

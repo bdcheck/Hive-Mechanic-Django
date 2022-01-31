@@ -18,6 +18,7 @@ from django.utils.translation import gettext as _
 
 from passive_data_kit.models import DataPoint
 
+from activity_logger.models import log
 from builder.models import Game, Player, Session
 
 INTEGRATION_TYPES = (
@@ -53,7 +54,10 @@ class Integration(models.Model):
     viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_viewables', blank=True)
 
     def __str__(self):
-        return self.name + ' (' + self.game.slug + ')'
+        return '%s (%s)' % (self.name , self.game.slug)
+
+    def log_id(self):
+        return 'integration:%d' % self.pk
 
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
@@ -112,6 +116,8 @@ class Integration(models.Model):
                 else:
                     session.process_incoming(self, None, extras)
 
+            log(self.log_id(), 'Processed incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
+
             if isinstance(payload, list):
                 actions = payload
 
@@ -144,6 +150,8 @@ class Integration(models.Model):
 
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process', action)
+
+                log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches
         translated_value = value
@@ -208,6 +216,15 @@ class Integration(models.Model):
                         variable_value = '???'
 
                     translated_value = translated_value.replace(tag, variable_value)
+                    
+            if translated_value != value:
+                metadata = {
+                    'original_value': value,
+                    'translated_value': translated_value,
+                }
+                    
+                log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
+
         except TypeError:
             pass # Attempting to translate non-string
 
@@ -271,6 +288,7 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 session.player.set_variable(action['variable'], action['translated_value'])
             elif scope == 'game':
                 session.game_version.game.set_variable(action['variable'], action['translated_value'])
+
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 

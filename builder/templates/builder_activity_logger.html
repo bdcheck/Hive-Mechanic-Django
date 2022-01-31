@@ -1,0 +1,62 @@
+{% extends 'builder_base.html' %}
+{% load static %}
+{% load builder_tags %}
+
+{% block 'page_title' %}System Log | Interaction Builder{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'navigation_title' %}System Log{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid mdc-typography">
+		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body2">
+				<div class="mdc-card" style="padding: 16px;">
+					{{ log_items.count }} entries
+				</div>
+			</div>
+
+			{% for item in log_items %}
+				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body2">
+					<div class="mdc-card mdc-layout-grid">
+						<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+								<strong>{{ item.logged }}</strong>
+								<p>{{ item.message }}</p>
+								<p>
+									{% for tag in item.tags.all %}
+										[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
+									{% endfor %}
+								</p>
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+								{% if item.player %}
+									Player: <a href="?player={{ item.player.pk }}">{{ item.player.identifier|obfuscate_identifier }}</a><br />
+								{% endif %}
+
+								{% if item.game_version %}
+									Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
+								{% endif %}
+
+								{% if item.session %}
+									Session: <a href="?session={{ item.session.pk }}">{{ item.session }}</a>
+								{% endif %}
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+								<strong>Metadata</strong><br />
+								{{ item.metadata }}
+							</div>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/activity_logger.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}
