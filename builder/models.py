@@ -435,7 +435,7 @@ class Game(models.Model):
 
         version = self.versions.order_by('-created').first()
 
-        log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value) , tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
+        log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value), tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
 
     def fetch_variable(self, variable):
         if variable in self.game_state: # pylint: disable=unsupported-membership-test
@@ -732,7 +732,7 @@ class Player(models.Model):
             'new_value': value
         }
 
-        log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value) , tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
+        log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
 
     def fetch_variable(self, variable):
         if variable in self.player_state: # pylint: disable=unsupported-membership-test
@@ -801,7 +801,7 @@ class Session(models.Model):
             'new_value': value
         }
 
-        log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value) , tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
+        log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value), tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
     def fetch_variable(self, variable):
         if variable.startswith('[') and variable.endswith(']'):
