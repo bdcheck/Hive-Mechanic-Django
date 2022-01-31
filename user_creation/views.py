@@ -60,7 +60,7 @@ def user_request_access(request): # pylint: disable=unused-argument, too-many-br
                 for message in validation_error.messages:
                     context['errors'].append(message)
 
-        if len(context['errors']) == 0:
+        if len(context['errors']) == 0: # pylint: disable=len-as-condition
             new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
 
             to_addrs = []
