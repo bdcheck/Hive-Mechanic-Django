@@ -34,7 +34,7 @@ def user_required_terms(request): # pylint: disable=unused-argument
 
     return redirect('builder_home')
 
-def user_request_access(request): # pylint: disable=unused-argument
+def user_request_access(request): # pylint: disable=unused-argument, too-many-branches
     context = {
         'password_requirements': password_validators_help_texts(),
         'errors': []
@@ -60,13 +60,13 @@ def user_request_access(request): # pylint: disable=unused-argument
                 for message in validation_error.messages:
                     context['errors'].append(message)
 
-        if len(context['errors']) == 0:
+        if len(context['errors']) == 0: # pylint: disable=len-as-condition
             new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
 
             to_addrs = []
-            
+
             admins_group = Group.objects.filter(name='Hive Mechanic Manager').first()
-            
+
             if admins_group is not None:
                 for user in admins_group.user_set.all():
                     if user.has_perm('auth.change_user') and user.email is not None:
@@ -75,7 +75,7 @@ def user_request_access(request): # pylint: disable=unused-argument
                 for user in get_user_model().objects.all():
                     if user.has_perm('auth.change_user') and user.email is not None:
                         to_addrs.append(user.email)
-                        
+
             if to_addrs:
                 subject = 'New Hive Mechanic Access Request (' + settings.ALLOWED_HOSTS[0] + ')'
 

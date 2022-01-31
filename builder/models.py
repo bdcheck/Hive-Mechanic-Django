@@ -26,6 +26,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models.signals import post_delete
+from django.db.utils import ProgrammingError
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -78,12 +79,32 @@ CYTOSCAPE_DIALOG_PLACEHOLDER = [{
 def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
 
-    if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
-        warnings.append(Warning(
-            'Missing required Hive Mechanic groups',
-            hint='Run the "initialize_permissions" command to set up required permissions',
-            id='builder.W001',
-        ))
+    try:
+        if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
+            warnings.append(Warning(
+                'Missing required Hive Mechanic groups',
+                hint='Run the "initialize_permissions" command to set up required permissions',
+                id='builder.W001',
+            ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
+
+    return warnings
+
+@register()
+def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    try:
+        for game in Game.objects.all():
+            for card in game.cards.filter(enabled=False):
+                warnings.append(Warning(
+                    'Activity "%s" is configured to use disabled card "%s"' % (game, card),
+                    hint='Enable the card or remove it from the game configuration to continue.',
+                    id='builder.W002',
+                ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
 
     return warnings
 
@@ -343,7 +364,7 @@ class Game(models.Model):
     def interaction_card_modules_json(self):
         modules = []
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             modules.append(reverse('builder_interaction_card', args=[card.identifier]))
 
         return mark_safe(json.dumps(modules)) # nosec
@@ -351,7 +372,7 @@ class Game(models.Model):
     def interaction_card_categories_json(self): # pylint: disable=invalid-name
         categories = {}
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             category_name = 'Hive Mechanic Card'
             category_priority = 0
 
