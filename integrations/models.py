@@ -56,7 +56,7 @@ class Integration(models.Model):
     enabled = models.BooleanField(default=True)
 
     def __str__(self):
-        return '%s (%s)' % (self.name , self.game.slug)
+        return '%s (%s)' % (self.name, self.game.slug)
 
     def log_id(self):
         return 'integration:%d' % self.pk
