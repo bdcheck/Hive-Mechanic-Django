@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=4096, unique=True)),
-                ('priority', models.CharField(max_length=4096, unique=True)),
+                ('priority', models.IntegerField(default=0)),
             ],
         ),
         migrations.AddField(
