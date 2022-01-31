@@ -26,6 +26,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models.signals import post_delete
+from django.db.utils import ProgrammingError
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -75,13 +76,16 @@ CYTOSCAPE_DIALOG_PLACEHOLDER = [{
 @register()
 def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
-
-    if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
-        warnings.append(Warning(
-            'Missing required Hive Mechanic groups',
-            hint='Run the "initialize_permissions" command to set up required permissions',
-            id='builder.W001',
-        ))
+    
+    try:
+        if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
+            warnings.append(Warning(
+                'Missing required Hive Mechanic groups',
+                hint='Run the "initialize_permissions" command to set up required permissions',
+                id='builder.W001',
+            ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
 
     return warnings
 
@@ -89,13 +93,16 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
 def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
     
-    for game in Game.objects.all():
-        for card in game.cards.filter(enabled=False):
-            warnings.append(Warning(
-                'Activity "%s" is configured to use disabled card "%s"' % (game, card),
-                hint='Enable the card or remove it from the game configuration to continue.',
-                id='builder.W002',
-            ))
+    try:
+        for game in Game.objects.all():
+            for card in game.cards.filter(enabled=False):
+                warnings.append(Warning(
+                    'Activity "%s" is configured to use disabled card "%s"' % (game, card),
+                    hint='Enable the card or remove it from the game configuration to continue.',
+                    id='builder.W002',
+                ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
 
     return warnings
 
