@@ -329,9 +329,16 @@ def execute_action(integration, session, action):
         outgoing.message = integration.translate_value(action['message'], session)
         outgoing.integration = integration
 
+        if integration.is_enabled() is False:
+            outgoing.sent_date = timezone.now()
+            outgoing.transmission_metadata = {
+                'error': 'Unable to send, integration is disabled.'
+            }
+
         outgoing.save()
 
-        outgoing.transmit()
+        if integration.enabled():
+            outgoing.transmit()
 
         return True
     elif action['type'] == 'echo-image':
@@ -340,9 +347,16 @@ def execute_action(integration, session, action):
         outgoing.message = 'image:' + integration.translate_value(action['image-url'], session)
         outgoing.integration = integration
 
+        if integration.is_enabled() is False:
+            outgoing.sent_date = timezone.now()
+            outgoing.transmission_metadata = {
+                'error': 'Unable to send, integration is disabled.'
+            }
+
         outgoing.save()
 
-        outgoing.transmit()
+        if integration.enabled():
+            outgoing.transmit()
 
         return True
     elif action['type'] == 'echo-voice':
@@ -351,12 +365,18 @@ def execute_action(integration, session, action):
         outgoing.send_date = timezone.now()
         outgoing.message = integration.translate_value(action['message'], session)
         outgoing.next_action = action['next_action']
-
         outgoing.integration = integration
+
+        if integration.is_enabled() is False:
+            outgoing.sent_date = timezone.now()
+            outgoing.transmission_metadata = {
+                'error': 'Unable to send, integration is disabled.'
+            }
 
         outgoing.save()
 
-        outgoing.transmit()
+        if integration.enabled():
+            outgoing.transmit()
 
         return True
 

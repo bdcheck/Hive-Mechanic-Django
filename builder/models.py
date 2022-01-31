@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long
+# pylint: disable=no-member, line-too-long, too-many-lines
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -432,7 +432,7 @@ class Game(models.Model):
             'old_value': old_value,
             'new_value': value
         }
-        
+
         version = self.versions.order_by('-created').first()
 
         log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value) , tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
@@ -731,7 +731,7 @@ class Player(models.Model):
             'old_value': old_value,
             'new_value': value
         }
-        
+
         log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value) , tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
 
     def fetch_variable(self, variable):
@@ -791,16 +791,16 @@ class Session(models.Model):
 
     def set_variable(self, variable, value):
         old_value = self.session_state.get(variable, None)
-        
+
         self.session_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
-        
+
         metadata = {
             'variable_name': variable,
             'old_value': old_value,
             'new_value': value
         }
-        
+
         log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value) , tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
     def fetch_variable(self, variable):
@@ -853,7 +853,7 @@ class Session(models.Model):
         metadata = {
             'dialog': 'dialog:%d' % self.dialog.pk,
         }
-        
+
         log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
     def last_message(self):
@@ -1020,3 +1020,6 @@ class SiteSettings(models.Model):
     banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
+
+    total_message_limit = models.IntegerField(null=True, blank=True)
+    count_messages_since = models.DateTimeField(null=True, blank=True)

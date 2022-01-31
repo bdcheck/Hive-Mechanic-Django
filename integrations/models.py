@@ -19,7 +19,7 @@ from django.utils.translation import gettext as _
 from passive_data_kit.models import DataPoint
 
 from activity_logger.models import log
-from builder.models import Game, Player, Session
+from builder.models import Game, Player, Session, SiteSettings
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
@@ -53,11 +53,48 @@ class Integration(models.Model):
     editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_editables', blank=True)
     viewers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='integration_viewables', blank=True)
 
+    enabled = models.BooleanField(default=True)
+
     def __str__(self):
         return '%s (%s)' % (self.name , self.game.slug)
 
     def log_id(self):
         return 'integration:%d' % self.pk
+
+    def is_enabled(self):
+        if self.enabled is not True:
+            return self.enabled
+
+        if self.type == 'twilio': # pylint: disable=no-else-return
+            site_settings = SiteSettings.objects.all().first()
+
+            if site_settings.total_message_limit is not None:
+                from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall # pylint: disable=import-outside-toplevel
+
+                incoming_messages = IncomingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
+
+                outgoing_messages = OutgoingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
+
+                outgoing_calls = OutgoingCall.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    outgoing_calls = OutgoingCall.objects.filter(sent_date__gte=site_settings.count_messages_since)
+
+                total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
+
+                if total >= site_settings.total_message_limit:
+                    print('Disabling %s: Twilio traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+
+                    self.enabled = False
+                    self.save()
+
+        return self.enabled
 
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
@@ -216,13 +253,13 @@ class Integration(models.Model):
                         variable_value = '???'
 
                     translated_value = translated_value.replace(tag, variable_value)
-                    
+
             if translated_value != value:
                 metadata = {
                     'original_value': value,
                     'translated_value': translated_value,
                 }
-                    
+
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:

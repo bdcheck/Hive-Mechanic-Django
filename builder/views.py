@@ -72,11 +72,11 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
         raise PermissionDenied('View permission required.')
 
     context = {}
-    
+
     query = Q(pk__gte=0)
-    
+
     tag = request.GET.get('tag', None)
-    
+
     if tag is not None:
         query = query & Q(tags__tag=tag)
 
