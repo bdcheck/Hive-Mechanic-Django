@@ -85,6 +85,20 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
 
     return warnings
 
+@register()
+def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+    
+    for game in Game.objects.all():
+        for card in game.cards.filter(enabled=False):
+            warnings.append(Warning(
+                'Activity "%s" is configured to use disabled card "%s"' % (game, card),
+                hint='Enable the card or remove it from the game configuration to continue.',
+                id='builder.W002',
+            ))
+
+    return warnings
+
 def file_cleanup(sender, **kwargs):
     '''
     File cleanup callback used to emulate the old delete
@@ -338,7 +352,7 @@ class Game(models.Model):
     def interaction_card_modules_json(self):
         modules = []
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             modules.append(reverse('builder_interaction_card', args=[card.identifier]))
 
         return mark_safe(json.dumps(modules)) # nosec
@@ -346,7 +360,7 @@ class Game(models.Model):
     def interaction_card_categories_json(self): # pylint: disable=invalid-name
         categories = {}
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             category_name = 'Hive Mechanic Card'
             category_priority = 0
 

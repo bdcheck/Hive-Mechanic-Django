@@ -261,8 +261,24 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
             latest.definition = json.dumps(definition, indent=2)
             latest.save()
-
-        definition = json.loads(latest.definition)
+            
+        definition = None
+        
+        try:
+            definition = json.loads(latest.definition)
+        except json.JSONDecodeError:
+            definition = [{
+                'type': 'sequence',
+                'id': 'new-sequence',
+                'name': 'Error',
+                'items': [{
+                    "name": "Parsing Error",
+                    "context": "Error reading game",
+                    "comment": "Unable to parse game definition.\n\nPlease verify that the JSON definition is valid.",
+                    "type": "comment",
+                    "id": "error"
+                }]
+            }]
 
         response = HttpResponse(json.dumps(definition, indent=2), content_type='application/json', status=200)
 

@@ -724,26 +724,31 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                 cardItem += '      <div class="mdc-layout-grid__inner" style="grid-gap: 0px;">'
 
                 $.each(category.cards, function(card_index, card_identifier) {
+                	console.log("CARD ID: " + card_identifier)
+                	
                     var nodeClass = window.dialogBuilder.cardMapping[card_identifier];
+                    
+                    if (nodeClass === undefined) {
+                    	alert('Unable to load card type "' + card_identifier + '". Please verify that the site is setup correctly.');
+                    } else {
+						var name = nodeClass.cardName();
 
-                    var name = nodeClass.cardName();
+						if (name == Node.cardName()) {
+							name = key;
+						}
 
-                    if (name == Node.cardName()) {
-                        name = key;
-                    }
-
-                    cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-' + itemSpan + '">'
-                    cardItem += '    <div class="mdc-radio">';
-                    cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + index + '-' + card_index + '" name="add-card-options" value="' + card_identifier + '">';
-                    cardItem += '      <div class="mdc-radio__background">';
-                    cardItem += '        <div class="mdc-radio__outer-circle"></div>';
-                    cardItem += '        <div class="mdc-radio__inner-circle"></div>';
-                    cardItem += '      </div>';
-                    cardItem += '    </div>';
-                    cardItem += '    <label for="add-card-option-' + index + '-' + card_index + '">' + name + '</label>';
-                    cardItem += '  </div>';
+						cardItem += '  <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-' + itemSpan + '">'
+						cardItem += '    <div class="mdc-radio">';
+						cardItem += '      <input class="mdc-radio__native-control" type="radio" id="add-card-option-' + index + '-' + card_index + '" name="add-card-options" value="' + card_identifier + '">';
+						cardItem += '      <div class="mdc-radio__background">';
+						cardItem += '        <div class="mdc-radio__outer-circle"></div>';
+						cardItem += '        <div class="mdc-radio__inner-circle"></div>';
+						cardItem += '      </div>';
+						cardItem += '    </div>';
+						cardItem += '    <label for="add-card-option-' + index + '-' + card_index + '">' + name + '</label>';
+						cardItem += '  </div>';
+					}
                 });
-
 
                 cardItem += '      </div>'
                 cardItem += '    </div>'
