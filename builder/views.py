@@ -261,9 +261,9 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
             latest.definition = json.dumps(definition, indent=2)
             latest.save()
-            
+
         definition = None
-        
+
         try:
             definition = json.loads(latest.definition)
         except json.JSONDecodeError:

@@ -76,7 +76,7 @@ CYTOSCAPE_DIALOG_PLACEHOLDER = [{
 @register()
 def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
-    
+
     try:
         if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
             warnings.append(Warning(
@@ -92,7 +92,7 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
 @register()
 def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
-    
+
     try:
         for game in Game.objects.all():
             for card in game.cards.filter(enabled=False):
