@@ -6,26 +6,27 @@ from requests import exceptions
 import json
 import configparser
 from ast import literal_eval
-
+import time
 
 net_timeout = 5
 max_timeout = 20
-check_time = 100
+check_time = 30
 timeout = 120000
 keys = [pygame.K_LEFT, pygame.K_RIGHT]
 start_button = pygame.K_DOWN
-
+save_cache = True
 config = configparser.ConfigParser()
 config.read("./config.ini")
 cd = config['Config']
 DEBUG = cd.getboolean('debug')
 PRELOAD_ON = cd.getboolean('preload_on')
+SAVE_CACHE = cd.getboolean("save_cache")
 FULLSCREEN = cd.getboolean('fullscreen')
 error_screen_file = cd['error_screen_file']
 token = cd['token']
 url = cd['url']
 start_sequence = cd['start_sequence']
-intialize_sequence = cd["intial_sequence"]
+intialize_sequence = cd["initial_sequence"]
 IMAGE_RESOLUTION = literal_eval(cd['image_resolution'])
 
 
@@ -93,7 +94,10 @@ class MlkMural(object):
         waiting = True
         while waiting:
             try:
+                start_time = time.time()
                 self.client.issue_command(command, player=player)
+                times = time.time() - start_time
+                print(f"issue command time = {times}")
                 waiting = False
             except (TimeoutError, exceptions.ConnectionError):
                 self.network_timeout()
@@ -121,15 +125,21 @@ class MlkMural(object):
         reset = 0
         self.goto_start_screen()
         pygame.time.set_timer(NEXT_SCREEN, check_time, True)
-
+        starttimer = 0
         while True:
             tick = clock.tick()
             timer += tick
             for event in pygame.event.get():
                 if event.type == NEXT_SCREEN:
+                    next_screen_timer = time.time()
+                    times = time.time() - starttimer
+                    print(f"start next {times}")
                     if playing_sound:
                         self.sound_cache.stop(playing_sound)
                     sound = self.fetch_variable("sound", player="game", scope=VariableScope.game)
+                    times = time.time() - next_screen_timer
+                    print(f"start next {times}")
+
                     image = self.fetch_variable("image", player="game", scope=VariableScope.game)
                     if sound == '""':
                         sound = None
@@ -141,11 +151,11 @@ class MlkMural(object):
                     else:
                         choices = []
                         error = True
-                    reset = self.fetch_variable("reset", player="game", scope=VariableScope.game)
+                    # reset = self.fetch_variable("reset", player="game", scope=VariableScope.game)
                     # retrieve sound and play if there
                     if sound:
                         playing_sound = sound
-                        self.sound_cache.play(sound)
+                        #self.sound_cache.play(sound)
                     # retrieve image and show on screen if there
                     if image:
                         current_image = self.image_cache.get_image(image)
@@ -157,13 +167,16 @@ class MlkMural(object):
                         pygame.display.flip()
                         pygame.display.update()
                     pause = False
+                    times = time.time() - starttimer
+                    print(f"everything done time {times}")
 
                 if event.type == pygame.KEYUP:
                     last_press = timer
                     # quit game
                     if event.key == pygame.K_q and DEBUG:
-                        self.cleanup(self.sound_cache)
-                        self.cleanup(self.image_cache)
+                        if not SAVE_CACHE:
+                            self.cleanup(self.sound_cache)
+                            self.cleanup(self.image_cache)
                         quit()
                     if event.key == start_button and self.current_screen != "start":
                         if not pause:
@@ -181,6 +194,7 @@ class MlkMural(object):
                         last_press = timer
                     # look to see if the button pressed was the first, second or third option
                     if event.key in keys and not pause:
+                        starttimer = time.time()
                         index = keys.index(event.key)
                         choice = choices[index]
                         self.current_screen = choice
