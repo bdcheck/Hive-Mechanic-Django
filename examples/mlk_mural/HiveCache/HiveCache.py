@@ -1,3 +1,4 @@
+import json
 from typing import ClassVar
 import os.path
 import requests
@@ -22,7 +23,7 @@ class HiveCache(object):
         return HiveCache.__main_cache__
 
     @staticmethod
-    def get_type(key)->str:
+    def get_type(key) -> str:
         """
         returns the mimetype category for an url
         :param key:
@@ -32,8 +33,59 @@ class HiveCache(object):
         cat_type = str(c_type[0]).split("/")[0]
         return cat_type
 
-    def __init__(self):
+    def __init__(self, name="main"):
         self.__cache = {}
+        self.__name = name
+        self.check_and_read_cache_list()
+
+    def check_file_exists(self, file, ending=None):
+        dir = tempfile.gettempdir()
+        new_file = dir + "/" + file
+        if ending:
+            new_file += ending
+        if os.path.exists(new_file):
+            return new_file
+        return False
+
+    def check_and_read_cache_list(self):
+        """
+        checks to see if it exists and if it exists reads it in
+        """
+        name = self.check_file_exists(self.__name, ".cache")
+        if name:
+            with open(name) as fp:
+                self.__cache = json.load(fp)
+
+            self.cleanup_cache_list()
+
+    def cleanup_cache_list(self):
+        """
+        Goes through cache list and determines if files exist
+        :return:
+        """
+        list_to_delete = []
+        for key in self.__cache:
+            data = self.__cache[key]
+            filename = data["filename"]
+            if not os.path.exists(filename):
+                list_to_delete.append(key)
+        for key in list_to_delete:
+            del self.__cache[key]
+
+
+    def write_cache_list(self):
+        """
+        Writes cache list to a file
+        :return:
+        """
+        dir = tempfile.gettempdir()
+        file = dir + "/"+self.__name + ".cache"
+        with open(file,"w") as fp:
+            dump = {key: self.get_all_fields_but_optional(value) for key, value in self.__cache.items()}
+            json.dump(dump, fp)
+
+    def get_all_fields_but_optional(self, entry):
+        return {key: value for key, value in entry.items() if key != "optional"}
 
     def check_if_exists(self, key: str):
         """Determines if a url is already in the system
@@ -62,6 +114,7 @@ class HiveCache(object):
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, file)
                 self.__cache[key] = data
+                self.write_cache_list()
             else:
                 self.__cache[key] = data
                 self.__remove_file(key)
@@ -149,6 +202,9 @@ class PygameSoundCache(HiveCache):
             PygameSoundCache.__sound_cache__ = PygameSoundCache()
         return PygameSoundCache.__sound_cache__
 
+    def __init__(self):
+        super().__init__("sound")
+
     def get_value(self, key: str) -> (dict, None):
         """
 
@@ -156,7 +212,7 @@ class PygameSoundCache(HiveCache):
         :return: dictionary of cache or None if doesn't exist
         """
         val = super().get_value(key)
-        if val and not val["optional"]:
+        if val and not val.get("optional"):
             sound = pygame.mixer.Sound(val["filename"])
             self.add_optional_value_to_key(key, sound)
         return val
@@ -168,7 +224,7 @@ class PygameSoundCache(HiveCache):
         :return: pygame.mixer.Sound or None if cache url cannot be found
         """
         data = self.get_value(key)
-        if data and data["optional"]:
+        if data and data.get("optional"):
             return data["optional"]
         return None
 
@@ -205,13 +261,16 @@ class PygameImageCache(HiveCache):
             PygameImageCache.__surface_cache__ = PygameImageCache()
         return PygameImageCache.__surface_cache__
 
+    def __init__(self):
+        super().__init__("images")
+
     def get_value(self, key: str) -> (dict, None):
         """
         :param key: URL str
         :return: dictionary of cache or None if doesn't exist
         """
         val = super().get_value(key)
-        if val and not val["optional"]:
+        if val and not val.get('optional'):
             image = pygame.image.load(val["filename"])
             self.add_optional_value_to_key(key, image)
         return val
@@ -223,10 +282,12 @@ class PygameImageCache(HiveCache):
         :return: pygame.surface or None if cache url cannot be found
         """
         data = self.get_value(key)
-        if data and data["optional"]:
+        if data and data.get("optional"):
             return data["optional"]
         return None
 
     def get_image(self, key) -> (pygame.surface, None):
         return self.get_optional_value(key)
+
+
 
