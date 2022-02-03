@@ -99,7 +99,7 @@ class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'created', 'last_updated')
+    list_display = ('name', 'created', 'last_updated', 'total_message_limit', 'count_messages_since')
 
 @admin.register(DataProcessor)
 class DataProcessorAdmin(admin.OSMGeoAdmin):

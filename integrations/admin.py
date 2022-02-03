@@ -7,9 +7,9 @@ from .models import Integration
 
 @admin.register(Integration)
 class IntegrationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'url_slug', 'type', 'game')
+    list_display = ('name', 'url_slug', 'type', 'game', 'enabled',)
     search_fields = ('name', 'url_slug', 'type', 'configuration',)
-    list_filter = ('game', 'type', 'create_new_players',)
+    list_filter = ('enabled', 'game', 'type', 'create_new_players',)
 
     def get_readonly_fields(self, request, obj=None):
         fields = super(IntegrationAdmin, self).get_readonly_fields(request, obj=obj) # pylint: disable=super-with-arguments

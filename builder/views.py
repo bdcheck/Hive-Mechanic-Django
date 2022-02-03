@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.db.models import Q
 from django.http import HttpResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -21,6 +22,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from filer.admin.clipboardadmin import ajax_upload
 from filer.models import filemodels
 
+from activity_logger.models import LogItem
 from integrations.models import Integration
 from user_creation.decorators import user_accepted_all_terms
 
@@ -62,6 +64,42 @@ def builder_activities(request): # pylint: disable=unused-argument
             context['activities'].append(game)
 
     return render(request, 'builder_activities.html', context=context)
+
+@login_required
+@user_accepted_all_terms
+def builder_activity_logger(request): # pylint: disable=unused-argument
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    context = {}
+
+    query = Q(pk__gte=0)
+
+    tag = request.GET.get('tag', None)
+
+    if tag is not None:
+        query = query & Q(tags__tag=tag)
+
+    player = request.GET.get('player', None)
+
+    if player is not None:
+        query = query & Q(player__pk=int(player))
+
+    session = request.GET.get('session', None)
+
+    if session is not None:
+        query = query & Q(session__pk=int(session))
+
+    game = request.GET.get('game', None)
+
+    if game is not None:
+        query = query & Q(game_version__game__pk=int(game))
+
+    sort = request.GET.get('sort', '-logged')
+
+    context['log_items'] = LogItem.objects.filter(query).order_by(sort)
+
+    return render(request, 'builder_activity_logger.html', context=context)
 
 
 @login_required
@@ -262,7 +300,23 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
             latest.definition = json.dumps(definition, indent=2)
             latest.save()
 
-        definition = json.loads(latest.definition)
+        definition = None
+
+        try:
+            definition = json.loads(latest.definition)
+        except json.JSONDecodeError:
+            definition = [{
+                'type': 'sequence',
+                'id': 'new-sequence',
+                'name': 'Error',
+                'items': [{
+                    "name": "Parsing Error",
+                    "context": "Error reading game",
+                    "comment": "Unable to parse game definition.\n\nPlease verify that the JSON definition is valid.",
+                    "type": "comment",
+                    "id": "error"
+                }]
+            }]
 
         response = HttpResponse(json.dumps(definition, indent=2), content_type='application/json', status=200)
 

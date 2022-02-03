@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long
+# pylint: disable=no-member, line-too-long, too-many-lines
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -26,12 +26,15 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models.signals import post_delete
+from django.db.utils import ProgrammingError
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
 from passive_data_kit.models import DataPoint
+
+from activity_logger.models import log
 
 from . import card_issues
 from .utils import fetch_cytoscape
@@ -76,12 +79,32 @@ CYTOSCAPE_DIALOG_PLACEHOLDER = [{
 def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
 
-    if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
-        warnings.append(Warning(
-            'Missing required Hive Mechanic groups',
-            hint='Run the "initialize_permissions" command to set up required permissions',
-            id='builder.W001',
-        ))
+    try:
+        if Group.objects.filter(name='Hive Mechanic Reader').count() == 0:
+            warnings.append(Warning(
+                'Missing required Hive Mechanic groups',
+                hint='Run the "initialize_permissions" command to set up required permissions',
+                id='builder.W001',
+            ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
+
+    return warnings
+
+@register()
+def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    try:
+        for game in Game.objects.all():
+            for card in game.cards.filter(enabled=False):
+                warnings.append(Warning(
+                    'Activity "%s" is configured to use disabled card "%s"' % (game, card),
+                    hint='Enable the card or remove it from the game configuration to continue.',
+                    id='builder.W002',
+                ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
 
     return warnings
 
@@ -329,6 +352,9 @@ class Game(models.Model):
     icon = models.ImageField(null=True, blank=True, upload_to='activity_icons')
     is_template = models.BooleanField(default=False)
 
+    def log_id(self):
+        return 'game_version:%d' % self.pk
+
     def __str__(self):
         return str(self.name)
 
@@ -338,7 +364,7 @@ class Game(models.Model):
     def interaction_card_modules_json(self):
         modules = []
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             modules.append(reverse('builder_interaction_card', args=[card.identifier]))
 
         return mark_safe(json.dumps(modules)) # nosec
@@ -346,7 +372,7 @@ class Game(models.Model):
     def interaction_card_categories_json(self): # pylint: disable=invalid-name
         categories = {}
 
-        for card in self.cards.all():
+        for card in self.cards.filter(enabled=True):
             category_name = 'Hive Mechanic Card'
             category_priority = 0
 
@@ -396,8 +422,20 @@ class Game(models.Model):
         self.save()
 
     def set_variable(self, variable, value):
+        old_value = self.game_state.get(variable, None)
+
         self.game_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        metadata = {
+            'variable_name': variable,
+            'old_value': old_value,
+            'new_value': value
+        }
+
+        version = self.versions.order_by('-created').first()
+
+        log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value), tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
 
     def fetch_variable(self, variable):
         if variable in self.game_state: # pylint: disable=unsupported-membership-test
@@ -472,6 +510,9 @@ class GameVersion(models.Model):
     created = models.DateTimeField()
 
     definition = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
+
+    def log_id(self):
+        return 'game_version:%d' % self.pk
 
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
@@ -676,9 +717,22 @@ class Player(models.Model):
 
     player_state = JSONField(default=dict, blank=True)
 
+    def log_id(self):
+        return 'player:%d' % self.pk
+
     def set_variable(self, variable, value):
+        old_value = self.player_state.get(variable, None)
+
         self.player_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        metadata = {
+            'variable_name': variable,
+            'old_value': old_value,
+            'new_value': value
+        }
+
+        log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
 
     def fetch_variable(self, variable):
         if variable in self.player_state: # pylint: disable=unsupported-membership-test
@@ -715,10 +769,15 @@ class Session(models.Model):
 
     session_state = JSONField(default=dict, blank=True)
 
+    def log_id(self):
+        return 'session:%d' % self.pk
+
     def complete_identifier(self, incomplete_id):
         return self.game_version.complete_identifier(incomplete_id, self.dialog())
 
     def process_incoming(self, integration, payload, extras=None):
+        # ??? Log event here?
+
         actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
@@ -731,8 +790,18 @@ class Session(models.Model):
         self.process_incoming(None, None)
 
     def set_variable(self, variable, value):
+        old_value = self.session_state.get(variable, None)
+
         self.session_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        metadata = {
+            'variable_name': variable,
+            'old_value': old_value,
+            'new_value': value
+        }
+
+        log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value), tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
     def fetch_variable(self, variable):
         if variable.startswith('[') and variable.endswith(']'):
@@ -780,6 +849,12 @@ class Session(models.Model):
 
         self.completed = timezone.now()
         self.save()
+
+        metadata = {
+            'dialog': 'dialog:%d' % self.dialog.pk,
+        }
+
+        log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
     def last_message(self):
         last_message = None
@@ -945,3 +1020,6 @@ class SiteSettings(models.Model):
     banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
+
+    total_message_limit = models.IntegerField(null=True, blank=True)
+    count_messages_since = models.DateTimeField(null=True, blank=True)
