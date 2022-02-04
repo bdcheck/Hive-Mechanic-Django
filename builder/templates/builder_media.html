@@ -109,7 +109,7 @@
             {# I know this is not 5MB but unsure what the actual texting limit is #}
               {% if m.size > 5000000 %}
               <div class="mdc-typography--body2" style="background-color: #e82e2e">
-                Size Larger than 5MB may have problems sending in a message.
+                WARNING: file sizes above 5 mb (like this one) are often skipped by Twilio for MMS messaging
                 {% else %}
                 <div class="mdc-typography--body2">
                 {% endif %}
