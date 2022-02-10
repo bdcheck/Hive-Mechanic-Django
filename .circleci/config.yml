@@ -24,6 +24,10 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: ""
     steps:
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
       - run:
@@ -101,6 +105,10 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: ""
     steps:
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
       - run:
