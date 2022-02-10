@@ -54,6 +54,7 @@ jobs:
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py install_default_repository
+            python manage.py initialize_default_site_settings
             python manage.py test --parallel 2
             pylint quicksilver
             pylint passive_data_kit
@@ -136,6 +137,7 @@ jobs:
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py install_default_repository
+            python manage.py initialize_default_site_settings
             python manage.py test --parallel 2
             pylint quicksilver
             pylint passive_data_kit
