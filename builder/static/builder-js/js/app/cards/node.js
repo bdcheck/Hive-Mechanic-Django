@@ -335,7 +335,29 @@ define(modules, function (mdc) {
 
             return fieldLines.join('\n');
         }
+         createSoundUrlField(field) {
+            var me = this;
 
+            var fieldLines = [];
+
+            fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field['width'] + '">');
+            fieldLines.push('  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">');
+            fieldLines.push('    <audio controls src="" id="' + me.cardId + '_' + field['field'] + '_preview" style="max-width: 100%; margin-bottom: 8px;"> </audio>');
+            fieldLines.push('  </div>');
+            fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field['field'] + '_field" style="width: 100%; margin-top: 4px;">');
+            fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field['field'] + '_value" />');
+            fieldLines.push('    <div class="mdc-notched-outline">');
+            fieldLines.push('      <div class="mdc-notched-outline__leading"></div>');
+            fieldLines.push('      <div class="mdc-notched-outline__notch">');
+            fieldLines.push('        <label for="' + me.cardId + '_' + field['field'] + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field['label']) + '</label>');
+            fieldLines.push('      </div>');
+            fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>');
+            fieldLines.push('    </div>');
+            fieldLines.push('  </div>');
+            fieldLines.push('</div>');
+
+            return fieldLines.join('\n');
+        }
         createTextField(field) {
             var me = this;
 
@@ -695,6 +717,8 @@ define(modules, function (mdc) {
                 fieldLines.push(this.createPattern(field));
             } else if (field['type'] == 'image-url') {
                 fieldLines.push(this.createImageUrlField(field));
+            } else if(field['type'] =='sound-url') {
+                fieldLines.push(this.createSoundUrlField(field));
             } else {
                 // TODO: Unknown Card Type
             }
@@ -751,7 +775,29 @@ define(modules, function (mdc) {
 
                     onUpdate(value);
                 });
-            } else if (field['type'] == 'choice') {
+            } else if (field['type'] == 'sound-url') {
+                const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'));
+
+                if (definition[field['field']] == undefined && definition[field['default']] != undefined) {
+                    definition[field['field']] = field['default'];
+                }
+
+                if (definition[field['field']] != undefined) {
+                    fieldWidget.value = definition[field['field']];
+
+                    $('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', fieldWidget.value);
+                }
+
+                $('#' + me.cardId + '_' + fieldName + '_value').on("change keyup paste", function() {
+                    var value = $('#' + me.cardId + '_' + fieldName + '_value').val();
+
+                    $('#' + me.cardId + '_' + field['field'] + '_preview').attr('src', value);
+
+                    me.sequence.markChanged(me.id);
+
+                    onUpdate(value);
+                });
+            }else if (field['type'] == 'choice') {
                 if (Array.isArray(field['options'])) { 
                     const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName));
 
@@ -1013,6 +1059,8 @@ define(modules, function (mdc) {
                 if (field['type'] == 'integer') {
                     me.initializeField(field, me.definition, onUpdate);
                 } else if (field['type'] == 'image-url') {
+                    me.initializeField(field, me.definition, onUpdate);
+                } else if (field['type'] == 'sound-url') {
                     me.initializeField(field, me.definition, onUpdate);
                 } else if (field['type'] == 'choice') {
                     me.initializeField(field, me.definition, onUpdate);
