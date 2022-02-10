@@ -108,6 +108,22 @@ def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unuse
 
     return warnings
 
+@register()
+def site_settings_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    try:
+        if SiteSettings.objects.count() == 0:
+            warnings.append(Warning(
+                'Missing site settings',
+                hint='Add a site settings object in the administration interface',
+                id='builder.W003',
+            ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
+
+    return warnings
+
 def file_cleanup(sender, **kwargs):
     '''
     File cleanup callback used to emulate the old delete
