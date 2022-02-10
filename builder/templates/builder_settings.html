@@ -32,7 +32,7 @@
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
 							<a href="#" id="icon_activity_click">
-								<center><img id="banner_image" style="background-color: #808080; max-height: 120px; margin-left: auto; margin-right: auto; max-width: 100%;"" src="{% if settings %}{{ settings.banner.url }}{% else %}https://via.placeholder.com/468x60?text=Upload+Image{% endif %}"></center>
+								<center><img id="banner_image" style="background-color: #808080; max-height: 120px; margin-left: auto; margin-right: auto; max-width: 100%;"" src="{% if settings.banner %}{{ settings.banner.url }}{% else %}https://via.placeholder.com/468x60?text=Upload+Image{% endif %}"></center>
 								<br>
 								<center class="mdc-typography--caption">Tap to update site banner</center>
 							</a>
