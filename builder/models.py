@@ -851,7 +851,7 @@ class Session(models.Model):
         self.save()
 
         metadata = {
-            'dialog': 'dialog:%d' % self.dialog.pk,
+            'dialog': 'dialog:%d' % self.dialog().pk,
         }
 
         log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
