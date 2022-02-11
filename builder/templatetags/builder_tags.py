@@ -49,7 +49,7 @@ def builder_site_login_banner():
     if settings.banner is None:
         return mark_safe('<h1 style="margin-top: 0px;" class="mdc-typography--headline5">%s</h1>' % settings.name) # nosec
 
-    return mark_safe('<img src="%s" style="max_width: 100%%;" alt="%s" />' % (settings.banner.url, settings.name)) # nosec
+    return mark_safe('<img src="%s" style="max-width: 100%%;" alt="%s" />' % (settings.banner.url, settings.name)) # nosec
 
 @register.filter
 def obfuscate_identifier(raw_identifier):
