@@ -90,7 +90,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             self.selenium.find_element_by_class_name('mdc-drawer-scrim').click()
 
-            self.selenium.implicitly_wait(5.0)
+            WebDriverWait(self.selenium, 5)
 
             next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
 
