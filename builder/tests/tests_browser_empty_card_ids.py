@@ -88,9 +88,9 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@data-node-id="response-test-2"]'))
 
-            self.selenium.implicitly_wait(1.0)
-
             self.selenium.find_element_by_class_name('mdc-top-app-bar__navigation-icon').click()
+
+            self.selenium.implicitly_wait(1.0)
 
             next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
 
