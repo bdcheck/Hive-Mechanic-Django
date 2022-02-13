@@ -606,7 +606,7 @@ class GameVersion(models.Model):
                         return True
         return False
 
-    def dialog_snapshot(self):
+    def dialog_snapshot(self): # pylint: disable=too-many-branches
         snapshot = []
 
         definition = json.loads(self.definition)
@@ -622,6 +622,18 @@ class GameVersion(models.Model):
                 initial_card = definition['initial-card']
         else:
             sequences = definition
+
+        if initial_card is None and len(sequences) > 0:
+            for sequence in sequences:
+                items = sequence.get('items', [])
+
+                if len(items) > 0:
+                    initial_card = items[0]['id']
+
+                    if ('#' in initial_card) is False:
+                        initial_card = '%s#%s' % (sequence['id'], initial_card)
+
+                    break
 
         for sequence in sequences:
             for item in sequence['items']:

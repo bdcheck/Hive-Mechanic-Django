@@ -307,18 +307,18 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         var items = [];
 
         $.each(window.dialogBuilder.definition.sequences, function (index, value) {
-            items.push('<li class="mdc-list-item mdc-list-item--with-one-line select_sequence" tabindex="' + index + '" data-index="' + index + '" style="padding-right: 0; align-items: center;">');
-            items.push('  <span class="mdc-list-item__start material-icons" aria-hidden="true">view_module</span>');
-            items.push('  <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px; flex-grow: 100;">' + value["name"] + '</span>'); //  mdc-list-item__end mdc-menu-surface--anchor
+            items.push('<li class="mdc-list-item select_sequence" tabindex="' + index + '" data-index="' + index + '" style="padding-left: 0; align-items: center;">'); /* mdc-list-item--with-one-line */
+            items.push('  <span class="mdc-list-item__ripple"></span>')
             items.push('  <span class="mdc-menu-surface--anchor">');
             items.push('    <button class="sequence-menu-open mdc-icon-button material-icons" data-index="' + index + '" tabindex="-1">');
             items.push('      more_vert');
             items.push('    </button>');
             items.push('  </span>');
+            items.push('  <span class="mdc-list-item__text mdc-list-item__end">' + value["name"] + '</span>'); //  mdc-list-item__end mdc-menu-surface--anchor
             items.push('</li>')
         });
 
-        items.push('<li class="mdc-list-item mdc-list-item--with-one-line add_sequence" href="#" style="margin-top: 2em;">');
+        items.push('<li class="mdc-list-item mdc-list-item--with-one-line add_sequence" href="#" style="margin-top: 0em;">');
         items.push('<span class="mdc-list-item__ripple"></span>');
         items.push('<span class="material-icons mdc-list-item__start" aria-hidden="true">add_box</span>');
         items.push('<span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Add Sequence</span>');
@@ -472,6 +472,9 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $(".select_sequence").click(function (eventObj) {
             $("#settings-view").hide();
             $("#editor-view").show();
+
+			drawer.open = false
+			
             let seq = window.dialogBuilder.definition.sequences;
             let target = eventObj.currentTarget;
             let index = parseInt(target.getAttribute('data-index'));
@@ -502,6 +505,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
                         window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[last], null);
 
                         window.dialogBuilder.addSequenceDialog.unlisten('MDCDialog:closed', this);
+                        
+                        drawer.open = false
                     }
                 }
             };
@@ -660,10 +665,16 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
                     var clean = cleanDefinition(window.dialogBuilder.definition);
 
-                    window.dialogBuilder.update(clean, function () {
+                    window.dialogBuilder.update(clean, function (data) {
                         window.setTimeout(function() {
                             $("#action_save").text('save');
                         }, 1000);
+                        
+                        if (data['redirect_url'] !== undefined) {
+                        	alert('The location of this activity has changed. Updating location...')
+                        	
+                        	window.location = data['redirect_url']
+                        }
 
                         dialogIsDirty = false;
                     }, function (error) {
@@ -789,17 +800,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         $('#hive-help-switch-toggle').change(function () {
             window.dialogBuilder.setHelpCardStatus()
         });
-        $('.hive_mechanic_help_filler').hide();
-
-
-        $(".hive_mechanic_help").show();
-        //load help after start
-        $(document).ready(function () {
-            $('.hive_mechanic_help_filler').hide();
-            $(".hive_mechanic_help").show();
-        });
-
-// CK ^^^ Why document.ready?
+        
+		window.dialogBuilder.helpToggle.selected = false;
 
         window.dialogBuilder.chooseDestinationDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('select-card-destination-edit-dialog'));
 
@@ -821,8 +823,14 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
         warning.addEventListener('click', (event) => {
             var clean = cleanDefinition(window.dialogBuilder.definition);
 
-            window.dialogBuilder.update(clean, function () {
+            window.dialogBuilder.update(clean, function (data) {
                 warningDialog.close();
+
+				if (data['redirect_url'] !== undefined) {
+					alert('The location of this activity has changed. Updating location...')
+					
+					window.location = data['redirect_url']
+				}
             }, function (error) {
                 console.log(error);
             });
@@ -1225,6 +1233,8 @@ requirejs(["material", "app/sequence", "cookie", "cards/node", "jquery"], functi
 
         refreshSettingsInterrupts();
         refreshSettingsVariables();
+
+		drawer.open = false
 
         var initialCardList = '    <ul class="mdc-list mdc-dialog__content initial_dialog_card_selection_menu" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">';
 

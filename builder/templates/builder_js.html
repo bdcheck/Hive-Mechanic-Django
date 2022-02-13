@@ -113,20 +113,21 @@
                 </section>
             </div>
         </header>
-        <aside class="mdc-drawer mdc-drawer--dismissible mdc-top-app-bar--fixed-adjust">
+        <aside class="mdc-drawer mdc-drawer--modal mdc-top-app-bar--fixed-adjust mdc-drawer--open">
             <div class="mdc-drawer__content">
-                <ul class="mdc-list" id="activity_list">
-                    <a class="mdc-list-item mdc-list-item--with-one-line" href="#" id="action_open_settings" aria-current="page">
+                <ul class="mdc-list" id="activity_list" style="padding: 0px;">
+                    <li class="mdc-list-item mdc-list-item--with-one-line" id="action_open_settings" aria-current="page">
                     	<span class="mdc-list-item__ripple"></span>
                         <span class="material-icons mdc-list-item__start" aria-hidden="true">video_settings</span>
                         <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Activity Settings</span>
-                    </a>
+                    </li>
         			<li role="separator" class="mdc-list-divider"></li>
                 </ul>
-                <ul class="mdc-list" id="sequences_list">
+                <ul class="mdc-list" id="sequences_list" style="padding: 0px;">
                 </ul>
             </div>
         </aside>
+        <div class="mdc-drawer-scrim"></div>
 
         <div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust" style="background-color: #BDBDBD;">
             <main class="main-content" id="main-content">
@@ -567,7 +568,7 @@
                 };
 
                 $.post("{% url 'builder_game' game.slug %}", payload, function(data) {
-                    success();
+                    success(data);
                 });
             },
             fetchVariables(fetched) {

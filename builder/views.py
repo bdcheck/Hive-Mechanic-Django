@@ -247,7 +247,7 @@ def builder_game(request, game): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
-    matched_game = Game.objects.filter(slug=game).first()
+    matched_game = get_object_or_404(Game, slug=game)
 
     if matched_game.can_view(request.user):
         context = {}
@@ -261,7 +261,32 @@ def builder_game(request, game): # pylint: disable=unused-argument
                 new_version = GameVersion(game=context['game'], created=timezone.now(), definition=json.dumps(definition, indent=2))
                 new_version.save()
 
-                return HttpResponse(json.dumps({'success': True}, indent=2), content_type='application/json', status=200)
+                game_name = definition.get('name', None)
+                game_identifier = definition.get('identifier', None)
+
+                payload = {
+                    'success': True
+                }
+
+                if (game_name is not None and game_identifier is not None):
+                    updated = False
+
+                    if context['game'].name != game_name:
+                        context['game'].name = game_name
+
+                        updated = True
+
+                    if context['game'].slug != game_identifier:
+                        context['game'].slug = game_identifier
+
+                        updated = True
+
+                        payload['redirect_url'] = reverse('builder_game', args=[context['game'].slug])
+
+                    if updated:
+                        context['game'].save()
+
+                return HttpResponse(json.dumps(payload, indent=2), content_type='application/json', status=200)
 
             raise PermissionDenied('Edit permission required.')
 
