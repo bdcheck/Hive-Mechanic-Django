@@ -90,9 +90,7 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             self.selenium.find_element_by_class_name('mdc-drawer-scrim').click()
 
-            WebDriverWait(self.selenium, 20).until(lambda driver: expected_conditions.element_to_be_clickable((By.XPATH, '//div[@data-node-id="response-test-2"]')))
-
-            next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
+            WebDriverWait(self.selenium, 20).until(lambda driver: expected_conditions.element_to_be_clickable((By.XPATH, '//div[@data-node-id="response-test-2"]'))).click()
 
             current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
 
