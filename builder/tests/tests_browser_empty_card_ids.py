@@ -99,8 +99,6 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
 
-            name_input = current_card.find_element_by_css_selector('input[id$="_name_value"]')
-
             self.assertEqual(name_input.get_attribute('value'), 'Response Test')
 
             first_link = current_card.find_element_by_css_selector('button[id$="_patterns__action__0_edit"]')
