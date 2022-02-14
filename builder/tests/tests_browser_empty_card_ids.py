@@ -11,6 +11,7 @@ import sys
 import six
 
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
@@ -90,7 +91,9 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             self.selenium.find_element_by_class_name('mdc-drawer-scrim').click()
 
-            WebDriverWait(self.selenium, 20).until(lambda driver: expected_conditions.element_to_be_clickable((By.XPATH, '//div[@data-node-id="response-test-2"]'))).click()
+            WebDriverWait(self.selenium, 20).until(lambda driver: expected_conditions.element_to_be_clickable((By.XPATH, '//div[@data-node-id="response-test-2"]')))
+
+            ActionChains(self.selenium).move_to_element(self.selenium.find_element_by_xpath('//div[@data-node-id="response-test-2"]')).click().perform()
 
             current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
 
