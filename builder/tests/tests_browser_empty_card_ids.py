@@ -11,9 +11,12 @@ import sys
 import six
 
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -86,15 +89,15 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             next_nodes = self.selenium.find_element_by_xpath('//div[@id="builder_next_nodes"]')
 
-            WebDriverWait(self.selenium, 15).until(lambda driver: driver.find_element_by_xpath('//div[@data-node-id="response-test-2"]'))
+            self.selenium.find_element_by_class_name('mdc-drawer-scrim').click()
 
-            next_nodes.find_element_by_xpath('//div[@data-node-id="response-test-2"]').click()
+            WebDriverWait(self.selenium, 20).until(lambda driver: expected_conditions.element_to_be_clickable((By.XPATH, '//div[@data-node-id="response-test-2"]')))
+
+            ActionChains(self.selenium).move_to_element(self.selenium.find_element_by_xpath('//div[@data-node-id="response-test-2"]')).click().perform()
 
             current_node = self.selenium.find_element_by_xpath('//div[@id="builder_current_node"]')
 
             current_card = current_node.find_element_by_xpath('//div[@data-node-id="response-test-2"]')
-
-            name_input = current_card.find_element_by_css_selector('input[id$="_name_value"]')
 
             self.assertEqual(name_input.get_attribute('value'), 'Response Test')
 

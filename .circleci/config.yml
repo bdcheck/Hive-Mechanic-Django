@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   python: circleci/python@1.2
   node: circleci/node@4.7.0
-  browser-tools: circleci/browser-tools@1.2.1
+  browser-tools: circleci/browser-tools@1.2.4
 
 workflows:
   build:
@@ -24,6 +24,11 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: ""
     steps:
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
       - run:
@@ -49,6 +54,7 @@ jobs:
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py install_default_repository
+            python manage.py initialize_default_site_settings
             python manage.py test --parallel 2
             pylint quicksilver
             pylint passive_data_kit
@@ -101,6 +107,11 @@ jobs:
           POSTGRES_DB: circle_test
           POSTGRES_PASSWORD: ""
     steps:
+      - run:
+          name: Install system dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
       - run:
@@ -126,6 +137,7 @@ jobs:
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
             python manage.py install_default_repository
+            python manage.py initialize_default_site_settings
             python manage.py test --parallel 2
             pylint quicksilver
             pylint passive_data_kit

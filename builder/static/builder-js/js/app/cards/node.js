@@ -407,7 +407,7 @@ define(modules, function (mdc) {
 
             var fieldLines = [];
 
-            var style = 'body1';
+            var style = 'caption';
 
             if (field['style'] != undefined) {
                 style = field['style'];
@@ -1083,10 +1083,12 @@ define(modules, function (mdc) {
             
             window.setTimeout(me.sequence.initializeDestinationMenu, 250);
 
-            if (window.dialogBuilder.helpToggle.checked) {
-                $(".hive_mechanic_help").show()
-            } else {
+            if (window.dialogBuilder.helpToggle.selected) {
                 $(".hive_mechanic_help").hide()
+                $(".hive_mechanic_help_filler").show()
+            } else {
+                $(".hive_mechanic_help").show()
+                $(".hive_mechanic_help_filler").hide()
             }
         }
 

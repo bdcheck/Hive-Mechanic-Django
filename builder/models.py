@@ -108,6 +108,22 @@ def inactive_cards_enabled_check(app_configs, **kwargs): # pylint: disable=unuse
 
     return warnings
 
+@register()
+def site_settings_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    try:
+        if SiteSettings.objects.count() == 0:
+            warnings.append(Warning(
+                'Missing site settings',
+                hint='Add a site settings object in the administration interface',
+                id='builder.W003',
+            ))
+    except ProgrammingError: # Thrown before migration happens.
+        pass
+
+    return warnings
+
 def file_cleanup(sender, **kwargs):
     '''
     File cleanup callback used to emulate the old delete
@@ -590,7 +606,7 @@ class GameVersion(models.Model):
                         return True
         return False
 
-    def dialog_snapshot(self):
+    def dialog_snapshot(self): # pylint: disable=too-many-branches
         snapshot = []
 
         definition = json.loads(self.definition)
@@ -606,6 +622,18 @@ class GameVersion(models.Model):
                 initial_card = definition['initial-card']
         else:
             sequences = definition
+
+        if initial_card is None and len(sequences) > 0:
+            for sequence in sequences:
+                items = sequence.get('items', [])
+
+                if len(items) > 0:
+                    initial_card = items[0]['id']
+
+                    if ('#' in initial_card) is False:
+                        initial_card = '%s#%s' % (sequence['id'], initial_card)
+
+                    break
 
         for sequence in sequences:
             for item in sequence['items']:
@@ -851,7 +879,7 @@ class Session(models.Model):
         self.save()
 
         metadata = {
-            'dialog': 'dialog:%d' % self.dialog.pk,
+            'dialog': 'dialog:%d' % self.dialog().pk,
         }
 
         log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
