@@ -136,11 +136,11 @@ class MlkMural(object):
                     print(f"start next {times}")
                     if playing_sound:
                         self.sound_cache.stop(playing_sound)
-                    sound = self.fetch_variable("sound", player="game", scope=VariableScope.game)
+                    sound = self.fetch_variable("current_sound", player="game", scope=VariableScope.game)
                     times = time.time() - next_screen_timer
                     print(f"start next {times}")
 
-                    image = self.fetch_variable("image", player="game", scope=VariableScope.game)
+                    image = self.fetch_variable("current_image", player="game", scope=VariableScope.game)
                     if sound == '""':
                         sound = None
                     if image == '""':
