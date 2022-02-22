@@ -73,4 +73,4 @@ for (var i = 0; i < edges.length; i++) {
     });
 }
 
-console.log(JSON.stringify(cyto, null, 2))
+process.stdout.write(JSON.stringify(cyto, null, 2))

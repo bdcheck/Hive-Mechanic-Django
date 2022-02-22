@@ -1,68 +1,67 @@
+/* global requirejs, alert */
+
 requirejs.config({
-    shim: {
-        jquery: {
-            exports: "$"
-        },
-        cookie: {
-            exports: "Cookies"
-        },
-        bootstrap: {
-            deps: ["jquery"]
-        },
+  shim: {
+    jquery: {
+      exports: '$'
     },
-    baseUrl: "/static/builder-js/js/app",
-    paths: {
-        app: '/static/builder-js/js/app',
-        material: "/static/builder-js/vendor/material-components-web.min",
-        jquery: "/static/builder-js/vendor/jquery-3.4.0.min",
-        cookie: "/static/builder-js/vendor/js.cookie"
+    cookie: {
+      exports: 'Cookies'
+    },
+    bootstrap: {
+      deps: ['jquery']
     }
-});
+  },
+  baseUrl: '/static/builder-js/js/app',
+  paths: {
+    app: '/static/builder-js/js/app',
+    material: '/static/builder-js/vendor/material-components-web.min',
+    jquery: '/static/builder-js/vendor/jquery-3.4.0.min',
+    cookie: '/static/builder-js/vendor/js.cookie'
+  }
+})
 
-requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
-    const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
+requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
+  const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
 
-    const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'));
+  const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'))
 
-    itemsList.listen('MDCList:action', function(e) {
-    	const path = $(itemsList.listElements[e['detail']['index']]).attr("data-href");
+  itemsList.listen('MDCList:action', function (e) {
+    const path = $(itemsList.listElements[e.detail.index]).attr('data-href')
 
-    	window.location = path;
-    });
+    window.location = path
+  })
 
-    const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
-    
-    var selectedSequence = null;
+  const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'))
 
-    topAppBar.setScrollTarget(document.getElementById('main-content'));
+  topAppBar.setScrollTarget(document.getElementById('main-content'))
 
-    topAppBar.listen('MDCTopAppBar:nav', () => {
-        drawer.open = !drawer.open;
-    });
-    
-    var csrftoken = Cookies.get('csrftoken');
+  topAppBar.listen('MDCTopAppBar:nav', () => {
+    drawer.open = !drawer.open
+  })
 
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  const csrftoken = Cookies.get('csrftoken')
+
+  function csrfSafeMethod (method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+  }
+
+  $.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader('X-CSRFToken', csrftoken)
+      }
     }
+  })
 
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-    
-    drawer.open = true;
+  drawer.open = true
 
-	const dataTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_players'));
+  mdc.dataTable.MDCDataTable.attachTo(document.getElementById('table_players'))
 
-	$(".action_delete_player").click(function(eventObj) {
-		eventObj.preventDefault();
-		
-		alert('TODO: Remove player #' + $(eventObj.target).attr('data-id'));
-	});
+  $('.action_delete_player').click(function (eventObj) {
+    eventObj.preventDefault()
 
-});
+    alert('TODO: Remove player #' + $(eventObj.target).attr('data-id'))
+  })
+})

@@ -37,7 +37,7 @@ from passive_data_kit.models import DataPoint
 from activity_logger.models import log
 
 from . import card_issues
-from .utils import fetch_cytoscape
+from .utils import fetch_cytoscape_node as fetch_cytoscape
 
 standard_library.install_aliases()
 
@@ -526,6 +526,7 @@ class GameVersion(models.Model):
     created = models.DateTimeField()
 
     definition = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
+    cached_cytoscape = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
 
     def log_id(self):
         return 'game_version:%d' % self.pk
@@ -714,14 +715,21 @@ class GameVersion(models.Model):
 
         return incomplete_id
 
-    def cytoscape_json(self, indent=0, simplify=False):
+    def cytoscape_json(self, indent=0, simplify=False, compute=False):
+        if compute is False or self.cached_cytoscape is not None:
+            return self.cached_cytoscape
+
         try:
             cytoscape_json = fetch_cytoscape(json.loads(self.definition), simplify=simplify)
 
             if indent > 0:
-                return json.dumps(cytoscape_json, indent=indent)
+                self.cached_cytoscape = json.dumps(cytoscape_json, indent=indent)
+            else:
+                self.cached_cytoscape = json.dumps(cytoscape_json)
 
-            return json.dumps(cytoscape_json)
+            self.save()
+
+            return self.cached_cytoscape
         except: # nosec # pylint: disable=bare-except
             traceback.print_exc()
 

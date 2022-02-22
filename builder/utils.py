@@ -3,6 +3,8 @@
 import io
 import json
 
+import sh
+
 from py_mini_racer import MiniRacer
 
 from django.contrib.staticfiles import finders
@@ -12,6 +14,7 @@ def fetch_cytoscape(definition, simplify=False): # pylint: disable=too-many-loca
     from .models import InteractionCard # pylint: disable=import-outside-toplevel, cyclic-import
 
     env_path = finders.find('builder-js/vendor/racer_env.js')
+    slugify_path = finders.find('builder-js/vendor/slugify.js')
     node_path = finders.find('builder-js/js/app/cards/node.js')
     sequence_path = finders.find('builder-js/js/app/sequence.js')
 
@@ -21,6 +24,13 @@ def fetch_cytoscape(definition, simplify=False): # pylint: disable=too-many-loca
         env_source = ''.join(env_file.readlines())
 
         js_context.eval(env_source)
+
+    with io.open(slugify_path, 'r', encoding='utf-8') as slugify_file:
+        slugify_source = ''.join(slugify_file.readlines())
+
+        js_context.eval(slugify_source)
+
+    js_context.eval('slugifyExt = slugify')
 
     with io.open(node_path, 'r', encoding='utf-8') as node_file:
         node_source = ''.join(node_file.readlines())
@@ -48,3 +58,43 @@ def fetch_cytoscape(definition, simplify=False): # pylint: disable=too-many-loca
     result = js_context.eval(script_source)
 
     return json.loads(result)
+
+def fetch_cytoscape_node(definition, simplify=False): # pylint: disable=too-many-locals
+    from .models import InteractionCard # pylint: disable=import-outside-toplevel, cyclic-import
+
+    env_path = finders.find('builder-js/vendor/racer_env.js')
+    slugify_path = finders.find('builder-js/vendor/slugify.js')
+    node_path = finders.find('builder-js/js/app/cards/node.js')
+    sequence_path = finders.find('builder-js/js/app/sequence.js')
+
+    full_script = ''
+
+    with io.open(env_path, 'r', encoding='utf-8') as env_file:
+        full_script += ''.join(env_file.readlines())
+
+    full_script += 'var slugifyExt = require("' + slugify_path + '")\n'
+    full_script += 'require("' + node_path + '")\n'
+    full_script += 'require("' + sequence_path + '")\n'
+
+    for card in InteractionCard.objects.filter(enabled=True):
+        full_script += 'require("' + card.client_implementation.path + '")\n'
+
+    full_script += '\n'
+
+    context = {
+        'definition': json.dumps(definition),
+        'simplify': simplify
+    }
+
+    full_script += render_to_string('utils/cytoscape_convert_node.js', context)
+
+    full_script += '\n'
+
+    result_io = io.StringIO()
+
+    try:
+        sh.nodejs(_in=full_script, _out=result_io)
+    except sh.ErrorReturnCode_1:
+        return None
+
+    return json.loads(result_io.getvalue())

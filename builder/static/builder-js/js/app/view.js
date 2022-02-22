@@ -56,7 +56,7 @@ requirejs(['material', 'cookie', 'jquery', 'cytoscape', 'cytoscape-dagre'], func
     style: [{
       selector: 'node',
       style: {
-        'label': 'data(name)',
+        label: 'data(name)',
         'label-type': 'data(hive_node_type)',
         'font-size': '10pt',
         'text-halign': 'center',
@@ -69,10 +69,10 @@ requirejs(['material', 'cookie', 'jquery', 'cytoscape', 'cytoscape-dagre'], func
         'curve-style': 'bezier',
         'control-point-distance': 64,
         'target-arrow-shape': 'triangle',
-        'label': 'data(hive_edge_description)',
+        label: 'data(hive_edge_description)',
         'font-size': '8pt',
         'text-rotation': 'autorotate',
-        'color': '#fff',
+        color: '#fff',
         'text-background-color': '#000',
         'text-background-opacity': 1,
         'text-background-shape': 'round-rectangle',
