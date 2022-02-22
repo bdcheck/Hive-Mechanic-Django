@@ -35,8 +35,7 @@ jobs:
       - run:
           name: Install NPM dependencies
           command: |
-            pwd
-            ls -l
+            npm install -g -s botium-cli botium-core
             npm install
       - restore_cache:
           key: venv-38-{{ .Branch }}-{{ checksum "requirements.txt" }}-v1
@@ -121,6 +120,7 @@ jobs:
       - run:
           name: Install NPM dependencies
           command: |
+            npm install -g -s botium-cli botium-core
             npm install
       - restore_cache:
           key: venv-27-{{ .Branch }}-{{ checksum "requirements.txt" }}
