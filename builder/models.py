@@ -624,11 +624,11 @@ class GameVersion(models.Model):
         else:
             sequences = definition
 
-        if initial_card is None and len(sequences) > 0:
+        if initial_card is None and len(sequences) > 0: # pylint: disable=len-as-condition
             for sequence in sequences:
                 items = sequence.get('items', [])
 
-                if len(items) > 0:
+                if len(items) > 0: # pylint: disable=len-as-condition
                     initial_card = items[0]['id']
 
                     if ('#' in initial_card) is False:
