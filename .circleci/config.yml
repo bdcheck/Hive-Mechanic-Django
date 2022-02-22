@@ -31,13 +31,13 @@ jobs:
             sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
+      - checkout
       - run:
           name: Install NPM dependencies
           command: |
             pwd
             ls -l
             npm install
-      - checkout
       - restore_cache:
           key: venv-38-{{ .Branch }}-{{ checksum "requirements.txt" }}-v1
       - run:
@@ -117,11 +117,11 @@ jobs:
             sudo apt-get install libasound2      
       - node/install
       - browser-tools/install-browser-tools
+      - checkout
       - run:
           name: Install NPM dependencies
           command: |
             npm install
-      - checkout
       - restore_cache:
           key: venv-27-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
