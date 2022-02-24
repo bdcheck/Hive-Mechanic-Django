@@ -1,6 +1,4 @@
-const modules = ['material', 'slugify', 'jquery']
-
-define(modules, function (mdc, slugifyExt) {
+define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
   class Node {
     constructor (definition, sequence) {
       this.definition = definition
