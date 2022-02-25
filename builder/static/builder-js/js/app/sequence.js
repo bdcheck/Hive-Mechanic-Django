@@ -582,7 +582,7 @@ define(modules, function (mdc, Node) {
     }
 
     resolveNode (nodeId) {
-      if (nodeId === null) {
+      if (nodeId === null || nodeId === undefined) {
         return null
       }
 
