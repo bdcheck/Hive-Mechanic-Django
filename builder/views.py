@@ -262,7 +262,14 @@ def builder_game(request, game): # pylint: disable=unused-argument
                 new_version.save()
 
                 game_name = definition.get('name', None)
-                game_identifier = definition.get('identifier', None)
+                game_identifier = slugify(game_name)
+                
+                slug_index = 1
+                
+                while Game.objects.filter(slug=game_identifier).count() > 0:
+                    game_identifier = '%s-%d' % (slugify(game_name), slug_index)
+                    
+                    slug_index += 1
 
                 payload = {
                     'success': True
@@ -309,18 +316,26 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
         if latest is None:
             latest = GameVersion(game=matched_game, created=timezone.now())
 
-            definition = [{
-                'type': 'sequence',
-                'id': 'new-sequence',
-                'name': 'New Sequence',
-                'items': [{
-                    "name": "Hello World",
-                    "context": "Start building your game here.",
-                    "message": "Hello World",
-                    "type": "send-message",
-                    "id": "hello-world"
-                }]
-            }]
+            definition = {
+                'sequences': [{
+                    'type': 'sequence',
+                    'id': 'new-sequence',
+                    'name': 'New Sequence',
+                    'items': [{
+                        "name": "Hello World",
+                        "context": "Start building your game here.",
+                        "message": "Hello World",
+                        "type": "send-message",
+                        "id": "hello-world"
+                    }]
+                }],
+                'interrupts': [],
+                'name': matched_game.name,
+                'identifier': matched_game.slug,
+                'initial-card': 'new-sequence#hello-world',
+                'variables': [],
+                'incoming_call_interrupt': ''
+            }
 
             latest.definition = json.dumps(definition, indent=2)
             latest.save()
@@ -329,6 +344,30 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
         try:
             definition = json.loads(latest.definition)
+            
+            if isinstance(definition, list):
+                definition = {
+                    'sequences': definition,
+                    'interrupts': [],
+                    'name': matched_game.name,
+                    'identifier': matched_game.slug,
+                    'initial-card': '',
+                    'variables': [],
+                    'incoming_call_interrupt': ''
+                }
+                
+            if definition.get('name', '') == '':
+                definition['name'] = matched_game.name
+
+            if definition.get('identifier', '') == '':
+                definition['identifier'] = matched_game.slug
+
+            if definition.get('initial-card', '') == '':
+                definition['initial-card'] = definition['sequences'][0]['id'] + '#' + definition['sequences'][0]['items'][0]['id']
+
+            if definition.get('incoming_call_interrupt', '') == '':
+                definition['incoming_call_interrupt'] = definition['sequences'][0]['id'] + '#' + definition['sequences'][0]['items'][0]['id']
+                
         except json.JSONDecodeError:
             definition = [{
                 'type': 'sequence',

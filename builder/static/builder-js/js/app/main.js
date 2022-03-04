@@ -102,7 +102,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
 
   const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'))
-  const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))
+  // const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))
 
   let initialCardSelect = null
   let voiceCardSelect = null
@@ -1312,7 +1312,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         activityIdentifier.value = window.dialogBuilder.definition.identifier
       }
 
-      $('#builder-activity-setting-activity-identifier').on('change keyup paste', function () {
+      /* $('#builder-activity-setting-activity-identifier').on('change keyup paste', function () {
         const slugged = slugify(activityIdentifier.value, {
           trim: false,
           remove: /[*+~.()'"!:@]/g
@@ -1329,7 +1329,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         }
 
         dialogIsDirty = true
-      })
+      }) */
     }, 100)
 
     $('#activity-identifier-warning').hide()
