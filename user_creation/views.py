@@ -61,31 +61,32 @@ def user_request_access(request): # pylint: disable=unused-argument, too-many-br
                     context['errors'].append(message)
 
         if len(context['errors']) == 0: # pylint: disable=len-as-condition
-            new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
+            if get_user_model().objects.filter(username=email).count() == 0:
+                new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
 
-            to_addrs = []
+                to_addrs = []
 
-            admins_group = Group.objects.filter(name='Hive Mechanic Manager').first()
+                admins_group = Group.objects.filter(name='Hive Mechanic Manager').first()
 
-            if admins_group is not None:
-                for user in admins_group.user_set.all():
-                    if user.has_perm('auth.change_user') and user.email is not None:
-                        to_addrs.append(user.email)
-            else:
-                for user in get_user_model().objects.all():
-                    if user.has_perm('auth.change_user') and user.email is not None:
-                        to_addrs.append(user.email)
+                if admins_group is not None:
+                    for user in admins_group.user_set.all():
+                        if user.has_perm('auth.change_user') and user.email is not None:
+                            to_addrs.append(user.email)
+                else:
+                    for user in get_user_model().objects.all():
+                        if user.has_perm('auth.change_user') and user.email is not None:
+                            to_addrs.append(user.email)
 
-            if to_addrs:
-                subject = 'New Hive Mechanic Access Request (' + settings.ALLOWED_HOSTS[0] + ')'
+                if to_addrs:
+                    subject = 'New Hive Mechanic Access Request (' + settings.ALLOWED_HOSTS[0] + ')'
 
-                message = render_to_string('new_user_message.txt', {
-                    'user': new_user,
-                    'settings': settings,
-                    'update_url': reverse('builder_authors')
-                })
+                    message = render_to_string('new_user_message.txt', {
+                        'user': new_user,
+                        'settings': settings,
+                        'update_url': reverse('builder_authors')
+                    })
 
-                send_mail(subject, message, settings.DEFAULT_FROM_MAIL_ADDRESS, to_addrs, fail_silently=False)
+                    send_mail(subject, message, settings.DEFAULT_FROM_MAIL_ADDRESS, to_addrs, fail_silently=False)
 
             return render(request, 'user_request_access_complete.html', context=context)
 
