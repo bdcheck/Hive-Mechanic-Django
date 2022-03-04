@@ -277,6 +277,14 @@ def builder_game(request, game): # pylint: disable=unused-argument
                         updated = True
 
                     if context['game'].slug != game_identifier:
+                        base_identifier = game_identifier
+                        base_index = 1
+                        
+                        while Game.objects.filter(slug=game_identifier).count() > 0:
+                            game_identifier = '%s-%s' % (base_identifier, base_index)
+                            
+                            base_index += 1
+                        
                         context['game'].slug = game_identifier
 
                         updated = True
@@ -284,6 +292,7 @@ def builder_game(request, game): # pylint: disable=unused-argument
                         payload['redirect_url'] = reverse('builder_game', args=[context['game'].slug])
 
                     if updated:
+                        
                         context['game'].save()
 
                 return HttpResponse(json.dumps(payload, indent=2), content_type='application/json', status=200)
