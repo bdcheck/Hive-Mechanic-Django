@@ -329,7 +329,7 @@ def execute_action(integration, session, action):
         outgoing.message = integration.translate_value(action['message'], session)
         outgoing.integration = integration
 
-        if integration.is_enabled is False:
+        if integration.enabled is False:
             outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
                 'error': 'Unable to send, integration is disabled.'
@@ -347,7 +347,7 @@ def execute_action(integration, session, action):
         outgoing.message = 'image:' + integration.translate_value(action['image-url'], session)
         outgoing.integration = integration
 
-        if integration.is_enabled is False:
+        if integration.enabled is False:
             outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
                 'error': 'Unable to send, integration is disabled.'
@@ -367,7 +367,7 @@ def execute_action(integration, session, action):
         outgoing.next_action = action['next_action']
         outgoing.integration = integration
 
-        if integration.is_enabled is False:
+        if integration.enabled is False:
             outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
                 'error': 'Unable to send, integration is disabled.'

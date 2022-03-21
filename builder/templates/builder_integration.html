@@ -5,46 +5,51 @@
 {% block 'page_title' %}Hive Mechanic{% endblock %}
 {% block 'navigation_title' %}Hive Mechanic{% endblock %}
 {% block 'main_content' %}
-
-
-    Integrations
     <div class="mdc-layout-grid">
-        <div class="mdc-layout-grid__inner"></div>
-        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-            <div class="mdc-data-table">
-                <table class="mdc-data-table__table" aria-label="All Games" id="table_players">
-                    <thead>
-                    <th></th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Slug</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Game</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Type</th>
-                    </thead>
-                    {% for i in integrations %}
-                          <tr class="mdc-data-table__header-row">
-                          <td class="mdc-data-table__cell">
-                                <button class="edit_integration" data-id="{{ i.pk }}" data-name="{{ i.name }}"
-                                        data-game="{{ i.game.id }}"> Edit
-                                </button>
-                            </td>
-                            <td class="mdc-data-table__cell">
-                                {{ i.name }}
-                            </td>
-                            <td class="mdc-data-table__cell">
-                                {{ i.url_slug }}
-                            </td>
-                            <td class="mdc-data-table__cell">
-                                {{ i.game.name }}
-                            </td>
-                            <td class="mdc-data-table__cell">
-                                {{ i.type }}
-                            </td>
+        <div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<h1 class="mdc-typography--headline5" style="margin: 0px;">Integrations</h1>
+						</div>
+					</div>
+				</div>
+			</div>
 
-
-                        </tr>
-                    {% endfor %}
-
-            </div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-data-table">
+					<table class="mdc-data-table__table" aria-label="All Games" id="table_players">
+						<thead>
+						<th></th>
+						<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+						<th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Slug</th>
+						<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Game</th>
+						<th class="mdc-data-table__header-cell" role="columnheader" scope="col"> Type</th>
+						</thead>
+						{% for i in integrations %}
+							  <tr class="mdc-data-table__header-row">
+							  <td class="mdc-data-table__cell">
+									<button class="edit_integration" data-id="{{ i.pk }}" data-name="{{ i.name }}"
+											data-game="{{ i.game.id }}"> Edit
+									</button>
+								</td>
+								<td class="mdc-data-table__cell">
+									{{ i.name }}
+								</td>
+								<td class="mdc-data-table__cell">
+									{{ i.url_slug }}
+								</td>
+								<td class="mdc-data-table__cell">
+									{{ i.game.name }}
+								</td>
+								<td class="mdc-data-table__cell">
+									{{ i.type }}
+								</td>
+							</tr>
+						{% endfor %}
+				</div>
+			</div>
         </div>
     </div>
 

@@ -8,11 +8,14 @@ from .models import Game, GameVersion, InteractionCard, InteractionCardCategory,
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'slug',)
+    list_display = ('name', 'slug', 'is_template',)
+    list_filter = ('is_template',)
 
 @admin.register(GameVersion)
 class GameVersionAdmin(admin.OSMGeoAdmin):
-    list_display = ('game', 'created',)
+    list_display = ('game', 'created', 'creator')
+    search_fields = ['definition']
+    list_filter = ('created', 'creator',)
 
 @admin.register(InteractionCardCategory)
 class InteractionCardCategoryAdmin(admin.OSMGeoAdmin):

@@ -2,20 +2,23 @@
 {% load static %}
 {% load builder_tags %}
 
-{% block 'page_title' %}System Log | Interaction Builder{% endblock %}
+{% block 'page_title' %}Activity Log | Hive Mechanic{% endblock %}
 
 {% block 'page_help' %}
 	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 {% endblock %}
 
-{% block 'navigation_title' %}System Log{% endblock %}
-
 {% block 'main_content' %}
 	<div class="mdc-layout-grid mdc-typography">
 		<div class="mdc-layout-grid__inner">
-			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body2">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 				<div class="mdc-card" style="padding: 16px;">
-					{{ log_items.count }} entries
+					<div class="mdc-layout-grid__inner">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<h1 class="mdc-typography--headline5" style="margin-top: 0px;">Activities</h1>
+							<div class="class="mdc-typography--subtitle">{{ log_items.count }} entries</div>
+						</div>
+					</div>
 				</div>
 			</div>
 

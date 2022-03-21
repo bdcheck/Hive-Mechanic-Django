@@ -46,6 +46,7 @@ def builder_home(request): # pylint: disable=unused-argument
         integration_types[integration.type].append(integration.fetch_statistics())
 
     context['integrations'] = integration_types
+    context['site_settings'] = SiteSettings.objects.all().order_by('-last_updated').first()
 
     return render(request, 'builder_home.html', context=context)
 
@@ -55,13 +56,17 @@ def builder_activities(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
-    context = {}
-
-    context['activities'] = []
+    context = {
+        'activities': [],
+        'templates': [],
+    }
 
     for game in Game.objects.all():
         if game.can_edit(request.user):
             context['activities'].append(game)
+
+        if game.is_template:
+            context['templates'].append(game)
 
     return render(request, 'builder_activities.html', context=context)
 
@@ -249,7 +254,7 @@ def builder_game(request, game): # pylint: disable=unused-argument
 
     matched_game = get_object_or_404(Game, slug=game)
 
-    if matched_game.can_view(request.user):
+    if matched_game.can_view(request.user): # pylint: disable=too-many-nested-blocks
         context = {}
 
         context['game'] = matched_game
@@ -258,18 +263,19 @@ def builder_game(request, game): # pylint: disable=unused-argument
             if matched_game.can_edit(request.user):
                 definition = json.loads(request.POST['definition'])
 
-                new_version = GameVersion(game=context['game'], created=timezone.now(), definition=json.dumps(definition, indent=2))
+                new_version = GameVersion(game=context['game'], created=timezone.now(), definition=json.dumps(definition, indent=2), creator=request.user)
                 new_version.save()
 
                 game_name = definition.get('name', None)
                 game_identifier = slugify(game_name)
-                
+
                 slug_index = 1
                 
-                while Game.objects.filter(slug=game_identifier).count() > 0:
-                    game_identifier = '%s-%d' % (slugify(game_name), slug_index)
-                    
-                    slug_index += 1
+                if game_identifier != game:
+                    while Game.objects.filter(slug=game_identifier).count() > 0:
+                        game_identifier = '%s-%d' % (slugify(game_name), slug_index)
+
+                        slug_index += 1
 
                 payload = {
                     'success': True
@@ -286,20 +292,24 @@ def builder_game(request, game): # pylint: disable=unused-argument
                     if context['game'].slug != game_identifier:
                         base_identifier = game_identifier
                         base_index = 1
-                        
+
                         while Game.objects.filter(slug=game_identifier).count() > 0:
                             game_identifier = '%s-%s' % (base_identifier, base_index)
-                            
+
                             base_index += 1
-                        
+
                         context['game'].slug = game_identifier
+
+                        definition['identifier'] = game_identifier
+                        new_version.definition = json.dumps(definition, indent=2)
+                        new_version.save()
 
                         updated = True
 
                         payload['redirect_url'] = reverse('builder_game', args=[context['game'].slug])
 
                     if updated:
-                        
+
                         context['game'].save()
 
                 return HttpResponse(json.dumps(payload, indent=2), content_type='application/json', status=200)
@@ -353,7 +363,7 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
         try:
             definition = json.loads(latest.definition)
-            
+
             if isinstance(definition, list):
                 definition = {
                     'sequences': definition,
@@ -364,7 +374,7 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
                     'variables': [],
                     'incoming_call_interrupt': ''
                 }
-                
+
             if definition.get('name', '') == '':
                 definition['name'] = matched_game.name
 
@@ -376,7 +386,7 @@ def builder_game_definition_json(request, game): # pylint: disable=unused-argume
 
             if definition.get('incoming_call_interrupt', '') == '':
                 definition['incoming_call_interrupt'] = definition['sequences'][0]['id'] + '#' + definition['sequences'][0]['items'][0]['id']
-                
+
         except json.JSONDecodeError:
             definition = [{
                 'type': 'sequence',
@@ -494,6 +504,13 @@ def builder_add_game(request): # pylint: disable=unused-argument
                 version = old_game.latest_version()
                 version.pk = None
                 version.game = new_game
+
+                definition = json.loads(version.definition)
+
+                definition['identifier'] = slug
+
+                version.definition = json.dumps(definition, indent=2)
+
                 version.save()
                 new_game.save()
             # default
@@ -618,12 +635,16 @@ def builder_settings(request): # pylint: disable=unused-argument
         if settings is None:
             settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
 
-        banner_file = request.FILES["site_banner"]
+        try:
+            banner_file = request.FILES["site_banner"]
 
-        if banner_file is not None:
-            settings.banner = request.FILES["site_banner"]
+            if banner_file is not None:
+                settings.banner = request.FILES["site_banner"]
+        except KeyError:
+            pass
 
         settings.name = request.POST.get('site_name', 'Hive Mechanic')
+        settings.message_of_the_day = request.POST.get('site_motd', '')
         settings.last_updated = now
         settings.save()
 

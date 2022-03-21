@@ -67,53 +67,60 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   $('#action_add_game').click(function (eventObj) {
     eventObj.preventDefault()
-    // get a list of all games that are templates
-    $.ajax({
-      url: '/builder/activity-templates',
-      data: {},
-      success: function (response) {
-        console.log(response)
-        const games = response.games
-        const templates = $('#template-list')
-        templates.empty()
-        templates.append($('<option/>').text('none').val('none').select())
-        for (const g in games) {
-          const v = games[g]
-          templates.append($('<option/>').text(v.name).val(v.id))
-        }
-      },
-      dataType: 'json'
-    })
-    $('#field_add_game').val('')
     addDialog.open()
   })
 
-  addDialog.listen('MDCDialog:closed', function () {
-    const name = $('#field_add_game').val()
+  const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
 
-    const selected = $('#template-list option:selected').val()
+  $('input[type=radio][name=activity-template]').change(function(eventObj) {
+  	let selected = $('input[type=radio][name=activity-template]:checked')
+  	
+  	let name = selected.attr('data-name')
+  	
+  	let existingName = $('#field_add_game').val()
+  	
+  	if (existingName == '' || (existingName.startsWith('New ') && existingName.endsWith(' Activity'))) {
+  		if (name !== undefined) {
+			nameField.value = 'New ' + name + ' Activity'
+		} else {
+			nameField.value = 'New Blank Activity'
+		}
+	}
+  });
+             
+  addDialog.listen('MDCDialog:closed', function (action) {
+  	if (action.detail.action == 'add') {
+		const name = nameField.value
 
-    $.post('/builder/add-game.json', { name: name, template: selected }, function (response) {
-      if (response.success) {
-        $('#dialog-title').html('Success')
-      } else {
-        $('#dialog-title').html('Failure')
-      }
+		const selected = $('input[type=radio][name=activity-template]:checked').val()
+	
+		const payload = {
+			name: name,
+			template: selected
+		}
 
-      $('#dialog-content').html(response.message)
+		$.post('/builder/add-game.json', payload, function (response) {
+		  if (response.success) {
+			$('#dialog-title').html('Success')
+		  } else {
+			$('#dialog-title').html('Failure')
+		  }
 
-      console.log(response)
+		  $('#dialog-content').html(response.message)
 
-      baseDialog.listen('MDCDialog:closed', function () {
-        if (response.success) {
-          if (response.redirect !== undefined) {
-            window.location.href = response.redirect
-          }
-        }
-      })
+		  console.log(response)
 
-      baseDialog.open()
-    })
+		  baseDialog.listen('MDCDialog:closed', function () {
+			if (response.success) {
+			  if (response.redirect !== undefined) {
+				window.location.href = response.redirect
+			  }
+			}
+		  })
+
+		  baseDialog.open()
+		})
+	}
   })
 
   mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))

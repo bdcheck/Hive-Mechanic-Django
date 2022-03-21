@@ -61,12 +61,17 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#banner_file').click()
   })
 
-  mdc.textField.MDCTextField.attachTo(document.querySelector('.mdc-text-field'))
+  mdc.textField.MDCTextField.attachTo(document.getElementById('name_field'))
+  const motdField = mdc.textField.MDCTextField.attachTo(document.getElementById('motd_field'))
 
   $('#update_button').click(function () { // catch the form's submit event
     const fileData = new FormData()
     fileData.append('site_name', $('#site_name').val())
-    fileData.append('site_banner', $('#banner_file').get(0).files[0])
+    fileData.append('site_motd', motdField.value)
+    
+    if ($('#banner_file').get(0).files[0] !== undefined) {
+	    fileData.append('site_banner', $('#banner_file').get(0).files[0])
+	}
 
     $.ajax({
       url: '/builder/settings',

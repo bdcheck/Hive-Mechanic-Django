@@ -1,4 +1,5 @@
 {% extends 'builder_base.html' %}
+{% load humanize %} 
 {% load static %}
 
 {% block 'page_title' %}All Activities | Hive Mechanic{% endblock %}
@@ -7,11 +8,21 @@
 	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 {% endblock %}
 
-{% block 'navigation_title' %}All Activities{% endblock %}
+{% block 'navigation_title' %}Hive Mechanic{% endblock %}
 
 {% block 'main_content' %}
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<h1 class="mdc-typography--headline5" style="margin: 0px;">Activities</h1>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			{% for activity in activities %}
 				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 					<div class="mdc-card" style="padding: 16px;">
@@ -23,21 +34,21 @@
 							</div>
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
 								<div style="position: relative;">
-									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; z-index:100; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
 										<span class="mdc-button__ripple"></span>
 										<i class="material-icons" aria-hidden="true">schema</i>
 									</button>
-									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
 								</div>
 							</div>
 							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
 							{% else %}
 								<div style="position: relative;">
-									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; z-index:100; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
 										<span class="mdc-button__ripple"></span>
 										<i class="material-icons" aria-hidden="true">schema</i>
 									</button>
-									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
 								</div>
 							</div>
 							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
@@ -62,6 +73,13 @@
 													</ul>
 												</div>
 											</div>
+										</div>
+										<div class="mdc-typography mdc-typography--subtitle1">
+											{% if activity.latest_version.creator %}
+												Last saved by {{ activity.latest_version.creator.get_full_name }} {{ activity.latest_version.created|naturalday }}.
+											{% else %}
+												Last saved {{ activity.latest_version.created|naturalday }}.
+											{% endif %}
 										</div>
 									</div>
 									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
@@ -107,26 +125,57 @@
 		<div class="mdc-fab__ripple"></div>
 		<span class="mdc-fab__icon material-icons">add</span>
 	</button>
+	
 	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="dialog_add_game">
 		<div class="mdc-dialog__container">
-
 			<div class="mdc-dialog__surface">
-				<h2 class="mdc-dialog__title" id="my-dialog-title">Add New Game</h2>
+				<h2 class="mdc-dialog__title" id="my-dialog-title">Add New Activity</h2>
+                <div class="mdc-dialog__content">
+					<div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
+						<div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
+				                Please select an existing template to begin:
+				            </div>
+				            
+				            {% for template in templates %}
+				            	<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+									<div class="mdc-radio">
+										<input class="mdc-radio__native-control" type="radio" id="activity-template-{{ template.slug }}" value="{{ template.pk }}" name="activity-template" data-name="{{ template.name }}">
+										<div class="mdc-radio__background">
+											<div class="mdc-radio__outer-circle"></div>
+											<div class="mdc-radio__inner-circle"></div>
+										</div>
+										<div class="mdc-radio__ripple"></div>
+										<div class="mdc-radio__focus-ring"></div>
+									</div>
+									<label for="activity-template-{{ template.slug }}">{{ template.name }}</label>
+								</div>
+							{% endfor %}
 
-                <div class="mdc-dialog__content" >
-                <label for="template-list">Templates</label>
-                    <select class="mdc-list" name="template-list" id="template-list">
-                    </select>
-                </div>
-				<div class="mdc-dialog__content" id="my-dialog-content">
-					<div class="mdc-text-field mdc-text-field--outlined" id="textfield_add_game" style="margin-top: 8px; width: 100%;">
-						<input type="text" class="mdc-text-field__input" id="field_add_game">
-						<div class="mdc-notched-outline">
-							<div class="mdc-notched-outline__leading"></div>
-								<div class="mdc-notched-outline__notch">
-								<label for="tf-outlined" class="mdc-floating-label">Game Name</label>
+							<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+								<div class="mdc-radio">
+									<input class="mdc-radio__native-control" type="radio" id="activity-template-no-template" value="none" name="activity-template">
+									<div class="mdc-radio__background">
+										<div class="mdc-radio__outer-circle"></div>
+										<div class="mdc-radio__inner-circle"></div>
+									</div>
+									<div class="mdc-radio__ripple"></div>
+									<div class="mdc-radio__focus-ring"></div>
+								</div>
+								<label for="activity-template-no-template">None</label>
 							</div>
-							<div class="mdc-notched-outline__trailing"></div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+								<div class="mdc-text-field mdc-text-field--outlined" id="textfield_add_game" style="margin-top: 8px; width: 100%;">
+									<input type="text" class="mdc-text-field__input" id="field_add_game">
+									<div class="mdc-notched-outline">
+										<div class="mdc-notched-outline__leading"></div>
+											<div class="mdc-notched-outline__notch">
+											<label for="tf-outlined" class="mdc-floating-label">Activity Name</label>
+										</div>
+										<div class="mdc-notched-outline__trailing"></div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -135,7 +184,7 @@
 						<span class="mdc-button__label">Cancel</span>
 					</button>
 					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add">
-						<span class="mdc-button__label">Add Game</span>
+						<span class="mdc-button__label">Add Activity</span>
 					</button>
 				</footer>
 			</div>
