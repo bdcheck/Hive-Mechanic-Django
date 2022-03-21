@@ -12,12 +12,13 @@
 {% block 'main_content' %}
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
-			{% for type_name, type_integrations in integrations.items %}
-				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-					<div class="mdc-card" style="padding: 16px;">
-						<div class="mdc-typography mdc-typography--headline5">Integrations: {{ type_integrations.0.type }}</div>
-					</div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card mdc-typography mdc-typography--body1" style="padding: 16px;">
+					{{ site_settings.message_of_the_day }}
 				</div>
+			</div>
+		
+			{% for type_name, type_integrations in integrations.items %}
 				{% for integration in type_integrations %}
 					<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
 						<div class="mdc-card" style="padding: 16px;">
@@ -29,6 +30,7 @@
 							{% for detail in integration.details %}
 								<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
 							{% endfor %}
+							<div class="mdc-typography mdc-typography--body1">Integration: {{ type_integrations.0.type }}</div>
 						</div>
 					</div>
 				{% endfor %}	

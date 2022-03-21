@@ -56,10 +56,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       const selectedAction = $('input[name="builder_reset_game"]:checked').val()
       const actionUrl = $('input[name="builder_reset_game"]:checked').attr('data-url')
 
-      console.log('ACTION: ')
-      console.log(selectedAction)
-      console.log(actionUrl)
-
       const payload = {
         action: selectedAction
       }
@@ -102,7 +98,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
 
   const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'))
-  const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))
+  // const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))
 
   let initialCardSelect = null
   let voiceCardSelect = null
@@ -114,6 +110,10 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   topAppBar.listen('MDCTopAppBar:nav', () => {
     drawer.open = !drawer.open
   })
+  
+  window.setTimeout(function() {
+	drawer.open = true
+  }, 1000);
 
   function onSequenceChanged (changedId) {
     $('#action_save').text('save')
@@ -651,13 +651,13 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
               $('#action_save').text('save')
             }, 1000)
 
+            dialogIsDirty = false
+
             if (data.redirect_url !== undefined) {
-              alert('The location of this activity has changed. Updating location...')
+              alert('The name of this activity has changed. Reloading activity...')
 
               window.location = data.redirect_url
             }
-
-            dialogIsDirty = false
           }, function (error) {
             console.log(error)
           })
@@ -1307,6 +1307,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
+      
+      /*
 
       if (window.dialogBuilder.definition.identifier !== undefined) {
         activityIdentifier.value = window.dialogBuilder.definition.identifier
@@ -1329,7 +1331,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         }
 
         dialogIsDirty = true
-      })
+      }) */
     }, 100)
 
     $('#activity-identifier-warning').hide()
@@ -1438,8 +1440,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   window.addEventListener('beforeunload', function (e) {
     e = e || window.event
 
-    e.preventDefault()
-
     if (dialogIsDirty) {
       e.preventDefault()
 
@@ -1450,7 +1450,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       return e.returnValue
     }
 
-    delete e.returnValue
+	delete e['returnValue'];  
   })
 
   $('#action_list_variables').off('click')

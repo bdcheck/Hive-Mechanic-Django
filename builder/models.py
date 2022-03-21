@@ -19,6 +19,7 @@ import requests
 from six import python_2_unicode_compatible
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.postgres.fields import JSONField
 from django.core.checks import Warning, register # pylint: disable=redefined-builtin
@@ -527,6 +528,8 @@ class GameVersion(models.Model):
 
     definition = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
     cached_cytoscape = models.TextField(max_length=(1024 * 1024 * 1024), null=True, blank=True)
+
+    creator = models.ForeignKey(get_user_model(), null=True, blank=True, on_delete=models.SET_NULL)
 
     def log_id(self):
         return 'game_version:%d' % self.pk
@@ -1053,6 +1056,7 @@ class DataProcessor(models.Model):
 
 class SiteSettings(models.Model):
     name = models.CharField(max_length=1024)
+    message_of_the_day = models.TextField(max_length=(1024 * 1024), default='Welcome to Hive Mechanic. You may customize this message in the site settings.')
     banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
