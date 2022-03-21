@@ -367,6 +367,23 @@ def execute_action(integration, session, action):
         outgoing.next_action = action['next_action']
         outgoing.integration = integration
 
+        if 'parameters' in action:
+            if 'speech_model' in action['parameters']:
+                outgoing.speech_model = action['parameters']['speech_model']
+
+            if 'speech_timeout' in action['parameters']:
+                outgoing.gather_speech_timeout = action['parameters']['speech_timeout']
+
+            if 'timeout' in action['parameters']:
+                outgoing.gather_timeout = action['parameters']['timeout']
+
+            if 'input_method' in action['parameters']:
+                outgoing.gather_input = action['parameters']['input_method']
+                print('SET INPUT = %s' % action['parameters']['input_method'])
+
+            if 'pause' in action['parameters']:
+                outgoing.pause_length = action['parameters']['pause']
+
         if integration.is_enabled is False:
             outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
