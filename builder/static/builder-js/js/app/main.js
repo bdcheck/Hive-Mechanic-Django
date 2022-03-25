@@ -940,7 +940,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   const refreshSettingsInterrupts = function () {
     $('#activity_settings_interrupts').empty()
 
-    for (let i = 0; i < window.dialogBuilder.definition.interrupts.length; i++) {
+    for (let i = 0; window.dialogBuilder.definition.interrupts !== undefined && i < window.dialogBuilder.definition.interrupts.length; i++) {
       const interrupt = window.dialogBuilder.definition.interrupts[i]
 
       const identifier = 'activity_interrupt_pattern_' + i + '_response_value'
