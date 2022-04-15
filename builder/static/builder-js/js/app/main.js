@@ -18,7 +18,9 @@ requirejs.config({
     material: '/static/builder-js/vendor/material-components-web-11.0.0',
     jquery: '/static/builder-js/vendor/jquery-3.4.0.min',
     cookie: '/static/builder-js/vendor/js.cookie',
-    slugify: '/static/builder-js/vendor/slugify'
+    slugify: '/static/builder-js/vendor/slugify',
+    marked: '/static/builder-js/vendor/marked',
+    purify: '/static/builder-js/vendor/purify',
   }
 })
 

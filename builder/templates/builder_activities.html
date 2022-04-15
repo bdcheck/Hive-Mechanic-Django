@@ -17,7 +17,7 @@
 				<div class="mdc-card" style="padding: 16px;">
 					<div class="mdc-layout-grid__inner">
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-							<h1 class="mdc-typography--headline5" style="margin: 0px;">Activities</h1>
+							<h1 class="mdc-typography--headline6" style="margin: 0px;">Activities</h1>
 						</div>
 					</div>
 				</div>
@@ -27,32 +27,28 @@
 				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 					<div class="mdc-card" style="padding: 16px;">
 						<div class="mdc-layout-grid__inner">
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
 							{% if activity.icon %}
-									<img class="tab_content" style="width: 100%; z-index:1;" src="{{ activity.icon.url }}" data-tab-index="1" />
-									<!-- <div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div> -->
-							</div>
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-								<div style="position: relative;">
-									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
-									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-										<span class="mdc-button__ripple"></span>
-										<i class="material-icons" aria-hidden="true">schema</i>
-									</button>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+									<div style="position: relative;">
+										<img class="tab_content" style="width: 100%; z-index:1;" src="{{ activity.icon.url }}" data-tab-index="1" />
+										<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+											<span class="mdc-button__ripple"></span>
+											<i class="material-icons" aria-hidden="true">schema</i>
+										</button>
+									</div>
 								</div>
-							</div>
-							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
 							{% else %}
-								<div style="position: relative;">
-									<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
-									<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-										<span class="mdc-button__ripple"></span>
-										<i class="material-icons" aria-hidden="true">schema</i>
-									</button>
+								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+									<div style="position: relative;">
+										<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index:1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+										<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+											<span class="mdc-button__ripple"></span>
+											<i class="material-icons" aria-hidden="true">schema</i>
+										</button>
+									</div>
 								</div>
-							</div>
-							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
 							{% endif %}
+							<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
 								<div class="mdc-layout-grid__inner">
 									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 										<div class="mdc-typography mdc-typography--headline6">
@@ -75,23 +71,26 @@
 											</div>
 										</div>
 										<div class="mdc-typography mdc-typography--subtitle1">
+											Creator: {{ activity.creator_name }}
+										</div>
+										<div class="mdc-typography mdc-typography--subtitle2">
 											{% if activity.latest_version.creator %}
-												Last saved by {{ activity.latest_version.creator.get_full_name }} {{ activity.latest_version.created|naturalday }}.
+												Last saved by {{ activity.latest_version.creator.get_full_name }} ({{ activity.latest_version.created|naturalday }}).
 											{% else %}
 												Last saved {{ activity.latest_version.created|naturalday }}.
 											{% endif %}
 										</div>
 									</div>
 									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+										<div class="mdc-typography mdc-typography--caption"><strong>Sessions</strong></div>
+										<div class="mdc-typography mdc-typography--body2">Active Sessions: {{ activity.active_session_count }}</div>
+										<div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ activity.inactive_session_count }}</div>
+									</div>
+									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
 										<div class="mdc-typography mdc-typography--caption"><strong>Activity Details</strong></div>
 										<div class="mdc-typography mdc-typography--body2">Identifier: {{ activity.slug }}</div>
 										<div class="mdc-typography mdc-typography--body2">Last Updated: {{ activity.latest_version.created }}</div>
 										<div class="mdc-typography mdc-typography--body2">Versions: {{ activity.versions.count }}</div>
-									</div>
-									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-										<div class="mdc-typography mdc-typography--caption"><strong>Sessions</strong></div>
-										<div class="mdc-typography mdc-typography--body2">Active Sessions: {{ activity.active_session_count }}</div>
-										<div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ activity.inactive_session_count }}</div>
 									</div>
 									<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 										<div class="mdc-typography mdc-typography--caption"><strong>Integrations</strong></div>

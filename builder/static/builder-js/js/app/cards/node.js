@@ -1,4 +1,4 @@
-define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
+define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slugifyExt, marked, purify) {
   class Node {
     constructor (definition, sequence) {
       this.definition = definition
@@ -63,7 +63,7 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
       htmlString += '        </div>'
       htmlString += '      </div>'
       htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      htmlString += '        <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_name" style="width: 100%">'
+      htmlString += '        <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_name" style="width: 100%; background-color: #ffffff;">'
       htmlString += '          <input class="mdc-text-field__input" type="text" id="' + this.cardId + '_name_value">'
       htmlString += '          <div class="mdc-notched-outline">'
       htmlString += '            <div class="mdc-notched-outline__leading"></div>'
@@ -74,8 +74,13 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
       htmlString += '          </div>'
       htmlString += '        </div>'
       htmlString += '      </div>'
+
+      if (this.showComment()) {
+          htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption" id="' + this.cardId + '_comment" style="background-color: #FDFEDE; padding: 4px;"></div>'
+      }
+
       htmlString += this.editBody()
-      htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption" id="' + this.cardId + '_comment" ></div>'
+      
       htmlString += '    </div>'
       htmlString += '  </div>'
       htmlString += '</div>'
@@ -233,7 +238,7 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
         $('#' + this.cardId + '_comment').hide()
       } else {
         $('#' + this.cardId + '_comment').show()
-        $('#' + this.cardId + '_comment').text(comment)
+        $('#' + this.cardId + '_comment').html(purify.sanitize(marked.parse(comment)))
       }
     }
 
@@ -1130,6 +1135,7 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
       htmlString += '      </div>'
       htmlString += '      <div class="mdc-typography--caption" id="' + this.cardId + '_activity-identifier-warning" style="color: #B71C1C;">Invalid characters or format detected. Please use only alphanumeric characters and dashes.</div>'
       htmlString += '    </div>'
+      
       htmlString += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
       htmlString += '      <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined" id="' + this.cardId + '_advanced_comment_field" style="width: 100%">'
       htmlString += '        <div class="mdc-notched-outline">'
@@ -1142,10 +1148,15 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
       htmlString += '        <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="' + this.cardId + '_advanced_comment_value"></textarea>'
       htmlString += '      </div>'
       htmlString += '    </div>'
+
       htmlString += '  </div>'
       htmlString += '</div>'
 
       return htmlString
+    }
+    
+    showComment () {
+        return true
     }
 
     viewHtml () {
@@ -1164,6 +1175,10 @@ define(['material', 'slugify', 'jquery'], function (mdc, slugifyExt) {
 
     style () {
       return 'background-color: #ffffff; margin-bottom: 10px;'
+    }
+    
+    readOnlyStyle () {
+    	return ''
     }
 
     destinationNodes (sequence) {

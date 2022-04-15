@@ -521,6 +521,14 @@ class Game(models.Model):
     def latest_version(self):
         return self.versions.order_by('-created').first()
 
+    def creator_name(self):
+        first_version = self.versions.exclude(creator=None).order_by('created').first()
+        
+        if first_version is not None:
+            return first_version.creator.get_full_name()
+            
+        return 'Unknown'
+
 @python_2_unicode_compatible
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)
