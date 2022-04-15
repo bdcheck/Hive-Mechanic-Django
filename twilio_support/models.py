@@ -180,7 +180,7 @@ class IncomingMessageMedia(models.Model):
     content_url = models.CharField(max_length=1024, null=True, blank=True)
     content_type = models.CharField(max_length=128, default='application/octet-stream')
 
-class OutgoingCall(models.Model):
+class OutgoingCall(models.Model): # pylint: disable=too-many-instance-attributes
     destination = models.CharField(max_length=256)
 
     send_date = models.DateTimeField()
@@ -320,7 +320,7 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
 
     return ['No content provided.']
 
-def execute_action(integration, session, action):
+def execute_action(integration, session, action): # pylint: disable=too-many-branches
     player = session.player
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
@@ -366,6 +366,23 @@ def execute_action(integration, session, action):
         outgoing.message = integration.translate_value(action['message'], session)
         outgoing.next_action = action['next_action']
         outgoing.integration = integration
+
+        if 'parameters' in action:
+            if 'speech_model' in action['parameters']:
+                outgoing.gather_speech_model = action['parameters']['speech_model']
+
+            if 'speech_timeout' in action['parameters']:
+                outgoing.gather_speech_timeout = action['parameters']['speech_timeout']
+
+            if 'timeout' in action['parameters']:
+                outgoing.gather_timeout = action['parameters']['timeout']
+
+            if 'input_method' in action['parameters']:
+                outgoing.gather_input = action['parameters']['input_method']
+                print('SET INPUT = %s' % action['parameters']['input_method'])
+
+            if 'pause' in action['parameters']:
+                outgoing.pause_length = action['parameters']['pause']
 
         if integration.enabled is False:
             outgoing.sent_date = timezone.now()

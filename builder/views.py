@@ -270,7 +270,7 @@ def builder_game(request, game): # pylint: disable=unused-argument
                 game_identifier = slugify(game_name)
 
                 slug_index = 1
-                
+
                 if game_identifier != game:
                     while Game.objects.filter(slug=game_identifier).count() > 0:
                         game_identifier = '%s-%d' % (slugify(game_name), slug_index)

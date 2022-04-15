@@ -201,11 +201,11 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     if call.gather_timeout is not None:
                         args['timeout'] = call.gather_timeout
 
-                    if call.gather_finish_on_key is not None:
-                        args['finish_on_key'] = call.gather_finish_on_key
+                    # if call.gather_finish_on_key is not None:
+                    #    args['finish_on_key'] = call.gather_finish_on_key
 
-                    if call.gather_num_digits is not None:
-                        args['num_digits'] = call.gather_num_digits
+                    # if call.gather_num_digits is not None:
+                    #    args['num_digits'] = call.gather_num_digits
 
                     if call.gather_speech_timeout is not None:
                         args['speech_timeout'] = call.gather_speech_timeout
