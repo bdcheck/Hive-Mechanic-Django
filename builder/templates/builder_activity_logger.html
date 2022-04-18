@@ -27,8 +27,8 @@
 					<div class="mdc-card mdc-layout-grid">
 						<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-								<strong>{{ item.logged }}</strong>
-								<p>{{ item.message }}</p>
+								{{ item.logged }}:
+								<p><strong>{{ item.message }}</strong></p>
 								<p>
 									{% for tag in item.tags.all %}
 										[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
@@ -49,8 +49,8 @@
 								{% endif %}
 							</div>
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								<strong>Metadata</strong><br />
-								{{ item.metadata }}
+								Metadata:<br />
+								<strong>{{ item.metadata }}</strong>
 							</div>
 						</div>
 					</div>

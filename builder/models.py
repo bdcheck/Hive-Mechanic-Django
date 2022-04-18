@@ -819,6 +819,8 @@ class Session(models.Model):
 
         actions = self.game_version.process_incoming(self, payload, extras)
 
+        print('Session.process_incoming: %s -- %s' % (payload, extras))
+
         if integration is not None:
             integration.execute_actions(self, actions)
         else:

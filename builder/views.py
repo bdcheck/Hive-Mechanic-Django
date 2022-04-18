@@ -3,6 +3,7 @@
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import datetime
 import json
 import os
 
@@ -84,6 +85,10 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
 
     if tag is not None:
         query = query & Q(tags__tag=tag)
+
+    start = timezone.now() - datetime.timedelta(days=30)
+
+    query = query & Q(logged__gte=start)
 
     player = request.GET.get('player', None)
 

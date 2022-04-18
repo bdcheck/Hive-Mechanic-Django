@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from twilio.twiml.voice_response import VoiceResponse, Gather
 
+from activity_logger.models import log
 from integrations.models import Integration
 
 from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse
@@ -229,5 +230,14 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 elif call.next_action == 'hangup':
                     response.hangup()
                     break
+
+            if len(response.verbs) == 0:
+                log_metadata = {}
+
+                log_metadata['phone_number'] = post_dict.get('To', None)
+                log_metadata['direction'] = post_dict.get('Direction', None)
+                log_metadata['call_status'] = post_dict.get('CallStatus', None)
+
+                log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
 
     return HttpResponse(str(response), content_type='text/xml')
