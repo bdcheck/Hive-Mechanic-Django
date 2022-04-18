@@ -4,6 +4,8 @@ import re
 
 from future.utils import raise_from, raise_with_traceback
 
+import humanize
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -72,3 +74,7 @@ def obfuscate_identifier(raw_identifier):
             obfuscated = character + obfuscated
 
     return obfuscated
+
+@register.filter
+def humanize_file_size(original_size):
+    return humanize.naturalsize(original_size)

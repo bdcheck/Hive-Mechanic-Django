@@ -83,6 +83,7 @@ class OutgoingCallAdmin(admin.ModelAdmin):
                 'gather_timeout',
                 'gather_speech_timeout',
                 'gather_speech_model',
+                'gather_loop',
             ],
             'classes': ['collapse']
         }),

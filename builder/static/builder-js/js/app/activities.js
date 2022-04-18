@@ -1,4 +1,4 @@
-/* global requirejs, confirm, alert */
+/* global requirejs, alert */
 
 requirejs.config({
   shim: {
@@ -72,58 +72,103 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
 
-  $('input[type=radio][name=activity-template]').change(function(eventObj) {
-  	let selected = $('input[type=radio][name=activity-template]:checked')
-  	
-  	let name = selected.attr('data-name')
-  	
-  	let existingName = $('#field_add_game').val()
-  	
-  	if (existingName == '' || (existingName.startsWith('New ') && existingName.endsWith(' Activity'))) {
-  		if (name !== undefined) {
-			nameField.value = 'New ' + name + ' Activity'
-		} else {
-			nameField.value = 'New Blank Activity'
-		}
-	}
-  });
-             
-  addDialog.listen('MDCDialog:closed', function (action) {
-  	if (action.detail.action == 'add') {
-		const name = nameField.value
+  $('input[type=radio][name=activity-template]').change(function (eventObj) {
+    const selected = $('input[type=radio][name=activity-template]:checked')
 
-		const selected = $('input[type=radio][name=activity-template]:checked').val()
-	
-		const payload = {
-			name: name,
-			template: selected
-		}
+    const name = selected.attr('data-name')
 
-		$.post('/builder/add-game.json', payload, function (response) {
-		  if (response.success) {
-			$('#dialog-title').html('Success')
-		  } else {
-			$('#dialog-title').html('Failure')
-		  }
+    const existingName = $('#field_add_game').val()
 
-		  $('#dialog-content').html(response.message)
-
-		  console.log(response)
-
-		  baseDialog.listen('MDCDialog:closed', function () {
-			if (response.success) {
-			  if (response.redirect !== undefined) {
-				window.location.href = response.redirect
-			  }
-			}
-		  })
-
-		  baseDialog.open()
-		})
-	}
+    if (existingName === '' || (existingName.startsWith('New ') && existingName.endsWith(' Activity'))) {
+      if (name !== undefined) {
+        nameField.value = 'New ' + name + ' Activity'
+      } else {
+        nameField.value = 'New Blank Activity'
+      }
+    }
   })
 
-  mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
+  addDialog.listen('MDCDialog:closed', function (action) {
+    if (action.detail.action === 'add') {
+      const name = nameField.value
+
+      const selected = $('input[type=radio][name=activity-template]:checked').val()
+
+      const payload = {
+        name: name,
+        template: selected
+      }
+
+      $.post('/builder/add-game.json', payload, function (response) {
+        if (response.success) {
+          $('#dialog-title').html('Success')
+        } else {
+          $('#dialog-title').html('Failure')
+        }
+
+        $('#dialog-content').html(response.message)
+
+        console.log(response)
+
+        baseDialog.listen('MDCDialog:closed', function () {
+          if (response.success) {
+            if (response.redirect !== undefined) {
+              window.location.href = response.redirect
+            }
+          }
+        })
+
+        baseDialog.open()
+      })
+    }
+  })
+
+  const cloneDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_clone_game'))
+  const cloneNameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_clone_game'))
+
+  cloneDialog.listen('MDCDialog:closed', function (action) {
+    if (action.detail.action === 'add') {
+      const name = cloneNameField.value
+
+      const payload = {
+        name: name,
+        template: $('#original_clone_id').val()
+      }
+
+      console.log('payload')
+      console.log(payload)
+
+      $.post('/builder/add-game.json', payload, function (response) {
+        if (response.success) {
+          $('#dialog-title').html('Success')
+        } else {
+          $('#dialog-title').html('Failure')
+        }
+
+        $('#dialog-content').html(response.message)
+
+        console.log(response)
+
+        baseDialog.listen('MDCDialog:closed', function () {
+          if (response.success) {
+            if (response.redirect !== undefined) {
+              window.location.href = response.redirect
+            }
+          }
+        })
+
+        baseDialog.open()
+      })
+    }
+  })
+
+  const deleteDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_delete_game'))
+
+  deleteDialog.listen('MDCDialog:closed', function (action) {
+    if (action.detail.action === 'delete') {
+      window.location.href = '/builder/activity/' + $('#game_delete_id').val() + '/delete'
+    }
+  })
 
   const csrftoken = Cookies.get('csrftoken')
 
@@ -152,9 +197,15 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
       const data = $(event.detail.item).data()
 
       if (data.action === 'delete') {
-        if (confirm('Are you sure you want to delete ' + data.name + '?')) {
-          window.location = '/builder/activity/' + data.id + '/delete'
-        }
+        $('#delete_game_name').html(data.name)
+        $('#game_delete_id').val(data.id)
+
+        deleteDialog.open()
+      } else if (data.action === 'clone') {
+        cloneNameField.value = 'Clone of ' + data.name
+        $('#original_clone_id').val(data.id)
+
+        cloneDialog.open()
       } else {
         alert('ACTION: ' + data.action + '(' + data.id + ')')
       }
@@ -205,8 +256,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   $('.preview_icon_button').click(function (eventObj) {
     eventObj.preventDefault()
-
-    console.log('click: ' + $(this).attr('data-preview-url'))
 
     $('#preview-dialog-canvas').height(parseInt($(window).height() * 0.9))
     $('#preview-dialog-canvas').width(parseInt($(window).width() * 0.9))

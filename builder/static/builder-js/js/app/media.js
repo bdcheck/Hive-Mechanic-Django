@@ -1,4 +1,4 @@
-/* global requirejs, FormData, alert */
+/* global requirejs, alert */
 
 requirejs.config({
   shim: {
@@ -61,34 +61,50 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#banner_file').click()
   })
 
-  mdc.textField.MDCTextField.attachTo(document.getElementById('name_field'))
-  const motdField = mdc.textField.MDCTextField.attachTo(document.getElementById('motd_field'))
+  const uploadDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_upload_file'))
+  const uploadDescriptionField = mdc.textField.MDCTextField.attachTo(document.getElementById('file_description'))
 
-  $('#update_button').click(function () { // catch the form's submit event
-    const fileData = new FormData()
-    fileData.append('site_name', $('#site_name').val())
-    fileData.append('site_motd', motdField.value)
+  uploadDialog.listen('MDCDialog:closed', function (action) {
+    if (action.detail.action === 'upload') {
+      $('#upload_file_description').val(uploadDescriptionField.value)
 
-    if ($('#banner_file').get(0).files[0] !== undefined) {
-      fileData.append('site_banner', $('#banner_file').get(0).files[0])
+      $('#upload_file_form').submit()
     }
+  })
 
-    $.ajax({
-      url: '/builder/settings',
-      type: 'POST',
-      data: fileData,
-      async: true,
-      cache: false,
-      processData: false,
-      contentType: false,
-      enctype: 'multipart/form-data',
-      success: function (response) {
-        $('#banner_image').attr('src', response.url)
-        alert('Settings updated.')
-      }
+  $('#upload_button').click(function (eventObj) {
+    $('#upload_field').off('change')
+
+    $('#upload_field').on('change', function (event) {
+      const filename = event.target.files[0].name
+
+      uploadDescriptionField.value = filename
+
+      uploadDialog.open()
     })
 
-    return false
+    $('#upload_field').click()
+  })
+
+  // const fileFilterField = mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
+  mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
+
+  // $('#image-filter').on('keyup', function () {
+  //  const val = $(this).val().toLowerCase()
+  //  console.log(val)
+  //  $('.image-grid').filter(function () {
+  //    $(this).toggle($(this).data('name').toLowerCase().indexOf(val) > -1)
+  //  })
+  // })
+
+  $('.clipboard-copy').click(function () { // catch the form's submit event
+    const copyText = $(this).attr('data-url')
+
+    navigator.clipboard.writeText(copyText).then(function () {
+      alert('URL copied to clipboard.')
+    }).catch(function () {
+      alert('Error copying URL to clipboard.')
+    })
   })
 
   drawer.open = true

@@ -191,6 +191,8 @@ def DDE_BOTIUM_EXTRAS(player):
 
 SILENCED_SYSTEM_CHECKS = ['fields.W904']
 
+TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
+
 from .local_settings import *
 
 # Suppress pygame notifications...

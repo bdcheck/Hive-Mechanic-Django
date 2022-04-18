@@ -174,6 +174,8 @@ define(modules, function (mdc, Node) {
         for (let i = 0; i < sourceNodes.length; i++) {
           const sourceNode = sourceNodes[i]
 
+          $('#' + sourceNode.cardId).css('background-color', '#E0E0E0')
+
           sourceNode.onClick(function () {
             me.loadNode(sourceNode.definition)
           })
