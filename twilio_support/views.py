@@ -231,7 +231,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     response.hangup()
                     break
 
-            if len(response.verbs) == 0:
+            if len(response.verbs) == 0: # pylint: disable=len-as-condition
                 log_metadata = {}
 
                 log_metadata['phone_number'] = post_dict.get('To', None)
