@@ -20,7 +20,7 @@ requirejs.config({
     cookie: '/static/builder-js/vendor/js.cookie',
     slugify: '/static/builder-js/vendor/slugify',
     marked: '/static/builder-js/vendor/marked',
-    purify: '/static/builder-js/vendor/purify',
+    purify: '/static/builder-js/vendor/purify'
   }
 })
 
@@ -112,10 +112,10 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   topAppBar.listen('MDCTopAppBar:nav', () => {
     drawer.open = !drawer.open
   })
-  
-  window.setTimeout(function() {
-	drawer.open = true
-  }, 1000);
+
+  window.setTimeout(function () {
+    drawer.open = true
+  }, 1000)
 
   function onSequenceChanged (changedId) {
     $('#action_save').text('save')
@@ -1309,7 +1309,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
-      
+
       /*
 
       if (window.dialogBuilder.definition.identifier !== undefined) {
@@ -1452,7 +1452,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       return e.returnValue
     }
 
-	delete e['returnValue'];  
+    delete e.returnValue
   })
 
   $('#action_list_variables').off('click')

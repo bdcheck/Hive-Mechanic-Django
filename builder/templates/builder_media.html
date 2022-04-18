@@ -1,154 +1,156 @@
 {% extends 'builder_base.html' %}
-{% load static %}
-{% load filer_admin_tags %}
+{% load builder_tags %}
 {% load absolute_uri_tags %}
+{% load filer_admin_tags %}
+{% load thumbnail %}
+{% load static %}
 {% block 'page_title' %}All Media | Hive Mechanic{% endblock %}
 {% block 'navigation_title' %}Hive Mechanic{% endblock %}
 {% block 'main_content' %}
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+							<h1 class="mdc-typography--headline5" style="margin-top: 8px;">
+								Media Library
+							</h1>
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+							<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="file_filter">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<input class="mdc-text-field__input" id="file_filter_field" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;">
+							</label>	
+						</div>
 
-  <script>
-    let copyToClipboard = function (text) {
-      navigator.clipboard.writeText(text).then(function () {
-        alert("Url copied")
-      }).catch(function () {
-        alert("Error copying")
-      });
-    }
-    $(document).ready(function () {
-      $("#image-filter").on("keyup", function () {
-        let val = $(this).val().toLowerCase()
-        console.log(val)
-        $(".image-grid").filter(function () {
-          $(this).toggle($(this).data("name").toLowerCase().indexOf(val) > -1)
-        });
-      });
-    });
+						<div class="mdc-layout-grid__cell--span-3" style="padding-bottom: 16px;">
+							<button class="mdc-button mdc-button--raised mdc-button--icon-leading" id="upload_button">
+								<span class="mdc-button__ripple"></span>
+								<span class="mdc-button__focus-ring"></span>
+								<i class="material-icons mdc-button__icon" aria-hidden="true">cloud_upload</i>
+								<span class="mdc-button__label">Upload File</span>
+							</button>
+							<div class="mdc-typography--body2" style="margin-top: 8px;">Can include images, audio, video, PDF, etc.</div>
+						</div>
+						<div class=" mdc-layout-grid__cell--span-9" style="text-align: right;">
+							<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ total_media_file_count}} media files</div>
+						</div>
 
-  </script>
-  <div id="clipboard-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
-    <div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
-      Copy to clipboard
-    </div>
-  </div>
-  <div class="mdc-layout-grid">
-    <div class="mdc-layout-grid__inner">
+						{% for media_file in media_files %}
+							<div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px;">
+								<div class="mdc-layout-grid__inner">
+									<div class= "mdc-layout-grid__cell--span-3">
+										{% if media_file.mime_type == 'image/jpeg' %}
+											<img src="{% thumbnail media_file 320x320 %}" style="width: 100%;">
+										{% else %}
+											{% if media_file.mime_type == 'application/pdf' %}
+												<img src="{% thumbnail media_file 320x320 %}" style="width: 100%;">
+											{% else %}
+												<video controls style="width: 100%;">
+												  <source src="{{ media_file.url }}" type="{{ media_file.mime_type }} ">
+												  Your browser does not support the video tag.
+												</video> 
+											{% endif %}
+										{% endif %}
+									</div>
+									<div class= mdc-layout-grid__cell--span-9 mdc-typography--body2">
+										<div>
+											Filename: <a href="{% absolute_uri media_file.url request %}">{{ media_file.original_filename }}</a><br />
+											Uploaded By: {{ media_file.owner }}<br />
+											Description: {% if media_file.description %} {{ media_file.description }} {% endif %}<br />
+											Uploaded At: {{ media_file.uploaded_at }}<br />
+											File Size: {{ media_file.size|humanize_file_size }}
+											<div style="background-color: #e82e2e; color: #fff; padding: 8px; {% if media_file.size < media_file_warning_size %}display: none;{% else %}display: inline-block;{% endif %}">
+												WARNING: file sizes above 5 mb (like this one) are often skipped by Twilio for MMS messaging
+											</div>
+										</div>
 
-	<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-		<div class="mdc-card" style="padding: 16px;">
-			<div class="mdc-layout-grid__inner">
-				<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-					<h1 class="mdc-typography--headline5" style="margin: 0px;">Media Library</h1>
+										<div style="margin-top: 1em; margin-bottom: 1em;">
+											File URL: <a href="{% absolute_uri media_file.url request %}" target="_blank">{% absolute_uri media_file.url request %}</a>		
+										</div>
+
+										<button class="mdc-button mdc-button--raised mdc-button--icon-leading clipboard-copy" id="upload_button" data-url="{% absolute_uri media_file.url request %}">
+											<span class="mdc-button__ripple"></span>
+											<span class="mdc-button__focus-ring"></span>
+											<i class="material-icons mdc-button__icon" aria-hidden="true">content_copy</i>
+											<span class="mdc-button__label">Copy URL to clipboard</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-    <div class="mdc-layout-grid__cell--span-12">
-    <div class="mdc-layout-grid">
-    <div class="mdc-layout-grid__inner">
-      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-        <div class="mdc-card" style="padding: 16px">
-          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-            <div class="mdc-layout-grid">
-              <div class="mdc-layout-grid__inner">
-              <div class="mdc-layout-grid__cell--span-12">
-              <label for="upload-field" class="mdc-typography--body1">Upload new media:</label>
-              <form method="post" enctype="multipart/form-data" action={% url 'builder_media_upload' %}>
-                {% csrf_token %}
-                <input class="mdc-form-field" id="upload-field" type="file" name="file"/>
-                <div class="mdc-typography--body2">
-                  Description (optional): <input class="mdc-form-field" type="text" id="description" name="description">
-                </div>
-                <input type="submit" class="mdc-form-field">
-              </form>
-              </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
-    </div>
+	<div id="clipboard-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+		<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
+			Copy to clipboard
+		</div>
+	</div>
 
-      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-        <div class="mdc-layout-grid">
-          <div class="mdc-layout-grid__inner">
-            <div class="mdc-layout-grid__cell--span-12">
-        <div class="mdc-card" style="padding: 16px">
-            <div class=" mdc-layout-grid__cell--span-3">
-              Browse Prior Uploads
-            </div>
-            <div class="mdc-layout-grid__cell--span-6">
-              Search (owner, filename, details, uploaded at): <input class="mdc-text-field" id="image-filter" placeholder="Search..">
-            </div>
-        </div></div>
-          </div>
-        </div>
+	<div id="upload-tooltip-id" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+		<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">
+			Upload file
+		</div>
+	</div>
+	
+	<form method="post" id="upload_file_form" enctype="multipart/form-data" action="{% url 'builder_media_upload' %}" style="display: none;">
+		{% csrf_token %}
+		<input class="mdc-form-field" id="upload_field" type="file" name="file"/>
+		<input class="mdc-form-field" type="text" id="upload_file_description" name="description">
+	</form>
 
-      </div>
+	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="upload-dialog-title" id="dialog_upload_file">
+		<div class="mdc-dialog__container">
+			<div class="mdc-dialog__surface">
+				<h2 class="mdc-dialog__title" id="upload-dialog-title">Upload File</h2>
+                <div class="mdc-dialog__content">
+					<div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
+						<div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
+				                Please add a description (optional):
+				            </div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+								<div class="mdc-text-field mdc-text-field--outlined" id="file_description" style="margin-top: 8px; width: 100%;">
+									<input type="text" class="mdc-text-field__input" id="field_file_description">
+									<div class="mdc-notched-outline">
+										<div class="mdc-notched-outline__leading"></div>
+											<div class="mdc-notched-outline__notch">
+											<label for="tf-outlined" class="mdc-floating-label">Description</label>
+										</div>
+										<div class="mdc-notched-outline__trailing"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<footer class="mdc-dialog__actions">
+					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+						<span class="mdc-button__label">Cancel</span>
+					</button>
+					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="upload">
+						<span class="mdc-button__label">Upload File</span>
+					</button>
+				</footer>
+			</div>
+		</div>
+		<div class="mdc-dialog__scrim"></div>
+	</div>
 
-        {% for m in media %}
-          <div class="mdc-layout-grid__cell--span-12">
-          <div class="mdc-layout-grid">
-          <div class="mdc-layout-grid__inner">
-          <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+	
+{% endblock %}
 
-            <div class="mdc-card image-grid" style="padding: 16px"
-            data-name="{{ m.owner }} {{ m.uploaded_at }} {{ m.url }} {{ m.description }}">
-              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+{% block 'old_main_content' %}
 
-            <div class= "mdc-layout-grid__cell--span-2 mdc-layout-grid--align-left">
-              <button class="mdc-button mdc-button--outlined">
-                {% file_icon m %}
-              </button>
-            </div>
-            <div class= mdc-layout-grid__cell--span-10">
-              <div class="mdc-typography--body2">
-                Filename: <a href="{% absolute_uri m.url request %}">{{ m.original_filename }}</a>
-
-              </div>
-              <div class="mdc-typography--body2">
-                Owner: {{ m.owner }}
-              </div>
-              <div class="mdc-typography--body2">
-                Description: {% if m.description %} {{ m.description }} {% endif %}
-              </div>
-            {# I know this is not 5MB but unsure what the actual texting limit is #}
-              {% if m.size > 5000000 %}
-              <div class="mdc-typography--body2" style="background-color: #e82e2e">
-                WARNING: file sizes above 5 mb (like this one) are often skipped by Twilio for MMS messaging
-                {% else %}
-                <div class="mdc-typography--body2">
-                {% endif %}
-                File Size:   {% widthratio m.size 1024 1 %}kB
-              </div>
-              <div class="mdc-typography--body2">
-                Uploaded at: {{ m.uploaded_at }}
-              </div>
-              <div class="mdc-typography--body2">
-                <a href="{% absolute_uri m.url request %}">{% absolute_uri m.url request %}</a>
-              </div>
-
-
-            </div>
-            <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-2 mdc-layout-grid--align-left">
-              <label for="copyclipboard{{ forloop.counter }}" class="mdc-typography--body2">Copy URL to clipboard</label>
-              <button class="material-icons mdc-button" aria-describedby="clipboard-tooltip-id"
-                      onclick="copyToClipboard('{% absolute_uri m.url request %}')" id="copyclipboard{{ forloop.counter }}">content_copy
-
-              </button>
-            </div>
-              </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-
-
+{% endblock %}
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/media.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
 {% endblock %}

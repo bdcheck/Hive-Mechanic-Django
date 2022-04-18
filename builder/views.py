@@ -6,18 +6,20 @@ from builtins import str # pylint: disable=redefined-builtin
 import json
 import os
 
-import django.views.defaults
-from django.core.exceptions import PermissionDenied
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import HttpResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views import defaults
 
 from filer.admin.clipboardadmin import ajax_upload
 from filer.models import filemodels
@@ -589,8 +591,8 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
-    media = filemodels.File.objects.order_by('-uploaded_at')
-    paginator = Paginator(media, 30)
+    media_files = filemodels.File.objects.order_by('-uploaded_at')
+    paginator = Paginator(media_files, 30)
 
     try:
         pages = paginator.page(page)
@@ -599,8 +601,11 @@ def builder_media(request):
     except EmptyPage:
         pages = paginator.page(paginator.num_pages)
 
-    context['media'] = media
+    context['media_files'] = media_files
     context['pages'] = pages
+    context['total_media_file_count'] = filemodels.File.objects.all().count()
+    context['media_file_warning_size'] = settings.TEXT_MESSAGE_WARNING_FILE_SIZE
+
     return render(request, 'builder_media.html', context=context)
 
 @login_required
@@ -610,7 +615,7 @@ def builder_media_upload(request):
         response = ajax_upload(request)
         res = json.loads(response.content)
         if 'error' in res:
-            return redirect(django.views.defaults.HttpResponseServerError)
+            return redirect(defaults.HttpResponseServerError)
         description = request.POST.get("description")
         if description:
             filer_file = filemodels.File.objects.filter(id=res["file_id"]).first()
@@ -627,37 +632,37 @@ def builder_settings(request): # pylint: disable=unused-argument
 
     context = {}
 
-    settings = SiteSettings.objects.all().order_by('-last_updated').first()
+    site_settings = SiteSettings.objects.all().order_by('-last_updated').first()
 
     now = timezone.now()
 
     if request.method == 'POST':
-        if settings is None:
-            settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
+        if site_settings is None:
+            site_settings = SiteSettings.objects.create(name=request.POST.get('site_name', 'Hive Mechanic'), created=now, last_updated=now)
 
         try:
             banner_file = request.FILES["site_banner"]
 
             if banner_file is not None:
-                settings.banner = request.FILES["site_banner"]
+                site_settings.banner = request.FILES["site_banner"]
         except KeyError:
             pass
 
-        settings.name = request.POST.get('site_name', 'Hive Mechanic')
-        settings.message_of_the_day = request.POST.get('site_motd', '')
-        settings.last_updated = now
-        settings.save()
+        site_settings.name = request.POST.get('site_name', 'Hive Mechanic')
+        site_settings.message_of_the_day = request.POST.get('site_motd', '')
+        site_settings.last_updated = now
+        site_settings.save()
 
         response_payload = {
-            'url': settings.banner.url
+            'url': site_settings.banner.url
         }
 
         response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
 
         return response
 
-    if settings is not None:
-        context['settings'] = settings
+    if site_settings is not None:
+        context['settings'] = site_settings
 
     return render(request, 'builder_settings.html', context=context)
 

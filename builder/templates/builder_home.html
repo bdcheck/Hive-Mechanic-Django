@@ -14,7 +14,7 @@
 		<div class="mdc-layout-grid__inner">
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 				<div class="mdc-card mdc-typography mdc-typography--body1" style="padding: 16px;">
-					{{ site_settings.message_of_the_day }}
+					<div>{{ site_settings.message_of_the_day|safe }}</div>
 				</div>
 			</div>
 		

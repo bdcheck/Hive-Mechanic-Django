@@ -76,11 +76,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       htmlString += '      </div>'
 
       if (this.showComment()) {
-          htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption" id="' + this.cardId + '_comment" style="background-color: #FDFEDE; padding: 4px;"></div>'
+        htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption" id="' + this.cardId + '_comment" style="background-color: #FDFEDE; padding: 4px;"></div>'
       }
 
       htmlString += this.editBody()
-      
+
       htmlString += '    </div>'
       htmlString += '  </div>'
       htmlString += '</div>'
@@ -163,11 +163,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
         const oldId = me.definition.id
 
-        console.log('1 MATCH?: ' + slugged + ' =? ' + value)
-
         if (slugged !== value) {
-          console.log('NO MATCH: ' + slugged + ' !==  ' + value)
-
           $('#' + me.cardId + '_activity-identifier-warning').show()
         } else {
           $('#' + me.cardId + '_activity-identifier-warning').hide()
@@ -437,12 +433,18 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         helpClass = 'hive_mechanic_help'
       }
 
+      let addClasses = ''
+
+      if (field.add_class !== undefined) {
+        addClasses = field.add_class
+      }
+
       if (field.value === '----') {
         fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + ' mdc-typography--' + style + ' ' + helpClass + '">')
         fieldLines.push('  <hr style="height: 1px; border: none; color: #9D9E9D; background-color: #9D9E9D;" />')
         fieldLines.push('</div>')
       } else {
-        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + ' mdc-typography--' + style + ' ' + helpClass + '" style="display: flex; align-items: center;">')
+        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + ' mdc-typography--' + style + ' ' + helpClass + ' ' + addClasses + '" style="display: flex; align-items: center;">')
         fieldLines.push('  <div>' + me.fetchLocalizedValue(field.value) + '</div>')
         fieldLines.push('</div>')
       }
@@ -1135,7 +1137,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       htmlString += '      </div>'
       htmlString += '      <div class="mdc-typography--caption" id="' + this.cardId + '_activity-identifier-warning" style="color: #B71C1C;">Invalid characters or format detected. Please use only alphanumeric characters and dashes.</div>'
       htmlString += '    </div>'
-      
+
       htmlString += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
       htmlString += '      <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined" id="' + this.cardId + '_advanced_comment_field" style="width: 100%">'
       htmlString += '        <div class="mdc-notched-outline">'
@@ -1148,21 +1150,23 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       htmlString += '        <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="' + this.cardId + '_advanced_comment_value"></textarea>'
       htmlString += '      </div>'
       htmlString += '    </div>'
+      htmlString += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption">'
+      htmlString += '      (<a href="https://www.markdownguide.org/cheat-sheet/" target="_blank">Markdown Cheat Sheet</a>)'
+      htmlString += '    </div>'
 
       htmlString += '  </div>'
       htmlString += '</div>'
 
       return htmlString
     }
-    
+
     showComment () {
-        return true
+      return true
     }
 
     viewHtml () {
       let htmlString = '<div class="mdc-card" id="' + this.cardId + '" style="' + this.style() + '"  data-node-id="' + this.id + '">'
       htmlString += '  <h6 class="mdc-typography--headline6" style="margin: 16px; margin-bottom: 0;"><span style="float: right">' + this.cardIcon() + '</span>' + this.cardName() + '</h6>'
-      // htmlString += '  <h6 class="mdc-typography--caption" style="margin: 16px; margin-bottom: 0; margin-top: 0;">' + this.id + '</h6>';
       htmlString += this.viewBody()
       htmlString += '</div>'
 
@@ -1176,9 +1180,9 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     style () {
       return 'background-color: #ffffff; margin-bottom: 10px;'
     }
-    
+
     readOnlyStyle () {
-    	return ''
+      return ''
     }
 
     destinationNodes (sequence) {

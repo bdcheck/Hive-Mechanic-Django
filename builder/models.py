@@ -523,10 +523,10 @@ class Game(models.Model):
 
     def creator_name(self):
         first_version = self.versions.exclude(creator=None).order_by('created').first()
-        
+
         if first_version is not None:
             return first_version.creator.get_full_name()
-            
+
         return 'Unknown'
 
 @python_2_unicode_compatible
