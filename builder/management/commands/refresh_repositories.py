@@ -18,6 +18,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements, too-many-branches
         for repository in RemoteRepository.objects.order_by('priority'): # pylint: disable=too-many-nested-blocks
+            headers = {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+
             response = requests.get(repository.url)
 
             repository_content = response.content
