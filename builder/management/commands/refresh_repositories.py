@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 'Pragma': 'no-cache'
             }
 
-            response = requests.get(repository.url)
+            response = requests.get(repository.url, headers=headers)
 
             repository_content = response.content
 
