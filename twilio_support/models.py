@@ -379,7 +379,6 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
             if 'input_method' in action['parameters']:
                 outgoing.gather_input = action['parameters']['input_method']
-                print('SET INPUT = %s' % action['parameters']['input_method'])
 
             if 'pause' in action['parameters']:
                 outgoing.pause_length = action['parameters']['pause']
