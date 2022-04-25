@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@1.2
-  node: circleci/node@4.7.0
+  python: circleci/python@2.0.3
+  node: circleci/node@5.0.2
   browser-tools: circleci/browser-tools@1.2.4
 
 workflows:
