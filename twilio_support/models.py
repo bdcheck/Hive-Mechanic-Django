@@ -377,6 +377,9 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
             if 'timeout' in action['parameters']:
                 outgoing.gather_timeout = action['parameters']['timeout']
 
+            if 'loop' in action['parameters']:
+                outgoing.gather_loop = int(action['parameters']['loop'])
+
             if 'input_method' in action['parameters']:
                 outgoing.gather_input = action['parameters']['input_method']
 
