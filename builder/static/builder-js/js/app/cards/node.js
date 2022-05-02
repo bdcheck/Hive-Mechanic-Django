@@ -636,7 +636,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return fieldLines.join('\n')
     }
 
-    addListFieldItem (field, itemDefinition) {
+    addListFieldItem (index, field, itemDefinition, onDelete) {
       const me = this
 
       const fieldName = field.field
@@ -676,7 +676,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           itemDefinition[templateField.original_field] = newValue
 
           me.sequence.markChanged(me.id)
-        })
+        }, onDelete)
       })
     }
 
@@ -695,7 +695,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         itemDefinition[fieldName] = newValue
 
         me.sequence.markChanged(me.id)
-      })
+      }, null)
     }
 
     createField (field) {
@@ -745,7 +745,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return fieldLines.join('\n')
     }
 
-    initializeField (field, definition, onUpdate) {
+    initializeField (field, definition, onUpdate, onDelete) {
       const me = this
 
       let fieldName = field.field
@@ -845,7 +845,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
             $('#' + me.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join(''))
 
-            me.initializeField(field, definition, onUpdate)
+            me.initializeField(field, definition, onUpdate, null)
           })
         }
       } else if (field.type === 'text') {
@@ -905,8 +905,15 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           me.sequence.markChanged(me.id)
         })
 
+        const fieldSequence = definition[field.field]
+
         $.each(definition[field.field], function (index, item) {
-          me.addListFieldItem(field, item)
+          me.addListFieldItem(index, field, item, function () {
+            fieldSequence.splice(index, 1)
+
+            me.sequence.loadNode(me.definition)
+            me.sequence.markChanged(me.id)
+          })
         })
       } else if (field.type === 'structure') {
         $.each(field.fields, function (index, itemField) {
@@ -929,16 +936,32 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           me.updatePatternView(contentField.value, operationField, contentField)
         }
 
+        let lastValue = 'delete-me'
+
         operationField.listen('MDCSelect:change', function () {
           me.updatePatternValue(operationField.value, contentField.value, onUpdate)
 
           me.updatePatternView(definition[actualFieldName], operationField, contentField)
         })
 
-        $('#' + me.cardId + '_' + fieldName + '__content_value').on('change keyup paste', function () {
-          me.updatePatternValue(operationField.value, $('#' + me.cardId + '_' + fieldName + '__content_value').val(), onUpdate)
+        $('#' + me.cardId + '_' + fieldName + '__content_value').on('change keyup paste', function (event) {
+          if (event.keyCode === 46 || event.keyCode === 8) {
+            if (lastValue === '') {
+              lastValue = null
+            } else if (lastValue === null) {
+              if (onDelete !== null) {
+                onDelete()
+              }
+            } else {
+              lastValue = $('#' + me.cardId + '_' + fieldName + '__content_value').val()
+            }
+          } else {
+            lastValue = $('#' + me.cardId + '_' + fieldName + '__content_value').val()
 
-          me.updatePatternView(definition[actualFieldName], operationField, contentField)
+            me.updatePatternValue(operationField.value, lastValue, onUpdate)
+
+            me.updatePatternView(definition[actualFieldName], operationField, contentField)
+          }
         })
       } else {
         // TODO: Unknown Card Type
@@ -1076,25 +1099,25 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         }
 
         if (field.type === 'integer') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'image-url') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'sound-url') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'choice') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'text') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'readonly') {
           // Do nothing...
         } else if (field.type === 'card') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else if (field.type === 'list') {
-          me.initializeField(field, me.definition, function () {})
+          me.initializeField(field, me.definition, function () {}, null)
         } else if (field.type === 'structure') {
-          me.initializeField(field, me.definition, function () {})
+          me.initializeField(field, me.definition, function () {}, null)
         } else if (field.type === 'pattern') {
-          me.initializeField(field, me.definition, onUpdate)
+          me.initializeField(field, me.definition, onUpdate, null)
         } else {
           // TODO: Unknown Card Type
         }
