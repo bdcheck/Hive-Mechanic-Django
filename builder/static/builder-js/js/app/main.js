@@ -479,7 +479,9 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
             const sequenceName = $('#add-sequence-name-value').val()
 
             const sequence = {
-              id: slugify(sequenceName),
+              id: slugify(sequenceName, {
+                strict: true
+              }),
               type: 'sequence',
               name: sequenceName,
               items: []
