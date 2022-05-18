@@ -470,29 +470,32 @@
         <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="builder-reset-game-dialog"  aria-labelledby="add-reset-game-dialog-title" aria-describedby="add-reset-game-dialog-content">
             <div class="mdc-dialog__container">
                 <div class="mdc-dialog__surface">
-                    <h2 class="mdc-dialog__title" id="add-reset-game-dialog-title">Reset Game?</h2>
+                    <h2 class="mdc-dialog__title" id="add-reset-game-dialog-title">Reset Activity</h2>
                     <div class="mdc-dialog__content mdc-layout-grid__inner" style="row-gap: 8px" id="add-reset-game-dialog-content">
 						<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 							<div class="mdc-radio">
-								<input class="mdc-radio__native-control" type="radio" value="reset-game-variables" id="reset_game" name="builder_reset_game" data-url="{% url 'builder_activity_actions_json' game.slug %}" checked />
+								<input class="mdc-radio__native-control" type="radio" value="close-active-sessions" id="close_sessions" name="builder_reset_game"  data-url="{% url 'builder_activity_actions_json' game.slug %}" checked />
 								<div class="mdc-radio__background">
 									<div class="mdc-radio__outer-circle"></div>
 									<div class="mdc-radio__inner-circle"></div>
 								</div>
 								<div class="mdc-radio__ripple"></div>
 							</div>
-							<label for="radio-1">Reset Game Variables</label>
+							<label for="radio-1" class="mdc-typography--body1">Close Active Sessions</label>
 						</div>
 						<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 							<div class="mdc-radio">
-								<input class="mdc-radio__native-control" type="radio" value="close-active-sessions" id="close_sessions" name="builder_reset_game"  data-url="{% url 'builder_activity_actions_json' game.slug %}" />
+								<input class="mdc-radio__native-control" type="radio" value="reset-game-variables" id="reset_game" name="builder_reset_game" data-url="{% url 'builder_activity_actions_json' game.slug %}" />
 								<div class="mdc-radio__background">
 									<div class="mdc-radio__outer-circle"></div>
 									<div class="mdc-radio__inner-circle"></div>
 								</div>
 								<div class="mdc-radio__ripple"></div>
 							</div>
-							<label for="radio-1">Close Active Sessions</label>
+							<label for="radio-1" class="mdc-typography--body1">
+								Reset Activity Variables<br />
+								<span class="mdc-typography--caption"">(Examples: High Score, Current Location)</span>
+							</label>
 						</div>
                     </div>
                     <footer class="mdc-dialog__actions">

@@ -615,6 +615,8 @@ class GameVersion(models.Model):
 
                         session.advance_to(interrupt['action'])
 
+                        session.nudge()
+
                         return True
         return False
 

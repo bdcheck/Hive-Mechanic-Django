@@ -535,8 +535,16 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('  <div id="' + me.cardId + '__' + fieldName + '__items"></div>')
       fieldLines.push('</div>')
 
+      if (field.add_item_text !== undefined) {
+        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 ">')
+        fieldLines.push('  <span class="mdc-typography--caption">' + me.fetchLocalizedValue(field.add_item_text) + '</span>')
+        fieldLines.push('</div>')
+      } else {
+        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"></div>')
+      }
+
       if (field.add_item_label !== undefined) {
-        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="text-align: right;">')
+        fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="text-align: right;">')
         fieldLines.push('  <button class="mdc-button mdc-button--raised" id="' + me.cardId + '__' + fieldName + '__add_item">')
         fieldLines.push('    <span class="mdc-button__label">' + me.fetchLocalizedValue(field.add_item_label) + '</span>')
         fieldLines.push('  </button>')

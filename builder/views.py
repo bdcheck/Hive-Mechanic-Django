@@ -515,8 +515,10 @@ def builder_add_game(request): # pylint: disable=unused-argument
                 definition = json.loads(version.definition)
 
                 definition['identifier'] = slug
+                definition['name'] = name
 
                 version.definition = json.dumps(definition, indent=2)
+                version.creator = request.user
 
                 version.save()
                 new_game.save()
