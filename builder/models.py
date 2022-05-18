@@ -894,14 +894,22 @@ class Session(models.Model):
         return self.dialog().current_state_id()
 
     def complete(self):
-        self.dialog().finish()
+        dialog_key = 'session-' + str(self.pk)
+
+        last_dialog = None
+
+        for dialog in Dialog.objects.filter(key=dialog_key, finished=None):
+            dialog.finish()
+
+            last_dialog = dialog
 
         self.completed = timezone.now()
         self.save()
 
-        metadata = {
-            'dialog': 'dialog:%d' % self.dialog().pk,
-        }
+        metadata = {}
+
+        if last_dialog is not None:
+            metadata['dialog'] = 'dialog:%d' % last_dialog.pk
 
         log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 

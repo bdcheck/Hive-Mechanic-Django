@@ -151,9 +151,9 @@ class Integration(models.Model):
                 if extras is not None and ('message_type' in extras) and extras['message_type'] == 'call':
                     pass
                 else:
-                    session.process_incoming(self, None, extras)
+                    pass # session.process_incoming(self, None, extras)
 
-            log(self.log_id(), 'Processed incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
+            log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
             if isinstance(payload, list):
                 actions = payload
