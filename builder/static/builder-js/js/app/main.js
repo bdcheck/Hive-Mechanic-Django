@@ -96,8 +96,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
-
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
+  mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_annotated_help_tip'))
 
   const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'))
   // const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))
@@ -1041,7 +1041,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
       if (interrupt.action !== undefined && interrupt.action !== '') {
         interruptBody += '  <button class="mdc-icon-button" id="activity_interrupt_pattern_' + i + '_response_click">'
-        interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">keyboard_arrow_right</i>'
+        interruptBody += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">arrow_forward</i>'
         interruptBody += '  </button>'
       }
 
@@ -1474,5 +1474,12 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         $('#builder-game-variables-dialog-content').append('<div class="mdc-typography--body1 mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-layout-grid__cell--align-top">= <strong>' + item.value + '</strong></div>')
       })
     })
+  })
+
+  const helpDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('annotated-help-dialog'))
+
+  $('#action_annotated_help').off('click')
+  $('#action_annotated_help').click(function (eventObj) {
+    helpDialog.open()
   })
 })

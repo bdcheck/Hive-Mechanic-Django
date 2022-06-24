@@ -32,6 +32,15 @@
 							<span class="mdc-typography mdc-typography--headline6">
 								Account Details
 							</span>
+
+							{% if latest_terms %}
+								<p class="mdc-typography mdc-typography--body1">
+									<strong>Terms Accepted</strong>
+									<br />
+									<a href="{% url 'user_terms_view' %}">{{ latest_terms.accepted }}</a>
+								</p>
+							{% endif %}
+
 							<p class="mdc-typography mdc-typography--body1">
 								<strong>Created</strong><br />
 								{{ user.date_joined }}

@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.http import HttpResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
@@ -64,7 +65,7 @@ def builder_activities(request): # pylint: disable=unused-argument
         'templates': [],
     }
 
-    for game in Game.objects.all():
+    for game in Game.objects.all().order_by(Lower('name')):
         if game.can_edit(request.user):
             context['activities'].append(game)
 
@@ -122,7 +123,7 @@ def builder_sessions(request): # pylint: disable=unused-argument
 
     context = {}
 
-    context['sessions'] = Session.objects.all()
+    context['sessions'] = Session.objects.all().order_by('-started')
 
     return render(request, 'builder_sessions.html', context=context)
 
@@ -699,8 +700,8 @@ def builder_activity_view(request, slug): # pylint: disable=unused-argument
 @user_accepted_all_terms
 def builder_integrations(request):
     context = {}
-    integration = Integration.objects.order_by("name")
-    games = Game.objects.order_by("name")
+    integration = Integration.objects.filter(enabled=True).order_by(Lower('name'))
+    games = Game.objects.order_by(Lower('name'))
     context["integrations"] = integration
     context["games"] = games
     return render(request, 'builder_integration.html', context=context)

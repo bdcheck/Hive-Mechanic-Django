@@ -34,6 +34,19 @@ def user_required_terms(request): # pylint: disable=unused-argument
 
     return redirect('builder_home')
 
+@login_required
+def user_terms_view(request): # pylint: disable=unused-argument
+    context = {}
+
+    context['latest_terms'] = request.user.terms_accepted.order_by('-accepted').first()
+
+    if context['latest_terms'] is not None:
+        context['terms'] = context['latest_terms'].terms_version
+
+        return render(request, 'required_terms_view.html', context=context)
+
+    return redirect('builder_home')
+
 def user_request_access(request): # pylint: disable=unused-argument, too-many-branches
     context = {
         'password_requirements': password_validators_help_texts(),
@@ -128,5 +141,6 @@ def user_account(request): # pylint: disable=unused-argument
                 context['messages'].append('Unable to update password, invalid current password provided.')
 
     context['user'] = request.user
+    context['latest_terms'] = request.user.terms_accepted.order_by('-accepted').first()
 
     return render(request, 'user_account.html', context=context)

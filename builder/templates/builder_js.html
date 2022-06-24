@@ -94,6 +94,11 @@
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Toggle interface mode (basic or advanced)</div>
 					</div>                    
 
+                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Annotated Help" aria-describedby="action_annotated_help_tip" id="action_annotated_help" style="margin-left: 22px;">quiz</a>
+					<div id="action_annotated_help_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View annotated help</div>
+					</div>                    
+
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="View Structure" aria-describedby="action_view_structure_tip" id="action_view_structure" style="margin-left: 22px;">schema</a>
 					<div id="action_view_structure_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View activity structure</div>
@@ -561,6 +566,21 @@
             </div>
             <!-- <div class="mdc-dialog__scrim"></div> -->
         </div>
+
+		<div class="mdc-dialog mdc-dialog--sheet mdc-dialog--no-content-padding" role="alertdialog" aria-modal="true" id="annotated-help-dialog"  aria-describedby="annotated-help-dialog-content" aria-labelledby="annotated-help-dialog__title--with-close-icon-button">
+			<div class="mdc-dialog__scrim" data-mdc-dialog-action="cancel"></div>
+			<div class="mdc-dialog__container">
+				<div class="mdc-dialog__surface" style="max-width: 80%; padding: 16px;">
+					<div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
+						<img src="{% static 'builder-js/images/annotated_help.png' %}" style="width: 100%;" />
+						
+						<p class="mdc-typography--body1" style="text-align: center;">For more tutorials on Hive Mechanic, see <a href="https://www.hivemechanic.org/overview/guides-and-tutorials/" target="_blank">our guides and tutorials</a>.</p>
+						<!-- <button class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close" style="position: absolute; top: 8px; right: 8px;">close</button> -->
+					</div>
+				</div>
+			</div>
+			<!-- <div class="mdc-dialog__scrim"></div> -->
+		</div>
 
 
     </body>

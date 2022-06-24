@@ -1,3 +1,5 @@
+# pylint: disable=line-too-long
+
 from six import python_2_unicode_compatible
 
 from django.conf import settings
@@ -15,7 +17,7 @@ class TermsVersion(models.Model):
 
 @python_2_unicode_compatible
 class TermsAcceptance(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='terms_accepted', on_delete=models.CASCADE)
     terms_version = models.ForeignKey(TermsVersion, on_delete=models.CASCADE)
     accepted = models.DateTimeField()
 

@@ -161,7 +161,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           trim: false
         })
 
-        const oldId = me.definition.id
+        let oldId = me.definition.id
 
         if (slugged !== value) {
           $('#' + me.cardId + '_activity-identifier-warning').show()
@@ -169,14 +169,22 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           $('#' + me.cardId + '_activity-identifier-warning').hide()
 
           const newId = slugged
+          const newFullId = me.sequence.definition.id + '#' + newId
 
           const sources = me.sourceNodes(me.sequence)
 
           for (let i = 0; i < sources.length; i++) {
-            sources[i].updateReferences(oldId, newId)
+            sources[i].updateReferences(oldId, newFullId)
           }
 
-          me.definition.id = value
+          oldId = me.sequence.definition.id + '#' + oldId
+
+          for (let i = 0; i < sources.length; i++) {
+            sources[i].updateReferences(oldId, newFullId)
+          }
+
+          me.definition.id = newId
+          me.id = newId
 
           me.sequence.markChanged(me.id)
         }

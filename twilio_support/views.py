@@ -3,6 +3,7 @@
 from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
 
+import json
 import mimetypes
 
 from io import BytesIO
@@ -135,6 +136,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
         post_dict = request.POST.dict()
 
+        print('POST: %s' % json.dumps(post_dict, indent=2))
+
         source = post_dict['From']
         destination = post_dict['To']
 
@@ -196,7 +199,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     args = {
                         'input': call.gather_input,
                         'barge_in': True,
-                        'num_digits': 1
+                        'num_digits': 1,
+                        'action_on_empty_result': True
                     }
 
                     if call.gather_timeout is not None:
