@@ -16,7 +16,7 @@
         {
           "name": "Pause to Delay",
           "type": "pause",
-          "duration": "1",
+          "duration": "3",
           "id": "pause-to-delay",
           "next": "finish-message"
         },
