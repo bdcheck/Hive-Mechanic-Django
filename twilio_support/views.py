@@ -3,7 +3,6 @@
 from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
 
-import json
 import mimetypes
 
 from io import BytesIO
