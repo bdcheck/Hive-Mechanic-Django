@@ -136,8 +136,6 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
         post_dict = request.POST.dict()
 
-        print('POST: %s' % json.dumps(post_dict, indent=2))
-
         source = post_dict['From']
         destination = post_dict['To']
 
