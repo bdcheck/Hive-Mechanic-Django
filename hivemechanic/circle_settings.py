@@ -34,6 +34,11 @@ STATIC_ROOT = BASE_DIR + '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR + '/media/'
 
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
+SILENCED_SYSTEM_CHECKS = ['security.W019']
+
 PDK_DASHBOARD_ENABLED = True
 
 SITE_URL = 'https://' + ALLOWED_HOSTS[0]
@@ -43,3 +48,4 @@ HIVE_API_URL = 'https://' + ALLOWED_HOSTS[0] + '/http/'
 HIVE_CLIENT_TOKEN = 'abc12345' # nosec
 
 # TEST_RUNNER = 'hivemechanic.no_db_test_runner.NoDbTestRunner'
+
