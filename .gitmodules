@@ -10,3 +10,6 @@
 [submodule "http_support/client"]
 	path = http_support/client
 	url = https://github.com/audacious-software/Hive-Mechanic-Client-Python.git
+[submodule "nagios_monitoring"]
+	path = nagios_monitor
+	url = https://github.com/audacious-software/Django-Nagios-Monitoring.git

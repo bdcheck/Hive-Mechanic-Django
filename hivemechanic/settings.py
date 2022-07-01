@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'quicksilver',
     'passive_data_kit',
     'django_dialog_engine',
+    'nagios_monitor',
     'user_creation',
     'builder',
     'activity_logger',
@@ -189,7 +190,12 @@ def DDE_BOTIUM_EXTRAS(player):
         'player': player
     }
 
-SILENCED_SYSTEM_CHECKS = ['fields.W904']
+SILENCED_SYSTEM_CHECKS = ['fields.W904', 'security.W005', 'security.W021']
+
+SECURE_HSTS_SECONDS = 300
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 
