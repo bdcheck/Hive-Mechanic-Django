@@ -67,7 +67,7 @@ def builder_home(request): # pylint: disable=unused-argument
     for session in context['completed_sessions']:
         durations.append((session.completed - session.started).total_seconds())
 
-    if len(durations) > 0:
+    if len(durations) > 0: # pylint: disable=len-as-condition
         mean_duration = numpy.mean(durations)
 
         delta = datetime.timedelta(seconds=mean_duration)
