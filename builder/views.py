@@ -5,10 +5,10 @@ from builtins import str # pylint: disable=redefined-builtin
 
 import datetime
 import json
-import statistics
 import os
 
 import humanize
+import numpy
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -68,7 +68,7 @@ def builder_home(request): # pylint: disable=unused-argument
         durations.append((session.completed - session.started).total_seconds())
 
     if len(durations) > 0:
-        mean_duration = statistics.mean(durations)
+        mean_duration = numpy.mean(durations)
 
         delta = datetime.timedelta(seconds=mean_duration)
 
