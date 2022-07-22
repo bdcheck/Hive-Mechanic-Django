@@ -61,6 +61,7 @@ def builder_home(request): # pylint: disable=unused-argument
     context['completed_sessions'] = Session.objects.exclude(completed=None)
 
     context['oldest_active_session'] = Session.objects.filter(completed=None).order_by('started').first()
+    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
 
     durations = []
 
