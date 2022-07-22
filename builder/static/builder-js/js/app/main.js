@@ -97,7 +97,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_annotated_help_tip'))
-  
+
   if (window.dialogBuilder.editable) {
     mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
   }
@@ -1062,22 +1062,22 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
-      
+
       let lastValue = patternField.value
 
-      $('#' + identifier).on('change keyup paste', function () {
+      $('#' + identifier).on('change keyup paste', function (event) {
         if (event.keyCode === 46 || event.keyCode === 8) {
           if (lastValue === '') {
             lastValue = null
-            
+
             return
           } else if (lastValue === null) {
-      window.dialogBuilder.definition.interrupts.splice(i, 1)
-      
-      window.setTimeout(refreshSettingsInterrupts, 100)
+            window.dialogBuilder.definition.interrupts.splice(i, 1)
+
+            window.setTimeout(refreshSettingsInterrupts, 100)
           }
         }
-        
+
         lastValue = patternField.value
         updatePattern(interrupt, operationSelect.value, patternField.value)
 
@@ -1204,7 +1204,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
-
 
       $('#' + valueFieldIdentifier).on('change keyup paste', function () {
         if (valueField.value === '' && nameField.value === '') {
