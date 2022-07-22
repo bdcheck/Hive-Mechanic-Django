@@ -487,7 +487,7 @@ class Game(models.Model):
         if self.can_edit(user):
             return True
 
-        if (self.editors.count() == 0 and self.viewers.count() == 0) or self.viewers.filter(pk=user.pk).count() > 0:
+        if self.viewers.count() == 0 or self.viewers.filter(pk=user.pk).count() > 0:
             return True
 
         return False

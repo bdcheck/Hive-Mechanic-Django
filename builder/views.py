@@ -68,6 +68,8 @@ def builder_activities(request): # pylint: disable=unused-argument
     for game in Game.objects.all().order_by(Lower('name')):
         if game.can_edit(request.user):
             context['activities'].append(game)
+        elif game.can_view(request.user):
+            context['activities'].append(game)
 
         if game.is_template:
             context['templates'].append(game)
@@ -266,9 +268,10 @@ def builder_game(request, game): # pylint: disable=unused-argument
         context = {}
 
         context['game'] = matched_game
+        context['editable'] = matched_game.can_edit(request.user)
 
         if request.method == 'POST':
-            if matched_game.can_edit(request.user):
+            if context['editable']:
                 definition = json.loads(request.POST['definition'])
 
                 new_version = GameVersion(game=context['game'], created=timezone.now(), definition=json.dumps(definition, indent=2), creator=request.user)
@@ -503,7 +506,7 @@ def builder_add_game(request): # pylint: disable=unused-argument
             new_game = Game(name=name, slug=slug)
             new_game.save()
 
-            if template and template != "none":
+            if template and template != 'none':
                 old_game = Game.objects.filter(id=template).first()
                 for card in old_game.cards.all():
                     new_game.cards.add(card)

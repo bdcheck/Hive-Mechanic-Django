@@ -180,6 +180,22 @@ define(modules, function (mdc, Node) {
             me.loadNode(sourceNode.definition)
           })
         }
+        
+        window.setTimeout(function() {
+			console.log('CHECKING EDITABLE: ' + window.dialogBuilder.editable)
+		
+			if (window.dialogBuilder.editable === false) {
+			  console.log('MAKING READONLY')
+			  $('input').attr('readonly', 'true')
+			  $('textarea').attr('readonly', 'true')
+			  $('select').attr('readonly', 'true')
+			} else {
+			  console.log('MAKING EDITABLE')
+			  $('input').removeAttr('readonly')
+			  $('textarea').removeAttr('readonly')
+			  $('select').removeAttr('readonly')
+			}
+		}, 250)
       } else {
         me.addCard(function (cardId) {
           for (let j = 0; j < me.definition.items.length; j++) {

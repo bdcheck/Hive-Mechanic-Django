@@ -95,9 +95,12 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_reset_activity_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
-  mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_toggle_mode'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_annotated_help_tip'))
+  
+  if (window.dialogBuilder.editable) {
+    mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_save_tip'))
+  }
 
   const activityName = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-name'))
   // const activityIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('builder-activity-setting-activity-identifier'))

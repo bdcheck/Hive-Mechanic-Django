@@ -57,7 +57,7 @@
             a {
                 text-decoration: none;
             }
-            
+
             .mdc-card img {
             	width: 100%;
             }
@@ -71,7 +71,6 @@
 				overflow-y: scroll;
 			} */
         </style>
-
     </head>
     <body class="mdc-typography">
         <header class="mdc-top-app-bar app-bar mdc-top-app-bar--fixed" id="app-bar">
@@ -81,7 +80,7 @@
                     <span class="mdc-top-app-bar__title">Hive Mechanic</span>
                 </section>
                 <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-					
+
                     <label for="hive-help-switch-toggle" id="hive-help-switch-label">Basic: </label>
 					<div class="mdc-switch" id="hive-help-switch" style="margin-left: 11px; margin-right: 44px;" aria-describedby="action_toggle_mode">
 						<div class="mdc-switch__track"></div>
@@ -92,33 +91,40 @@
 					</div>
 					<div id="action_toggle_mode" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Toggle interface mode (basic or advanced)</div>
-					</div>                    
+					</div>
 
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Annotated Help" aria-describedby="action_annotated_help_tip" id="action_annotated_help" style="margin-left: 22px;">quiz</a>
 					<div id="action_annotated_help_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View annotated help</div>
-					</div>                    
+					</div>
 
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="View Structure" aria-describedby="action_view_structure_tip" id="action_view_structure" style="margin-left: 22px;">schema</a>
 					<div id="action_view_structure_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View activity structure</div>
-					</div>                    
+					</div>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" aria-describedby="action_reset_activity_tip" id="action_reset_activity" style="margin-left: 11px;">update</a>
 					<div id="action_reset_activity_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Reset activity</div>
-					</div>                    
+					</div>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="List Game Variables" aria-describedby="action_list_variables_tip" id="action_list_variables" style="margin-left: 11px;">calculate</a>
 					<div id="action_list_variables_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">List activity variables</div>
-					</div>                    
+					</div>
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Select Card" aria-describedby="action_select_card_tip" id="action_select_card" style="margin-left: 11px;">toc</a>
 					<div id="action_select_card_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Advance to selected card</div>
-					</div>                    
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" aria-describedby="action_save_tip" id="action_save" style="margin-left: 11px;">save</a>
-					<div id="action_save_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
-						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Save activity</div>
-					</div>                    
+					</div>
+					{% if editable %}
+						<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Save" aria-describedby="action_save_tip" id="action_save" style="margin-left: 11px;">save</a>
+						<div id="action_save_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+							<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Save activity</div>
+						</div>
+					{% else %}
+						<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Locked" aria-describedby="action_locked_tip" id="action_locked" style="margin-left: 11px;">lock</a>
+						<div id="action_lock_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
+							<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Locked activity</div>
+						</div>
+					{% endif %}
                 </section>
             </div>
         </header>
@@ -261,7 +267,7 @@
 												{% csrf_token %}
 												<input name="activity_pk" type="hidden" value="{{ game.pk }}" />
 												<input name="icon_file" id="icon_activity_file" type="file" accept="image/*" />
-											</form>											
+											</form>
 										</div>
 									</div>
 									<div class="mdc-layout-grid__inner" style="border-top: thin solid #9e9e9e; margin-top: 16px; padding-top: 16px;">
@@ -560,7 +566,7 @@
 						<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
 					</div>
                     <div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
-						<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe> 
+						<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe>
                     </div>
                 </div>
             </div>
@@ -573,7 +579,7 @@
 				<div class="mdc-dialog__surface" style="max-width: 80%; padding: 16px;">
 					<div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
 						<img src="{% static 'builder-js/images/annotated_help.png' %}" style="width: 100%;" />
-						
+
 						<p class="mdc-typography--body1" style="text-align: center;">For more tutorials on Hive Mechanic, see <a href="https://www.hivemechanic.org/overview/guides-and-tutorials/" target="_blank">our guides and tutorials</a>.</p>
 						<!-- <button class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close" style="position: absolute; top: 8px; right: 8px;">close</button> -->
 					</div>
@@ -585,11 +591,18 @@
 
     </body>
     <script>
+    	let editable = false
+    	
+    	{% if editable %}
+    		editable = true
+    	{% endif %}
+    	
         window.dialogBuilder = {
             cards: {{ game.interaction_card_modules_json }},
             source: '{{ game.definition_json }}',
             visualization: "{% url 'builder_activity_view' game.slug %}",
             categories: {{ game.interaction_card_categories_json }},
+            editable: editable,
             update: function(definition, success, failure) {
                 var payload = {
                     'definition': JSON.stringify(definition, 2)
