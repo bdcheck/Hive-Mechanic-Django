@@ -1062,8 +1062,23 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
+      
+      let lastValue = patternField.value
 
       $('#' + identifier).on('change keyup paste', function () {
+        if (event.keyCode === 46 || event.keyCode === 8) {
+          if (lastValue === '') {
+            lastValue = null
+            
+            return
+          } else if (lastValue === null) {
+      window.dialogBuilder.definition.interrupts.splice(i, 1)
+      
+      window.setTimeout(refreshSettingsInterrupts, 100)
+          }
+        }
+        
+        lastValue = patternField.value
         updatePattern(interrupt, operationSelect.value, patternField.value)
 
         dialogIsDirty = true
@@ -1172,9 +1187,12 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_variable_' + i + '_name'))
       const nameFieldIdentifier = 'activity_variable_' + i + '_name_value'
 
+      const valueField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_variable_' + i + '_value'))
+      const valueFieldIdentifier = 'activity_variable_' + i + '_value_value'
+
       $('#' + nameFieldIdentifier).on('change keyup paste', function () {
-        if (variable.name === '' && nameField.value === '') {
-          window.dialogBuilder.definition['session-variables'].splice(itemIndex, 1)
+        if (valueField.value === '' && nameField.value === '') {
+          window.dialogBuilder.definition.variables.splice(itemIndex, 1)
           refreshSettingsVariables()
         } else {
           variable.name = nameField.value
@@ -1183,11 +1201,14 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         dialogIsDirty = true
       })
 
-      const valueField = mdc.textField.MDCTextField.attachTo(document.getElementById('activity_variable_' + i + '_value'))
-      const valueFieldIdentifier = 'activity_variable_' + i + '_value_value'
 
       $('#' + valueFieldIdentifier).on('change keyup paste', function () {
-        variable.value = valueField.value
+        if (valueField.value === '' && nameField.value === '') {
+          window.dialogBuilder.definition.variables.splice(itemIndex, 1)
+          refreshSettingsVariables()
+        } else {
+          variable.value = valueField.value
+        }
 
         dialogIsDirty = true
       })
