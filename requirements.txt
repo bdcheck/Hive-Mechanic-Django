@@ -30,7 +30,7 @@ httplib2==0.20.1
 humanize==4.0.0; python_version >= '3.0'
 humanize==1.0.0; python_version < '3.0'
 lockfile==0.12.2
-lxml==4.6.5
+lxml==4.9.1
 numpy==1.23.0; python_version >= '3.0'
 numpy==1.16.6; python_version < '3.0'
 oauth2client==4.1.3
