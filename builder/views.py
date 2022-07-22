@@ -7,6 +7,8 @@ import datetime
 import json
 import os
 
+import humanize
+import numpy
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -28,8 +30,8 @@ from filer.models import filemodels
 
 from activity_logger.models import LogItem
 from integrations.models import Integration
+from twilio_support.models import IncomingMessage, OutgoingMessage
 from user_creation.decorators import user_accepted_all_terms
-
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
 
@@ -51,6 +53,29 @@ def builder_home(request): # pylint: disable=unused-argument
 
     context['integrations'] = integration_types
     context['site_settings'] = SiteSettings.objects.all().order_by('-last_updated').first()
+    context['incoming_messages'] = IncomingMessage.objects.all()
+    context['outgoing_messages_sent'] = OutgoingMessage.objects.exclude(sent_date=None)
+    context['outgoing_messages_pending'] = OutgoingMessage.objects.filter(sent_date=None)
+
+    context['active_sessions'] = Session.objects.filter(completed=None)
+    context['completed_sessions'] = Session.objects.exclude(completed=None)
+
+    context['oldest_active_session'] = Session.objects.filter(completed=None).order_by('started').first()
+    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
+
+    durations = []
+
+    for session in context['completed_sessions']:
+        durations.append((session.completed - session.started).total_seconds())
+
+    if len(durations) > 0: # pylint: disable=len-as-condition
+        mean_duration = numpy.mean(durations)
+
+        delta = datetime.timedelta(seconds=mean_duration)
+
+        context['average_session_duration_humanized'] = humanize.naturaldelta(delta)
+    else:
+        context['average_session_duration_humanized'] = 'Unknown, no sessions completed  yet.'
 
     return render(request, 'builder_home.html', context=context)
 

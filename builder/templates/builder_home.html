@@ -1,4 +1,5 @@
 {% extends 'builder_base.html' %}
+{% load humanize %}
 {% load static %}
 
 {% block 'page_title' %}Dashboard | Interaction Builder{% endblock %}
@@ -17,7 +18,67 @@
 					<div>{{ site_settings.message_of_the_day|safe }}</div>
 				</div>
 			</div>
-		
+		</div>
+	</div>
+	
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
+			<!-- <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
+					<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
+				</div>
+			</div> -->
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Sessions</div>
+					<p class="mdc-typography mdc-typography--body1">Active Sessions: <strong>{{ active_sessions.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Completed Sessions: <strong>{{ completed_sessions.count|intcomma }}</strong></p>
+					
+					{% if oldest_active_session %}
+						<p class="mdc-typography mdc-typography--body1">Oldest Session: <strong>XXX @ {{ oldest_active_session.game_version.game }}</strong> (since {{ oldest_active_session.started }})</p>
+					{% endif %}
+
+					{% if most_recent_active_session %}
+						<p class="mdc-typography mdc-typography--body1">Most Recent Session: <strong>XXX @ {{ most_recent_active_session.game_version.game }}</strong> (since {{ oldest_active_session.started }})</p>
+					{% endif %}
+
+					<p class="mdc-typography mdc-typography--body1">Average Session Duration: <strong>{{ average_session_duration_humanized }}</strong></p>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
+					<p class="mdc-typography mdc-typography--body1">Messages Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Messages Sent: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Messages Pending: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Messages Until Limit: <strong>XXX</strong></p>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+				<div class="mdc-card mdc-layout-grid__cell--span-3" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">Phone Calls</div>
+					<p class="mdc-typography mdc-typography--body1">Calls Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Calls Made: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Average Call Duration: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Total Call Minutes: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Calls Until Limit: <strong>XXX</strong></p>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-typography mdc-typography--headline6">API Calls</div>
+					<p class="mdc-typography mdc-typography--body1">Calls Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Calls Sent: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
+					<p class="mdc-typography mdc-typography--body1">Average Call Count: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="mdc-layout-grid">
+		<div class="mdc-layout-grid__inner">
 			{% for type_name, type_integrations in integrations.items %}
 				{% for integration in type_integrations %}
 					<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
@@ -35,69 +96,6 @@
 					</div>
 				{% endfor %}	
 			{% endfor %}	
-		</div>
-	</div>
-	
-	
-	
-	<div class="mdc-layout-grid">
-		<div class="mdc-layout-grid__inner">
-			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
-					<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Sessions</div>
-					<p class="mdc-typography mdc-typography--body1">Active Sessions: <strong>{{ active_sessions.count }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1">Completed Sessions: <strong>{{ completed_sessions.count }}</strong></p>
-					
-					{% if oldest_active_session %}
-						<p class="mdc-typography mdc-typography--body1">Oldest Session: <strong>{{ oldest_active_session.dialog }}</strong> (since {{ oldest_active_session.started }})</p>
-					{% endif %}
-
-					<p class="mdc-typography mdc-typography--body1">Average Session Duration: <strong>{{ average_session_duration_humanized }}</strong></p>
-				</div>
-
-				<div class="mdc-card" style="padding: 16px; margin-top: 24px;">
-					<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
-					<p class="mdc-typography mdc-typography--body1">Messages Received: <strong>{{ incoming_messages.count }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1">Messages Sent: <strong>{{ outgoing_messages_sent.count }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1">Messages Pending: <strong>{{ outgoing_messages_pending.count }}</strong></p>
-				</div>
-			</div>
-		</div>
-		<div class="mdc-layout-grid__inner">
-			<div class="mdc-layout-grid__cell">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-card__media mdc-card__media--16-9">
-						<div class="mdc-card__media-content">
-							<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
-							<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-card__media mdc-card__media--16-9">
-						<div class="mdc-card__media-content">
-							<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-card__media mdc-card__media--16-9">
-						<div class="mdc-card__media-content">
-							<div class="mdc-typography mdc-typography--headline6">Completions</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 {% endblock %}

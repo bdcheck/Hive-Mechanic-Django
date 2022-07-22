@@ -177,7 +177,9 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
         if integration_match is not None:
             integration_match.process_incoming(post_dict)
 
-            for call in OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date'):
+            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date')
+
+            for call in pending_calls:
                 if call.next_action != 'gather':
                     if call.message is not None and call.message != '':
                         if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
