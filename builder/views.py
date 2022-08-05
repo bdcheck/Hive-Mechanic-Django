@@ -40,7 +40,7 @@ from .models import Game, GameVersion, InteractionCard, Player, Session, DataPro
 def builder_home(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
-        
+
     now = timezone.now()
 
     context = {}
@@ -71,11 +71,11 @@ def builder_home(request): # pylint: disable=unused-argument
             outgoing_calls = OutgoingCall.objects.all()
 
             if site_settings.count_messages_since is not None:
-               incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
-               outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
-               outgoing_calls = OutgoingCall.objects.filter(sent_date__gte=site_settings.count_messages_since)
-               
-               context ['message_limit_reset']  = site_settings.count_messages_since
+                incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
+                outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
+                outgoing_calls = OutgoingCall.objects.filter(sent_date__gte=site_settings.count_messages_since)
+
+                context['message_limit_reset'] = site_settings.count_messages_since
 
             messages_sent = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
             messages_remaining = site_settings.total_message_limit - messages_sent

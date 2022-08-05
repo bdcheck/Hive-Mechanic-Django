@@ -20,7 +20,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
 			<!-- <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
@@ -34,7 +34,7 @@
 					<div class="mdc-typography mdc-typography--headline6">Sessions</div>
 					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Active: <strong>{{ active_sessions.count|intcomma }}</strong></p>
 					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Completed: <strong>{{ completed_sessions.count|intcomma }}</strong></p>
-					
+
 					{% if oldest_active_session %}
 						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Oldest: <strong>XXX @ {{ oldest_active_session.game_version.game }}</strong> (since {{ oldest_active_session.started }})</p>
 					{% endif %}
@@ -106,15 +106,15 @@
 								{{ integration.name }}
 							</div>
 							<div class="mdc-typography mdc-typography--subtitle1">{{ integration.game }} ({{ integration.type }})</div>
-						
+
 							{% for detail in integration.details %}
 								<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
 							{% endfor %}
 							<div class="mdc-typography mdc-typography--body1">Integration: {{ type_integrations.0.type }}</div>
 						</div>
 					</div>
-				{% endfor %}	
-			{% endfor %}	
+				{% endfor %}
+			{% endfor %}
 		</div>
 	</div>
 {% endblock %}
