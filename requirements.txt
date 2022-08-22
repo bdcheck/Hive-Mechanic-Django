@@ -10,6 +10,8 @@ easy-thumbnails==2.6; python_version < '3.0'
 easy-thumbnails==2.8.3; python_version >= '3.0'
 py-mini-racer==0.6.0
 pygame==2.0.1
+reportlab==3.5.68; python_version < '3.0'
+reportlab==3.6.11; python_version >= '3.0'
 sh==1.14.2
 twilio==6.63.2; python_version < '3.0'
 twilio==7.4.0; python_version >= '3.0'
