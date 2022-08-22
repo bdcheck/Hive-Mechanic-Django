@@ -15,6 +15,8 @@ pygame==2.0.1
 reportlab==3.5.68; python_version < '3.0'
 reportlab==3.6.11; python_version >= '3.0'
 sh==1.14.2
+svglib==0.9.4; python_version < '3.0'
+svglib==1.4.1; python_version >= '3.0'
 twilio==6.63.2; python_version < '3.0'
 twilio==7.4.0; python_version >= '3.0'
 
