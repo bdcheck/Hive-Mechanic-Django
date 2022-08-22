@@ -3,6 +3,11 @@
 -r passive_data_kit/requirements.txt
 -r quicksilver/requirements.txt
 
+django-db-logger==0.1.10
+easy-thumbnails==2.6; python_version < '3.0'
+easy-thumbnails==2.8.3; python_version >= '3.0'
+pygame==2.0.1
+
 # arrow==0.14.7; python_version < '3.0'
 # arrow==1.2.0; python_version >= '3.0'
 # bandit==1.7.0; python_version >= '3.0'
@@ -20,7 +25,6 @@
 # Django==1.11.29; python_version < '3.0'
 # Django==3.2.14; python_version >= '3.0'
 # django-admin==2.0.1
-django-db-logger==0.1.10
 # django-extensions==2.2.9
 # django-filer==2.1.2; python_version >= '3.0'
 # django-filer==1.7.1; python_version < '3.0'
@@ -57,7 +61,6 @@ django-db-logger==0.1.10
 # pyasn1-modules==0.2.8
 # pycparser==2.20
 # pyfcm==1.5.4
-pygame==2.0.1
 # pylint==2.11.1; python_version >= '3.0'
 # pylint==1.9.5; python_version < '3.0'
 # PyNaCl==1.4.0
