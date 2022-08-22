@@ -11,6 +11,8 @@ easy-thumbnails==2.8.3; python_version >= '3.0'
 py-mini-racer==0.6.0
 pygame==2.0.1
 sh==1.14.2
+twilio==6.63.2; python_version < '3.0'
+twilio==7.4.0; python_version >= '3.0'
 
 # arrow==0.14.7; python_version < '3.0'
 # arrow==1.2.0; python_version >= '3.0'
@@ -83,8 +85,6 @@ sh==1.14.2
 # six==1.16.0
 # standardjson==0.3.1
 # tblib==1.7.0
-# twilio==6.63.2; python_version < '3.0'
-# twilio==7.4.0; python_version >= '3.0'
 # typing==3.10.0.0; python_version < '3.5'
 # ua-parser==0.10.0
 # urllib3==1.26.7
