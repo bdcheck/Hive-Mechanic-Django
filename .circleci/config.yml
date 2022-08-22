@@ -45,11 +45,11 @@ jobs:
             sudo apt-get update && sudo apt-get install -y gdal-bin
             python3 -m venv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
+            git submodule init
+            git submodule update
             pip install --upgrade pip
             pip install --upgrade wheel
             pip install -r requirements.txt
-            git submodule init
-            git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
@@ -131,11 +131,11 @@ jobs:
             sudo apt-get update && sudo apt-get install -y gdal-bin
             virtualenv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
+            git submodule init
+            git submodule update
             pip install --upgrade pip
             pip install --upgrade wheel
             pip install -r requirements.txt
-            git submodule init
-            git submodule update
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
