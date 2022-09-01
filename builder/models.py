@@ -1003,7 +1003,7 @@ class Session(models.Model):
 
         self.set_variable(visit_key, timezone.now().isoformat())
 
-        session.advance_to(terms_interrupt)
+        self.advance_to(terms_interrupt)
 
 class DataProcessor(models.Model):
     name = models.CharField(max_length=4096, unique=True)
@@ -1059,7 +1059,7 @@ class DataProcessor(models.Model):
 
                 latest_version = versions[-1]
 
-                implementation_content = requests.get(latest_version['implementation']).content
+                implementation_content = requests.get(latest_version['implementation'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 
@@ -1104,7 +1104,7 @@ class DataProcessor(models.Model):
                 if versions:
                     latest_version = versions[0]
 
-                    repo_implementation = requests.get(latest_version['implementation']).text
+                    repo_implementation = requests.get(latest_version['implementation'], timeout=120).text
 
                     implementation_diff = list(difflib.unified_diff(repo_implementation.splitlines(), self.processor_function.splitlines(), lineterm=''))
 
