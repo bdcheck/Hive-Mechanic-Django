@@ -44,7 +44,7 @@ class Integration(models.Model):
     url_slug = models.SlugField(max_length=1024, unique=True)
     type = models.CharField(max_length=1024, choices=INTEGRATION_TYPES, default='twilio')
 
-    game = models.ForeignKey(Game, related_name='integrations', on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, related_name='integrations', on_delete=models.SET_NULL, blank=True, null=True)
 
     create_new_players = models.BooleanField(default=True)
 
@@ -56,7 +56,10 @@ class Integration(models.Model):
     enabled = models.BooleanField(default=True)
 
     def __str__(self):
-        return '%s (%s)' % (self.name, self.game.slug)
+        if self.game is not None:
+            return '%s (%s)' % (self.name, self.game.slug)
+
+        return '%s (No game configured)' % self.name
 
     def log_id(self):
         return 'integration:%d' % self.pk
@@ -138,6 +141,8 @@ class Integration(models.Model):
 
             player_match.save()
 
+            # TODO: Log player created
+
         if player_match is not None:
             session = self.game.current_active_session(player=player_match)
 
@@ -153,7 +158,12 @@ class Integration(models.Model):
                 else:
                     pass # session.process_incoming(self, None, extras)
 
+                # TODO: Log player created
+
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
+
+            if session.visited_terms() is False and session.accepted_terms() is False:
+                session.advance_to_terms()
 
             if isinstance(payload, list):
                 actions = payload
@@ -365,6 +375,10 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         return True
     elif action['type'] == 'echo-image':
         print(action['image-url'])
+
+        return True
+    elif action['type'] == 'accept-terms':
+        session.accept_terms()
 
         return True
 
