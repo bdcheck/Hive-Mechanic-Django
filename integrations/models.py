@@ -141,7 +141,7 @@ class Integration(models.Model):
 
             player_match.save()
 
-            # TODO: Log player created
+            log(self.log_id(), 'Created new player.', tags=['integration', 'player'], metadata=payload, player=player_match, session=None, game_version=self.game.latest_version())
 
         if player_match is not None:
             session = self.game.current_active_session(player=player_match)
@@ -158,7 +158,7 @@ class Integration(models.Model):
                 else:
                     pass # session.process_incoming(self, None, extras)
 
-                # TODO: Log player created
+                log(self.log_id(), 'Created new session.', tags=['integration', 'player'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
