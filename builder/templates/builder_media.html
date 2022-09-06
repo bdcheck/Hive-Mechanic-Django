@@ -18,13 +18,15 @@
 							</h1>
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-							<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="file_filter">
-								<span class="mdc-notched-outline">
-									<span class="mdc-notched-outline__leading"></span>
-									<span class="mdc-notched-outline__trailing"></span>
-								</span>
-								<input class="mdc-text-field__input" id="file_filter_field" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;">
-							</label>	
+							<form action="" method="GET">
+								<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="search_field">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input class="mdc-text-field__input" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;" name="q" value="{% if query %}{{ query }}{% endif %}">
+								</label>	
+							</form>
 						</div>
 
 						<div class="mdc-layout-grid__cell--span-3" style="padding-bottom: 16px;">
@@ -37,7 +39,11 @@
 							<div class="mdc-typography--body2" style="margin-top: 8px;">Can include images, audio, video, PDF, etc.</div>
 						</div>
 						<div class=" mdc-layout-grid__cell--span-9" style="text-align: right;">
-							<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ total_media_file_count}} media files</div>
+							{% if media_files|length == 1 %}
+								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ media_files|length }} media file</div>
+							{% else %}
+								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ media_files|length }} media files</div>
+							{% endif %}
 						</div>
 
 						{% for media_file in media_files %}

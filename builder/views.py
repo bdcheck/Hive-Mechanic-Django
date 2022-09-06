@@ -668,7 +668,18 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
+
     media_files = filemodels.File.objects.order_by('-uploaded_at')
+
+    search = request.GET.get('q', None)
+
+    context['query'] = search
+
+    if search is not None:
+        query = Q(original_filename__icontains=search) | Q(description__icontains=search) # pylint: disable=unsupported-binary-operation
+
+        media_files = filemodels.File.objects.filter(query).order_by('-uploaded_at')
+
     paginator = Paginator(media_files, 30)
 
     try:
