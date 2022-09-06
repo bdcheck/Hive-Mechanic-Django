@@ -22,13 +22,15 @@
 							</h1>
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-							<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="file_filter">
-								<span class="mdc-notched-outline">
-									<span class="mdc-notched-outline__leading"></span>
-									<span class="mdc-notched-outline__trailing"></span>
-								</span>
-								<input class="mdc-text-field__input" id="file_filter_field" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;">
-							</label>	
+							<form action="" method="GET">
+								<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="search_field">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input class="mdc-text-field__input" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;" name="q" value="{% if query %}{{ query }}{% endif %}">
+								</label>	
+							</form>
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
 							<button class="mdc-button mdc-button--raised mdc-button--icon-leading" id="action_add_game">
@@ -39,7 +41,11 @@
 							</button>
 						</div>
 						<div class=" mdc-layout-grid__cell--span-6" style="text-align: right;">
-							<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activities</div>
+							{% if activities|length == 1 %}
+								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activity</div>
+							{% else %}
+								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activities</div>
+							{% endif %}
 						</div>
 
 						{% for activity in activities %}

@@ -135,9 +135,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
         template: $('#original_clone_id').val()
       }
 
-      console.log('payload')
-      console.log(payload)
-
       $.post('/builder/add-game.json', payload, function (response) {
         if (response.success) {
           $('#dialog-title').html('Success')

@@ -120,7 +120,18 @@ def builder_activities(request): # pylint: disable=unused-argument
         'templates': [],
     }
 
-    for game in Game.objects.all().order_by(Lower('name')):
+    search = request.GET.get('q', None)
+
+    context['query'] = search
+
+    games = Game.objects.all().order_by(Lower('name'))
+
+    if search is not None:
+        query = Q(name__icontains=search) | Q(slug__icontains=search) # pylint: disable=unsupported-binary-operation
+
+        games = Game.objects.filter(query).order_by(Lower('name'))
+
+    for game in games:
         if game.can_edit(request.user):
             context['activities'].append(game)
         elif game.can_view(request.user):
