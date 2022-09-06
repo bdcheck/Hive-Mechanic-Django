@@ -8,7 +8,7 @@ from .views import builder_game, builder_game_definition_json, builder_interacti
                    builder_update_icon, builder_media, builder_media_upload, builder_game_templates, \
                    builder_settings, builder_game_variables, builder_integrations, builder_integrations_update, \
                    builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors, \
-                   builder_activity_logger
+                   builder_activity_logger, builder_clear_variables
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
@@ -32,6 +32,8 @@ urlpatterns = [
     url(r'^media$', builder_media, name='builder_media'),
     url(r'^media_upload$', builder_media_upload, name='builder_media_upload'),
     url(r'^integrations$', builder_integrations, name='builder_integrations'),
-    url(r'update_integration', builder_integrations_update, name='builder_integrations_update'),
+    url(r'update-integration.json', builder_integrations_update, name='builder_integrations_update'),
+    url(r'clear-variables.json', builder_clear_variables, name='builder_clear_variables'),
+
     url(r'^', builder_home, name='builder_home'),
 ]
