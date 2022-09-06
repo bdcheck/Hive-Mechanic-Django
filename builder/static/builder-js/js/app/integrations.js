@@ -68,8 +68,11 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     const target = $(eventObj.target)
 
+    const integrationId = target.attr('data-id')
+
     integrationName.value = target.attr('data-name')
-    $('#integration_id').val(target.attr('data-id'))
+
+    $('#integration_id').val(integrationId)
 
     $('[name="activity_name"]').removeAttr('checked')
 
@@ -82,6 +85,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     })
 
     $('.mdc-radio input').removeAttr('disabled')
+    $('[name="activity_name"]').removeAttr('checked')
 
     $('.integration_linked_warning').hide()
 
@@ -95,6 +99,13 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     if (game !== '') {
       $('[name="activity_name"][value="' + game + '"]').attr('checked', true)
+      $('[name="activity_name"][value="' + game + '"]').removeAttr('disabled')
+
+      $('#activity_name_' + game + '_label .activity_name').css({
+        'text-decoration-line': ''
+      })
+
+      $('#activity_name_' + game + '_label .integration_linked_warning').hide()
     } else {
       $('[name="activity_name"][value="-1"]').attr('checked', true)
     }
