@@ -275,9 +275,9 @@ class InteractionCard(models.Model):
 
                 latest_version = versions[-1]
 
-                entry_content = requests.get(latest_version['entry-actions']).content
-                evaluate_content = requests.get(latest_version['evaluate-function']).content
-                client_content = requests.get(latest_version['client-implementation']).content
+                entry_content = requests.get(latest_version['entry-actions'], timeout=120).content
+                evaluate_content = requests.get(latest_version['evaluate-function'], timeout=120).content
+                client_content = requests.get(latest_version['client-implementation'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 
@@ -323,9 +323,9 @@ class InteractionCard(models.Model):
                 if versions:
                     latest_version = versions[0]
 
-                    repo_entry = requests.get(latest_version['entry-actions']).text
-                    repo_evaluate = requests.get(latest_version['evaluate-function']).text
-                    repo_client = requests.get(latest_version['client-implementation']).text
+                    repo_entry = requests.get(latest_version['entry-actions'], timeout=120).text
+                    repo_evaluate = requests.get(latest_version['evaluate-function'], timeout=120).text
+                    repo_client = requests.get(latest_version['client-implementation'], timeout=120).text
 
                     with open(self.client_implementation.path, encoding='utf-8') as client_file:
                         local_client = client_file.read()
@@ -955,9 +955,55 @@ class Session(models.Model):
     def fetch_player_context(self):
         return self.player.player_state.copy()
 
+    def terms_key(self):
+        return '__accepted_terms__%d' % self.game_version.game.pk
+
     def fetch_game_context(self):
         return self.game_version.game.game_state.copy()
 
+    def accept_terms(self):
+        key = self.terms_key()
+
+        self.player.set_variable(key, timezone.now().isoformat())
+
+    def accepted_terms(self):
+        key = self.terms_key()
+
+        accepted = self.player.fetch_variable(key)
+
+        if accepted is not None:
+            return True
+
+        game_def = json.loads(self.game_version.definition)
+
+        if game_def.get('terms_interrupt', None) is None:
+            return True
+
+        return False
+
+    def visited_terms(self):
+        key = '%s__visited' % self.terms_key()
+
+        visited = self.fetch_variable(key)
+
+        if visited is not None:
+            return True
+
+        return False
+
+    def advance_to_terms(self):
+        game_def = json.loads(self.game_version.definition)
+
+        terms_interrupt = game_def.get('terms_interrupt', None)
+
+        if terms_interrupt is None:
+            return
+
+        visit_key = '%s__visited' % self.terms_key()
+
+        self.set_variable(visit_key, timezone.now().isoformat())
+
+        self.advance_to(terms_interrupt)
 
 class DataProcessor(models.Model):
     name = models.CharField(max_length=4096, unique=True)
@@ -1013,7 +1059,7 @@ class DataProcessor(models.Model):
 
                 latest_version = versions[-1]
 
-                implementation_content = requests.get(latest_version['implementation']).content
+                implementation_content = requests.get(latest_version['implementation'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 
@@ -1058,7 +1104,7 @@ class DataProcessor(models.Model):
                 if versions:
                     latest_version = versions[0]
 
-                    repo_implementation = requests.get(latest_version['implementation']).text
+                    repo_implementation = requests.get(latest_version['implementation'], timeout=120).text
 
                     implementation_diff = list(difflib.unified_diff(repo_implementation.splitlines(), self.processor_function.splitlines(), lineterm=''))
 

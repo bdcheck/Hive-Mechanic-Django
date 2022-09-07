@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 'Pragma': 'no-cache'
             }
 
-            response = requests.get(repository.url, headers=headers)
+            response = requests.get(repository.url, headers=headers, timeout=120)
 
             repository_content = response.content
 
@@ -51,8 +51,8 @@ class Command(BaseCommand):
                             print('Adding new card: ' + card_def['name'] + '...')
                         matched_card = InteractionCard(identifier=card_def['identifier'], name=card_def['name'], enabled=False)
 
-                        matched_card.entry_actions = requests.get(last_version['entry-actions']).content.decode("utf-8")
-                        matched_card.evaluate_function = requests.get(last_version['evaluate-function']).content.decode("utf-8")
+                        matched_card.entry_actions = requests.get(last_version['entry-actions'], timeout=120).content.decode("utf-8")
+                        matched_card.evaluate_function = requests.get(last_version['evaluate-function'], timeout=120).content.decode("utf-8")
                         matched_card.version = last_version['version']
                         matched_card.repository_definition = card_json
 
@@ -64,7 +64,7 @@ class Command(BaseCommand):
 
                         matched_card.save()
 
-                        client_content = requests.get(last_version['client-implementation']).content
+                        client_content = requests.get(last_version['client-implementation'], timeout=120).content
 
                         matched_card.client_implementation.save(card_def['identifier'] + '.js', ContentFile(client_content))
 
@@ -113,7 +113,7 @@ class Command(BaseCommand):
                             print('Adding new data processor: ' + processor_def['name'] + '...')
                         matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
 
-                        matched_processor.processor_function = requests.get(last_version['implementation']).content.decode("utf-8")
+                        matched_processor.processor_function = requests.get(last_version['implementation'], timeout=120).content.decode("utf-8")
                         matched_processor.version = last_version['version']
                         matched_processor.repository_definition = processor_json
 

@@ -64,4 +64,53 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     alert('TODO: Remove player #' + $(eventObj.target).attr('data-id'))
   })
+
+  const baseDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('base-dialog'))
+
+  let selectedClearId = -1
+
+  const clearVariablesDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_clear_variables'))
+
+  clearVariablesDialog.listen('MDCDialog:closed', function (action) {
+    console.log('action')
+    console.log(action)
+
+    if (action.detail.action === 'clear_variables') {
+      const which = $('input[type=radio][name=clear-variables]:checked').val()
+
+      const payload = {
+        id: selectedClearId,
+        clear: which
+      }
+
+      console.log('payload')
+      console.log(payload)
+
+      $.post('/builder/clear-variables.json', payload, function (response) {
+        if (response.success) {
+          $('#dialog-title').html('Success')
+        } else {
+          $('#dialog-title').html('Failure')
+        }
+
+        $('#dialog-content').html(response.message)
+
+        console.log(response)
+
+        baseDialog.listen('MDCDialog:closed', function () {
+
+        })
+
+        baseDialog.open()
+      })
+    }
+  })
+
+  $('.action_clear_variables').click(function (eventObj) {
+    eventObj.preventDefault()
+
+    selectedClearId = parseInt($(eventObj.target).attr('data-id'))
+
+    clearVariablesDialog.open()
+  })
 })

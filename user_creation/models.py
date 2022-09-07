@@ -2,9 +2,21 @@
 
 from six import python_2_unicode_compatible
 
+from django.core.checks import Warning, register # pylint: disable=redefined-builtin
+
 from django.conf import settings
 from django.db import models
 
+@register()
+def check_data_export_parameters(app_configs, **kwargs): # pylint: disable=unused-argument
+    errors = []
+
+    if hasattr(settings, 'DEFAULT_FROM_MAIL_ADDRESS') is False:
+        error = Warning('DEFAULT_FROM_MAIL_ADDRESS parameter not defined', hint='Update configuration to include DEFAULT_FROM_MAIL_ADDRESS. (Example: "E-mail Sender <email@example.com>")', obj=None, id='user_creation.W001')
+        errors.append(error)
+
+    return errors
+    
 @python_2_unicode_compatible
 class TermsVersion(models.Model):
     name = models.CharField(max_length=4096, unique=True)

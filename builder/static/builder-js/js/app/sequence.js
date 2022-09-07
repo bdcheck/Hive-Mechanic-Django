@@ -182,15 +182,11 @@ define(modules, function (mdc, Node) {
         }
 
         window.setTimeout(function () {
-          console.log('CHECKING EDITABLE: ' + window.dialogBuilder.editable)
-
           if (window.dialogBuilder.editable === false) {
-            console.log('MAKING READONLY')
             $('input').attr('readonly', 'true')
             $('textarea').attr('readonly', 'true')
             $('select').attr('readonly', 'true')
           } else {
-            console.log('MAKING EDITABLE')
             $('input').removeAttr('readonly')
             $('textarea').removeAttr('readonly')
             $('select').removeAttr('readonly')
@@ -559,9 +555,6 @@ define(modules, function (mdc, Node) {
 
             if (cardName.trim() === '') {
               const selectedCard = $("input[name='add-card-options']:checked").parent().parent().find('label').text()
-
-              console.log('SELECTED')
-              console.log(selectedCard)
 
               cardName = 'New ' + selectedCard + ' Card'
             }

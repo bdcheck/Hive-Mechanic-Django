@@ -120,7 +120,18 @@ def builder_activities(request): # pylint: disable=unused-argument
         'templates': [],
     }
 
-    for game in Game.objects.all().order_by(Lower('name')):
+    search = request.GET.get('q', None)
+
+    context['query'] = search
+
+    games = Game.objects.all().order_by(Lower('name'))
+
+    if search is not None:
+        query = Q(name__icontains=search) | Q(slug__icontains=search) # pylint: disable=unsupported-binary-operation
+
+        games = Game.objects.filter(query).order_by(Lower('name'))
+
+    for game in games:
         if game.can_edit(request.user):
             context['activities'].append(game)
         elif game.can_view(request.user):
@@ -669,7 +680,18 @@ def builder_update_icon(request):
 def builder_media(request):
     context = {}
     page = request.GET.get('page', 1)
+
     media_files = filemodels.File.objects.order_by('-uploaded_at')
+
+    search = request.GET.get('q', None)
+
+    context['query'] = search
+
+    if search is not None:
+        query = Q(original_filename__icontains=search) | Q(description__icontains=search) # pylint: disable=unsupported-binary-operation
+
+        media_files = filemodels.File.objects.filter(query).order_by('-uploaded_at')
+
     paginator = Paginator(media_files, 30)
 
     try:
@@ -699,8 +721,8 @@ def builder_media_upload(request):
             filer_file = filemodels.File.objects.filter(id=res["file_id"]).first()
             filer_file.description = description
             filer_file.save()
-    return redirect('builder_media')
 
+    return redirect('builder_media')
 
 @login_required
 @user_accepted_all_terms
@@ -770,11 +792,64 @@ def builder_activity_view(request, slug): # pylint: disable=unused-argument
 @login_required
 @user_accepted_all_terms
 def builder_integrations(request):
-    context = {}
-    integration = Integration.objects.filter(enabled=True).order_by(Lower('name'))
-    games = Game.objects.order_by(Lower('name'))
-    context["integrations"] = integration
-    context["games"] = games
+    context = {
+        'activities': [],
+        'matches': [],
+        'integrations': []
+    }
+
+    search = request.GET.get('q', None)
+
+    context['query'] = search
+
+    integrations = Integration.objects.order_by(Lower('name'))
+
+    if search is not None:
+        query = Q(name__icontains=search) | Q(url_slug__icontains=search) | Q(type__icontains=search) | Q(game__name__icontains=search) # pylint: disable=unsupported-binary-operation
+
+        integrations = Integration.objects.filter(query).order_by(Lower('name'))
+
+    for game in Game.objects.order_by(Lower('name')):
+        activity = {
+            'pk': game.pk,
+            'name': game.name
+        }
+
+        integration_types = []
+
+        for integration in game.integrations.all():
+            if (integration.type in integration_types) is False:
+                integration_types.append(integration.type)
+
+        activity_type_classes = ''
+
+        for integration_type in integration_types:
+            if activity_type_classes != '':
+                activity_type_classes += ' '
+
+            activity_type_classes += 'includes_' + integration_type
+
+        activity['integration_type_classes'] = activity_type_classes
+
+        context['activities'].append(activity)
+
+    for integration in integrations:
+        integration_dict = {
+            'pk': integration.pk,
+            'name': integration.name,
+            'url_slug': integration.url_slug,
+            'type': integration.type,
+            'activity': None,
+            'enabled': integration.enabled
+        }
+
+        if integration.game is not None:
+            integration_dict['activity'] = integration.game.name
+            integration_dict['activity_id'] = integration.game.pk
+            integration_dict['activity_slug'] = integration.game.slug
+
+        context['integrations'].append(integration_dict)
+
     return render(request, 'builder_integration.html', context=context)
 
 
@@ -782,17 +857,30 @@ def builder_integrations(request):
 @user_accepted_all_terms
 def builder_integrations_update(request):
     if request.method == 'POST':
-        int_id = request.POST.get("integration_id")
-        int_name = request.POST.get("integration_name")
-        game_id = request.POST.get("game_id")
-        integration = Integration.objects.get(pk=int_id)
-        game = Game.objects.get(pk=game_id)
-        integration.game = game
-        if int_name:
-            integration.name = int_name
-        integration.save()
-    return redirect('builder_integrations')
+        response_payload = {}
 
+        integration = Integration.objects.filter(pk=int(request.POST.get('id', '-1'))).first()
+
+        if integration is not None:
+            integration.name = request.POST.get('name', 'New Integration')
+            integration.game = Game.objects.filter(pk=int(request.POST.get('activity', '-1'))).first()
+
+            integration.save()
+
+            response_payload['result'] = 'success'
+            response_payload['message'] = 'Integration updated.'
+            response_payload['redirect'] = reverse('builder_integrations')
+        else:
+            response_payload['result'] = 'error'
+            response_payload['message'] = 'Unable to located specified integration.'
+
+        response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+        response['X-Hive-Mechanic-Editable'] = True
+
+        return response
+
+    return redirect('builder_integrations')
 
 @login_required
 @user_accepted_all_terms
@@ -843,3 +931,65 @@ def builder_activity_actions_json(request, activity): # pylint: disable=unused-a
         return response
 
     raise PermissionDenied('Edit permission required.')
+
+@login_required
+@user_accepted_all_terms
+def builder_clear_variables(request): # pylint: disable=too-many-branches
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    response_payload = {
+        'success': False,
+        'message': 'Unable to clear variables.'
+    }
+
+    safe_keys = ('twilio_player',)
+
+    if request.method == 'POST': # pylint: disable=too-many-nested-blocks
+        player_id = int(request.POST.get('id', '-1'))
+        to_clear = request.POST.get('clear', None)
+
+        player = Player.objects.filter(pk=player_id).first()
+
+        if player is not None:
+            clear_keys = []
+
+            if to_clear in ('all', 'site'):
+                for key in player.player_state.keys():
+                    if key.startswith('__') and (key in safe_keys) is False:
+                        clear_keys.append(key)
+
+            if to_clear in ('all', 'activity'):
+                for key in player.player_state.keys():
+                    if key.startswith('__') is False and (key in safe_keys) is False:
+                        clear_keys.append(key)
+
+            for key in clear_keys:
+                del player.player_state[key]
+
+            player.save()
+
+            for session in player.sessions.filter(completed=None):
+                clear_keys = []
+
+                if to_clear in ('all', 'site'):
+                    for key in session.session_state.keys():
+                        if key.startswith('__') and (key in safe_keys) is False:
+                            clear_keys.append(key)
+
+                if to_clear in ('all', 'activity'):
+                    for key in session.session_state.keys():
+                        if key.startswith('__') is False and (key in safe_keys) is False:
+                            clear_keys.append(key)
+
+                for key in clear_keys:
+                    del session.session_state[key]
+
+                session.save()
+
+            response_payload['message'] = 'Variables cleared.'
+            response_payload['success'] = True
+        else:
+            response_payload['message'] = 'Unable to locate participant.'
+
+    return HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)

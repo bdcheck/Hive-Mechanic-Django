@@ -64,7 +64,7 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
 
                 media.save()
 
-                media_response = requests.get(media.content_url)
+                media_response = requests.get(media.content_url, timeout=120)
 
                 if media_response.status_code != requests.codes.ok:
                     continue

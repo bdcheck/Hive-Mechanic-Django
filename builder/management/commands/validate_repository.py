@@ -14,7 +14,7 @@ class Command(BaseCommand):
         parser.add_argument('repository_url', type=str)
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals
-        response = requests.get(cmd_options['repository_url'])
+        response = requests.get(cmd_options['repository_url'], timeout=120)
 
         repository = response.json()
 
@@ -24,9 +24,9 @@ class Command(BaseCommand):
             versions = card_def['versions']
 
             for version in versions:
-                entry_content = requests.get(version['entry-actions']).content
-                evaluate_content = requests.get(version['evaluate-function']).content
-                client_content = requests.get(version['client-implementation']).content
+                entry_content = requests.get(version['entry-actions'], timeout=120).content
+                evaluate_content = requests.get(version['evaluate-function'], timeout=120).content
+                client_content = requests.get(version['client-implementation'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             versions = processor_def['versions']
 
             for version in versions:
-                implemementation_content = requests.get(version['implementation']).content
+                implemementation_content = requests.get(version['implementation'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 

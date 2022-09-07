@@ -1353,7 +1353,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
     static slugify (text) {
       return slugifyExt(text, {
-        remove: /[*+~.()'"!:@]/g,
+        remove: /[*+~.()'"!?:@]/g,
         trim: false
       })
     }
