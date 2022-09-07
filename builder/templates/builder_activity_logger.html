@@ -13,49 +13,56 @@
 		<div class="mdc-layout-grid__inner">
 			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-layout-grid__inner">
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-							<h1 class="mdc-typography--headline5" style="margin-top: 0px;">Activities</h1>
-							<div class="class="mdc-typography--subtitle">{{ log_items.count }} entries</div>
+					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+							<h1 class="mdc-typography--headline5">Activity Log{% if selected_tag %}: {{ selected_tag }}{% endif %}</h1>
+							<div class="class="mdc-typography--subtitle">
+								{{ total_count }} entries - Page {{ page_index|add:1 }} of {{ page_count }} - (<a href="{% url 'builder_activity_logger' %}">Reset View</a>)
+							</div>
 						</div>
-					</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+							[Search Box]
+						</div>
+						{% for item in log_items %}
+							<div class="mdc-layout-grid__cell--span-12 mdc-typography--body2" style="border-top: 1px solid #BDBDBD; margin-left: -16px; margin-right: -16px;">
+								<div class="mdc-layout-grid">
+									<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											{{ item.logged }}:
+											<p><strong>{{ item.message }}</strong></p>
+											<p>
+												{% for tag in item.tags.all %}
+													{% if tag.tag == selected_tag %}
+														[<strong><a href="?tag={{ tag.tag }}">{{ tag.name }}</a></strong>]
+													{% else %}
+														[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
+													{% endif %}
+												{% endfor %}
+											</p>
+										</div>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											{% if item.player %}
+												Player: <a href="?player={{ item.player.pk }}">{{ item.player.identifier|obfuscate_identifier }}</a><br />
+											{% endif %}
+
+											{% if item.game_version %}
+												Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
+											{% endif %}
+
+											{% if item.session %}
+												Session: <a href="?session={{ item.session.pk }}">{{ item.session }}</a>
+											{% endif %}
+										</div>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+											Metadata:<br />
+											<strong>{{ item.metadata }}</strong>
+										</div>
+									</div>
+								</div>
+							</div>
+					{% endfor %}
 				</div>
 			</div>
-
-			{% for item in log_items %}
-				<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body2">
-					<div class="mdc-card mdc-layout-grid">
-						<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-								{{ item.logged }}:
-								<p><strong>{{ item.message }}</strong></p>
-								<p>
-									{% for tag in item.tags.all %}
-										[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
-									{% endfor %}
-								</p>
-							</div>
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-								{% if item.player %}
-									Player: <a href="?player={{ item.player.pk }}">{{ item.player.identifier|obfuscate_identifier }}</a><br />
-								{% endif %}
-
-								{% if item.game_version %}
-									Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
-								{% endif %}
-
-								{% if item.session %}
-									Session: <a href="?session={{ item.session.pk }}">{{ item.session }}</a>
-								{% endif %}
-							</div>
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								Metadata:<br />
-								<strong>{{ item.metadata }}</strong>
-							</div>
-						</div>
-					</div>
-				</div>
-			{% endfor %}
 		</div>
 	</div>
 {% endblock %}

@@ -146,6 +146,8 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
     if tag is not None:
         query = query & Q(tags__tag=tag)
 
+        context['selected_tag'] = tag
+
     start = timezone.now() - datetime.timedelta(days=30)
 
     query = query & Q(logged__gte=start)
@@ -167,7 +169,17 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
 
     sort = request.GET.get('sort', '-logged')
 
-    context['log_items'] = LogItem.objects.filter(query).order_by(sort)
+    items_per_page = int(request.GET.get('size', '25'))
+    page_index = int(request.GET.get('page', '0'))
+
+    start = page_index * items_per_page
+    end = start + items_per_page
+
+    context['total_count'] = LogItem.objects.filter(query).order_by(sort).count()
+    context['log_items'] = LogItem.objects.filter(query).order_by(sort)[start:end]
+
+    context['page_index'] = page_index
+    context['page_count'] = int(context['total_count'] / items_per_page)
 
     return render(request, 'builder_activity_logger.html', context=context)
 
@@ -719,9 +731,10 @@ def builder_settings(request): # pylint: disable=unused-argument
         site_settings.last_updated = now
         site_settings.save()
 
-        response_payload = {
-            'url': site_settings.banner.url
-        }
+        response_payload = {}
+
+        if bool(site_settings.banner):
+            response_payload['url'] = site_settings.banner.url
 
         response = HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
 

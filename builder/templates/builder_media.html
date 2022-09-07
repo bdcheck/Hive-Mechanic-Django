@@ -44,7 +44,7 @@
 							<div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px;">
 								<div class="mdc-layout-grid__inner">
 									<div class= "mdc-layout-grid__cell--span-3">
-										{% if media_file.mime_type == 'image/jpeg' %}
+										{% if 'image/' in media_file.mime_type %}
 											<img src="{% thumbnail media_file 320x320 %}" style="width: 100%;">
 										{% else %}
 											{% if media_file.mime_type == 'application/pdf' %}
