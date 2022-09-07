@@ -16,7 +16,7 @@ def check_data_export_parameters(app_configs, **kwargs): # pylint: disable=unuse
         errors.append(error)
 
     return errors
-    
+
 @python_2_unicode_compatible
 class TermsVersion(models.Model):
     name = models.CharField(max_length=4096, unique=True)
