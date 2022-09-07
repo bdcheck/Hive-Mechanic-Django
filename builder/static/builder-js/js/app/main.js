@@ -107,6 +107,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
   let initialCardSelect = null
   let voiceCardSelect = null
+  let termsCardSelect = null
 
   let selectedSequence = null
 
@@ -1264,8 +1265,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     initialCardList += '    </ul>'
 
     $('#builder-activity-setting-initial-card-list').html(initialCardList)
-
     $('#builder-activity-setting-voice-card-list').html(initialCardList)
+    $('#builder-activity-setting-terms-card-list').html(initialCardList)
 
     $('.builder-destination-item').hide()
 
@@ -1328,8 +1329,21 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         })
       }
 
+      if (termsCardSelect === null) {
+        termsCardSelect = mdc.select.MDCSelect.attachTo(document.getElementById('builder-activity-setting-terms-card'))
+
+        termsCardSelect.listen('MDCSelect:change', () => {
+          window.dialogBuilder.termsCard = termsCardSelect.value
+
+          window.dialogBuilder.definition.terms_interrupt = termsCardSelect.value
+
+          dialogIsDirty = true
+        })
+      }
+
       initialCardSelect.value = window.dialogBuilder.definition['initial-card']
       voiceCardSelect.value = window.dialogBuilder.definition.incoming_call_interrupt
+      termsCardSelect.value = window.dialogBuilder.definition.terms_interrupt
 
       activityName.value = window.dialogBuilder.definition.name
 
