@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long
+# pylint: disable=no-member, line-too-long, too-many-lines
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin
@@ -144,7 +144,7 @@ def builder_activities(request): # pylint: disable=unused-argument
 
 @login_required
 @user_accepted_all_terms
-def builder_activity_logger(request): # pylint: disable=unused-argument
+def builder_activity_logger(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
@@ -152,9 +152,9 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
 
     query = Q(pk__gte=0)
 
-    tag = request.GET.get('tag', None)
+    tag = request.GET.get('tag', '')
 
-    if tag is not None:
+    if tag != '':
         query = query & Q(tags__tag=tag)
 
         context['selected_tag'] = tag
@@ -191,6 +191,48 @@ def builder_activity_logger(request): # pylint: disable=unused-argument
 
     context['page_index'] = page_index
     context['page_count'] = int(context['total_count'] / items_per_page)
+
+    if context['total_count'] > items_per_page and page_index < (context['page_count'] - 1):
+        context['next_page'] = '%s?page=%d' % (reverse('builder_activity_logger'), page_index + 1)
+
+        if tag != '':
+            context['next_page'] += '&tag=%s' % tag
+
+        if player is not None:
+            context['next_page'] += '&player=%s' % player
+
+        if session is not None:
+            context['next_page'] += '&session=%s' % session
+
+        if game is not None:
+            context['next_page'] += '&game=%s' % game
+
+        if sort is not None:
+            context['next_page'] += '&sort=%s' % sort
+
+        if items_per_page is not None:
+            context['next_page'] += '&size=%s' % items_per_page
+
+    if context['total_count'] > items_per_page and page_index > 0:
+        context['prior_page'] = '%s?page=%d' % (reverse('builder_activity_logger'), page_index - 1)
+
+        if tag != '':
+            context['prior_page'] += '&tag=%s' % tag
+
+        if player is not None:
+            context['prior_page'] += '&player=%s' % player
+
+        if session is not None:
+            context['prior_page'] += '&session=%s' % session
+
+        if game is not None:
+            context['prior_page'] += '&game=%s' % game
+
+        if sort is not None:
+            context['prior_page'] += '&sort=%s' % sort
+
+        if items_per_page is not None:
+            context['prior_page'] += '&size=%s' % items_per_page
 
     return render(request, 'builder_activity_logger.html', context=context)
 

@@ -32,8 +32,8 @@ urlpatterns = [
     url(r'^media$', builder_media, name='builder_media'),
     url(r'^media_upload$', builder_media_upload, name='builder_media_upload'),
     url(r'^integrations$', builder_integrations, name='builder_integrations'),
-    url(r'update-integration.json', builder_integrations_update, name='builder_integrations_update'),
-    url(r'clear-variables.json', builder_clear_variables, name='builder_clear_variables'),
+    url(r'^update-integration.json', builder_integrations_update, name='builder_integrations_update'),
+    url(r'^clear-variables.json', builder_clear_variables, name='builder_clear_variables'),
 
     url(r'^', builder_home, name='builder_home'),
 ]
