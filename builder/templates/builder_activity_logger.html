@@ -15,13 +15,37 @@
 				<div class="mdc-card" style="padding: 16px;">
 					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-							<h1 class="mdc-typography--headline5">Activity Log{% if selected_tag %}: {{ selected_tag }}{% endif %}</h1>
-							<div class="class="mdc-typography--subtitle">
-								{{ total_count }} entries - Page {{ page_index|add:1 }} of {{ page_count }} - (<a href="{% url 'builder_activity_logger' %}">Reset View</a>)
-							</div>
+							<h1 class="mdc-typography--headline5" style="margin-top: 8px;">
+								Activity Log{% if selected_tag %}: {{ selected_tag }}{% endif %}
+							</h1>
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-							[Search Box]
+						</div>
+						<div class=" mdc-layout-grid__cell--span-6" style="padding-bottom: 16px; padding-top: 16px;">
+							{{ total_count }} entries &bull; Page {{ page_index|add:1 }} of {{ page_count }} &bull; (<a href="{% url 'builder_activity_logger' %}">Reset View</a>)
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-typography--button" style="padding-bottom: 16px; padding-top: 16px; text-align: right;">
+							{% if prior_page %}
+								<a href="{{ prior_page }}" class="mdc-button mdc-button--icon-leading">
+									<span class="mdc-button__ripple"></span>
+									<span class="mdc-button__focus-ring"></span>
+									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_left</i>
+									<span class="mdc-button__label">Previous Page</span>
+								</a>
+							{% endif %}
+							
+							{% if prior_page and next_page %}
+								&bull;
+							{% endif %}
+
+							{% if next_page %}
+								<a href="{{ next_page }}" class="mdc-button mdc-button--icon-leading">
+									<span class="mdc-button__ripple"></span>
+									<span class="mdc-button__focus-ring"></span>
+									<span class="mdc-button__label">Next Page</span>
+									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_right</i>
+								</a>
+							{% endif %}
 						</div>
 						{% for item in log_items %}
 							<div class="mdc-layout-grid__cell--span-12 mdc-typography--body2" style="border-top: 1px solid #BDBDBD; margin-left: -16px; margin-right: -16px;">
