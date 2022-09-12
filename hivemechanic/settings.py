@@ -199,6 +199,8 @@ CSRF_COOKIE_SECURE = True
 
 TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 
+QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
+
 from .local_settings import *
 
 # Suppress pygame notifications...
