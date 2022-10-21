@@ -1,7 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
