@@ -24,7 +24,7 @@ requirejs.config({
   }
 })
 
-requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquery'], function (mdc, sequence, Cookies, slugify, Node) {
+requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquery'], function (mdc, Sequence, Cookies, slugify, Node) {
   const csrftoken = Cookies.get('csrftoken')
 
   function csrfSafeMethod (method) {
@@ -128,7 +128,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       let issues = []
 
       for (let i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
-        const loadedSequence = sequence.loadSequence(window.dialogBuilder.definition.sequences[i])
+        const loadedSequence = Sequence.loadSequence(window.dialogBuilder.definition.sequences[i])
 
         const sequenceIssues = loadedSequence.issues()
 
@@ -232,7 +232,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       selectedSequence.removeChangeListener(onSequenceChanged)
     }
 
-    selectedSequence = sequence.loadSequence(definition)
+    selectedSequence = Sequence.loadSequence(definition)
 
     $('.mdc-top-app-bar__title').html(selectedSequence.name())
 
@@ -483,9 +483,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
             const sequenceName = $('#add-sequence-name-value').val()
 
             const sequence = {
-              id: slugify(sequenceName, {
-                strict: true
-              }),
+              id: Sequence.newSequenceId(sequenceName),
               type: 'sequence',
               name: sequenceName,
               items: []

@@ -52,7 +52,9 @@
 					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
 					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Sent: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
 					{% with outgoing_messages_errored.count as error_count %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Errors: <strong {% if error_count > 0 %}style="color: #B71C1C;"{% endif %}>{{ error_count|intcomma }}</strong></p>
+						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
+							<span class="material-icons">error</span>
+							Messages Sent Errors: <strong {% if error_count > 0 %}style="color: #B71C1C;"{% endif %}>{{ error_count|intcomma }}</strong></p>
 					{% endwith %}
 					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Scheduled Messages: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
 					{% if message_limit %}

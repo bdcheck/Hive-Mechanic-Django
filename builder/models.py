@@ -529,6 +529,15 @@ class Game(models.Model):
 
         return 'Unknown'
 
+    def disabled_integrations(self):
+        disabled = []
+
+        for integration in self.integrations.all():
+            if integration.is_enabled() is False:
+                disabled.append(integration)
+
+        return disabled
+
 @python_2_unicode_compatible
 class GameVersion(models.Model):
     game = models.ForeignKey(Game, related_name='versions', on_delete=models.CASCADE)

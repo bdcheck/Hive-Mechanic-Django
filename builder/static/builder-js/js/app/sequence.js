@@ -629,6 +629,38 @@ define(modules, function (mdc, Node) {
 
       return sequence
     }
+
+    static newSequenceId (sequenceName) {
+      const newIdBase = Node.slugify(sequenceName)
+
+      if (Sequence.sequenceIdExists(newIdBase) === false) {
+        return newIdBase
+      }
+
+      let index = 1
+
+      let newId = newIdBase + '-' + index
+
+      while (Sequence.sequenceIdExists(newId)) {
+        index += 1
+
+        newId = newIdBase + '-' + index
+      }
+
+      return newId
+    }
+
+    static sequenceIdExists (sequenceId) {
+      for (let i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
+        const sequence = window.dialogBuilder.definition.sequences[i]
+
+        if (sequence.id.toLowerCase() === sequenceId.toLowerCase()) {
+          return true
+        }
+      }
+
+      return false
+    }
   }
 
   const sequence = {}
@@ -640,6 +672,9 @@ define(modules, function (mdc, Node) {
 
     return sequence
   }
+
+  sequence.newSequenceId = Sequence.newSequenceId
+  sequence.sequenceIdExists = Sequence.sequenceIdExists
 
   return sequence
 })

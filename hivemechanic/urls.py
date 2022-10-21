@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^http/', include('http_support.urls')),
     url(r'^http/', include('http_support.urls')),
     url(r'^access/', include('user_creation.urls')),
+    url(r'^monitor/', include('nagios_monitor.urls')),
     url(r'^activity/', include('activity_logger.urls')),
 ]
 

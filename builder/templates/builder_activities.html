@@ -49,99 +49,112 @@
 						</div>
 
 						{% for activity in activities %}
-							<div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px;">
-								<div class="mdc-layout-grid__inner">
-									{% if activity.icon %}
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-											<div style="position: relative;">
-												<img class="tab_content" style="width: 100%; z-index: 1;" src="{{ activity.icon.url }}" data-tab-index="1" />
-												<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-													<span class="mdc-button__ripple"></span>
-													<i class="material-icons" aria-hidden="true">schema</i>
-												</button>
-											</div>
-										</div>
-									{% else %}
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-											<div style="position: relative;">
-												<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index: 1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
-												<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-													<span class="mdc-button__ripple"></span>
-													<i class="material-icons" aria-hidden="true">schema</i>
-												</button>
-											</div>
-										</div>
-									{% endif %}
-									<div class= mdc-layout-grid__cell--span-10 mdc-typography--body2">
-										<div class="mdc-typography mdc-typography--headline6">
-											<a href="{% url 'builder_game' activity.slug %}">{{ activity.name }}</a>
-
-											<div class="mdc-menu-surface--anchor" style="float: right;">
-												<i class="material-icons mdc-icon-button__icon activity_menu_open" aria-hidden="true">more_vert</i>
-												<div class="mdc-menu mdc-menu-surface">
-													<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-														<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-id="{{ activity.pk }}" data-name="{{ activity.name }}" data-action="clone">
-															<span class="mdc-list-item__ripple"></span>
-															<span class="mdc-list-item__text mdc-list-item__start">Clone Activity&#8230;</span>
-														</li>
-														<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem"  data-id="{{ activity.slug }}" data-name="{{ activity.name }}" data-action="delete">
-															<span class="mdc-list-item__ripple"></span>
-															<span class="mdc-list-item__text mdc-list-item__start">Delete Activity&#8230;</span>
-														</li>
-													</ul>
+							{% with disabled_integrations=activity.disabled_integrations %}
+								<div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px; {% if disabled_integrations|length > 0 %}background-color: #EF9A9A;{% endif %}">
+									<div class="mdc-layout-grid__inner">
+										{% if activity.icon %}
+											<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+												<div style="position: relative;">
+													<img class="tab_content" style="width: 100%; z-index: 1;" src="{{ activity.icon.url }}" data-tab-index="1" />
+													<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+														<span class="mdc-button__ripple"></span>
+														<i class="material-icons" aria-hidden="true">schema</i>
+													</button>
 												</div>
 											</div>
-										</div>
-
-										<div class="mdc-layout-grid__inner">
-											<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-												<div class="mdc-typography mdc-typography--subtitle1">
-													Creator: {{ activity.creator_name }}
+										{% else %}
+											<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+												<div style="position: relative;">
+													<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index: 1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+													<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+														<span class="mdc-button__ripple"></span>
+														<i class="material-icons" aria-hidden="true">schema</i>
+													</button>
 												</div>
-												<div class="mdc-typography mdc-typography--subtitle2">
-													{% if activity.latest_version.creator %}
-														Last saved by {{ activity.latest_version.creator.get_full_name }} ({{ activity.latest_version.created|naturalday }}).
-													{% else %}
-														Last saved {{ activity.latest_version.created|naturalday }}.
+											</div>
+										{% endif %}
+										<div class="mdc-layout-grid__cell--span-10 mdc-typography--body2">
+											<div class="mdc-layout-grid__inner">
+												<div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
+													<a href="{% url 'builder_game' activity.slug %}">{{ activity.name }}</a>
+												</div>
+												<div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
+													<div class="mdc-menu-surface--anchor" style="float: right;">
+														<i class="material-icons mdc-icon-button__icon activity_menu_open" aria-hidden="true">more_vert</i>
+														<div class="mdc-menu mdc-menu-surface">
+															<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+																<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-id="{{ activity.pk }}" data-name="{{ activity.name }}" data-action="clone">
+																	<span class="mdc-list-item__ripple"></span>
+																	<span class="mdc-list-item__text mdc-list-item__start">Clone Activity&#8230;</span>
+																</li>
+																<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem"  data-id="{{ activity.slug }}" data-name="{{ activity.name }}" data-action="delete">
+																	<span class="mdc-list-item__ripple"></span>
+																	<span class="mdc-list-item__text mdc-list-item__start">Delete Activity&#8230;</span>
+																</li>
+															</ul>
+														</div>
+													</div>
+													
+													{% if disabled_integrations %}
+														<div style="display: inline-block" class="material-icons mdc-typography--headline1">error</div>
+														<div style="display: inline-block" class="mdc-typography mdc-typography--body2">
+															<strong>Disabled Integrations (INT.001)</strong>
+															{% for integration in disabled_integrations %}
+																<br />{{ integration.name }}
+															{% endfor %}
+														</div>
 													{% endif %}
 												</div>
-											</div>
-											<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-												<div class="mdc-typography mdc-typography--caption"><strong>Sessions</strong></div>
-												<div class="mdc-typography mdc-typography--body2">Active Sessions: {{ activity.active_session_count }}</div>
-												<div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ activity.inactive_session_count }}</div>
-											</div>
-											<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-												<div class="mdc-typography mdc-typography--caption"><strong>Activity Details</strong></div>
-												<div class="mdc-typography mdc-typography--body2">Identifier: {{ activity.slug }}</div>
-												<div class="mdc-typography mdc-typography--body2">Last Updated: {{ activity.latest_version.created }}</div>
-												<div class="mdc-typography mdc-typography--body2">Versions: {{ activity.versions.count }}</div>
-											</div>
-											{% if activity.integrations.all.count > 0 %}
+
 												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-													<div class="mdc-typography mdc-typography--caption"><strong>Integrations</strong></div>
-													{% for integration in activity.integrations.all %}
-														<div>
-															{% with stats=integration.fetch_statistics %}
-																<div class="mdc-typography mdc-typography--body2 toggle_integration" style="position: relative; height: 32px;">
-																	<span class="material-icons" style="font-size: 18px; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.5;">add_circle</span>
-																	<strong style="position: absolute; top: 50%; left:22px; transform: translateY(-50%);">{{ stats.name }} ({{ stats.type }})</strong>
-																</div>
-																<div class="toggle_integration_content" style="margin-left: 22px; display: none;">
-																		{% for detail in stats.details %}
-																			<div class="mdc-typography mdc-typography--body2">{{ detail.0 }}: {{ detail.1 }}</div>
-																		{% endfor %}
-																		<br />
-																</div>
-															{% endwith %}
-														</div>
-													{% endfor %}
+													<div class="mdc-typography mdc-typography--subtitle1">
+														Creator: {{ activity.creator_name }}
+													</div>
+													<div class="mdc-typography mdc-typography--subtitle2">
+														{% if activity.latest_version.creator %}
+															Last saved by {{ activity.latest_version.creator.get_full_name }} ({{ activity.latest_version.created|naturalday }}).
+														{% else %}
+															Last saved {{ activity.latest_version.created|naturalday }}.
+														{% endif %}
+													</div>
 												</div>
-											{% endif %}
+												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-typography mdc-typography--caption"><strong>Sessions</strong></div>
+													<div class="mdc-typography mdc-typography--body2">Active Sessions: {{ activity.active_session_count }}</div>
+													<div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ activity.inactive_session_count }}</div>
+												</div>
+												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+													<div class="mdc-typography mdc-typography--caption"><strong>Activity Details</strong></div>
+													<div class="mdc-typography mdc-typography--body2">Identifier: {{ activity.slug }}</div>
+													<div class="mdc-typography mdc-typography--body2">Last Updated: {{ activity.latest_version.created }}</div>
+													<div class="mdc-typography mdc-typography--body2">Versions: {{ activity.versions.count }}</div>
+												</div>
+												{% if activity.integrations.all.count > 0 %}
+													<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+														<div class="mdc-typography mdc-typography--caption"><strong>Integrations</strong></div>
+														{% for integration in activity.integrations.all %}
+															<div>
+																{% with stats=integration.fetch_statistics %}
+																	<div class="mdc-typography mdc-typography--body2 toggle_integration" style="position: relative; height: 32px;">
+																		<span class="material-icons" style="font-size: 18px; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.5;">add_circle</span>
+																		<strong style="position: absolute; top: 50%; left:22px; transform: translateY(-50%);">{{ stats.name }} ({{ stats.type }})</strong>
+																	</div>
+																	<div class="toggle_integration_content" style="margin-left: 22px; display: none;">
+																			{% for detail in stats.details %}
+																				<div class="mdc-typography mdc-typography--body2">{{ detail.0 }}: {{ detail.1 }}</div>
+																			{% endfor %}
+																			<br />
+																	</div>
+																{% endwith %}
+															</div>
+														{% endfor %}
+													</div>
+												{% endif %}
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
+							{% endwith %}
 						{% endfor %}
 					</div>
 				</div>
