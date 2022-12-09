@@ -320,7 +320,7 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
 
     return ['No content provided.']
 
-def execute_action(integration, session, action): # pylint: disable=too-many-branches
+def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
@@ -384,7 +384,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
                 outgoing.gather_input = action['parameters']['input_method']
 
                 if outgoing.gather_input == 'dtmf_speech':
-                    outgoing.gather_input == 'dtmf speech' # For legacy cards...
+                    outgoing.gather_input = 'dtmf speech' # For legacy cards...
 
             if 'pause' in action['parameters']:
                 outgoing.pause_length = action['parameters']['pause']
