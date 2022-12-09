@@ -1,9 +1,9 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@2.0.3
-  node: circleci/node@5.0.2
-  browser-tools: circleci/browser-tools@1.2.4
+  python: circleci/python@2.1.1
+  node: circleci/node@5.0.3
+  browser-tools: circleci/browser-tools@1.4.0
 
 workflows:
   build:
@@ -14,7 +14,7 @@ workflows:
 jobs:
   build-38:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.11
       - image: cimg/postgres:9.6-postgis
         auth:
           username: mydockerhub-user
