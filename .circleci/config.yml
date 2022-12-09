@@ -14,7 +14,7 @@ workflows:
 jobs:
   build-38:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.8
       - image: cimg/postgres:9.6-postgis
         auth:
           username: mydockerhub-user
@@ -159,6 +159,7 @@ jobs:
       - run:
           name: Test dialog content (Django Dialog Engine)
           command: |
+            nvm use 17.9.1
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
@@ -169,6 +170,7 @@ jobs:
       - run:
           name: Test dialog content (Hive Mechanic)
           command: |
+            nvm use 17.9.1
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-hive-builder"
