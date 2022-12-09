@@ -28,7 +28,7 @@ jobs:
           name: Install system dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install libasound2      
+            sudo apt-get install libasound2 libsdl2-dev
       - node/install
       - browser-tools/install-browser-tools
       - checkout
@@ -114,7 +114,7 @@ jobs:
           name: Install system dependencies
           command: |
             sudo apt-get update
-            sudo apt-get install libasound2      
+            sudo apt-get install libasound2 libsdl2-dev
       - node/install
       - browser-tools/install-browser-tools
       - checkout
