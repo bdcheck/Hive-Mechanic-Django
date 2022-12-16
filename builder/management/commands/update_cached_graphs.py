@@ -18,7 +18,4 @@ class Command(BaseCommand):
         query = Q(cached_cytoscape=None) | Q(cached_cytoscape='null')
 
         for version in GameVersion.objects.filter(query):
-            graph = version.cytoscape_json(simplify=False, compute=True)
-
-            # if graph is None:
-            #    print('Unable to update %s' % version)
+            version.cytoscape_json(simplify=False, compute=True)
