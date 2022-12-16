@@ -738,6 +738,9 @@ class GameVersion(models.Model):
         return incomplete_id
 
     def cytoscape_json(self, indent=0, simplify=False, compute=False):
+        if self.cached_cytoscape == 'null':
+            self.cached_cytoscape = None
+
         if compute is False or self.cached_cytoscape is not None:
             return self.cached_cytoscape
 
@@ -748,6 +751,9 @@ class GameVersion(models.Model):
                 self.cached_cytoscape = json.dumps(cytoscape_json, indent=indent)
             else:
                 self.cached_cytoscape = json.dumps(cytoscape_json)
+
+            if self.cached_cytoscape == 'null':
+                self.cached_cytoscape = None
 
             self.save()
 
