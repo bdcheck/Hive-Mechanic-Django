@@ -20,8 +20,7 @@ requirejs.config({
 });
 
 requirejs(["material", "cookie", "jquery"], function(mdc, Cookies) {
-    console.log(mdc);
-    
+    const name = mdc.textField.MDCTextField.attachTo(document.getElementById('field_name'));
     const username = mdc.textField.MDCTextField.attachTo(document.getElementById('field_email'));
     const password = mdc.textField.MDCTextField.attachTo(document.getElementById('field_password'));
     const passwordConfirm = mdc.textField.MDCTextField.attachTo(document.getElementById('field_password_confirm'));

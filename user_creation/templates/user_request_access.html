@@ -80,8 +80,19 @@
 											
 											<p style="color: #B71C1C;">Please correct the issue(s) and try again.</p>
 										{% endif %}
+
+										<label class="mdc-text-field mdc-text-field--outlined" id="field_name" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
+											<span class="mdc-notched-outline">
+												<span class="mdc-notched-outline__leading"></span>
+												<span class="mdc-notched-outline__notch">
+													<span class="mdc-floating-label" id="my-label-id">Name</span>
+												</span>
+												<span class="mdc-notched-outline__trailing"></span>
+											</span>
+											<input type="text" name="name" class="mdc-text-field__input" value="{{ request.POST.name }}" aria-labelledby="my-label-id">
+										</label>
 										
-										<label class="mdc-text-field mdc-text-field--outlined" id="field_email" style="width: 100%; margin-bottom: 16px; margin-top: 16px;">
+										<label class="mdc-text-field mdc-text-field--outlined" id="field_email" style="width: 100%; margin-bottom: 16px;">
 											<span class="mdc-notched-outline">
 												<span class="mdc-notched-outline__leading"></span>
 												<span class="mdc-notched-outline__notch">

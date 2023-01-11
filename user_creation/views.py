@@ -54,7 +54,12 @@ def user_request_access(request): # pylint: disable=unused-argument, too-many-br
     }
 
     if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+
         email = request.POST.get('email', None)
+
+        if name == '':
+            context['errors'].append('Please provide a name.')
 
         try:
             validate_email(email)
@@ -76,6 +81,15 @@ def user_request_access(request): # pylint: disable=unused-argument, too-many-br
         if len(context['errors']) == 0: # pylint: disable=len-as-condition
             if get_user_model().objects.filter(username=email).count() == 0:
                 new_user = get_user_model().objects.create_user(username=email, email=email, password=password, is_active=False)
+
+                names = name.split()
+
+                new_user.last_name = names[-1]
+
+                if len(names) > 1:
+                    new_user.first_name = ' '.join(names[:-1])
+
+                new_user.save()
 
                 to_addrs = []
 
