@@ -97,10 +97,10 @@
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View annotated help</div>
 					</div>
 
-                    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="View Structure" aria-describedby="action_view_structure_tip" id="action_view_structure" style="margin-left: 22px;">schema</a>
+                    <!-- <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="View Structure" aria-describedby="action_view_structure_tip" id="action_view_structure" style="margin-left: 22px;">schema</a>
 					<div id="action_view_structure_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">View activity structure</div>
-					</div>
+					</div> -->
                     <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Reset Game" aria-describedby="action_reset_activity_tip" id="action_reset_activity" style="margin-left: 11px;">update</a>
 					<div id="action_reset_activity_tip" class="mdc-tooltip" role="tooltip" aria-hidden="true">
 						<div class="mdc-tooltip__surface mdc-tooltip__surface-animation">Reset activity</div>
@@ -364,7 +364,35 @@
 								</div>
 							</div>
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
-								(Context here...)
+								<div id="add_card_context_before" class="add_card_context">
+									<strong>Existing Links</strong>
+									<div class="mdc-layout-grid__inner">
+										<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											<div class="mdc-radio" id="add_card_context_connect_existing" >
+												<input class="mdc-radio__native-control" type="radio" name="add_card_context_connect_links" />
+												<div class="mdc-radio__background">
+													<div class="mdc-radio__outer-circle"></div>
+													<div class="mdc-radio__inner-circle"></div>
+												</div>
+												<div class="mdc-radio__ripple"></div>
+												<div class="mdc-radio__focus-ring"></div>
+											</div>
+											<label for="radio-1">Connect existing source cards to the new card</label>
+										</div>								
+										<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											<div class="mdc-radio" id="add_card_context_dangle_existing" >
+												<input class="mdc-radio__native-control" type="radio" name="add_card_context_connect_links" />
+												<div class="mdc-radio__background">
+													<div class="mdc-radio__outer-circle"></div>
+													<div class="mdc-radio__inner-circle"></div>
+												</div>
+												<div class="mdc-radio__ripple"></div>
+												<div class="mdc-radio__focus-ring"></div>
+											</div>
+											<label for="radio-1">Do not connect</label>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
                     </div>
@@ -594,21 +622,6 @@
             <div class="mdc-dialog__scrim"></div>
         </div>
 
-        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content">
-            <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface" style="max-width: none;">
-					<div class="mdc-dialog__header">
-						<h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
-						<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
-					</div>
-                    <div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
-						<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe>
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="mdc-dialog__scrim"></div> -->
-        </div>
-
 		<div class="mdc-dialog mdc-dialog--sheet mdc-dialog--no-content-padding" role="alertdialog" aria-modal="true" id="annotated-help-dialog"  aria-describedby="annotated-help-dialog-content" aria-labelledby="annotated-help-dialog__title--with-close-icon-button">
 			<div class="mdc-dialog__scrim" data-mdc-dialog-action="cancel"></div>
 			<div class="mdc-dialog__container">
@@ -623,6 +636,50 @@
 			</div>
 			<!-- <div class="mdc-dialog__scrim"></div> -->
 		</div>
+
+        <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="card-insert-before" aria-labelledby="card-insert-before-title" aria-describedby="card-insert-before-content">
+            <div class="mdc-dialog__container">
+                <div class="mdc-dialog__surface">
+                    <h2 class="mdc-dialog__title" id="card-insert-before-title">Preserve Links?</h2>
+                    <div class="mdc-dialog__content mdc-layout-grid__inner" style="row-gap: 8px" id=""card-insert-before-content">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12" style="padding-bottom: 16px;">
+                        	<p class="mdc-typography--body1">Would you like this card's source links transferred to the new card?</p>
+                        </div>
+                    </div>
+                    <footer class="mdc-dialog__actions">
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="ignore">
+                            <span class="mdc-button__label">Ignore</span>
+                        </button>
+                        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="preserve">
+                            <span class="mdc-button__label">Transfer</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+            <div class="mdc-dialog__scrim"></div>
+        </div>
+        
+        <div id="structure_preview" style="background-color: #e0e0e0; width: 320px; height: 240px; z-index: 9999; border-radius: 8px; position: absolute; left: 16px; bottom: 16px; border: 2px solid #404040;">
+			<iframe title="Structure View" id="preview-dialog-canvas" style="width: 100%; height: 100%; border: none; margin: 0px; border-radius: 8px" scrolling="no"></iframe>
+			<div id="structure_toggle" class="material-icons" style="font-size: 24px; position: absolute; top: 4px; right: 4px; color: #404040">fullscreen</div>
+			<div id="structure_minimize" class="material-icons" style="font-size: 24px; position: absolute; bottom: 4px; left: 4px; color: #404040">south_west</div>
+        </div>
+        
+<!--
+		<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content">
+            <div class="mdc-dialog__container" style="margin-left: auto; margin-right: 24px;">
+                <div class="mdc-dialog__surface" style="margin-top: auto; margin-bottom: 24px; max-width: none;">
+					<div class="mdc-dialog__header">
+						<h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
+						<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
+					</div>
+                    <div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
+						<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+-->
 
 
     </body>

@@ -33,7 +33,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
     visualizationStyle () {
       return {
-        shape: 'round-rectangle'
+        shape: 'round-rectangle',
+        'background-color': '#eeeeee'
       }
     }
 
@@ -53,7 +54,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       htmlString += '            <i class="material-icons mdc-icon-button__icon" aria-hidden="true" id="' + this.cardId + '_menu_open">more_vert</i>'
       htmlString += '            <div class="mdc-menu mdc-menu-surface" id="' + this.cardId + '_menu">'
       htmlString += '              <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">'
-      htmlString += '                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem">'
+      htmlString += '                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-action="insert_before">'
+      htmlString += '                  <span class="mdc-list-item__ripple"></span>'
+      htmlString += '                  <span class="mdc-list-item__text mdc-list-item__start">Insert Card Before&#8230;</span>'
+      htmlString += '                </li>'
+      htmlString += '                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-action="advanced">'
       htmlString += '                  <span class="mdc-list-item__ripple"></span>'
       htmlString += '                  <span class="mdc-list-item__text mdc-list-item__start">Advanced Settings&#8230;</span>'
       htmlString += '                </li>'
@@ -223,11 +228,36 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         }
       })
 
+      mdc.dialog.MDCDialog.attachTo(document.getElementById('card-insert-before'))
+
       const menu = mdc.menu.MDCMenu.attachTo(document.getElementById(this.cardId + '_menu'))
       menu.setFixedPosition(true)
 
       menu.listen('MDCMenu:selected', function (event) {
-        advancedDialog.open()
+        if (event.detail.index === 0) { // Insert Before
+          $('.add_card_context').hide()
+          $('#add_card_context_before').show()
+
+          me.sequence.addCard(function (newCardId) {
+            const connectExisting = mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_connect_existing'))
+            mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_dangle_existing'))
+
+            me.sequence.insertBefore(me.id, newCardId, connectExisting.checked)
+
+            //              insertBeforeDialog.listen('MDCDialog:closed', function (event) {
+            //                if (event.detail.action === 'transfer') {
+            //                } else { // Keep
+            //                  me.sequence.insertBefore(me.id, newCardId, false)
+            //                }
+            //
+            //                insertBeforeDialog.unlisten('MDCDialog:closed', this)
+            //              })
+            //
+            //              insertBeforeDialog.open()
+          })
+        } else {
+          advancedDialog.open()
+        }
       })
 
       $('#' + this.cardId + '_menu_open').click(function (eventObj) {
@@ -1228,6 +1258,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return []
     }
 
+    setDefaultDestination (originalId) {
+      // replace nodes in def.
+    }
+
     sourceNodes (sequence) {
       const sources = []
       const includedIds = []
@@ -1352,9 +1386,25 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     static slugify (text) {
-      return slugifyExt(text, {
+      let cleaned = text.split('').map(function (character) {
+        if (/^[a-z0-9]+$/i.test(character)) {
+          return character
+        } else {
+          return '-'
+        }
+      }).join('')
+
+      console.log('slugify 1: ' + cleaned)
+
+      while (cleaned.includes('--')) {
+        cleaned = cleaned.replace('--', '-')
+      }
+
+      console.log('slugify 2: ' + cleaned)
+
+      return slugifyExt(cleaned, {
         remove: /[*+~.()'"!?:@]/g,
-        trim: false
+        trim: true
       })
     }
 

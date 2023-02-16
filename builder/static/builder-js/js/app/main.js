@@ -73,13 +73,13 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     }
   })
 
-  window.dialogBuilder.viewStructureDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('preview-dialog'))
+  /* window.dialogBuilder.viewStructureDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('preview-dialog'))
 
   $('#action_view_structure').click(function (eventObj) {
     eventObj.preventDefault()
 
-    $('#preview-dialog-canvas').height(parseInt($(window).height() * 0.9))
-    $('#preview-dialog-canvas').width(parseInt($(window).width() * 0.9))
+    $('#preview-dialog-canvas').height(parseInt(($(window).height() / 2) * 0.9))
+    $('#preview-dialog-canvas').width(parseInt(($(window).width() / 2) * 0.9))
 
     $('#preview-dialog-content').height($('#preview-dialog-canvas').height())
     $('#preview-dialog-content').css('overflow', 'hidden')
@@ -89,9 +89,13 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     window.setTimeout(function () {
       $('#preview-dialog-canvas').attr('src', window.dialogBuilder.visualization)
     }, 100)
-  })
+  }) */
 
-  mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_view_structure_tip'))
+  window.setTimeout(function () {
+    $('#preview-dialog-canvas').attr('src', window.dialogBuilder.visualization)
+  }, 2500)
+
+  // mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_view_structure_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_reset_activity_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_list_variables_tip'))
   mdc.tooltip.MDCTooltip.attachTo(document.getElementById('action_select_card_tip'))
@@ -578,6 +582,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
           let id = event.currentTarget.id
 
+          console.log('ID: ' + id)
+
           id = id.replace('all_cards_destination_item_', '')
 
           window.dialogBuilder.loadNodeById(id)
@@ -589,29 +595,42 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   }
 
   window.dialogBuilder.loadNodeById = function (cardId) {
+    let sequenceId = null
+
+    if (cardId.includes('#')) {
+      const tokens = cardId.split('#')
+
+      sequenceId = tokens[0]
+      cardId = tokens[1]
+    }
+
+    console.log('loadNodeById: ' + sequenceId + ' / ' + cardId)
+
     for (let i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
       const sequence = window.dialogBuilder.definition.sequences[i]
 
-      if (sequence.id !== cardId) {
-        for (let j = 0; j < sequence.items.length; j++) {
-          const item = sequence.items[j]
+      if (sequenceId === sequence.id || sequenceId === null) {
+        if (sequence.id !== cardId) {
+          for (let j = 0; j < sequence.items.length; j++) {
+            const item = sequence.items[j]
 
-          if (item.id === cardId) {
-            const loadedSequence = window.dialogBuilder.loadSequence(sequence, item.id)
+            if (item.id === cardId) {
+              const loadedSequence = window.dialogBuilder.loadSequence(sequence, item.id)
 
-            $('#' + item.id + '-advanced-dialog').remove()
+              $('#' + item.id + '-advanced-dialog').remove()
 
-            const node = Node.createCard(item, loadedSequence)
+              const node = Node.createCard(item, loadedSequence)
 
-            const current = $('#builder_current_node')
+              const current = $('#builder_current_node')
 
-            const html = node.editHtml()
+              const html = node.editHtml()
 
-            current.html(html)
+              current.html(html)
 
-            node.initialize()
+              node.initialize()
 
-            return
+              return
+            }
           }
         }
       }
@@ -1521,4 +1540,57 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   $('#action_annotated_help').click(function (eventObj) {
     helpDialog.open()
   })
+
+  $('#structure_toggle').off('click')
+
+  $('#structure_toggle').click(function (eventObj) {
+    eventObj.preventDefault()
+
+    const width = $('#structure_preview').width()
+
+    if (width > 400) {
+      $('#structure_preview').width('320px')
+      $('#structure_preview').height('240px')
+      $('#structure_toggle').text('fullscreen')
+    } else {
+      $('#structure_preview').css('width', 'calc(100vw - 32px)')
+      $('#structure_preview').css('height', 'calc(100vh - 32px)')
+      $('#structure_toggle').text('fullscreen_exit')
+    }
+
+    document.getElementById('preview-dialog-canvas').src = document.getElementById('preview-dialog-canvas').src
+  })
+
+  $('#structure_minimize').off('click')
+
+  $('#structure_minimize').click(function (eventObj) {
+    eventObj.preventDefault()
+
+    const width = $('#structure_preview').width()
+
+    if (width > 48) {
+      $('#structure_toggle').hide()
+      $('#preview-dialog-canvas').hide()
+      $('#structure_preview').width('32px')
+      $('#structure_preview').height('32px')
+      $('#structure_minimize').text('schema')
+    } else {
+      $('#structure_preview').width('320px')
+      $('#structure_preview').height('240px')
+      $('#structure_minimize').text('south_west')
+      $('#structure_toggle').text('fullscreen')
+      $('#structure_toggle').show()
+      $('#preview-dialog-canvas').show()
+
+      document.getElementById('preview-dialog-canvas').src = document.getElementById('preview-dialog-canvas').src
+    }
+  })
+
+  window.dialogBuilder.toggleViewIfNecessary = function () {
+    const width = $('#structure_preview').width()
+
+    if (width > 400) {
+      $('#structure_toggle').click()
+    }
+  }
 })

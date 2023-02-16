@@ -113,6 +113,18 @@ define(modules, function (mdc, Node) {
 
         node.initialize()
 
+        const waitAndCall = function () {
+          const viewFrame = $('#preview-dialog-canvas').get(0)
+
+          if (viewFrame.contentWindow.highlightGraphId !== undefined) {
+            viewFrame.contentWindow.highlightGraphId(me.definition.id + '#' + definition.id)
+          } else {
+            window.setTimeout(this, 100)
+          }
+        }
+
+        waitAndCall()
+
         if ($('#sequence_breadcrumbs').children('#breadcrumb-' + node.id).length > 0) {
           const match = $('#sequence_breadcrumbs').children('#breadcrumb-' + node.id)
           let last = $('#sequence_breadcrumbs').children().last()
@@ -193,6 +205,8 @@ define(modules, function (mdc, Node) {
           }
         }, 250)
       } else {
+        $('.add_card_context').hide()
+
         me.addCard(function (cardId) {
           for (let j = 0; j < me.definition.items.length; j++) {
             const item = me.definition.items[j]
@@ -475,6 +489,8 @@ define(modules, function (mdc, Node) {
             if (id === 'add_card') {
               window.dialogBuilder.chooseDestinationDialog.close()
 
+              $('.add_card_context').hide()
+
               me.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
             } else {
               window.dialogBuilder.chooseDestinationDialogCallback(nodeId)
@@ -527,6 +543,8 @@ define(modules, function (mdc, Node) {
             const id = event.currentTarget.id.replace('choose_destination_item_', '')
 
             if (id === 'add_card') {
+              $('.add_card_context').hide()
+
               me.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
             } else {
               window.dialogBuilder.chooseDestinationDialogCallback(nodeId)
@@ -538,6 +556,53 @@ define(modules, function (mdc, Node) {
       $('.builder-destination-item').hide()
     }
 
+    insertBefore (originalId, newId, transferLinks) {
+      console.log('INSERT BEFORE: ' + originalId + ' -- ' + newId + ' -- ' + transferLinks)
+
+      let originalCard = null
+      let newCard = null
+
+      this.definition.items.forEach(function (item) {
+        if (item.id === originalId) {
+          originalCard = item
+        }
+
+        if (item.id === newId) {
+          newCard = item
+        }
+      })
+
+      if (originalCard !== null && newCard !== null) {
+        const newIndex = this.definition.items.indexOf(newCard)
+
+        const originalIndex = this.definition.items.indexOf(originalCard)
+
+        this.definition.items.splice(newIndex, 1)
+
+        this.definition.items.splice(originalIndex, 0, newCard)
+      }
+
+      if (this.definition['initial-card'] === originalId || this.definition['initial-card'] === this.definition.id + '#' + originalId) {
+        this.definition['initial-card'] = this.definition.id + '#' + newId
+      }
+
+      const newNode = this.resolveNode(newId)
+
+      if (transferLinks) {
+        const originalNode = this.resolveNode(originalId)
+
+        const sourceNodes = originalNode.sourceNodes(this)
+
+        sourceNodes.forEach(function (node) {
+          node.updateReferences(originalId, newId)
+        })
+      }
+
+      newNode.setDefaultDestination(originalId)
+
+      this.loadNode(newNode.definition)
+    }
+
     addCard (callback) {
       $('#add-card-name-value').val('')
 
@@ -546,6 +611,11 @@ define(modules, function (mdc, Node) {
       const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'))
 
       const me = this
+
+      mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_connect_existing'))
+      const dangleExisting = mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_dangle_existing'))
+
+      dangleExisting.checked = true
 
       const listener = {
         handleEvent: function (event) {

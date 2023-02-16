@@ -61,7 +61,11 @@ requirejs(['material', 'cookie', 'jquery', 'cytoscape', 'cytoscape-dagre'], func
         'font-size': '10pt',
         'text-halign': 'center',
         'text-valign': 'center',
-        'compound-sizing-wrt-labels': 'include'
+        'compound-sizing-wrt-labels': 'include',
+        'border-width': '1',
+        'border-style': 'solid',
+        'border-color': '#404040',
+        'border-opacity': '1.0'
       }
     }, {
       selector: 'edge',
@@ -81,5 +85,28 @@ requirejs(['material', 'cookie', 'jquery', 'cytoscape', 'cytoscape-dagre'], func
     }]
   })
 
+  cy.on('tap', 'node', function (evt) {
+    const node = evt.target
+    window.parent.dialogBuilder.loadNodeById(node.id())
+
+    window.parent.dialogBuilder.toggleViewIfNecessary()
+  })
+
   cy.center()
+
+  window.lastHighlightedNode = null
+  window.lastHighlightedNodeColor = null
+
+  window.highlightGraphId = function (identifier) {
+    if (window.lastHighlightedNode !== null) {
+      window.lastHighlightedNode.style('background-color', window.lastHighlightedNodeColor)
+    }
+
+    console.log('HIGHLIGHT[VIEW]: ' + identifier)
+
+    window.lastHighlightedNode = cy.getElementById(identifier)
+    window.lastHighlightedNodeColor = window.lastHighlightedNode.style('background-color')
+
+    window.lastHighlightedNode.style('background-color', '#800000') // ; margin-bottom: 10px;'
+  }
 })

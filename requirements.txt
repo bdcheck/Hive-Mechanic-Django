@@ -1,3 +1,5 @@
+wheel
+
 -r django_dialog_engine/requirements.txt
 -r nagios_monitor/requirements.txt
 -r passive_data_kit/requirements.txt
