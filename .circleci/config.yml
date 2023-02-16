@@ -29,9 +29,9 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev
+      - checkout
       - node/install
       - browser-tools/install-browser-tools
-      - checkout
       - run:
           name: Install NPM dependencies
           command: |
@@ -115,9 +115,9 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install libasound2 libsdl2-dev
+      - checkout
       - node/install
       - browser-tools/install-browser-tools
-      - checkout
       - run:
           name: Install NPM dependencies
           command: |
