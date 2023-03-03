@@ -239,8 +239,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           $('#add_card_context_before').show()
 
           me.sequence.addCard(function (newCardId) {
-            const connectExisting = mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_connect_existing'))
-            mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_dangle_existing'))
+            const connectExisting = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById('add_card_context_connect_existing'))
 
             me.sequence.insertBefore(me.id, newCardId, connectExisting.checked)
 
@@ -1394,13 +1393,9 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         }
       }).join('')
 
-      console.log('slugify 1: ' + cleaned)
-
       while (cleaned.includes('--')) {
         cleaned = cleaned.replace('--', '-')
       }
-
-      console.log('slugify 2: ' + cleaned)
 
       return slugifyExt(cleaned, {
         remove: /[*+~.()'"!?:@]/g,

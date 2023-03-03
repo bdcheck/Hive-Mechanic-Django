@@ -604,21 +604,19 @@ define(modules, function (mdc, Node) {
     }
 
     addCard (callback) {
-      $('#add-card-name-value').val('')
+      const me = this
 
-      // window.dialogBuilder.newCardSelect.value = '';
+      $('#add-card-name-value').val('')
 
       const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'))
 
-      const me = this
-
-      mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_connect_existing'))
-      const dangleExisting = mdc.radio.MDCRadio.attachTo(document.getElementById('add_card_context_dangle_existing'))
-
-      dangleExisting.checked = true
+      const connectExisting = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById('add_card_context_connect_existing'))
+      connectExisting.checked = true
 
       const listener = {
         handleEvent: function (event) {
+          window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this)
+
           if (event.detail.action === 'add_card') {
             let cardName = nameField.value
             const cardType = $("input[name='add-card-options']:checked").val() //  window.dialogBuilder.newCardSelect.value;
@@ -639,8 +637,6 @@ define(modules, function (mdc, Node) {
             }
 
             callback(cardDef.id)
-
-            window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this)
           }
         }
       }
