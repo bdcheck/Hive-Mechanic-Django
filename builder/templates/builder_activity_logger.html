@@ -55,6 +55,7 @@
 											{{ item.logged }}:
 											<p><strong>{{ item.message }}</strong></p>
 											<p>
+												<strong>Tags:</strong>
 												{% for tag in item.tags.all %}
 													{% if tag.tag == selected_tag %}
 														[<strong><a href="?tag={{ tag.tag }}">{{ tag.name }}</a></strong>]
