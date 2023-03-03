@@ -31,7 +31,7 @@ class LogItem(models.Model):
     def __str__(self):
         return '%s[%s]: %s (%s)' % (self.source, self.logged, self.message, self.tags_str())
 
-    def tags_str(self):
+    def tags_str(self): # pylint: disable=no-self-use
         return 'TODO'
 
 def log(source, message, tags=list, metadata=None, player=None, session=None, game_version=None): # pylint: disable=too-many-arguments

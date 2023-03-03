@@ -1,8 +1,6 @@
 # pylint: disable=no-member
 # -*- coding: utf-8 -*-
 
-from django.utils import timezone
-
 class HiveActivityFinishedException(Exception):
     pass
 
@@ -28,7 +26,7 @@ def execute_action(integration, session, action):
 
     return False
 
-def annotate_statistics(integration, statistics):
+def annotate_statistics(integration, statistics): # pylint: disable=unused-argument
     statistics['type'] = 'Other Integration'
 
-    # TODO: stats
+    # Add stats

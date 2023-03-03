@@ -4,6 +4,7 @@ wheel
 -r nagios_monitor/requirements.txt
 -r passive_data_kit/requirements.txt
 -r quicksilver/requirements.txt
+-r simple_backup/requirements.txt
 
 django-db-logger==0.1.10
 django-filer==2.1.2; python_version >= '3.0'

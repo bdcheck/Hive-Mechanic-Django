@@ -367,29 +367,20 @@
 								<div id="add_card_context_before" class="add_card_context">
 									<strong>Existing Links</strong>
 									<div class="mdc-layout-grid__inner">
-										<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-											<div class="mdc-radio" id="add_card_context_connect_existing" >
-												<input class="mdc-radio__native-control" type="radio" name="add_card_context_connect_links" />
-												<div class="mdc-radio__background">
-													<div class="mdc-radio__outer-circle"></div>
-													<div class="mdc-radio__inner-circle"></div>
+										<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+											<div class="mdc-checkbox mdc-checkbox--touch" id="add_card_context_connect_existing">
+												<input type="checkbox" class="mdc-checkbox__native-control"/>
+												<div class="mdc-checkbox__background">
+													<svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+														<path class="mdc-checkbox__checkmark-path" fill="none"	d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+													</svg>
+													<div class="mdc-checkbox__mixedmark"></div>
 												</div>
-												<div class="mdc-radio__ripple"></div>
-												<div class="mdc-radio__focus-ring"></div>
+												<div class="mdc-checkbox__ripple"></div>
+												<div class="mdc-checkbox__focus-ring"></div>
 											</div>
-											<label for="radio-1">Connect existing source cards to the new card</label>
-										</div>								
-										<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-											<div class="mdc-radio" id="add_card_context_dangle_existing" >
-												<input class="mdc-radio__native-control" type="radio" name="add_card_context_connect_links" />
-												<div class="mdc-radio__background">
-													<div class="mdc-radio__outer-circle"></div>
-													<div class="mdc-radio__inner-circle"></div>
-												</div>
-												<div class="mdc-radio__ripple"></div>
-												<div class="mdc-radio__focus-ring"></div>
-											</div>
-											<label for="radio-1">Do not connect</label>
+											<label for="add_card_context_connect_existing">Connect existing source cards to the new card</label>
+
 										</div>
 									</div>
 								</div>

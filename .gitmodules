@@ -13,3 +13,6 @@
 [submodule "nagios_monitoring"]
 	path = nagios_monitor
 	url = https://github.com/audacious-software/Django-Nagios-Monitoring.git
+[submodule "simple_backup"]
+	path = simple_backup
+	url = https://github.com/audacious-software/Simple-Backup-Django.git

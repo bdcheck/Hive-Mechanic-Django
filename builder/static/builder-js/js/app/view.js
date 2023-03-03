@@ -102,8 +102,6 @@ requirejs(['material', 'cookie', 'jquery', 'cytoscape', 'cytoscape-dagre'], func
       window.lastHighlightedNode.style('background-color', window.lastHighlightedNodeColor)
     }
 
-    console.log('HIGHLIGHT[VIEW]: ' + identifier)
-
     window.lastHighlightedNode = cy.getElementById(identifier)
     window.lastHighlightedNodeColor = window.lastHighlightedNode.style('background-color')
 
