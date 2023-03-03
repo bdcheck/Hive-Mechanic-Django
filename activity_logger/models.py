@@ -1,8 +1,9 @@
+# pylint: disable=line-too-long, no-member
+
 import json
 
 from six import python_2_unicode_compatible
 
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -33,7 +34,7 @@ class LogItem(models.Model):
     def tags_str(self):
         return 'TODO'
 
-def log(source, message, tags=list, metadata=None, player=None, session=None, game_version=None):
+def log(source, message, tags=list, metadata=None, player=None, session=None, game_version=None): # pylint: disable=too-many-arguments
     if metadata is None:
         metadata = {}
 

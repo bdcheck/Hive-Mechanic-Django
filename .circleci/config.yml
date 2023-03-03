@@ -57,10 +57,14 @@ jobs:
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
             # python manage.py test --parallel 2
-            pylint quicksilver
-            pylint passive_data_kit
             pylint nagios_monitor
+            pylint passive_data_kit
+            pylint quicksilver
+            pylint simple_backup
+            pylint activity_logger
+            pylint activity_logger
             pylint builder
+            pylint cli_support
             pylint integrations
             pylint http_support
             pylint twilio_support
@@ -146,10 +150,14 @@ jobs:
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
             # python manage.py test --parallel 2
-            pylint quicksilver
-            pylint passive_data_kit
             pylint nagios_monitor
+            pylint passive_data_kit
+            pylint quicksilver
+            pylint simple_backup
+            pylint activity_logger
+            pylint activity_logger
             pylint builder
+            pylint cli_support
             pylint integrations
             pylint http_support
             pylint twilio_support

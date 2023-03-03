@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'passive_data_kit',
     'django_dialog_engine',
     'nagios_monitor',
+    'simple_backup',
     'user_creation',
     'builder',
     'activity_logger',
