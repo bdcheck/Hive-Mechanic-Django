@@ -100,6 +100,8 @@ def incremental_backup(parameters): # pylint: disable=too-many-branches, too-man
                 to_transmit.append(path)
         except ValueError:
             pass
+        except TypeError:
+            pass
 
     for site_settings in SiteSettings.objects.all():
         try:
@@ -111,6 +113,8 @@ def incremental_backup(parameters): # pylint: disable=too-many-branches, too-man
 
                 to_transmit.append(path)
         except ValueError:
+            pass
+        except TypeError:
             pass
 
     return to_transmit

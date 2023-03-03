@@ -81,5 +81,7 @@ def incremental_backup(parameters):
                 to_transmit.append(path)
         except ValueError:
             pass
+        except TypeError:
+            pass
 
     return to_transmit
