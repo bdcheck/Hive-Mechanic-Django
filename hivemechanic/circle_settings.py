@@ -37,7 +37,7 @@ MEDIA_ROOT = BASE_DIR + '/media/'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
-SILENCED_SYSTEM_CHECKS = ['security.W019', 'security.W005', 'security.W021', 'fields.W904']
+SILENCED_SYSTEM_CHECKS = ['security.W019', 'security.W005', 'security.W021', 'fields.W904', 'simple_backup.W001', 'simple_backup.W002',]
 
 PDK_DASHBOARD_ENABLED = True
 
