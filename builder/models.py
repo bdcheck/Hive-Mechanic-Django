@@ -746,7 +746,7 @@ class GameVersion(models.Model):
 
         try:
             cytoscape_json = fetch_cytoscape(json.loads(self.definition), simplify=simplify)
-            
+
             if cytoscape_json is None:
                 self.cached_cytoscape = '{}'
             elif indent > 0:
