@@ -88,6 +88,8 @@ def incremental_backup(parameters): # pylint: disable=too-many-branches, too-man
                 to_transmit.append(path)
         except ValueError:
             pass
+        except TypeError:
+            pass
 
     for game in Game.objects.all():
         try:

@@ -279,6 +279,8 @@ class InteractionCard(models.Model):
                 evaluate_content = requests.get(latest_version['evaluate-function'], timeout=120).content
                 client_content = requests.get(latest_version['client-implementation'], timeout=120).content
 
+                card_name = card_metadata['name']
+
                 computed_hash = hashlib.sha512()
 
                 computed_hash.update(entry_content)
@@ -288,6 +290,9 @@ class InteractionCard(models.Model):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash == latest_version['sha512-hash']:
+                    self.name = card_name
+
+                    self.entry_actions = entry_content.decode('utf-8')
                     self.entry_actions = entry_content.decode('utf-8')
                     self.evaluate_function = evaluate_content.decode('utf-8')
 
