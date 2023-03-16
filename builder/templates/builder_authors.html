@@ -84,7 +84,15 @@
 													{% if user.first_name and user.last_name %}
 														{{ user.first_name }} {{ user.last_name }}
 													{% else %}
-														<em>No name provided&#8230;</em>
+														{% if user.first_name %}
+															{{ user.first_name }}
+														{% else %}
+															{% if user.last_name %}
+																{{ user.last_name }}
+															{% else %}
+																<em>No name provided&#8230;</em>
+															{% endif %}
+														{% endif %}
 													{% endif %}
 												</td>
 												<td class="mdc-data-table__cell">
