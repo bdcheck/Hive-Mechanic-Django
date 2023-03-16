@@ -109,7 +109,7 @@ class HiveCache(object):
             file = tempfile.NamedTemporaryFile(suffix=ext, delete=False)
             cat_type = str(c_type[0]).split("/")[0]
             data = {"filename": file.name, "type": cat_type, "optional": None}
-            r = requests.get(key, stream=True)
+            r = requests.get(key, stream=True, timeout=300)
             if r.status_code == 200:
                 r.raw.decode_content = True
                 shutil.copyfileobj(r.raw, file)

@@ -32,7 +32,7 @@ def post_request_with_retries(url, payload, logger, max_retry_duration=120, init
             if server_timeout is not None:
                 query = requests.post(url, data=payload, timeout=server_timeout)
             else:
-                query = requests.post(url, data=payload)
+                query = requests.post(url, data=payload, timeout=300)
 
             if query.status_code == requests.codes.ok: # pylint: disable=no-else-return
                 return query
