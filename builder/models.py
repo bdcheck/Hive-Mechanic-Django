@@ -568,9 +568,18 @@ class GameVersion(models.Model):
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
-                actions.extend(new_actions)
+                added_new_action = False
 
-                new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+                for new_action in new_actions:
+                    if (new_action in new_actions) is False:
+                        actions.append(action)
+
+                        added_new_action = True
+
+                if added_new_action:
+                    new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+                else:
+                    new_actions = [] # Break out of likely endless loop
 
             if dialog.finished is not None:
                 session.completed = dialog.finished
