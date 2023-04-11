@@ -1,0 +1,304 @@
+{% extends 'builder_base.html' %}
+{% load humanize %}
+{% load static %}
+{% load builder_tags %}
+
+{% block 'page_title' %}Activity Log | Hive Mechanic{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid mdc-typography">
+		<div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-9">
+				<div class="mdc-card">
+					<div class="mdc-data-table " id="events_table">
+					  <div class="mdc-data-table__table-container">
+						<table class="mdc-data-table__table mdc-typography--caption" aria-label="Event Log" style="width: 100%">
+						  <thead>
+							<tr class="mdc-data-table__header-row">
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Source</strong></th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Player</strong></th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Event</strong></th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;"><strong>Date</strong></th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: max-content;"><span class="material-icons">attachment</span></th>
+							</tr>
+						  </thead>
+						  <tbody class="mdc-data-table__content">
+							{% for item in log_items %}
+								<tr class="mdc-data-table__row" data-message="{{ item.message }}" data-date="{{ item.logged }}" data-name="{{ item.source }}" data-details='{{ item.details_json }}' {% if item.has_preview %}data-attachment='{{ item.preview }}'{% endif %}>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.source }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.player }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.message }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">{{ item.logged|date:'M j Y, g:iA' }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">
+								  	{% with item.preview_count as preview_count %}
+								  		{% if preview_count > 0 %}
+											<center>{{ preview_count }}</center>
+										{% endif %}
+									{% endwith %}
+								  </td>
+								</tr>
+							{% endfor %}
+						  </tbody>
+						</table>
+					  </div>
+					  <div class="mdc-data-table__pagination">
+						<div class="mdc-data-table__pagination-trailing">
+						  <div class="mdc-data-table__pagination-rows-per-page">
+							<div class="mdc-data-table__pagination-rows-per-page-label">
+							  Events per page
+							</div>
+							<div class="mdc-select mdc-select--outlined mdc-select--no-label mdc-data-table__pagination-rows-per-page-select mdc-data-table__pagination-rows-per-page-select--outlined" id="items_per_page">
+							  <div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-labelledby="demo-pagination-select" tabindex="0">
+								<span class="mdc-select__selected-text-container">
+								  <span id="demo-pagination-select" class="mdc-select__selected-text">25</span>
+								</span>
+								<span class="mdc-select__dropdown-icon">
+								  <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5">
+									<polygon class="mdc-select__dropdown-icon-inactive"	stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+									<polygon class="mdc-select__dropdown-icon-active" stroke="none"	fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+								  </svg>
+								</span>
+								<span class="mdc-notched-outline mdc-notched-outline--notched">
+								  <span class="mdc-notched-outline__leading"></span>
+								  <span class="mdc-notched-outline__trailing"></span>
+								</span>
+							  </div>
+
+							  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox">
+								<ul class="mdc-list">
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--selected mdc-list-item--with-one-line" aria-selected="true" role="option" data-value="25">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">25</span>
+									</span>
+								  </li>
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--with-one-line" role="option" data-value="50">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">50</span>
+									</span>
+								  </li>
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--with-one-line" role="option" data-value="100">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">100</span>
+									</span>
+								  </li>
+								</ul>
+							  </div>
+							</div>
+						  </div>
+
+						  <div class="mdc-data-table__pagination-navigation">
+							<div class="mdc-data-table__pagination-total">
+							  {{ start_item|intcomma }} to {{ end_item|intcomma }} of {{ total_count|intcomma }}
+							</div>
+							{% if first_page %}
+								<a href="{{ first_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true">
+								  <div class="mdc-button__icon">first_page</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true" disabled>
+								  <div class="mdc-button__icon">first_page</div>
+								</button>
+							{% endif %}
+							{% if prior_page %}
+								<a href="{{ prior_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
+								  <div class="mdc-button__icon">chevron_left</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" disabled>
+								  <div class="mdc-button__icon">chevron_left</div>
+								</button>
+							{% endif %}
+							{% if next_page %}
+								<a href="{{ next_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
+								  <div class="mdc-button__icon">chevron_right</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" disabled>
+								  <div class="mdc-button__icon">chevron_right</div>
+								</button>
+							{% endif %}
+							{% if last_page %}
+								<a href="{{ last_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true">
+								  <div class="mdc-button__icon">last_page</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true" disabled>
+								  <div class="mdc-button__icon">last_page</div>
+								</button>
+							{% endif %}
+						  </div>
+						</div>
+					  </div>
+					</div>
+				</div>
+			</div>
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-typography mdc-typography--caption">
+				<div style="position: fixed; padding-right: 16px;">
+					<div class="mdc-card" style="margin-bottom: 16px; padding: 8px;">
+						<div id="empty_details">
+							Select one or more events from the left&#8230;
+						</div>
+						<div id="event_details_view">
+							<img id="event_preview" style="width: 100%; border: thin solid #808080; border-radius: 4px; box-sizing: border-box; aspect-ratio: 1/1; object-fit: cover;">
+
+							<strong id="event_name"></strong>
+							<div id="event_summary"></div>
+					
+							<p id="event_date" class="mdc-typography--caption"></p>
+					
+							<p class="mdc-typography--caption" style="margin-bottom: 0;">
+								<strong>Details</strong><br />
+							
+								<div id="event_details"></div>
+							</p>
+						</div>
+					</div>
+					<!-- <div class="mdc-card mdc-typography--caption" style="margin-bottom: 16px; padding: 8px;">
+						<label class="mdc-text-field mdc-text-field--outlined" id="search_field">
+							<span class="mdc-notched-outline">
+								<span class="mdc-notched-outline__leading"></span>
+								<span class="mdc-notched-outline__notch">
+									<span class="mdc-floating-label" id="my-label-id">Search</span>
+								</span>
+								<span class="mdc-notched-outline__trailing"></span>
+							</span>
+							<input type="search" class="mdc-text-field__input" aria-labelledby="my-label-id">
+						</label>
+					</div> -->
+					<div class="mdc-card mdc-typography--caption" style="margin-bottom: 16px; padding: 8px;">
+						<!-- <p style="margin-top: 0px;">
+							<strong>Date Range</strong><br />
+							<label class="mdc-text-field mdc-text-field--outlined" style="margin-bottom: 8px;" id="start_date">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__notch">
+										<span class="mdc-floating-label" id="my-label-id" style="font-size: 12px;">Start</span>
+									</span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id">
+							</label>
+							<label class="mdc-text-field mdc-text-field--outlined" id="end_date">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__notch">
+										<span class="mdc-floating-label" id="my-label-id" style="font-size: 12px;">End</span>
+									</span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id">
+							</label>
+						</p> -->
+						<p>
+							<strong>Tags</strong>
+							{% for tag in tags %}
+								<br /><a href="{{ tag.url }}">{{ tag.name }}</a>
+							{% endfor %}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<!-- 	<div class="mdc-layout-grid mdc-typography">
+		<div class="mdc-layout-grid__inner">
+			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card" style="padding: 16px;">
+					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+							<h1 class="mdc-typography--headline5" style="margin-top: 8px;">
+								Activity Log{% if selected_tag %}: {{ selected_tag }}{% endif %}
+							</h1>
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+						</div>
+						<div class=" mdc-layout-grid__cell--span-6" style="padding-bottom: 16px; padding-top: 16px;">
+							{{ total_count }} entries &bull; Page {{ page_index|add:1 }} of {{ page_count }} &bull; (<a href="{% url 'builder_activity_logger' %}">Reset View</a>)
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-typography--button" style="padding-bottom: 16px; padding-top: 16px; text-align: right;">
+							{% if prior_page %}
+								<a href="{{ prior_page }}" class="mdc-button mdc-button--icon-leading">
+									<span class="mdc-button__ripple"></span>
+									<span class="mdc-button__focus-ring"></span>
+									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_left</i>
+									<span class="mdc-button__label">Previous Page</span>
+								</a>
+							{% endif %}
+							
+							{% if prior_page and next_page %}
+								&bull;
+							{% endif %}
+
+							{% if next_page %}
+								<a href="{{ next_page }}" class="mdc-button mdc-button--icon-leading">
+									<span class="mdc-button__ripple"></span>
+									<span class="mdc-button__focus-ring"></span>
+									<span class="mdc-button__label">Next Page</span>
+									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_right</i>
+								</a>
+							{% endif %}
+						</div>
+						{% for item in log_items %}
+							<div class="mdc-layout-grid__cell--span-12 mdc-typography--body2" style="border-top: 1px solid #BDBDBD; margin-left: -16px; margin-right: -16px;">
+								<div class="mdc-layout-grid">
+									<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											{{ item.logged }}:
+											<p><strong>{{ item.message }}</strong></p>
+											<p>
+												<strong>Tags:</strong>
+												{% for tag in item.tags.all %}
+													{% if tag.tag == selected_tag %}
+														[<strong><a href="?tag={{ tag.tag }}">{{ tag.name }}</a></strong>]
+													{% else %}
+														[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
+													{% endif %}
+												{% endfor %}
+											</p>
+										</div>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+											{% if item.player %}
+												Player: <a href="?player={{ item.player.pk }}">{{ item.player.identifier|obfuscate_identifier }}</a><br />
+											{% endif %}
+
+											{% if item.game_version %}
+												Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
+											{% endif %}
+
+											{% if item.session %}
+												Session: <a href="?session={{ item.session.pk }}">{{ item.session }}</a>
+											{% endif %}
+										</div>
+										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+											Metadata:<br />
+											<strong>{{ item.metadata }}</strong>
+										</div>
+									</div>
+								</div>
+							</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div> -->
+
+<div class="mdc-dialog" id="dialog_preview">
+	<div class="mdc-dialog__container">
+		<div class="mdc-dialog__surface" role="alertdialog">
+			<img id="dialog_preview_image" style="width: 100%;">
+		</div>
+	<div class="mdc-dialog__scrim"></div>
+</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script data-main="{% static 'builder-js/js/app/activity_log_table.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

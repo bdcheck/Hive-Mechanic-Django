@@ -32,7 +32,65 @@ class LogItem(models.Model):
         return '%s[%s]: %s (%s)' % (self.source, self.logged, self.message, self.tags_str())
 
     def tags_str(self): # pylint: disable=no-self-use
-        return 'TODO'
+        return '(Coming soon)'
+
+    def player(self):
+        metadata = self.fetch_metadata()
+
+        if metadata is not None and isinstance(metadata, dict):
+            player = metadata.get('player', None)
+
+            if player is not None:
+                return 'twilio_player:XXXXXX%s' % player[-4:]
+
+        return ''
+
+    def details_json(self):
+        details = {}
+
+        metadata = self.fetch_metadata()
+
+        if metadata is not None and isinstance(metadata, dict):
+            details['hive_player'] = metadata.get('player', '')
+            details['hive_session'] = '(Coming soon)'
+            details['game_version'] = metadata.get('game', '')
+
+        return json.dumps(details)
+
+    def fetch_metadata(self):
+        if self.metadata is None or self.metadata == '':
+            return {}
+
+        return json.loads(self.metadata)
+
+    def update_metadata(self, new_metadata):
+        metadata = self.fetch_metadata()
+
+        metadata.update(new_metadata)
+
+        self.metadata = json.dumps(metadata, indent=2)
+        self.save()
+
+    def preview_count(self):
+        metadata = self.fetch_metadata()
+
+        if metadata is not None and isinstance(metadata, dict):
+            return len(metadata.get('media_files', []))
+
+        return 0
+
+    def has_preview(self):
+        return self.preview_count() > 0
+
+    def preview(self):
+        metadata = self.fetch_metadata()
+
+        media_files = metadata.get('media_files', [])
+
+        if len(media_files) > 0:
+            return media_files[0]
+
+        return None
 
 def log(source, message, tags=list, metadata=None, player=None, session=None, game_version=None): # pylint: disable=too-many-arguments
     if metadata is None:

@@ -5,7 +5,9 @@ from builtins import str # pylint: disable=redefined-builtin
 
 import datetime
 import json
+import math
 import os
+import urllib
 
 import humanize
 import numpy
@@ -28,7 +30,7 @@ from django.views import defaults
 from filer.admin.clipboardadmin import ajax_upload
 from filer.models import filemodels
 
-from activity_logger.models import LogItem
+from activity_logger.models import LogItem, LogTag
 from integrations.models import Integration
 from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall
 from user_creation.decorators import user_accepted_all_terms
@@ -235,7 +237,6 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
             context['prior_page'] += '&size=%s' % items_per_page
 
     return render(request, 'builder_activity_logger.html', context=context)
-
 
 @login_required
 @user_accepted_all_terms
@@ -1035,3 +1036,84 @@ def builder_clear_variables(request): # pylint: disable=too-many-branches
             response_payload['message'] = 'Unable to locate participant.'
 
     return HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+
+@login_required
+@user_accepted_all_terms
+def builder_activity_logger_new(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
+    if request.user.has_perm('builder.builder_login') is False:
+        raise PermissionDenied('View permission required.')
+
+    context = {}
+
+    query = Q(pk__gte=0)
+
+    tag = request.GET.get('tag', None)
+
+    if tag is not None:
+        query = query & Q(tags__tag=tag)
+
+    sort = request.GET.get('sort', '-logged')
+
+    items_per_page = int(request.GET.get('size', '25'))
+    page_index = int(request.GET.get('page', '0'))
+
+    start = page_index * items_per_page
+    end = start + items_per_page
+
+    context['total_count'] = LogItem.objects.filter(query).count()
+
+    if end > context['total_count']:
+        end = context['total_count']
+
+    context['log_items'] = LogItem.objects.filter(query).order_by(sort)[start:end]
+
+    context['page_index'] = page_index
+    context['page_count'] = math.ceil(context['total_count'] / items_per_page)
+
+    context['start_item'] = start + 1
+    context['end_item'] = end
+
+    base_url = reverse('builder_activity_logger')
+
+    query_string = {
+        'size': items_per_page,
+    }
+
+    if sort is not None:
+        query_string['sort'] = sort
+
+    context['tags'] = []
+
+    for itemTag in LogTag.objects.all().order_by('name'):
+        query_string['tag'] = itemTag.tag
+
+        context['tags'].append({
+            'name': itemTag.name,
+            'url': '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+        })
+        
+    del query_string['tag']
+
+    if tag is not None:
+        query_string['tag'] = tag
+
+    if context['total_count'] > items_per_page and page_index < context['page_count']:
+        query_string['page'] = page_index + 1
+
+        context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+        if page_index + 1 < context['page_count']:
+            query_string['page'] = context['page_count'] - 1
+            context['last_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+    if context['page_index'] > 0:
+        query_string['page'] = page_index - 1
+
+        context['prior_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+        query_string['page'] = 0
+
+        context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+    return render(request, 'builder_activity_log_table.html', context=context)
