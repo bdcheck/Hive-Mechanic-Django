@@ -571,8 +571,8 @@ class GameVersion(models.Model):
                 added_new_action = False
 
                 for new_action in new_actions:
-                    if (new_action in new_actions) is False:
-                        actions.append(action)
+                    if (new_action in actions) is False:
+                        actions.append(new_action)
 
                         added_new_action = True
 
