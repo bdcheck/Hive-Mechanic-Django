@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     @handle_lock
     @handle_schedule
-    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
+    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals
         messaging_tag = LogTag.objects.get(tag='messaging')
         has_preview_tag = LogTag.objects.get(tag='has_preview')
 

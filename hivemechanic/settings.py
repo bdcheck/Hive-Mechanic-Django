@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.humanize',
     'django_db_logger',
+    'prettyjson',
     'quicksilver',
     'passive_data_kit',
     'django_dialog_engine',
