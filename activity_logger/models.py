@@ -34,7 +34,7 @@ class LogItem(models.Model):
     def tags_str(self): # pylint: disable=no-self-use
         return '(Coming soon)'
 
-    def player(self):
+    def player_str(self):
         metadata = self.fetch_metadata()
 
         if metadata is not None and isinstance(metadata, dict):

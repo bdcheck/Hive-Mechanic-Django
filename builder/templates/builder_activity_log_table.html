@@ -30,7 +30,7 @@
 							{% for item in log_items %}
 								<tr class="mdc-data-table__row" data-message="{{ item.message }}" data-date="{{ item.logged }}" data-name="{{ item.source }}" data-details='{{ item.details_json }}' {% if item.has_preview %}data-attachment='{{ item.preview }}'{% endif %}>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.source }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.player }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.player_str }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.message }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">{{ item.logged|date:'M j Y, g:iA' }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">
