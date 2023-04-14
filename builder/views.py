@@ -146,7 +146,7 @@ def builder_activities(request): # pylint: disable=unused-argument
 
 @login_required
 @user_accepted_all_terms
-def builder_activity_logger(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
+def builder_activity_logger_legacy(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
@@ -1040,7 +1040,7 @@ def builder_clear_variables(request): # pylint: disable=too-many-branches
 
 @login_required
 @user_accepted_all_terms
-def builder_activity_logger_new(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
+def builder_activity_logger(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
@@ -1085,14 +1085,14 @@ def builder_activity_logger_new(request): # pylint: disable=unused-argument, too
 
     context['tags'] = []
 
-    for itemTag in LogTag.objects.all().order_by('name'):
-        query_string['tag'] = itemTag.tag
+    for item_tag in LogTag.objects.all().order_by('name'):
+        query_string['tag'] = item_tag.tag
 
         context['tags'].append({
-            'name': itemTag.name,
+            'name': item_tag.name,
             'url': '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
         })
-        
+
     del query_string['tag']
 
     if tag is not None:
