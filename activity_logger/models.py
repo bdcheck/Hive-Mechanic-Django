@@ -87,7 +87,7 @@ class LogItem(models.Model):
 
         media_files = metadata.get('media_files', [])
 
-        if len(media_files) > 0:
+        if len(media_files) > 0: # pylint: disable=len-as-condition
             return media_files[0]
 
         return None
