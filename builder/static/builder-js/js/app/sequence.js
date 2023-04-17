@@ -557,6 +557,8 @@ define(modules, function (mdc, Node) {
     }
 
     insertBefore (originalId, newId, transferLinks) {
+      const me = this
+
       console.log('INSERT BEFORE: ' + originalId + ' -- ' + newId + ' -- ' + transferLinks)
 
       let originalCard = null
@@ -595,6 +597,10 @@ define(modules, function (mdc, Node) {
 
         sourceNodes.forEach(function (node) {
           node.updateReferences(originalId, newId)
+
+          if (originalId.includes('#') === false) {
+            node.updateReferences(me.definition.id + '#' + originalId, newId)
+          }
         })
       }
 
