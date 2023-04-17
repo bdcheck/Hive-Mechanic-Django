@@ -9,6 +9,7 @@ import math
 import os
 import urllib
 
+import arrow
 import humanize
 import numpy
 
@@ -1040,7 +1041,7 @@ def builder_clear_variables(request): # pylint: disable=too-many-branches
 
 @login_required
 @user_accepted_all_terms
-def builder_activity_logger(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements
+def builder_activity_logger(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements, too-many-locals
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
@@ -1052,6 +1053,37 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
     if tag is not None:
         query = query & Q(tags__tag=tag)
+
+        context['tag'] = tag
+
+    start_date = request.GET.get('start', '')
+
+    if start_date != '':
+        start = arrow.get(start_date).datetime
+
+        query = query & Q(logged__gte=start)
+
+        context['start'] = start_date
+
+    end_date = request.GET.get('end', '')
+
+    if end_date != '':
+        end = arrow.get(end_date).datetime
+
+        end = end + datetime.timedelta(days=1)
+
+        query = query & Q(logged__lt=end)
+
+        context['end'] = end_date
+
+    search_query = request.GET.get('q', '')
+
+    if search_query != '':
+        search = (Q(source__icontains=search_query) | Q(message__icontains=search_query) | Q(metadata__icontains=search_query)) # pylint: disable=unsupported-binary-operation
+
+        query = query & search
+
+        context['query'] = search_query
 
     sort = request.GET.get('sort', '-logged')
 
@@ -1083,6 +1115,11 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
     if sort is not None:
         query_string['sort'] = sort
 
+        context['sort'] = sort
+
+    if search_query != '':
+        query_string['q'] = search_query
+
     context['tags'] = []
 
     for item_tag in LogTag.objects.all().order_by('name'):
@@ -1090,10 +1127,13 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
         context['tags'].append({
             'name': item_tag.name,
+            'tag': item_tag.tag,
             'url': '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
         })
 
     del query_string['tag']
+
+    context['clear_tag_url'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
 
     if tag is not None:
         query_string['tag'] = tag

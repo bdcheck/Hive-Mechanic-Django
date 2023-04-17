@@ -19,10 +19,20 @@ class Command(BaseCommand):
     @handle_lock
     @handle_schedule
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals
-        messaging_tag = LogTag.objects.get(tag='messaging')
-        has_preview_tag = LogTag.objects.get(tag='has_preview')
+        messaging_tag = LogTag.objects.filter(tag='messaging').first()
+        
+        if messaging_tag is None:
+        	messaging_tag = LogTag.objects.create(tag='messaging', name='All Messages')
+        
+        has_preview_tag = LogTag.objects.filter(tag='has_preview').first()
 
-        incoming_tag = LogTag.objects.get(tag='incoming_message')
+        if has_preview_tag is None:
+        	has_preview_tag = LogTag.objects.create(tag='has_preview', name='Has Preview')
+
+        incoming_tag = LogTag.objects.filter(tag='incoming_message').first()
+
+        if incoming_tag is None:
+        	incoming_tag = LogTag.objects.create(tag='incoming_message', name='Incoming Messages')
 
         last_incoming_log = incoming_tag.log_items.order_by('-logged').first()
 
@@ -60,7 +70,10 @@ class Command(BaseCommand):
 
             print('Created incoming message log item for %s' % log_item.source)
 
-        outgoing_tag = LogTag.objects.get(tag='outgoing_message')
+        outgoing_tag = LogTag.objects.filter(tag='outgoing_message').first()
+
+        if outgoing_tag is None:
+        	outgoing_tag = LogTag.objects.create(tag='outgoing_message', name='Outgoing Messages')
 
         last_outgoing_log = outgoing_tag.log_items.order_by('-logged').first()
 

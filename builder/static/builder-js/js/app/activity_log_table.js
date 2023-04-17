@@ -90,9 +90,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#event_summary').html(target.data('message'))
     $('#event_date').html(target.data('date'))
 
-    console.log('PARSE: ')
-    console.log(target.data('details'))
-
     const details = target.data('details')
 
     let detailsHtml = ''
@@ -126,9 +123,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     const preview = target.data('attachment')
 
-    console.log('PREVIEW: ')
-    console.log(preview)
-
     if (preview) {
       $('#event_preview').attr('src', preview)
       $('#event_preview').show()
@@ -160,7 +154,101 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
   $('#event_details_view').hide()
 
-  mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
-  mdc.textField.MDCTextField.attachTo(document.getElementById('end_date'))
+  const startDate = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
+  const endDate = mdc.textField.MDCTextField.attachTo(document.getElementById('end_date'))
+
+  $('#filter_date_button').click(function (eventObj) {
+    console.log('START:')
+    console.log(startDate.value)
+
+    console.log('END:')
+    console.log(endDate.value)
+
+    if (startDate.value !== '' && endDate.value !== '' && endDate.value < startDate.value) {
+      const endValue = endDate.value
+
+      endDate.value = startDate.value
+      startDate.value = endValue
+    }
+
+    const currentUrl = new URL(window.location)
+
+    currentUrl.searchParams.set('start', startDate.value)
+    currentUrl.searchParams.set('end', endDate.value)
+
+    window.location = currentUrl.href
+  })
+
   mdc.textField.MDCTextField.attachTo(document.getElementById('search_field'))
+  // const clearSearch = mdc.textField.MDCTextFieldIcon(document.getElementById('search_field_clear'));
+
+  $('#search_field input').keyup(function (eventObj) {
+    if (eventObj.originalEvent.keyCode === 13) {
+      eventObj.preventDefault()
+
+      const query = $('#search_field input').val()
+
+      const currentUrl = new URL(window.location)
+
+      currentUrl.searchParams.set('q', query)
+
+      window.location = currentUrl.href
+    }
+  })
+
+  $('#search_field_clear').click(function (eventObj) {
+    const currentUrl = new URL(window.location)
+
+    currentUrl.searchParams.set('q', '')
+
+    window.location = currentUrl.href
+  })
+
+  $('#sort_source').click(function (eventObj) {
+    const currentUrl = new URL(window.location)
+
+    if (currentUrl.searchParams.get('sort', '') === 'source') {
+      currentUrl.searchParams.set('sort', '-source')
+    } else {
+      currentUrl.searchParams.set('sort', 'source')
+    }
+
+    window.location = currentUrl.href
+  })
+
+  $('#sort_player').click(function (eventObj) {
+    const currentUrl = new URL(window.location)
+
+    if (currentUrl.searchParams.get('sort', '') === 'player') {
+      currentUrl.searchParams.set('sort', '-player')
+    } else {
+      currentUrl.searchParams.set('sort', 'player')
+    }
+
+    window.location = currentUrl.href
+  })
+
+  $('#sort_message').click(function (eventObj) {
+    const currentUrl = new URL(window.location)
+
+    if (currentUrl.searchParams.get('sort', '') === 'message') {
+      currentUrl.searchParams.set('sort', '-message')
+    } else {
+      currentUrl.searchParams.set('sort', 'message')
+    }
+
+    window.location = currentUrl.href
+  })
+
+  $('#sort_logged').click(function (eventObj) {
+    const currentUrl = new URL(window.location)
+
+    if (currentUrl.searchParams.get('sort', '') === 'logged') {
+      currentUrl.searchParams.set('sort', '-logged')
+    } else {
+      currentUrl.searchParams.set('sort', 'logged')
+    }
+
+    window.location = currentUrl.href
+  })
 })

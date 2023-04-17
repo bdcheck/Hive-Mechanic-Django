@@ -19,10 +19,42 @@
 						<table class="mdc-data-table__table mdc-typography--caption" aria-label="Event Log" style="width: 100%">
 						  <thead>
 							<tr class="mdc-data-table__header-row">
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Source</strong></th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Player</strong></th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col"><strong>Event</strong></th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;"><strong>Date</strong></th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+							  	<strong style="vertical-align: middle;"><a href="#" id="sort_source">Source</a></strong>
+							  	{% if sort == 'source' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+							  	{% endif %}
+							  	{% if sort == '-source' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+							  	{% endif %}
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+							  	<strong style="vertical-align: middle;"><a href="#" id="sort_player">Player</a></strong>
+							  	{% if sort == 'player' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+							  	{% endif %}
+							  	{% if sort == '-player' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+							  	{% endif %}
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+							  	<strong style="vertical-align: middle;"><a href="#" id="sort_message">Event</a></strong>
+							  	{% if sort == 'message' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+							  	{% endif %}
+							  	{% if sort == '-message' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+							  	{% endif %}
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;">
+							  	<strong style="vertical-align: middle;"><a href="#" id="sort_logged">Date</a></strong>
+							  	{% if sort == 'logged' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+							  	{% endif %}
+							  	{% if sort == '-logged' %}
+							  		<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+							  	{% endif %}
+							  </th>
 							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: max-content;"><span class="material-icons">attachment</span></th>
 							</tr>
 						  </thead>
@@ -140,7 +172,7 @@
 				</div>
 			</div>
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-typography mdc-typography--caption">
-				<div style="position: fixed; padding-right: 16px;">
+				<div style="position: fixed; padding-right: 16px; overflow-x: hidden; overflow-y: auto; max-height: calc(100vh - 88px);">
 					<div class="mdc-card" style="margin-bottom: 16px; padding: 8px;">
 						<div id="empty_details">
 							Select one or more events from the left&#8230;
@@ -160,8 +192,8 @@
 							</p>
 						</div>
 					</div>
-					<!-- <div class="mdc-card mdc-typography--caption" style="margin-bottom: 16px; padding: 8px;">
-						<label class="mdc-text-field mdc-text-field--outlined" id="search_field">
+					<div class="mdc-card mdc-typography--caption" style="margin-bottom: 16px; padding: 8px;">
+						<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon" id="search_field" style="margin-top: 8px;">
 							<span class="mdc-notched-outline">
 								<span class="mdc-notched-outline__leading"></span>
 								<span class="mdc-notched-outline__notch">
@@ -169,13 +201,12 @@
 								</span>
 								<span class="mdc-notched-outline__trailing"></span>
 							</span>
-							<input type="search" class="mdc-text-field__input" aria-labelledby="my-label-id">
-						</label>
-					</div> -->
-					<div class="mdc-card mdc-typography--caption" style="margin-bottom: 16px; padding: 8px;">
-						<!-- <p style="margin-top: 0px;">
+							<input type="search" class="mdc-text-field__input" aria-labelledby="my-label-id" value="{{ query }}">
+  							{% if query %}<i class="material-icons mdc-text-field__icon mdc-text-field__icon--trailing" tabindex="0" role="button" id="search_field_clear">clear</i>{% endif %}
+  						</label>
+						<p style="margin-top: 16px;">
 							<strong>Date Range</strong><br />
-							<label class="mdc-text-field mdc-text-field--outlined" style="margin-bottom: 8px;" id="start_date">
+							<label class="mdc-text-field mdc-text-field--outlined" style="margin-bottom: 8px; margin-top: 8px; width: 100%;" id="start_date">
 								<span class="mdc-notched-outline">
 									<span class="mdc-notched-outline__leading"></span>
 									<span class="mdc-notched-outline__notch">
@@ -183,9 +214,9 @@
 									</span>
 									<span class="mdc-notched-outline__trailing"></span>
 								</span>
-								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id">
+								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id" value="{{ start }}">
 							</label>
-							<label class="mdc-text-field mdc-text-field--outlined" id="end_date">
+							<label class="mdc-text-field mdc-text-field--outlined" id="end_date" style="width: 100%;">
 								<span class="mdc-notched-outline">
 									<span class="mdc-notched-outline__leading"></span>
 									<span class="mdc-notched-outline__notch">
@@ -193,13 +224,25 @@
 									</span>
 									<span class="mdc-notched-outline__trailing"></span>
 								</span>
-								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id">
+								<input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id"  value="{{ end }}">
 							</label>
-						</p> -->
+							<button class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 8px;" id="filter_date_button">
+								<span class="mdc-button__ripple"></span>
+								<span class="mdc-button__focus-ring"></span>
+								<span class="mdc-button__label">Filter by date</span>
+							</button>							
+						</p>
 						<p>
-							<strong>Tags</strong>
-							{% for tag in tags %}
-								<br /><a href="{{ tag.url }}">{{ tag.name }}</a>
+							<strong>Tags</strong>{% if tag %} <a href="{{ clear_tag_url }}" style="float: right;"><em>Clear</em></a>{% endif %}<br />
+							{% for item_tag in tags %}
+								{% if forloop.counter0 != 0 %}&bull;{% endif %}
+								{% if tag == item_tag.tag %}
+									<strong>
+										<a href="{{ item_tag.url }}">{{ item_tag.name }}</a>
+									</strong>
+								{% else %}
+									<a href="{{ item_tag.url }}">{{ item_tag.name }}</a>
+								{% endif %}
 							{% endfor %}
 						</p>
 					</div>
@@ -208,95 +251,14 @@
 		</div>
 	</div>
 
-<!-- 	<div class="mdc-layout-grid mdc-typography">
-		<div class="mdc-layout-grid__inner">
-			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-							<h1 class="mdc-typography--headline5" style="margin-top: 8px;">
-								Activity Log{% if selected_tag %}: {{ selected_tag }}{% endif %}
-							</h1>
-						</div>
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-						</div>
-						<div class=" mdc-layout-grid__cell--span-6" style="padding-bottom: 16px; padding-top: 16px;">
-							{{ total_count }} entries &bull; Page {{ page_index|add:1 }} of {{ page_count }} &bull; (<a href="{% url 'builder_activity_logger' %}">Reset View</a>)
-						</div>
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 mdc-typography--button" style="padding-bottom: 16px; padding-top: 16px; text-align: right;">
-							{% if prior_page %}
-								<a href="{{ prior_page }}" class="mdc-button mdc-button--icon-leading">
-									<span class="mdc-button__ripple"></span>
-									<span class="mdc-button__focus-ring"></span>
-									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_left</i>
-									<span class="mdc-button__label">Previous Page</span>
-								</a>
-							{% endif %}
-							
-							{% if prior_page and next_page %}
-								&bull;
-							{% endif %}
 
-							{% if next_page %}
-								<a href="{{ next_page }}" class="mdc-button mdc-button--icon-leading">
-									<span class="mdc-button__ripple"></span>
-									<span class="mdc-button__focus-ring"></span>
-									<span class="mdc-button__label">Next Page</span>
-									<i class="material-icons mdc-button__icon" aria-hidden="true">chevron_right</i>
-								</a>
-							{% endif %}
-						</div>
-						{% for item in log_items %}
-							<div class="mdc-layout-grid__cell--span-12 mdc-typography--body2" style="border-top: 1px solid #BDBDBD; margin-left: -16px; margin-right: -16px;">
-								<div class="mdc-layout-grid">
-									<div class="mdc-layout-grid__inner" style="grid-gap: 0px">
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-											{{ item.logged }}:
-											<p><strong>{{ item.message }}</strong></p>
-											<p>
-												<strong>Tags:</strong>
-												{% for tag in item.tags.all %}
-													{% if tag.tag == selected_tag %}
-														[<strong><a href="?tag={{ tag.tag }}">{{ tag.name }}</a></strong>]
-													{% else %}
-														[<a href="?tag={{ tag.tag }}">{{ tag.name }}</a>]
-													{% endif %}
-												{% endfor %}
-											</p>
-										</div>
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-											{% if item.player %}
-												Player: <a href="?player={{ item.player.pk }}">{{ item.player.identifier|obfuscate_identifier }}</a><br />
-											{% endif %}
-
-											{% if item.game_version %}
-												Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
-											{% endif %}
-
-											{% if item.session %}
-												Session: <a href="?session={{ item.session.pk }}">{{ item.session }}</a>
-											{% endif %}
-										</div>
-										<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-											Metadata:<br />
-											<strong>{{ item.metadata }}</strong>
-										</div>
-									</div>
-								</div>
-							</div>
-					{% endfor %}
-				</div>
+	<div class="mdc-dialog" id="dialog_preview">
+		<div class="mdc-dialog__container">
+			<div class="mdc-dialog__surface" role="alertdialog">
+				<img id="dialog_preview_image" style="width: 100%;">
 			</div>
-		</div>
-	</div> -->
-
-<div class="mdc-dialog" id="dialog_preview">
-	<div class="mdc-dialog__container">
-		<div class="mdc-dialog__surface" role="alertdialog">
-			<img id="dialog_preview_image" style="width: 100%;">
-		</div>
-	<div class="mdc-dialog__scrim"></div>
-</div>
+		<div class="mdc-dialog__scrim"></div>
+	</div>
 {% endblock %}
 
 {% block 'js_init' %}
