@@ -310,6 +310,9 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
         if payload_body == '':
             payload_body = None
 
+        if payload_body is None and incoming_message.media.count() > 0:
+            payload_body = '^^^'
+
         integration.process_player_incoming('twilio_player', player_identifier, payload_body, {
             'last_message': last_message,
             'message_type': message_type,

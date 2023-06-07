@@ -568,24 +568,27 @@ class GameVersion(models.Model):
     def __str__(self):
         return self.game.name + ' (' + str(self.created) + ')'
 
-    def process_incoming(self, session, payload, extras=None):
+    def process_incoming(self, session, payload, extras=None): # pylint: disable=too-many-branches
         if extras is None:
             extras = {}
 
+        if extras.get('last_message', None) is None:
+            last_message = session.player.last_message()
+
+            if last_message is not None:
+                extras['last_message'] = {
+                    'raw_object': last_message,
+                    'message': last_message.message
+                }
+
         actions = []
 
-        if self.interrupt(payload, session, extras) is False: # pylint; disable=too-many-nested-blocks
+        if self.interrupt(payload, session, extras) is False: # pylint: disable=too-many-nested-blocks
             dialog = session.dialog()
 
             session.refresh_from_db()
 
-            print('PAYLOAD[0]: %s' % payload)
-
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
-
-            print('MD[0]: ' + json.dumps(session.session_state, indent=2))
-            print('ACTIONS[0]: ' + json.dumps(new_actions, indent=2))
-            print('EXTRAS[0]: %s' % extras)
 
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
                 session.refresh_from_db()
@@ -604,9 +607,6 @@ class GameVersion(models.Model):
 
                 if added_new_action:
                     new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
-
-                    print('MD[1]: ' + json.dumps(session.session_state, indent=2))
-                    print('ACTIONS[1]: ' + json.dumps(new_actions, indent=2))
                 else:
                     new_actions = [] # Break out of likely endless loop
 
@@ -872,6 +872,16 @@ class Player(models.Model):
 
     def inactive_session_count(self):
         return self.sessions.exclude(completed=None).count()
+
+    def last_message(self, direction='incoming'):
+        from twilio_support.models import IncomingMessage # pylint: disable=import-outside-toplevel
+
+        source_id = self.identifier.split(':')[-1]
+
+        if direction == 'incoming':
+            return IncomingMessage.objects.filter(source=source_id).order_by('-receive_date').first()
+
+        return None
 
 class Session(models.Model):
     player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)
