@@ -25,7 +25,7 @@ from django.contrib.postgres.fields import JSONField
 from django.core.checks import Warning, register # pylint: disable=redefined-builtin
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_delete
 from django.db.utils import ProgrammingError
 from django.urls import reverse
@@ -426,6 +426,7 @@ class Game(models.Model):
 
         return session
 
+    @transaction.atomic
     def reset_active_session_variables(self):
         for version in self.versions.all():
             for session in version.sessions.all():
@@ -433,21 +434,28 @@ class Game(models.Model):
                     session.session_state = {}
                     session.save()
 
+    @transaction.atomic
     def close_active_sessions(self):
         for version in self.versions.all():
             for session in version.sessions.all():
                 if session.completed is None:
                     session.complete()
 
+    @transaction.atomic
     def reset_variables(self):
         self.game_state = {} # pylint: disable=unsupported-assignment-operation
         self.save()
 
+        self.refresh_from_db()
+
+    @transaction.atomic
     def set_variable(self, variable, value):
         old_value = self.game_state.get(variable, None)
 
         self.game_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        self.refresh_from_db()
 
         metadata = {
             'variable_name': variable,
@@ -459,6 +467,7 @@ class Game(models.Model):
 
         log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value), tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
 
+    @transaction.atomic
     def fetch_variable(self, variable):
         if variable in self.game_state: # pylint: disable=unsupported-membership-test
             return self.game_state[variable] # pylint: disable=unsubscriptable-object
@@ -560,24 +569,44 @@ class GameVersion(models.Model):
         return self.game.name + ' (' + str(self.created) + ')'
 
     def process_incoming(self, session, payload, extras=None):
+        if extras is None:
+            extras = {}
+
         actions = []
 
-        if self.interrupt(payload, session, extras) is False:
+        if self.interrupt(payload, session, extras) is False: # pylint; disable=too-many-nested-blocks
             dialog = session.dialog()
+
+            session.refresh_from_db()
+
+            print('PAYLOAD[0]: %s' % payload)
 
             new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
+            print('MD[0]: ' + json.dumps(session.session_state, indent=2))
+            print('ACTIONS[0]: ' + json.dumps(new_actions, indent=2))
+            print('EXTRAS[0]: %s' % extras)
+
             while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
+                session.refresh_from_db()
+
                 added_new_action = False
 
                 for new_action in new_actions:
                     if (new_action in actions) is False:
-                        actions.append(new_action)
+                        if new_action.get('type', None) == 'set-variable':
+                            for game_integration in self.game.integrations.all():
+                                game_integration.execute_actions(session, [new_action])
+                        else:
+                            actions.append(new_action)
 
                         added_new_action = True
 
                 if added_new_action:
                     new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+
+                    print('MD[1]: ' + json.dumps(session.session_state, indent=2))
+                    print('ACTIONS[1]: ' + json.dumps(new_actions, indent=2))
                 else:
                     new_actions = [] # Break out of likely endless loop
 
@@ -800,11 +829,14 @@ class Player(models.Model):
     def log_id(self):
         return 'player:%d' % self.pk
 
+    @transaction.atomic
     def set_variable(self, variable, value):
         old_value = self.player_state.get(variable, None)
 
         self.player_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        self.refresh_from_db()
 
         metadata = {
             'variable_name': variable,
@@ -814,6 +846,7 @@ class Player(models.Model):
 
         log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
 
+    @transaction.atomic
     def fetch_variable(self, variable):
         if variable in self.player_state: # pylint: disable=unsupported-membership-test
             return self.player_state[variable] # pylint: disable=unsubscriptable-object
@@ -858,6 +891,11 @@ class Session(models.Model):
     def process_incoming(self, integration, payload, extras=None):
         # ??? Log event here?
 
+        if extras is None:
+            extras = {}
+
+        extras['__integration'] = integration
+
         actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:
@@ -869,11 +907,14 @@ class Session(models.Model):
     def nudge(self):
         self.process_incoming(None, None)
 
+    @transaction.atomic
     def set_variable(self, variable, value):
         old_value = self.session_state.get(variable, None)
 
         self.session_state[variable] = value # pylint: disable=unsupported-assignment-operation
         self.save()
+
+        self.refresh_from_db()
 
         metadata = {
             'variable_name': variable,
@@ -883,6 +924,7 @@ class Session(models.Model):
 
         log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value), tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 
+    @transaction.atomic
     def fetch_variable(self, variable):
         if variable.startswith('[') and variable.endswith(']'):
             value = None
@@ -924,6 +966,7 @@ class Session(models.Model):
     def current_node(self):
         return self.dialog().current_state_id()
 
+    @transaction.atomic
     def complete(self):
         dialog_key = 'session-' + str(self.pk)
 
@@ -1156,5 +1199,5 @@ class SiteSettings(models.Model):
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
 
-    total_message_limit = models.IntegerField(null=True, blank=True)
+    total_message_limit = models.IntegerField(null=True, blank=True, help_text='Total of incoming and outgoing messages, plus voice calls')
     count_messages_since = models.DateTimeField(null=True, blank=True)

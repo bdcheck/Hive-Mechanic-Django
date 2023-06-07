@@ -126,6 +126,8 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
 
 @csrf_exempt
 def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements
+    print('START CALL RESPONSE')
+
     response = VoiceResponse()
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
@@ -175,9 +177,14 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
             incoming.save()
 
         if integration_match is not None:
+            # If response empty - clear out pending outgoing call objects
+            # Reset position in dialog to Voice Start Card
+
+            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
+
             integration_match.process_incoming(post_dict)
 
-            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date')
+            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).order_by('send_date')
 
             for call in pending_calls:
                 if call.next_action != 'gather':
@@ -242,5 +249,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 log_metadata['call_status'] = post_dict.get('CallStatus', None)
 
                 log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
+
+    print('CALL RESPONSE: %s' % response)
 
     return HttpResponse(str(response), content_type='text/xml')
