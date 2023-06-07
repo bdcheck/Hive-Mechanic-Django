@@ -56,6 +56,7 @@ jobs:
             python manage.py initialize_permissions
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
+            python manage.py install_quicksilver_tasks
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit
