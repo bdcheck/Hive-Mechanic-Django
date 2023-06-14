@@ -55,5 +55,5 @@ def log_500_error(request, template_name='500.html'): # pylint: disable=too-many
 
     return server_error(request, template_name)
 
-def intentional_error(request):
+def intentional_error(request): # pylint: disable=unused-argument
     raise Exception('This is an intentional exception!')
