@@ -3,6 +3,7 @@
 from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
 
+import datetime
 import mimetypes
 
 from io import BytesIO
@@ -126,12 +127,10 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
 
 @csrf_exempt
 def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements
-    print('START CALL RESPONSE')
-
     response = VoiceResponse()
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
-        now = timezone.now()
+        now = timezone.now() - datetime.timedelta(seconds=10)
 
         integration_match = None
 
@@ -151,7 +150,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     post_dict['From'] = source
                     post_dict['To'] = destination
 
-        if 'CallStatus' in post_dict:
+        if post_dict.get('CallStatus', None) is not None:
             incoming = IncomingCallResponse(source=source)
             incoming.receive_date = now
 
@@ -183,6 +182,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
             pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
 
             integration_match.process_incoming(post_dict)
+
+            now = timezone.now()
 
             pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).order_by('send_date')
 
@@ -249,7 +250,5 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 log_metadata['call_status'] = post_dict.get('CallStatus', None)
 
                 log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
-
-    print('CALL RESPONSE: %s' % response)
 
     return HttpResponse(str(response), content_type='text/xml')
