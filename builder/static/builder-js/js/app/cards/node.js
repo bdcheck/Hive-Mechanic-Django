@@ -827,7 +827,19 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         if (definition[field.field] !== undefined) {
           fieldWidget.value = definition[field.field]
 
-          $('#' + me.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
+          $('#' + me.cardId + '_' + field.field + '_preview').hide()
+
+          try {
+            const imageUrl = new URL(fieldWidget.value)
+
+            if (imageUrl.protocol !== undefined && imageUrl.protocol !== null) {
+              $('#' + me.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
+
+              $('#' + me.cardId + '_' + field.field + '_preview').show()
+            }
+          } catch (error) {
+
+          }
         }
 
         $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
@@ -1233,16 +1245,22 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     viewHtml () {
+      const me = this
+
+      const callback = function(newBody) {
+        $('#' + me.cardId + ' .view-body').html(newBody)
+      }
+
       let htmlString = '<div class="mdc-card" id="' + this.cardId + '" style="' + this.style() + '"  data-node-id="' + this.id + '">'
       htmlString += '  <h6 class="mdc-typography--headline6" style="margin: 16px; margin-bottom: 0;"><span style="float: right">' + this.cardIcon() + '</span>' + this.cardName() + '</h6>'
-      htmlString += this.viewBody()
+      htmlString += '  <span class="view-body">' + this.viewBody(callback) + '</span>'
       htmlString += '</div>'
 
       return htmlString
     }
 
-    viewBody () {
-      return '<div class="mdc-typography--body1" style="margin: 16px;"><pre>' + JSON.stringify(this.definition, null, 2) + '</pre></div>'
+    viewBody (callback) {
+      callback('<div class="mdc-typography--body1" style="margin: 16px;"><pre>' + JSON.stringify(this.definition, null, 2) + '</pre></div>')
     }
 
     style () {

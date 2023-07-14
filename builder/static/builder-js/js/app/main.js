@@ -63,9 +63,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       }
 
       $.post(actionUrl, payload, function (data) {
-        console.log('response')
-        console.log(data)
-
         if (data.message !== undefined) {
           alert(data.message)
         }
@@ -582,8 +579,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
           let id = event.currentTarget.id
 
-          console.log('ID: ' + id)
-
           id = id.replace('all_cards_destination_item_', '')
 
           window.dialogBuilder.loadNodeById(id)
@@ -603,8 +598,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       sequenceId = tokens[0]
       cardId = tokens[1]
     }
-
-    console.log('loadNodeById: ' + sequenceId + ' / ' + cardId)
 
     for (let i = 0; i < window.dialogBuilder.definition.sequences.length; i++) {
       const sequence = window.dialogBuilder.definition.sequences[i]
@@ -1279,6 +1272,14 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       }
     })
 
+    initialCardList +=    '      <li class="mdc-list-divider" role="separator"></li>'
+    initialCardList +=    '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" id="builder-activity-setting-initial-card-list-destination-item-no-card-destination" data-node-id="no-card-destination" data-value="no-card-destination">'
+    initialCardList +=    '        <span class="mdc-list-item__ripple"></span>'
+    initialCardList +=    '        <span class="mdc-list-item__text mdc-list-item__start">(None Selected)</span>'
+    initialCardList +=    '        <span class="mdc-layout-grid--align-right mdc-list-item__end"></span>'
+    initialCardList +=    '      </li>'
+
+
     initialCardList += '    </ul>'
 
     $('#builder-activity-setting-initial-card-list').html(initialCardList)
@@ -1328,10 +1329,20 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         initialCardSelect.listen('MDCSelect:change', () => {
           window.dialogBuilder.initialCard = initialCardSelect.value
 
-          window.dialogBuilder.definition['initial-card'] = initialCardSelect.value
+          if ([undefined, null, '', 'no-card-destination'].includes(initialCardSelect.value)) {
+            // Pass
+          } else {
+            window.dialogBuilder.definition['initial-card'] = initialCardSelect.value
+          }
 
           dialogIsDirty = true
         })
+
+        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.definition['initial-card'])) {
+          initialCardSelect.value = 'no-card-destination'
+        } else {
+          initialCardSelect.value = window.dialogBuilder.definition['initial-card']
+        }
       }
 
       if (voiceCardSelect === null) {
@@ -1342,8 +1353,20 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
           window.dialogBuilder.definition.incoming_call_interrupt = voiceCardSelect.value
 
+          if ([undefined, null, '', 'no-card-destination'].includes(voiceCardSelect.value)) {
+            // Pass
+          } else {
+            window.dialogBuilder.definition.incoming_call_interrupt = voiceCardSelect.value
+          }
+
           dialogIsDirty = true
         })
+
+        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.incoming_call_interrupt)) {
+          voiceCardSelect.value = 'no-card-destination'
+        } else {
+          voiceCardSelect.value = window.dialogBuilder.definition.incoming_call_interrupt
+        }
       }
 
       if (termsCardSelect === null) {
@@ -1352,15 +1375,22 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
         termsCardSelect.listen('MDCSelect:change', () => {
           window.dialogBuilder.termsCard = termsCardSelect.value
 
-          window.dialogBuilder.definition.terms_interrupt = termsCardSelect.value
+          if ([undefined, null, '', 'no-card-destination'].includes(termsCardSelect.value)) {
+            // Pass
+          } else {
+            window.dialogBuilder.definition.terms_interrupt = termsCardSelect.value
+          }
 
           dialogIsDirty = true
         })
+
+        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.terms_interrupt)) {
+          termsCardSelect.value = 'no-card-destination'
+        } else {
+          termsCardSelect.value = window.dialogBuilder.definition.terms_interrupt
+        }
       }
 
-      initialCardSelect.value = window.dialogBuilder.definition['initial-card']
-      voiceCardSelect.value = window.dialogBuilder.definition.incoming_call_interrupt
-      termsCardSelect.value = window.dialogBuilder.definition.terms_interrupt
 
       activityName.value = window.dialogBuilder.definition.name
 
@@ -1369,31 +1399,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
         dialogIsDirty = true
       })
-
-      /*
-
-      if (window.dialogBuilder.definition.identifier !== undefined) {
-        activityIdentifier.value = window.dialogBuilder.definition.identifier
-      }
-
-      $('#builder-activity-setting-activity-identifier').on('change keyup paste', function () {
-        const slugged = slugify(activityIdentifier.value, {
-          trim: false,
-          remove: /[*+~.()'"!:@]/g
-        })
-
-        if (slugged !== activityIdentifier.value) {
-          console.log('NO MATCH: ' + slugged + ' !== ' + activityIdentifier.value)
-
-          $('#activity-identifier-warning').show()
-        } else {
-          $('#activity-identifier-warning').hide()
-
-          window.dialogBuilder.definition.identifier = slugged
-        }
-
-        dialogIsDirty = true
-      }) */
     }, 100)
 
     $('#activity-identifier-warning').hide()

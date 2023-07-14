@@ -757,10 +757,14 @@ def builder_media(request):
 def builder_media_upload(request):
     if request.method == 'POST':
         response = ajax_upload(request)
+
         res = json.loads(response.content)
+
         if 'error' in res:
             return redirect(defaults.HttpResponseServerError)
+
         description = request.POST.get("description")
+
         if description:
             filer_file = filemodels.File.objects.filter(id=res["file_id"]).first()
             filer_file.description = description
