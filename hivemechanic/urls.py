@@ -38,3 +38,5 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
+
+handler500 = 'activity_logger.views.log_500_error'

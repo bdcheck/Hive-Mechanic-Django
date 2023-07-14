@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@2.1.1
-  node: circleci/node@5.0.3
+  node: circleci/node@5.1.0
   browser-tools: circleci/browser-tools@1.4.0
 
 workflows:
@@ -56,6 +56,7 @@ jobs:
             python manage.py initialize_permissions
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
+            python manage.py install_quicksilver_tasks
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit
@@ -149,6 +150,7 @@ jobs:
             python manage.py initialize_permissions
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
+            python manage.py install_quicksilver_tasks
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit

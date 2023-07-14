@@ -3,6 +3,7 @@
 from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
 
+import datetime
 import mimetypes
 
 from io import BytesIO
@@ -129,7 +130,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
     response = VoiceResponse()
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
-        now = timezone.now()
+        now = timezone.now() - datetime.timedelta(seconds=10)
 
         integration_match = None
 
@@ -149,7 +150,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     post_dict['From'] = source
                     post_dict['To'] = destination
 
-        if 'CallStatus' in post_dict:
+        if post_dict.get('CallStatus', None) is not None:
             incoming = IncomingCallResponse(source=source)
             incoming.receive_date = now
 
@@ -175,9 +176,16 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
             incoming.save()
 
         if integration_match is not None:
+            # If response empty - clear out pending outgoing call objects
+            # Reset position in dialog to Voice Start Card
+
+            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
+
             integration_match.process_incoming(post_dict)
 
-            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=timezone.now(), integration=integration_match).order_by('send_date')
+            now = timezone.now()
+
+            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).order_by('send_date')
 
             for call in pending_calls:
                 if call.next_action != 'gather':
