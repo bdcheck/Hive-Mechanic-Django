@@ -315,7 +315,6 @@ class InteractionCard(models.Model):
     def refresh_card(self):
         return self.update_card(force=True)
 
-
     def print_repository_diffs(self):
         try:
             repo_metadata = json.loads(self.repository_definition)
@@ -586,33 +585,31 @@ class GameVersion(models.Model):
         if self.interrupt(payload, session, extras) is False: # pylint: disable=too-many-nested-blocks
             dialog = session.dialog()
 
-            session.refresh_from_db()
-
-            new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
-
-            while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
-                session.refresh_from_db()
-
-                added_new_action = False
-
-                for new_action in new_actions:
-                    if (new_action in actions) is False:
-                        if new_action.get('type', None) == 'set-variable':
-                            for game_integration in self.game.integrations.all():
-                                game_integration.execute_actions(session, [new_action])
-                        else:
-                            actions.append(new_action)
-
-                        added_new_action = True
-
-                if added_new_action:
-                    new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
-                else:
-                    new_actions = [] # Break out of likely endless loop
-
             if dialog.finished is not None:
-                session.completed = dialog.finished
-                session.save()
+                new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
+
+                while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition
+                    added_new_action = False
+
+                    for new_action in new_actions:
+                        if (new_action in actions) is False:
+                            if new_action.get('type', None) == 'set-variable':
+                                for game_integration in self.game.integrations.all():
+                                    game_integration.execute_actions(session, [new_action])
+                            else:
+                                actions.append(new_action)
+
+                                added_new_action = True
+
+                    if added_new_action:
+                        new_actions = dialog.process(None, extras={'session': session, 'extras': extras})
+                    else:
+                        new_actions = [] # Break out of likely endless loop
+
+                if dialog.finished is not None:
+                    session.complete(dialog)
+            else:
+                session.complete(dialog)
 
         return actions
 
@@ -977,15 +974,20 @@ class Session(models.Model):
         return self.dialog().current_state_id()
 
     @transaction.atomic
-    def complete(self):
+    def complete(self, dialog=None):
         dialog_key = 'session-' + str(self.pk)
 
         last_dialog = None
-
-        for dialog in Dialog.objects.filter(key=dialog_key, finished=None):
+        
+        if dialog is not None:
             dialog.finish()
 
             last_dialog = dialog
+        else:
+            for dialog in Dialog.objects.filter(key=dialog_key, finished=None):
+                dialog.finish()
+
+                last_dialog = dialog
 
         self.completed = timezone.now()
         self.save()
@@ -994,6 +996,8 @@ class Session(models.Model):
 
         if last_dialog is not None:
             metadata['dialog'] = 'dialog:%d' % last_dialog.pk
+        elif dialog is not None:
+            metadata['dialog'] = 'dialog:%d' % dialog.pk
 
         log(self.log_id(), 'Completed dialog.', tags=['session', 'dialog'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
 

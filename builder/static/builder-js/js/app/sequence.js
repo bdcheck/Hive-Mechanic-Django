@@ -80,7 +80,7 @@ define(modules, function (mdc, Node) {
         for (let j = 0; j < this.definition.items.length; j++) {
           const item = this.definition.items[j]
 
-          if (item.id === definition.id) {
+          if (item === definition) {
             found = true
           }
         }
@@ -93,7 +93,7 @@ define(modules, function (mdc, Node) {
               for (let j = 0; j < sequence.items.length; j++) {
                 const item = sequence.items[j]
 
-                if (item.id === definition.id) {
+                if (item === definition) {
                   window.dialogBuilder.loadSequence(sequence, definition.id)
 
                   return
