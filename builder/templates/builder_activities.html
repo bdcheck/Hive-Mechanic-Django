@@ -1,316 +1,325 @@
 {% extends 'builder_base.html' %}
-{% load humanize %} 
+{% load humanize %}
 {% load static %}
 
 {% block 'page_title' %}All Activities | Hive Mechanic{% endblock %}
 
 {% block 'page_help' %}
-	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+    <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 {% endblock %}
 
 {% block 'navigation_title' %}Hive Mechanic{% endblock %}
 
 {% block 'main_content' %}
-	<div class="mdc-layout-grid">
-		<div class="mdc-layout-grid__inner">
-			<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-							<h1 class="mdc-typography--headline5" style="margin-top: 8px;">
-								Activities
-							</h1>
-						</div>
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-							<form action="" method="GET">
-								<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="search_field">
-									<span class="mdc-notched-outline">
-										<span class="mdc-notched-outline__leading"></span>
-										<span class="mdc-notched-outline__trailing"></span>
-									</span>
-									<input class="mdc-text-field__input" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;" name="q" value="{% if query %}{{ query }}{% endif %}">
-								</label>	
-							</form>
-						</div>
-						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
-							<button class="mdc-button mdc-button--raised mdc-button--icon-leading" id="action_add_game">
-								<span class="mdc-button__ripple"></span>
-								<span class="mdc-button__focus-ring"></span>
-								<i class="material-icons mdc-button__icon" aria-hidden="true">library_add</i>
-								<span class="mdc-button__label">Add Activity</span>
-							</button>
-						</div>
-						<div class=" mdc-layout-grid__cell--span-6" style="text-align: right;">
-							{% if activities|length == 1 %}
-								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activity</div>
-							{% else %}
-								<div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activities</div>
-							{% endif %}
-						</div>
+    <div class="mdc-layout-grid">
+        <div class="mdc-layout-grid__inner">
+            <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                <div class="mdc-card" style="padding: 16px;">
+                    <div class="mdc-layout-grid__inner" style="grid-gap: 0px !important;">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
+                            <h1 class="mdc-typography--headline5" style="margin-top: 8px;">
+                                Activities
+                            </h1>
+                        </div>
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+                            <form action="" method="GET">
+                                <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--no-label" style="width: 100%;" id="search_field">
+                                    <span class="mdc-notched-outline">
+                                        <span class="mdc-notched-outline__leading"></span>
+                                        <span class="mdc-notched-outline__trailing"></span>
+                                    </span>
+                                    <input class="mdc-text-field__input" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;" name="q" value="{% if query %}{{ query }}{% endif %}">
+                                </label>
+                            </form>
+                        </div>
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-bottom: 16px;">
+                            <button class="mdc-button mdc-button--raised mdc-button--icon-leading" id="action_add_game">
+                                <span class="mdc-button__ripple"></span>
+                                <span class="mdc-button__focus-ring"></span>
+                                <i class="material-icons mdc-button__icon" aria-hidden="true">library_add</i>
+                                <span class="mdc-button__label">Add Activity</span>
+                            </button>
+                        </div>
+                        <div class=" mdc-layout-grid__cell--span-6" style="text-align: right;">
+                            {% if activities|length == 1 %}
+                                <div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activity</div>
+                            {% else %}
+                                <div class="mdc-typography--subtitle1" style="margin-top: 8px;">{{ activities|length }} activities</div>
+                            {% endif %}
+                        </div>
 
-						{% for activity in activities %}
-							{% with disabled_integrations=activity.disabled_integrations %}
-								<div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px; {% if disabled_integrations|length > 0 %}background-color: #EF9A9A;{% endif %}">
-									<div class="mdc-layout-grid__inner">
-										{% if activity.icon %}
-											<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-												<div style="position: relative;">
-													<img class="tab_content" style="width: 100%; z-index: 1;" src="{{ activity.icon.url }}" data-tab-index="1" />
-													<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-														<span class="mdc-button__ripple"></span>
-														<i class="material-icons" aria-hidden="true">schema</i>
-													</button>
-												</div>
-											</div>
-										{% else %}
-											<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
-												<div style="position: relative;">
-													<div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index: 1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
-													<button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
-														<span class="mdc-button__ripple"></span>
-														<i class="material-icons" aria-hidden="true">schema</i>
-													</button>
-												</div>
-											</div>
-										{% endif %}
-										<div class="mdc-layout-grid__cell--span-10 mdc-typography--body2">
-											<div class="mdc-layout-grid__inner">
-												<div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
-													<a href="{% url 'builder_game' activity.slug %}">{{ activity.name }}</a>
-												</div>
-												<div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
-													<div class="mdc-menu-surface--anchor" style="float: right;">
-														<i class="material-icons mdc-icon-button__icon activity_menu_open" aria-hidden="true">more_vert</i>
-														<div class="mdc-menu mdc-menu-surface">
-															<ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
-																<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-id="{{ activity.pk }}" data-name="{{ activity.name }}" data-action="clone">
-																	<span class="mdc-list-item__ripple"></span>
-																	<span class="mdc-list-item__text mdc-list-item__start">Clone Activity&#8230;</span>
-																</li>
-																<li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem"  data-id="{{ activity.slug }}" data-name="{{ activity.name }}" data-action="delete">
-																	<span class="mdc-list-item__ripple"></span>
-																	<span class="mdc-list-item__text mdc-list-item__start">Delete Activity&#8230;</span>
-																</li>
-															</ul>
-														</div>
-													</div>
-													
-													{% if disabled_integrations %}
-														<div style="display: inline-block" class="material-icons mdc-typography--headline1">error</div>
-														<div style="display: inline-block" class="mdc-typography mdc-typography--body2">
-															<strong>Disabled Integrations (INT.001)</strong>
-															{% for integration in disabled_integrations %}
-																<br />{{ integration.name }}
-															{% endfor %}
-														</div>
-													{% endif %}
-												</div>
+                        {% for activity in activities %}
+                            {% with disabled_integrations=activity.disabled_integrations %}
+                                <div class="mdc-layout-grid__cell--span-12" style="border-top: 1px solid #BDBDBD; padding: 16px; margin-left: -16px; margin-right: -16px; {% if disabled_integrations|length > 0 %}background-color: #EF9A9A;{% endif %}">
+                                    <div class="mdc-layout-grid__inner">
+                                        {% if activity.icon %}
+                                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+                                                <div style="position: relative;">
+                                                    <img class="tab_content" style="width: 100%; z-index: 1;" src="{{ activity.icon.url }}" data-tab-index="1" />
+                                                    <button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+                                                        <span class="mdc-button__ripple"></span>
+                                                        <i class="material-icons" aria-hidden="true">schema</i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+                                                <div style="position: relative;">
+                                                    <div class="builder_game_preview tab_content" id="builder_game_preview_{ activity.pk }}" style="width: 100%; z-index: 1;" data-definition="{{ activity.cytoscape_json_simple }}" data-tab-index="0" /></div>
+                                                    <button class="mdc-button mdc-button--outlined preview_icon_button" style="position: absolute; bottom: 12px; right: 8px; display: none; background-color: #fff; z-index: 2;" data-preview-url="{% url 'builder_activity_view' activity.slug %}">
+                                                        <span class="mdc-button__ripple"></span>
+                                                        <i class="material-icons" aria-hidden="true">schema</i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="mdc-layout-grid__cell--span-10 mdc-typography--body2">
+                                            <div class="mdc-layout-grid__inner">
+                                                <div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
+                                                    <a href="{% url 'builder_game' activity.slug %}">{{ activity.name }}</a>
+                                                </div>
+                                                <div class="mdc-layout-grid__cell--span-6 mdc-typography mdc-typography--headline6">
+                                                    <div class="mdc-menu-surface--anchor" style="float: right;">
+                                                        <i class="material-icons mdc-icon-button__icon activity_menu_open" aria-hidden="true">more_vert</i>
+                                                        <div class="mdc-menu mdc-menu-surface">
+                                                            <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1">
+                                                                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem" data-id="{{ activity.pk }}" data-name="{{ activity.name }}" data-action="clone">
+                                                                    <span class="mdc-list-item__ripple"></span>
+                                                                    <span class="mdc-list-item__text mdc-list-item__start">Clone Activity&#8230;</span>
+                                                                </li>
+                                                                <li class="mdc-list-item mdc-list-item mdc-list-item--with-one-line" role="menuitem"  data-id="{{ activity.slug }}" data-name="{{ activity.name }}" data-action="delete">
+                                                                    <span class="mdc-list-item__ripple"></span>
+                                                                    <span class="mdc-list-item__text mdc-list-item__start">Delete Activity&#8230;</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
 
-												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-													<div class="mdc-typography mdc-typography--subtitle1">
-														Creator: {{ activity.creator_name }}
-													</div>
-													<div class="mdc-typography mdc-typography--subtitle2">
-														{% if activity.latest_version.creator %}
-															Last saved by {{ activity.latest_version.creator.get_full_name }} ({{ activity.latest_version.created|naturalday }}).
-														{% else %}
-															Last saved {{ activity.latest_version.created|naturalday }}.
-														{% endif %}
-													</div>
-												</div>
-												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-													<div class="mdc-typography mdc-typography--caption"><strong>Sessions</strong></div>
-													<div class="mdc-typography mdc-typography--body2">Active Sessions: {{ activity.active_session_count }}</div>
-													<div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ activity.inactive_session_count }}</div>
-												</div>
-												<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-													<div class="mdc-typography mdc-typography--caption"><strong>Activity Details</strong></div>
-													<div class="mdc-typography mdc-typography--body2">Identifier: {{ activity.slug }}</div>
-													<div class="mdc-typography mdc-typography--body2">Last Updated: {{ activity.latest_version.created }}</div>
-													<div class="mdc-typography mdc-typography--body2">Versions: {{ activity.versions.count }}</div>
-												</div>
-												{% if activity.integrations.all.count > 0 %}
-													<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-														<div class="mdc-typography mdc-typography--caption"><strong>Integrations</strong></div>
-														{% for integration in activity.integrations.all %}
-															<div>
-																{% with stats=integration.fetch_statistics %}
-																	<div class="mdc-typography mdc-typography--body2 toggle_integration" style="position: relative; height: 32px;">
-																		<span class="material-icons" style="font-size: 18px; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.5;">add_circle</span>
-																		<strong style="position: absolute; top: 50%; left:22px; transform: translateY(-50%);">{{ stats.name }} ({{ stats.type }})</strong>
-																	</div>
-																	<div class="toggle_integration_content" style="margin-left: 22px; display: none;">
-																			{% for detail in stats.details %}
-																				<div class="mdc-typography mdc-typography--body2">{{ detail.0 }}: {{ detail.1 }}</div>
-																			{% endfor %}
-																			<br />
-																	</div>
-																{% endwith %}
-															</div>
-														{% endfor %}
-													</div>
-												{% endif %}
-											</div>
-										</div>
-									</div>
-								</div>
-							{% endwith %}
-						{% endfor %}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                                                    {% if disabled_integrations %}
+                                                        <div style="display: inline-block" class="material-icons mdc-typography--headline1">error</div>
+                                                        <div style="display: inline-block" class="mdc-typography mdc-typography--body2">
+                                                            <strong>Disabled Integrations (INT.001)</strong>
+                                                            {% for integration in disabled_integrations %}
+                                                                <br />{{ integration.name }}
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
 
-	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="dialog_add_game">
-		<div class="mdc-dialog__container">
-			<div class="mdc-dialog__surface">
-				<h2 class="mdc-dialog__title" id="my-dialog-title">Add New Activity</h2>
+                                                <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                                    <div class="mdc-typography mdc-typography--subtitle1">
+                                                        Creator: {{ activity.creator_name }}
+                                                    </div>
+                                                    <div class="mdc-typography mdc-typography--subtitle2">
+                                                        {% if activity.latest_version.creator %}
+                                                            Last saved by {{ activity.latest_version.creator.get_full_name }} ({{ activity.latest_version.created|naturalday }}).
+                                                        {% else %}
+                                                            Last saved {{ activity.latest_version.created|naturalday }}.
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                {% with activity.participation_data as participation_data %}
+                                                    <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                                        <div class="mdc-typography mdc-typography--caption"><strong>Participants &amp; Sessions</strong></div>
+                                                        {% with activity.participant_counts as participant_counts %}
+                                                            <div class="mdc-typography mdc-typography--body2">Total Unique Participants: {{ participation_data.all_players }} ({{ participation_data.active_players }} active)</div>
+                                                        {% endwith %}
+                                                        <div class="mdc-typography mdc-typography--body2">Active Sessions: {{ participation_data.active_sessions }}</div>
+                                                        <div class="mdc-typography mdc-typography--body2">Inactive Sessions: {{ participation_data.inactive_sessions }}</div>
+
+                                                        {% with activity.last_session_started as last_session %}
+                                                            <div class="mdc-typography mdc-typography--body2">Latest Session: {% if last_session %}{{ last_session.started }}{% else %}None started yet{% endif %}</div>
+                                                        {% endwith %}
+                                                    </div>
+                                                {% endwith %}
+                                                <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                                                    <div class="mdc-typography mdc-typography--caption"><strong>Activity Details</strong></div>
+                                                    <div class="mdc-typography mdc-typography--body2">Identifier: {{ activity.slug }}</div>
+                                                    <div class="mdc-typography mdc-typography--body2">Last Updated: {{ activity.latest_version.created }}</div>
+                                                    <div class="mdc-typography mdc-typography--body2">Versions: {{ activity.versions.count }}</div>
+                                                </div>
+                                                {% if activity.integrations.all.count > 0 %}
+                                                    <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                                        <div class="mdc-typography mdc-typography--caption"><strong>Integrations</strong></div>
+                                                        {% for integration in activity.integrations.all %}
+                                                            <div>
+                                                                {% with stats=integration.fetch_statistics %}
+                                                                    <div class="mdc-typography mdc-typography--body2 toggle_integration" style="position: relative; height: 32px;">
+                                                                        <span class="material-icons" style="font-size: 18px; position: absolute; top: 50%; transform: translateY(-50%); opacity: 0.5;">add_circle</span>
+                                                                        <strong style="position: absolute; top: 50%; left:22px; transform: translateY(-50%);">{{ stats.name }} ({{ stats.type }})</strong>
+                                                                    </div>
+                                                                    <div class="toggle_integration_content" style="margin-left: 22px; display: none;">
+                                                                            {% for detail in stats.details %}
+                                                                                <div class="mdc-typography mdc-typography--body2">{{ detail.0 }}: {{ detail.1 }}</div>
+                                                                            {% endfor %}
+                                                                            <br />
+                                                                    </div>
+                                                                {% endwith %}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content" id="dialog_add_game">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface">
+                <h2 class="mdc-dialog__title" id="my-dialog-title">Add New Activity</h2>
                 <div class="mdc-dialog__content">
-					<div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
-						<div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
-				                Please select an existing template to begin:
-				            </div>
-				            
-				            {% for template in templates %}
-				            	<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-									<div class="mdc-radio">
-										<input class="mdc-radio__native-control" type="radio" id="activity-template-{{ template.slug }}" value="{{ template.pk }}" name="activity-template" data-name="{{ template.name }}">
-										<div class="mdc-radio__background">
-											<div class="mdc-radio__outer-circle"></div>
-											<div class="mdc-radio__inner-circle"></div>
-										</div>
-										<div class="mdc-radio__ripple"></div>
-										<div class="mdc-radio__focus-ring"></div>
-									</div>
-									<label for="activity-template-{{ template.slug }}">{{ template.name }}</label>
-								</div>
-							{% endfor %}
+                    <div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
+                        <div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
+                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
+                                Please select an existing template to begin:
+                            </div>
 
-							<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								<div class="mdc-radio">
-									<input class="mdc-radio__native-control" type="radio" id="activity-template-no-template" value="none" name="activity-template">
-									<div class="mdc-radio__background">
-										<div class="mdc-radio__outer-circle"></div>
-										<div class="mdc-radio__inner-circle"></div>
-									</div>
-									<div class="mdc-radio__ripple"></div>
-									<div class="mdc-radio__focus-ring"></div>
-								</div>
-								<label for="activity-template-no-template">None</label>
-							</div>
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								<div class="mdc-text-field mdc-text-field--outlined" id="textfield_add_game" style="margin-top: 8px; width: 100%;">
-									<input type="text" class="mdc-text-field__input" id="field_add_game">
-									<div class="mdc-notched-outline">
-										<div class="mdc-notched-outline__leading"></div>
-											<div class="mdc-notched-outline__notch">
-											<label for="tf-outlined" class="mdc-floating-label">Activity Name</label>
-										</div>
-										<div class="mdc-notched-outline__trailing"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<footer class="mdc-dialog__actions">
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-						<span class="mdc-button__label">Cancel</span>
-					</button>
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add">
-						<span class="mdc-button__label">Add Activity</span>
-					</button>
-				</footer>
-			</div>
-		</div>
-		<div class="mdc-dialog__scrim"></div>
-	</div>
+                            {% for template in templates %}
+                                <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                    <div class="mdc-radio">
+                                        <input class="mdc-radio__native-control" type="radio" id="activity-template-{{ template.slug }}" value="{{ template.pk }}" name="activity-template" data-name="{{ template.name }}">
+                                        <div class="mdc-radio__background">
+                                            <div class="mdc-radio__outer-circle"></div>
+                                            <div class="mdc-radio__inner-circle"></div>
+                                        </div>
+                                        <div class="mdc-radio__ripple"></div>
+                                        <div class="mdc-radio__focus-ring"></div>
+                                    </div>
+                                    <label for="activity-template-{{ template.slug }}">{{ template.name }}</label>
+                                </div>
+                            {% endfor %}
 
-	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clone-dialog-title" aria-describedby="clone-dialog-content" id="dialog_clone_game">
-		<div class="mdc-dialog__container">
-			<div class="mdc-dialog__surface">
-				<h2 class="mdc-dialog__title" id="clone-dialog-title">Clone Activity?</h2>
+                            <div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                <div class="mdc-radio">
+                                    <input class="mdc-radio__native-control" type="radio" id="activity-template-no-template" value="none" name="activity-template">
+                                    <div class="mdc-radio__background">
+                                        <div class="mdc-radio__outer-circle"></div>
+                                        <div class="mdc-radio__inner-circle"></div>
+                                    </div>
+                                    <div class="mdc-radio__ripple"></div>
+                                    <div class="mdc-radio__focus-ring"></div>
+                                </div>
+                                <label for="activity-template-no-template">None</label>
+                            </div>
+                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                <div class="mdc-text-field mdc-text-field--outlined" id="textfield_add_game" style="margin-top: 8px; width: 100%;">
+                                    <input type="text" class="mdc-text-field__input" id="field_add_game">
+                                    <div class="mdc-notched-outline">
+                                        <div class="mdc-notched-outline__leading"></div>
+                                            <div class="mdc-notched-outline__notch">
+                                            <label for="tf-outlined" class="mdc-floating-label">Activity Name</label>
+                                        </div>
+                                        <div class="mdc-notched-outline__trailing"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="mdc-dialog__actions">
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                        <span class="mdc-button__label">Cancel</span>
+                    </button>
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add">
+                        <span class="mdc-button__label">Add Activity</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+        <div class="mdc-dialog__scrim"></div>
+    </div>
+
+    <div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="clone-dialog-title" aria-describedby="clone-dialog-content" id="dialog_clone_game">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface">
+                <h2 class="mdc-dialog__title" id="clone-dialog-title">Clone Activity?</h2>
                 <div class="mdc-dialog__content">
-					<div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
-						<div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								<div class="mdc-text-field mdc-text-field--outlined" id="textfield_clone_game" style="margin-top: 8px; width: 100%;">
-									<input type="text" class="mdc-text-field__input" id="field_clone_game">
-									<div class="mdc-notched-outline">
-										<div class="mdc-notched-outline__leading"></div>
-											<div class="mdc-notched-outline__notch">
-											<label for="tf-outlined" class="mdc-floating-label">Cloned Activity Name</label>
-										</div>
-										<div class="mdc-notched-outline__trailing"></div>
-									</div>
-								</div>
-								<input type="hidden" id="original_clone_id">
-							</div>
-						</div>
-					</div>
-				</div>
-				<footer class="mdc-dialog__actions">
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-						<span class="mdc-button__label">Cancel</span>
-					</button>
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add">
-						<span class="mdc-button__label">Clone Activity</span>
-					</button>
-				</footer>
-			</div>
-		</div>
-		<div class="mdc-dialog__scrim"></div>
-	</div>
+                    <div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
+                        <div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
+                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                <div class="mdc-text-field mdc-text-field--outlined" id="textfield_clone_game" style="margin-top: 8px; width: 100%;">
+                                    <input type="text" class="mdc-text-field__input" id="field_clone_game">
+                                    <div class="mdc-notched-outline">
+                                        <div class="mdc-notched-outline__leading"></div>
+                                            <div class="mdc-notched-outline__notch">
+                                            <label for="tf-outlined" class="mdc-floating-label">Cloned Activity Name</label>
+                                        </div>
+                                        <div class="mdc-notched-outline__trailing"></div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="original_clone_id">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="mdc-dialog__actions">
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                        <span class="mdc-button__label">Cancel</span>
+                    </button>
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="add">
+                        <span class="mdc-button__label">Clone Activity</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+        <div class="mdc-dialog__scrim"></div>
+    </div>
 
-	<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-content" id="dialog_delete_game">
-		<div class="mdc-dialog__container">
-			<div class="mdc-dialog__surface">
-				<h2 class="mdc-dialog__title" id="clone-dialog-title">Delete Activity?</h2>
+    <div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-content" id="dialog_delete_game">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface">
+                <h2 class="mdc-dialog__title" id="clone-dialog-title">Delete Activity?</h2>
                 <div class="mdc-dialog__content">
-					<div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
-						<div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
-							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-								<input type="hidden" id="game_delete_id">
-								<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
-									Are you sure you want to delete <strong id="delete_game_name">???</strong>?
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<footer class="mdc-dialog__actions">
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
-						<span class="mdc-button__label">Cancel</span>
-					</button>
-					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="delete">
-						<span class="mdc-button__label">Delete Activity</span>
-					</button>
-				</footer>
-			</div>
-		</div>
-		<div class="mdc-dialog__scrim"></div>
-	</div>
+                    <div class="mdc-layout-grid mdc-typography" style="padding: 0px;">
+                        <div class="mdc-layout-grid__inner" style="grid-gap: 8px;">
+                            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                                <input type="hidden" id="game_delete_id">
+                                <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
+                                    Are you sure you want to delete <strong id="delete_game_name">???</strong>?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="mdc-dialog__actions">
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+                        <span class="mdc-button__label">Cancel</span>
+                    </button>
+                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="delete">
+                        <span class="mdc-button__label">Delete Activity</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+        <div class="mdc-dialog__scrim"></div>
+    </div>
 
 
-	<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content" style="z-index: 9999;">
-		<div class="mdc-dialog__container">
-			<div class="mdc-dialog__surface" style="max-width: none;">
-				<div class="mdc-dialog__header">
-					<h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
-					<button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
-				</div>
-				<div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
-					<iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe> 
-				</div>
-			</div>
-		</div>
-		<!-- <div class="mdc-dialog__scrim"></div> -->
-	</div>
+    <div class="mdc-dialog" role="alertdialog" aria-modal="true" id="preview-dialog"  aria-labelledby="preview-dialog-title" aria-describedby="preview-dialog-content" style="z-index: 9999;">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface" style="max-width: none;">
+                <div class="mdc-dialog__header">
+                    <h2 class="mdc-dialog__title" id="preview-dialog-title" style="display: inline-block;">Structure View</h2>
+                    <button class="mdc-button material-icons" style="float: right; margin-top: 12px;" data-mdc-dialog-action="close">close</button>
+                </div>
+                <div class="mdc-dialog__content" id="preview-dialog-content" style="padding: 0px;">
+                    <iframe title="Structure View" id="preview-dialog-canvas" style="border-top: thin solid gray; border-bottom: thin solid gray; border-left: none; border-right: none; background-color: #eeeeee;" scrolling="no"></iframe>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="mdc-dialog__scrim"></div> -->
+    </div>
 
 {% endblock %}
 
 {% block 'js_init' %}
-	<script data-main="{% static 'builder-js/js/app/activities.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+    <script data-main="{% static 'builder-js/js/app/activities.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
 {% endblock %}

@@ -9,6 +9,20 @@
 	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 {% endblock %}
 
+{% block 'additional_css' %}
+	.selected_tag {
+		display: inline-block;
+		background-color: #6100EE;
+		border-radius: 5px;
+		color: #ffffff;
+		font-weight: bold;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-bottom: 2px;
+		margin-bottom: 2px;
+	}
+{% endblock %}
+
 {% block 'main_content' %}
 	<div class="mdc-layout-grid mdc-typography">
 		<div class="mdc-layout-grid__inner">
@@ -172,7 +186,7 @@
 				</div>
 			</div>
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-typography mdc-typography--caption">
-				<div style="position: fixed; padding-right: 16px; overflow-x: hidden; overflow-y: auto; max-height: calc(100vh - 88px);">
+				<div style="position: fixed; padding-right: 16px; overflow-x: hidden; overflow-y: auto; height: calc(100vh - 88px);">
 					<div class="mdc-card" style="margin-bottom: 16px; padding: 8px;">
 						<div id="empty_details">
 							Select one or more events from the left&#8230;
@@ -233,17 +247,59 @@
 							</button>							
 						</p>
 						<p>
-							<strong>Tags</strong>{% if tag %} <a href="{{ clear_tag_url }}" style="float: right;"><em>Clear</em></a>{% endif %}<br />
+							<strong>Tags</strong>{% if tags %} <a href="{{ clear_tag_url }}" style="float: right;">Clear</a>{% endif %}<br />
 							{% for item_tag in tags %}
 								{% if forloop.counter0 != 0 %}&bull;{% endif %}
-								{% if tag == item_tag.tag %}
-									<strong>
-										<a href="{{ item_tag.url }}">{{ item_tag.name }}</a>
-									</strong>
+								{% if item_tag.tag in selected_tags%}
+									<a href="{{ item_tag.clear_url }}" class="selected_tag">{{ item_tag.name }}</a>
 								{% else %}
-									<a href="{{ item_tag.url }}">{{ item_tag.name }}</a>
+									<a href="{{ item_tag.add_url }}">{{ item_tag.name }}</a>
 								{% endif %}
 							{% endfor %}
+						</p>
+						<p>
+							<div class="mdc-select mdc-select--outlined" id="activity_select">
+								<div class="mdc-select__anchor"	role="button" aria-haspopup="listbox" aria-expanded="false">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+										<span id="outlined-select-label" class="mdc-floating-label">Select activity&#8230;</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<span class="mdc-select__selected-text-container">
+										<span id="demo-selected-text" class="mdc-select__selected-text"></span>
+									</span>
+									<span class="mdc-select__dropdown-icon">
+										<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+											<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+											<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+										</svg>
+									</span>
+								</div>
+
+								<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" style="z-index: 9999;">
+									<ul class="mdc-list" role="listbox" aria-label="Select activity&#8230;">
+										{% for activity in activities %}
+											{% if activity.slug == selected_activity %}
+												<li class="mdc-list-item mdc-list-item--selected" data-value="{{ activity.slug }}" role="option">
+													<span class="mdc-list-item__ripple"></span>
+													<span class="mdc-list-item__text">
+														{{ activity.name }}
+													</span>
+												</li>
+											{% else %}
+												<li class="mdc-list-item" data-value="{{ activity.slug }}" role="option">
+													<span class="mdc-list-item__ripple"></span>
+													<span class="mdc-list-item__text">
+														{{ activity.name }}
+													</span>
+												</li>
+											{% endif %}
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
 						</p>
 					</div>
 				</div>
@@ -262,5 +318,6 @@
 {% endblock %}
 
 {% block 'js_init' %}
+	<script>window.selectedActivity = '{{ selected_activity }}'</script>
 	<script data-main="{% static 'builder-js/js/app/activity_log_table.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
 {% endblock %}

@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import pkgutil
+import time
 import traceback
 
 from future import standard_library
@@ -493,6 +494,91 @@ class Game(models.Model):
                     count += 1
 
         return count
+
+    def active_player_count(self):
+        players = []
+
+        for version in self.versions.all():
+            for session in version.sessions.filter(completed=None):
+                if (session.player.pk in players) is False:
+                    players.append(session.player.pk)
+
+        return len(players)
+
+    def total_player_count(self):
+        players = []
+
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if (session.player.pk in players) is False:
+                    players.append(session.player.pk)
+
+        return len(players)
+
+    def last_session_started(self):
+        last_session = None
+
+        for version in self.versions.all():
+            last_started = version.sessions.all().order_by('-started').first()
+
+            if last_started is not None:
+                if last_session is None or last_started.started > last_session.started:
+                    last_session = last_started
+
+        return last_session
+
+    def participant_counts(self):
+        players = []
+        active_players = []
+
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                if (session.player.pk in players) is False:
+                    players.append(session.player.pk)
+
+                if session.completed is None and (session.player.pk in active_players) is False:
+                    active_players.append(session.player.pk)
+
+        return (len(players), len(active_players),)
+
+    def participation_data(self):
+        cached_info = self.game_state.get('cached_participation_data', {})
+        last_update = cached_info.get('cache_date', 0)
+
+        now = time.time()
+
+        if (now - last_update) < 300:
+            return cached_info
+
+        players = []
+        active_players = []
+        sessions = []
+        active_sessions = []
+
+        for version in self.versions.all():
+            for session in version.sessions.all():
+                sessions.append(session.pk)
+
+                if (session.player.pk in players) is False:
+                    players.append(session.player.pk)
+
+                if session.completed is None and (session.player.pk in active_players) is False:
+                    active_sessions.append(session.pk)
+                    active_players.append(session.player.pk)
+
+        cached_info = {
+            'active_sessions': len(active_sessions),
+            'inactive_sessions': len(sessions) - len(active_sessions),
+            'all_sessions': len(sessions),
+            'active_players': len(active_players),
+            'all_players': len(players),
+            'cache_date': now
+        }
+
+        self.game_state['cached_participation_data'] = cached_info
+        self.save()
+
+        return cached_info
 
     def can_view(self, user):
         if user.is_authenticated is False:

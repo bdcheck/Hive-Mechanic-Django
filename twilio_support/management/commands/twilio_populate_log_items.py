@@ -8,6 +8,7 @@ from quicksilver.decorators import handle_lock, handle_schedule, add_qs_argument
 
 
 from activity_logger.models import LogTag, LogItem
+from builder.models import Player
 
 from ...models import IncomingMessage, OutgoingMessage
 
@@ -52,8 +53,13 @@ class Command(BaseCommand):
             metadata = log_item.fetch_metadata()
             metadata['player'] = 'twilio_player:%s' % message.source
 
+            log_item.player = Player.objects.filter(identifier=metadata['player']).first()
+
             if message.integration is not None:
                 metadata['game'] = '%s' % message.integration.game
+
+                if message.integration.game is not None:
+                    log_item.game_version = message.integration.game.versions.order_by('-pk').first()
 
             if message.media.count() > 0:
                 media_files = []
@@ -93,8 +99,13 @@ class Command(BaseCommand):
             metadata = log_item.fetch_metadata()
             metadata['player'] = 'twilio_player:%s' % message.destination
 
+            log_item.player = Player.objects.filter(identifier=metadata['player']).first()
+
             if message.integration is not None:
                 metadata['game'] = '%s' % message.integration.game
+
+                if message.integration.game is not None:
+                    log_item.game_version = message.integration.game.versions.order_by('-pk').first()
 
             if log_item.message.startswith('image:'):
                 media_files = []

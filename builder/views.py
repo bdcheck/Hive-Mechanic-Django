@@ -1049,12 +1049,14 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
     query = Q(pk__gte=0)
 
-    tag = request.GET.get('tag', None)
+    tags = request.GET.getlist('tag')
 
-    if tag is not None:
-        query = query & Q(tags__tag=tag)
+    tag_intersections = [LogItem.objects.filter(pk__gte=0)]
 
-        context['tag'] = tag
+    for tag in tags:
+        tag_intersections.append(LogItem.objects.filter(tags__tag=tag))
+
+    context['selected_tags'] = tags
 
     start_date = request.GET.get('start', '')
 
@@ -1085,6 +1087,21 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
         context['query'] = search_query
 
+    activity_slug = request.GET.get('activity', '')
+
+    if activity_slug != '':
+        activity_query = None
+
+        activity = Game.objects.get(slug=activity_slug)
+
+        for version in activity.versions.all():
+            if activity_query is None:
+                activity_query = Q(game_version=version)
+            else:
+                activity_query = activity_query | Q(game_version=version)
+
+        query = query & activity_query
+
     sort = request.GET.get('sort', '-logged')
 
     items_per_page = int(request.GET.get('size', '25'))
@@ -1098,7 +1115,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
     if end > context['total_count']:
         end = context['total_count']
 
-    context['log_items'] = LogItem.objects.filter(query).order_by(sort)[start:end]
+    context['log_items'] = LogItem.objects.filter(query).intersection(*tag_intersections).order_by(sort)[start:end]
 
     context['page_index'] = page_index
     context['page_count'] = math.ceil(context['total_count'] / items_per_page)
@@ -1125,35 +1142,77 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
     for item_tag in LogTag.objects.all().order_by('name'):
         query_string['tag'] = item_tag.tag
 
+        params = urllib.parse.parse_qs(request.META.get('QUERY_STRING', ''))
+
+        new_params = dict()
+
+        for key, value in params.items():
+            if isinstance(value, str):
+                value = [value]
+
+            new_params[key] = value
+
+        if 'tag' in new_params:
+            if (item_tag.tag in new_params['tag']) is False:
+                new_params['tag'].append(item_tag.tag)
+        else:
+            new_params['tag'] = [item_tag.tag]
+
+        new_url = '%s?%s' % (base_url, urllib.parse.urlencode(new_params, doseq=True))
+
+        if item_tag.tag in new_params['tag']:
+            new_params['tag'].remove(item_tag.tag)
+
+        clear_url = '%s?%s' % (base_url, urllib.parse.urlencode(new_params, doseq=True))
+
         context['tags'].append({
             'name': item_tag.name,
             'tag': item_tag.tag,
-            'url': '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+            'add_url': new_url,
+            'clear_url': clear_url
         })
+
+    context['clear_activity_url'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+    selected_activity = request.GET.get('activity', None)
+
+    context['selected_activity'] = selected_activity
+
+    activities = []
+
+    for game in Game.objects.filter(is_template=False).order_by(Lower('name')):
+        activities.append({
+            'name': game.name,
+            'slug': game.slug,
+        })
+
+    context['activities'] = activities
 
     del query_string['tag']
 
     context['clear_tag_url'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
 
-    if tag is not None:
-        query_string['tag'] = tag
+    query_string['tag'] = []
+
+    for tag in tags:
+        query_string['tag'].append(tag)
 
     if context['total_count'] > items_per_page and page_index < context['page_count']:
         query_string['page'] = page_index + 1
 
-        context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+        context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
         if page_index + 1 < context['page_count']:
             query_string['page'] = context['page_count'] - 1
-            context['last_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+            context['last_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
     if context['page_index'] > 0:
         query_string['page'] = page_index - 1
 
-        context['prior_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+        context['prior_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
         query_string['page'] = 0
 
-        context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+        context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
     return render(request, 'builder_activity_log_table.html', context=context)
