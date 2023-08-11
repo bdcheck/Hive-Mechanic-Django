@@ -93,14 +93,14 @@ def annotate_statistics(integration, statistics):
 
     statistics['details'].append(['Message Count (Last 24 Hours)', today_count])
 
-    recent_out = OutgoingMessage.objects.filter(integration=integration).order_by('sent_date').first()
+    recent_out = OutgoingMessage.objects.filter(integration=integration).order_by('-sent_date').first()
 
     if recent_out is not None:
         statistics['details'].append(['Most Recent Sent', recent_out.sent_date])
     else:
         statistics['details'].append(['Most Recent Sent', 'No messages sent yet'])
 
-    recent_in = IncomingMessage.objects.filter(integration=integration).order_by('receive_date').first()
+    recent_in = IncomingMessage.objects.filter(integration=integration).order_by('-receive_date').first()
 
     if recent_in is not None:
         statistics['details'].append(['Most Recent Received', recent_in.receive_date])

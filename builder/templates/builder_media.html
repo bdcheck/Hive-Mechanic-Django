@@ -51,21 +51,25 @@
 								<div class="mdc-layout-grid__inner">
 									<div class= "mdc-layout-grid__cell--span-3">
 										{% if 'image/' in media_file.mime_type %}
-											<img src="{% thumbnail media_file 320x320 %}" style="width: 100%;">
+											<img src="{{ media_file.url }}" style="width: 100%;">
 										{% else %}
 											{% if media_file.mime_type == 'application/pdf' %}
-												<img src="{% thumbnail media_file 320x320 %}" style="width: 100%;">
+												<img src="{% thumbnail media_file.url 320x320 %}" style="width: 100%;">
 											{% else %}
-												<video controls style="width: 100%;">
-												  <source src="{{ media_file.url }}" type="{{ media_file.mime_type }} ">
-												  Your browser does not support the video tag.
-												</video> 
+												{% if 'text/' in media_file.mime_type %}
+													<iframe src="{{ media_file.url }}" sandbox="" style="width: 100%; border: thin solid black;"></iframe>
+												{% else %}
+													<video controls style="width: 100%;">
+													  <source src="{{ media_file.url }}" type="{{ media_file.mime_type }} ">
+													  Your browser does not support the video tag.
+													</video> 
+												{% endif %}
 											{% endif %}
 										{% endif %}
 									</div>
 									<div class= mdc-layout-grid__cell--span-9 mdc-typography--body2">
 										<div>
-											Filename: <a href="{% absolute_uri media_file.url request %}">{{ media_file.original_filename }}</a><br />
+											Filename: <a href="{% absolute_uri media_file.url request %}">{{ media_file.original_filename }}</a> -- {{ media_file.mime_type }}<br />
 											Uploaded By: {{ media_file.owner }}<br />
 											Description: {% if media_file.description %} {{ media_file.description }} {% endif %}<br />
 											Uploaded At: {{ media_file.uploaded_at }}<br />
