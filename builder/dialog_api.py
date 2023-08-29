@@ -12,7 +12,7 @@ import traceback
 import requests
 
 from filer.models import filemodels
-from six.moves.urllib.parse import urlparse
+from six.moves import urllib
 
 from django.conf import settings
 
@@ -50,11 +50,11 @@ def cache_url(original_url, description=None):
             if extension.startswith('.') is False:
                 extension = '.%s' % extension
 
-            parsed_url = urlparse(original_url)
+            parsed_url = urllib.parse.urlparse(original_url)
 
             filename = parsed_url.path.split('/')[-1]
 
-            if len(filename) == 0:
+            if len(filename) == 0: # pylint: disable=len-as-condition
                 filename = parsed_url.netloc
 
             if filename.endswith(extension) is False:
