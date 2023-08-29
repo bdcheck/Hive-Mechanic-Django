@@ -671,7 +671,7 @@ class GameVersion(models.Model):
         if self.interrupt(payload, session, extras) is False: # pylint: disable=too-many-nested-blocks
             dialog = session.dialog()
 
-            if dialog.finished is not None:
+            if dialog.finished is None:
                 new_actions = dialog.process(payload, extras={'session': session, 'extras': extras})
 
                 while new_actions is not None and len(new_actions) > 0: # pylint: disable=len-as-condition

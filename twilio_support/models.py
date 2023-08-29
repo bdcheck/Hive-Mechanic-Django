@@ -81,19 +81,19 @@ def annotate_statistics(integration, statistics):
     today = timezone.now() - datetime.timedelta(days=1)
     week = timezone.now() - datetime.timedelta(days=7)
 
-    all_count = OutgoingMessage.objects.filter(integration=integration).count() + IncomingMessage.objects.filter(integration=integration).count()
+    all_count = OutgoingMessage.objects.filter(integration=integration, errored=False).count() + IncomingMessage.objects.filter(integration=integration).count()
 
     statistics['details'].append(['Message Count (All)', all_count])
 
-    week_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=week).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=week).count()
+    week_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=week, errored=False).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=week).count()
 
     statistics['details'].append(['Message Count (Last 7 Days)', week_count])
 
-    today_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=today).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=today).count()
+    today_count = OutgoingMessage.objects.filter(integration=integration, sent_date__gte=today, errored=False).count() + IncomingMessage.objects.filter(integration=integration, receive_date__gte=today).count()
 
     statistics['details'].append(['Message Count (Last 24 Hours)', today_count])
 
-    recent_out = OutgoingMessage.objects.filter(integration=integration).order_by('-sent_date').first()
+    recent_out = OutgoingMessage.objects.filter(integration=integration, errored=False).order_by('-sent_date').first()
 
     if recent_out is not None:
         statistics['details'].append(['Most Recent Sent', recent_out.sent_date])
