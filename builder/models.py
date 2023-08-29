@@ -1064,16 +1064,16 @@ class Session(models.Model):
         dialog_key = 'session-' + str(self.pk)
 
         last_dialog = None
-        
+
         if dialog is not None:
             dialog.finish()
 
             last_dialog = dialog
         else:
-            for dialog in Dialog.objects.filter(key=dialog_key, finished=None):
-                dialog.finish()
+            for session_dialog in Dialog.objects.filter(key=dialog_key, finished=None):
+                session_dialog.finish()
 
-                last_dialog = dialog
+                last_dialog = session_dialog
 
         self.completed = timezone.now()
         self.save()
@@ -1150,7 +1150,7 @@ class Session(models.Model):
 
         game_def = json.loads(self.game_version.definition)
 
-        if game_def.get('terms_interrupt', None) is None:
+        if game_def.get('terms_interrupt', None) in [None, '']:
             return True
 
         return False
@@ -1170,7 +1170,11 @@ class Session(models.Model):
 
         terms_interrupt = game_def.get('terms_interrupt', None)
 
-        if terms_interrupt is None:
+        if terms_interrupt is None or terms_interrupt == '':
+            visit_key = '%s__visited' % 'no-terms-available'
+
+            self.set_variable(visit_key, timezone.now().isoformat())
+
             return
 
         visit_key = '%s__visited' % self.terms_key()

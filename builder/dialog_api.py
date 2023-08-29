@@ -12,7 +12,9 @@ import traceback
 import requests
 
 from filer.models import filemodels
-from six.moves.urllib.parse import urlparse
+from six.moves import urllib
+
+from django.conf import settings
 
 from django.core.files import File
 from django.utils import timezone
@@ -24,13 +26,16 @@ from integrations.models import Integration
 
 from .models import Game, GameVersion, Player, Session
 
-def cache_url(original_url):
-    description = 'Retrieved originally from %s.' % original_url
+def cache_url(original_url, description=None):
+    description_str = 'Retrieved originally from %s.' % original_url
 
-    cache_file = filemodels.File.objects.filter(description=description).first()
+    if description is not None:
+        description_str = '%s -- %s' % (description, description_str)
+
+    cache_file = filemodels.File.objects.filter(description=description_str).first()
 
     if cache_file is None:
-        response = requests.get(original_url)
+        response = requests.get(original_url, timeout=60)
 
         if response.status_code >= 200 and response.status_code < 300:
             content_type = response.headers.get('content-type')
@@ -45,11 +50,11 @@ def cache_url(original_url):
             if extension.startswith('.') is False:
                 extension = '.%s' % extension
 
-            parsed_url = urlparse(original_url)
+            parsed_url = urllib.parse.urlparse(original_url)
 
             filename = parsed_url.path.split('/')[-1]
 
-            if len(filename) == 0:
+            if len(filename) == 0: # pylint: disable=len-as-condition
                 filename = parsed_url.netloc
 
             if filename.endswith(extension) is False:
@@ -60,19 +65,27 @@ def cache_url(original_url):
             with tempfile.NamedTemporaryFile(delete=False, prefix=tokens[0], suffix=('%s' % tokens[1])) as temp_file:
                 temp_file.write(response.content)
 
-            cache_file = filemodels.File.objects.create(description=description, mime_type=content_type)
+            cache_file = filemodels.File.objects.create(description=description_str, mime_type=content_type)
             cache_file.original_filename = filename
             cache_file.save()
 
-            cache_file.file.save(filename, File(open(temp_file.name, 'rb')))
+            with open(temp_file.name, 'rb') as destination:
+                cache_file.file.save(filename, File(destination))
         else:
             return None
 
-    return cache_file.url
+    return 'https://%s%s' % (settings.ALLOWED_HOSTS[0], cache_file.url)
 
 
 def update_custom_node_environment(custom_env):
     custom_env['cache_url'] = cache_url
+
+    processor_env = custom_env.get('data_processor_environment', {})
+
+    processor_env['cache_url'] = cache_url
+
+    custom_env['data_processor_environment'] = processor_env
+
 
 def create_dialog_from_path(file_path, dialog_key=None):
     try:
