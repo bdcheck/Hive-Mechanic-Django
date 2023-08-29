@@ -1247,20 +1247,20 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     viewHtml () {
       const me = this
 
-      const callback = function(newBody) {
+      const updateCardBody = function (newBody) {
         $('#' + me.cardId + ' .view-body').html(newBody)
       }
 
       let htmlString = '<div class="mdc-card" id="' + this.cardId + '" style="' + this.style() + '"  data-node-id="' + this.id + '">'
       htmlString += '  <h6 class="mdc-typography--headline6" style="margin: 16px; margin-bottom: 0;"><span style="float: right">' + this.cardIcon() + '</span>' + this.cardName() + '</h6>'
-      htmlString += '  <span class="view-body">' + this.viewBody(callback) + '</span>'
+      htmlString += '  <span class="view-body">' + this.viewBody(updateCardBody) + '</span>'
       htmlString += '</div>'
 
       return htmlString
     }
 
-    viewBody (callback) {
-      callback('<div class="mdc-typography--body1" style="margin: 16px;"><pre>' + JSON.stringify(this.definition, null, 2) + '</pre></div>')
+    viewBody (updateCardBody) {
+      updateCardBody('<div class="mdc-typography--body1" style="margin: 16px;"><pre>' + JSON.stringify(this.definition, null, 2) + '</pre></div>')
     }
 
     style () {

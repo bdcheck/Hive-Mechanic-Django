@@ -1272,13 +1272,12 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       }
     })
 
-    initialCardList +=    '      <li class="mdc-list-divider" role="separator"></li>'
-    initialCardList +=    '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" id="builder-activity-setting-initial-card-list-destination-item-no-card-destination" data-node-id="no-card-destination" data-value="no-card-destination">'
-    initialCardList +=    '        <span class="mdc-list-item__ripple"></span>'
-    initialCardList +=    '        <span class="mdc-list-item__text mdc-list-item__start">(None Selected)</span>'
-    initialCardList +=    '        <span class="mdc-layout-grid--align-right mdc-list-item__end"></span>'
-    initialCardList +=    '      </li>'
-
+    initialCardList += '      <li class="mdc-list-divider" role="separator"></li>'
+    initialCardList += '      <li class="mdc-list-item mdc-list-item--with-one-line" role="menuitem" id="builder-activity-setting-initial-card-list-destination-item-no-card-destination" data-node-id="no-card-destination" data-value="no-card-destination">'
+    initialCardList += '        <span class="mdc-list-item__ripple"></span>'
+    initialCardList += '        <span class="mdc-list-item__text mdc-list-item__start">(None Selected)</span>'
+    initialCardList += '        <span class="mdc-layout-grid--align-right mdc-list-item__end"></span>'
+    initialCardList += '      </li>'
 
     initialCardList += '    </ul>'
 
@@ -1390,7 +1389,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           termsCardSelect.value = window.dialogBuilder.definition.terms_interrupt
         }
       }
-
 
       activityName.value = window.dialogBuilder.definition.name
 
