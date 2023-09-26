@@ -1102,7 +1102,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
             if activity_query is None:
                 activity_query = Q(game_version=version)
             else:
-                activity_query = activity_query | Q(game_version=version)
+                activity_query = activity_query | Q(game_version=version) # pylint: disable=unsupported-binary-operation
 
         query = query & activity_query
 
@@ -1148,7 +1148,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
         params = urllib.parse.parse_qs(request.META.get('QUERY_STRING', ''))
 
-        new_params = dict()
+        new_params = {}
 
         for key, value in params.items():
             if isinstance(value, str):

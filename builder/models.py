@@ -10,7 +10,6 @@ import hashlib
 import json
 import os
 import pkgutil
-import time
 import traceback
 
 from future import standard_library
@@ -26,9 +25,11 @@ from django.contrib.postgres.fields import JSONField
 from django.core.checks import Warning, register # pylint: disable=redefined-builtin
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_save
 from django.db.utils import ProgrammingError
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -359,8 +360,11 @@ class InteractionCard(models.Model):
 
 post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.interaction_card.file_cleanup')
 
+def reset_game_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument
+    instance.metadata_updated = None
+
 @python_2_unicode_compatible
-class Game(models.Model):
+class Game(models.Model): # pylint: disable=too-many-public-methods
     name = models.CharField(max_length=1024, db_index=True)
     slug = models.SlugField(max_length=1024, db_index=True, unique=True)
 
@@ -374,6 +378,9 @@ class Game(models.Model):
     icon = models.ImageField(null=True, blank=True, upload_to='activity_icons')
     is_template = models.BooleanField(default=False)
 
+    metadata = JSONField(default=dict, blank=True)
+    metadata_updated = models.DateTimeField(null=True, blank=True)
+
     def log_id(self):
         return 'game_version:%d' % self.pk
 
@@ -382,6 +389,60 @@ class Game(models.Model):
 
     def definition_json(self):
         return reverse('builder_game_definition_json', args=[self.slug])
+
+    def fetch_metadata(self, force=False):
+        now = timezone.now()
+
+        if force or self.metadata_updated is None or (now - self.metadata_updated).total_seconds() > 300:
+            self.metadata = {}
+
+            self.metadata['name'] = self.name
+            self.metadata['slug'] = self.slug
+            self.metadata['creator'] = self.creator_name()
+            self.metadata['versions_count'] = self.versions.count()
+
+            latest_version = self.latest_version()
+
+            if latest_version is not None:
+                self.metadata['last_saved'] = latest_version.created
+
+                if latest_version.creator is not None:
+                    self.metadata['last_saved_by'] = latest_version.creator.get_full_name()
+
+            last_session = self.last_session_started()
+
+            if last_session is not None:
+                self.metadata['last_session_started'] = last_session.started
+
+            self.metadata.update(self.participation_data())
+
+            integrations = []
+
+            for integration in self.integrations.all():
+                integration_stats = {}
+
+                integration_stats.update(integration.fetch_statistics())
+
+                if 'game' in integration_stats:
+                    del integration_stats['game']
+
+                integrations.append(integration_stats)
+
+            self.metadata['integrations'] = integrations
+
+            clean_metadata = json.dumps(self.metadata, cls=DjangoJSONEncoder)
+
+            self.metadata = json.loads(clean_metadata)
+
+            self.metadata_updated = now
+
+            pre_save.disconnect(reset_game_metadata, sender=Game, dispatch_uid='builder.game.reset_game_metadata')
+
+            self.save()
+
+            pre_save.connect(reset_game_metadata, sender=Game, dispatch_uid='builder.game.reset_game_metadata')
+
+        return self.metadata
 
     def interaction_card_modules_json(self):
         modules = []
@@ -541,14 +602,6 @@ class Game(models.Model):
         return (len(players), len(active_players),)
 
     def participation_data(self):
-        cached_info = self.game_state.get('cached_participation_data', {})
-        last_update = cached_info.get('cache_date', 0)
-
-        now = time.time()
-
-        if (now - last_update) < 300:
-            return cached_info
-
         players = []
         active_players = []
         sessions = []
@@ -571,11 +624,7 @@ class Game(models.Model):
             'all_sessions': len(sessions),
             'active_players': len(active_players),
             'all_players': len(players),
-            'cache_date': now
         }
-
-        self.game_state['cached_participation_data'] = cached_info
-        self.save()
 
         return cached_info
 
@@ -636,6 +685,8 @@ class Game(models.Model):
                 disabled.append(integration)
 
         return disabled
+
+pre_save.connect(reset_game_metadata, sender=Game, dispatch_uid='builder.game.reset_game_metadata')
 
 @python_2_unicode_compatible
 class GameVersion(models.Model):
@@ -902,6 +953,11 @@ class GameVersion(models.Model):
             else:
                 self.game.set_variable(variable['name'], variable['value'])
 
+@receiver(pre_save, sender=GameVersion)
+def reset_game_version_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument
+    if instance.game is not None:
+        instance.game.metadata_updated = None
+        instance.game.save()
 
 @python_2_unicode_compatible
 class Player(models.Model):
@@ -1165,7 +1221,7 @@ class Session(models.Model):
 
         return False
 
-    def advance_to_terms(self):
+    def advance_to_terms(self, payload=None):
         game_def = json.loads(self.game_version.definition)
 
         terms_interrupt = game_def.get('terms_interrupt', None)
@@ -1180,6 +1236,13 @@ class Session(models.Model):
         visit_key = '%s__visited' % self.terms_key()
 
         self.set_variable(visit_key, timezone.now().isoformat())
+
+        if payload is not None:
+            payload_str = json.dumps(payload)
+
+            terms_payload_key = '%s__payload_key' % self.terms_key()
+
+            self.set_variable(terms_payload_key, payload_str)
 
         self.advance_to(terms_interrupt)
 

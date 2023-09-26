@@ -7,6 +7,7 @@ from future.utils import raise_from, raise_with_traceback
 import humanize
 
 from django import template
+from django.utils import dateparse
 from django.utils.safestring import mark_safe
 
 from ..models import SiteSettings
@@ -78,3 +79,12 @@ def obfuscate_identifier(raw_identifier):
 @register.filter
 def humanize_file_size(original_size):
     return humanize.naturalsize(original_size)
+
+@register.filter
+def iso_to_datetime(iso_date):
+    try:
+        return dateparse.parse_datetime(iso_date)
+    except TypeError:
+        pass
+
+    return iso_date
