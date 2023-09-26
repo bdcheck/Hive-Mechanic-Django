@@ -175,19 +175,19 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
   mdc.textField.MDCTextField.attachTo(document.getElementById('search_field'))
   // const clearSearch = mdc.textField.MDCTextFieldIcon(document.getElementById('search_field_clear'));
-  
+
   console.log('mdc')
   console.log(mdc)
 
   const activitySelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_select'))
 
   activitySelect.listen('MDCSelect:change', () => {
-	let url = new URL(window.location.href)
-	
-	url.searchParams.set('activity', activitySelect.value)
-	
-	window.location = url
-  });
+    const url = new URL(window.location.href)
+
+    url.searchParams.set('activity', activitySelect.value)
+
+    window.location = url
+  })
 
   $('#search_field input').keyup(function (eventObj) {
     if (eventObj.originalEvent.keyCode === 13) {
