@@ -363,8 +363,8 @@ post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.
 def reset_game_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument
     instance.metadata_updated = None
 
-@python_2_unicode_compatible
-class Game(models.Model): # pylint: disable=too-many-public-methods
+@python_2_unicode_compatible  # pylint: disable=too-many-public-methods
+class Game(models.Model):
     name = models.CharField(max_length=1024, db_index=True)
     slug = models.SlugField(max_length=1024, db_index=True, unique=True)
 
