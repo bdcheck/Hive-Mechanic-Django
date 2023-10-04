@@ -1375,7 +1375,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           window.dialogBuilder.termsCard = termsCardSelect.value
 
           if ([undefined, null, '', 'no-card-destination'].includes(termsCardSelect.value)) {
-            // Pass
+            window.dialogBuilder.definition.terms_interrupt = null
           } else {
             window.dialogBuilder.definition.terms_interrupt = termsCardSelect.value
           }
@@ -1383,7 +1383,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           dialogIsDirty = true
         })
 
-        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.terms_interrupt)) {
+        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.definition.terms_interrupt)) {
           termsCardSelect.value = 'no-card-destination'
         } else {
           termsCardSelect.value = window.dialogBuilder.definition.terms_interrupt
