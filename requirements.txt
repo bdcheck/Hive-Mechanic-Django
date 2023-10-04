@@ -13,7 +13,8 @@ easy-thumbnails==2.6; python_version < '3.0'
 easy-thumbnails==2.8.3; python_version >= '3.0'
 humanize==4.8.0; python_version >= '3.0'
 humanize==1.0.0; python_version < '3.0'
-Pillow==9.0.1; python_version >= '3.0'
+Pillow==10.0.1; python_version >= '3.8'
+Pillow==9.0.1; python_version >= '3.0' and python_version < '3.8'
 Pillow==6.2.2; python_version < '3.0'
 py-mini-racer==0.6.0
 pygame==2.0.1
