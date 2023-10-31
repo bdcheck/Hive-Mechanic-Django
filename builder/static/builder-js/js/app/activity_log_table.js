@@ -124,16 +124,15 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     const preview = target.data('attachment')
 
     if (preview) {
-      $('#event_preview').attr('src', preview)
+      $('#event_preview_object').attr('data', preview)
       $('#event_preview').show()
 
-      $('#dialog_preview_image').attr('src', preview)
+      $('#dialog_preview_image').attr('data', preview)
     } else {
       $('#event_preview').hide()
     }
 
     $('#event_preview').click(function () {
-      console.log('CLICK PREVIEW')
       dialogPreview.open()
     })
 

@@ -260,6 +260,16 @@ class IncomingCallResponse(models.Model):
 
     integration = models.ForeignKey(Integration, related_name='twilio_incoming_calls', null=True, blank=True, on_delete=models.SET_NULL)
 
+class IncomingCallMedia(models.Model):
+    call = models.ForeignKey(IncomingCallResponse, related_name='media', on_delete=models.CASCADE)
+
+    index = models.IntegerField(default=0)
+
+    content_file = models.FileField(upload_to='incoming_call_media', null=True, blank=True)
+    content_url = models.CharField(max_length=1024, null=True, blank=True)
+    content_type = models.CharField(max_length=128, default='application/octet-stream')
+
+
 def process_incoming(integration, payload): # pylint: disable=too-many-branches
     message_type = 'text'
 

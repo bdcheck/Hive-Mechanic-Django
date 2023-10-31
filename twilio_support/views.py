@@ -5,6 +5,7 @@ from builtins import range # pylint: disable=redefined-builtin
 
 import datetime
 import mimetypes
+import time
 
 from io import BytesIO
 
@@ -15,13 +16,14 @@ from django.core import files
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 from django.utils import timezone
 from twilio.twiml.voice_response import VoiceResponse, Gather
 
 from activity_logger.models import log
 from integrations.models import Integration
 
-from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse
+from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse, IncomingCallMedia
 
 @csrf_exempt
 def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -126,7 +128,7 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
     return HttpResponse(response, content_type='text/xml')
 
 @csrf_exempt
-def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements
+def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many-statements, too-many-locals
     response = VoiceResponse()
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
@@ -174,6 +176,45 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 incoming.message = None
 
             incoming.save()
+
+            if post_dict.get('RecordingUrl', None) is not None:
+                media = IncomingCallMedia(call=incoming)
+
+                media.content_url = '%s.mp3' % post_dict.get('RecordingUrl')
+                media.index = 0
+
+                media.save()
+
+                attempts = 5
+
+                while attempts > 0:
+                    attempts -= 1
+
+                    media_response = requests.get(media.content_url, timeout=120)
+
+                    media.content_type = media_response.headers['content-type']
+
+                    if media_response.status_code == requests.codes.ok:
+                        filename = media.content_url.split('/')[-1]
+
+                        extension = mimetypes.guess_extension(media.content_type)
+
+                        if extension is not None:
+                            if extension == '.jpe':
+                                extension = '.jpg'
+
+                            filename += extension
+
+                        file_bytes = BytesIO()
+                        file_bytes.write(media_response.content)
+
+                        media.content_file.save(filename, files.File(file_bytes))
+                        media.save()
+
+                        break
+
+                    time.sleep(1)
+
 
         if integration_match is not None:
             # If response empty - clear out pending outgoing call objects
@@ -236,6 +277,15 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                         pass
 
                     response.append(gather)
+
+                    break
+                elif call.next_action == 'record':
+                    args = {
+                        'action': reverse('incoming_twilio_call'),
+                        'timeout': 10,
+                    }
+
+                    response.record(**args)
 
                     break
                 elif call.next_action == 'hangup':

@@ -10,7 +10,7 @@ from quicksilver.decorators import handle_lock, handle_schedule, add_qs_argument
 from activity_logger.models import LogTag, LogItem
 from builder.models import Player
 
-from ...models import IncomingMessage, OutgoingMessage
+from ...models import IncomingMessage, OutgoingMessage, IncomingCallResponse
 
 class Command(BaseCommand):
     @add_qs_arguments
@@ -121,3 +121,57 @@ class Command(BaseCommand):
             log_item.update_metadata(metadata)
 
             print('Created outgoing message item for %s' % log_item.source)
+
+        phone_call_tag = LogTag.objects.filter(tag='phone_call').first()
+
+        if phone_call_tag is None:
+            phone_call_tag = LogTag.objects.create(tag='phone_call', name='Phone Call')
+
+        incoming_call_tag = LogTag.objects.filter(tag='incoming_call').first()
+
+        if incoming_call_tag is None:
+            incoming_call_tag = LogTag.objects.create(tag='incoming_call', name='Incoming Phone Call')
+
+        last_incoming_call_log = incoming_call_tag.log_items.order_by('-logged').first()
+
+        when = arrow.get(0).datetime
+
+        if last_incoming_call_log is not None:
+            when = last_incoming_call_log.logged
+
+        for incoming_call in IncomingCallResponse.objects.filter(receive_date__gt=when).order_by('receive_date'):
+            log_item = LogItem.objects.create(source='incoming_call:%s' % incoming_call.pk, message='(Incoming call response)', logged=incoming_call.receive_date)
+            log_item.tags.add(incoming_call_tag)
+            log_item.tags.add(phone_call_tag)
+
+            if log_item.message is None or log_item.message == '':
+                log_item.message = '(Blank or no message provided.)'
+
+            metadata = log_item.fetch_metadata()
+            metadata['player'] = 'twilio_player:%s' % incoming_call.source
+
+            log_item.player = Player.objects.filter(identifier=metadata['player']).first()
+
+            if incoming_call.integration is not None:
+                metadata['game'] = '%s' % incoming_call.integration.game
+
+                if incoming_call.integration.game is not None:
+                    log_item.game_version = incoming_call.integration.game.versions.order_by('-pk').first()
+
+            if incoming_call.media.count() > 0:
+                media_files = []
+
+                for media_item in incoming_call.media.all():
+                    try:
+                        if media_item.content_file is not None:
+                            media_files.append(media_item.content_file.url)
+                    except ValueError:
+                        pass
+
+                metadata['media_files'] = media_files
+
+                log_item.tags.add(has_preview_tag)
+
+            log_item.update_metadata(metadata)
+
+            print('Created incoming call log item for %s' % log_item.source)

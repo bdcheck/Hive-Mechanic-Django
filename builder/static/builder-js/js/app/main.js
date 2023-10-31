@@ -300,6 +300,15 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   $('#action_save').show()
 
   window.dialogBuilder.reloadSequences = function () {
+    if (window.dialogBuilder.definition.sequences.length === 0) {
+      window.dialogBuilder.definition.sequences.push({
+        type: 'sequence',
+        id: 'new-sequence',
+        name: 'New Sequence',
+        items: []
+      })
+    }
+
     const items = []
 
     $.each(window.dialogBuilder.definition.sequences, function (index, value) {
@@ -810,6 +819,15 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
       }
 
       window.dialogBuilder.definition = gameDef
+    }
+
+    if (window.dialogBuilder.definition.sequences.length === 0) {
+      window.dialogBuilder.definition.sequences.push({
+        type: 'sequence',
+        id: 'new-sequence',
+        name: 'New Sequence',
+        items: []
+      })
     }
 
     window.dialogBuilder.loadSequence(window.dialogBuilder.definition.sequences[0], null)
@@ -1361,9 +1379,13 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           dialogIsDirty = true
         })
 
-        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.incoming_call_interrupt)) {
+        console.log(`incoming_call_interrupt: ${window.dialogBuilder.definition.incoming_call_interrupt}`)
+
+        if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.definition.incoming_call_interrupt)) {
           voiceCardSelect.value = 'no-card-destination'
+          console.log('set[0]: ni;')
         } else {
+          console.log(`set: ${window.dialogBuilder.definition.incoming_call_interrupt}`)
           voiceCardSelect.value = window.dialogBuilder.definition.incoming_call_interrupt
         }
       }

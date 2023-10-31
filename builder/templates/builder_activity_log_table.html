@@ -192,7 +192,10 @@
 							Select one or more events from the left&#8230;
 						</div>
 						<div id="event_details_view">
-							<img id="event_preview" style="width: 100%; border: thin solid #808080; border-radius: 4px; box-sizing: border-box; aspect-ratio: 1/1; object-fit: cover;">
+							<div id="event_preview">
+								<object id="event_preview_object" style="width: 100%; border: thin solid #808080; border-radius: 4px; box-sizing: border-box; aspect-ratio: 1/1; object-fit: cover;" onload="this.contentDocument.querySelector('object').pause()"></object><br>
+								<center>Open Preview</center>
+							</div>
 
 							<strong id="event_name"></strong>
 							<div id="event_summary"></div>
@@ -311,7 +314,7 @@
 	<div class="mdc-dialog" id="dialog_preview">
 		<div class="mdc-dialog__container">
 			<div class="mdc-dialog__surface" role="alertdialog">
-				<img id="dialog_preview_image" style="width: 100%;">
+				<object id="dialog_preview_image" style="width: 100%; min-height: 40px;" onload="this.contentDocument.querySelector('object').pause()"></object>
 			</div>
 		<div class="mdc-dialog__scrim"></div>
 	</div>
