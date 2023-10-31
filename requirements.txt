@@ -10,7 +10,7 @@ django-db-logger==0.1.10
 django-filer==2.1.2; python_version >= '3.0'
 django-filer==1.7.1; python_version < '3.0'
 easy-thumbnails==2.6; python_version < '3.0'
-easy-thumbnails==2.8.3; python_version >= '3.0'
+easy-thumbnails==2.8.5; python_version >= '3.0'
 humanize==4.8.0; python_version >= '3.0'
 humanize==1.0.0; python_version < '3.0'
 Pillow==10.0.1; python_version >= '3.8'
