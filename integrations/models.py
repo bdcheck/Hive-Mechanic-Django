@@ -162,8 +162,14 @@ class Integration(models.Model):
 
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
+            print('TERMS: %s -- %s' % (session.visited_terms(), session.accepted_terms()))
+
             if session.visited_terms() is False and session.accepted_terms() is False:
-                session.advance_to_terms()
+                session.advance_to_terms(payload=payload)
+
+                session.process_incoming(self, None)
+
+                return
 
             if isinstance(payload, list):
                 actions = payload
@@ -171,6 +177,8 @@ class Integration(models.Model):
                 payload = None
 
                 self.execute_actions(session, actions)
+
+            print('PROCESS: %s -- %s' % (session.current_node(), payload))
 
             session.process_incoming(self, payload, extras)
 

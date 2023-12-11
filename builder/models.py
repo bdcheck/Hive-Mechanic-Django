@@ -806,9 +806,28 @@ class GameVersion(models.Model):
                         return True
         return False
 
-    def dialog_snapshot(self): # pylint: disable=too-many-branches
-        snapshot = []
+    def fetch_interrupt(self, payload, session, extras):
+        if extras is None:
+            extras = {}
 
+        definition = json.loads(self.definition)
+
+        if 'message_type' in extras and extras['message_type'] == 'call':
+            if 'payload' in extras and 'CallStatus' in extras['payload']:
+                if extras['payload']['CallStatus'] == 'ringing':
+                    if 'incoming_call_interrupt' in definition:
+                        return definition['incoming_call_interrupt']
+
+        if 'interrupts' in definition:
+            for interrupt in definition['interrupts']:
+                for integration in self.game.integrations.all():
+                    if integration.is_interrupt(interrupt['pattern'], payload):
+                        return interrupt['action']
+
+        return None
+
+
+    def initial_card(self):
         definition = json.loads(self.definition)
 
         sequences = []
@@ -834,6 +853,23 @@ class GameVersion(models.Model):
                         initial_card = '%s#%s' % (sequence['id'], initial_card)
 
                     break
+
+        return initial_card
+
+
+    def dialog_snapshot(self): # pylint: disable=too-many-branches
+        snapshot = []
+
+        initial_card = self.initial_card()
+
+        definition = json.loads(self.definition)
+
+        sequences = []
+
+        if 'sequences' in definition:
+            sequences = definition['sequences']
+        else:
+            sequences = definition
 
         for sequence in sequences:
             for item in sequence['items']:
@@ -1196,6 +1232,19 @@ class Session(models.Model):
 
         self.player.set_variable(key, timezone.now().isoformat())
 
+        terms_payload_key = '%s__payload_key' % key
+
+        payload = self.fetch_variable(terms_payload_key)
+
+        interrupted_state_key = '%s__interrupted_state_key' % key
+
+        resume_id = self.fetch_variable(interrupted_state_key)
+
+        if resume_id is not None:
+            self.advance_to(resume_id)
+
+        self.process_incoming(None, payload)
+
     def accepted_terms(self):
         key = self.terms_key()
 
@@ -1243,6 +1292,18 @@ class Session(models.Model):
             terms_payload_key = '%s__payload_key' % self.terms_key()
 
             self.set_variable(terms_payload_key, payload_str)
+
+        interrupted_state = self.current_node()
+
+        if interrupted_state is None:
+            interrupted_state = self.game_version.fetch_interrupt(payload, self, None)
+
+        if interrupted_state is None:
+            interrupted_state = self.game_version.initial_card()
+
+        interrupted_state_key = '%s__interrupted_state_key' % self.terms_key()
+
+        self.set_variable(interrupted_state_key, interrupted_state)
 
         self.advance_to(terms_interrupt)
 

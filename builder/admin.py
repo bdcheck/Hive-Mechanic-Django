@@ -1,8 +1,15 @@
 # pylint: disable=line-too-long
 # -*- coding: utf-8 -*-
 
+from prettyjson import PrettyJSONWidget
+
 from django.contrib import messages
 from django.contrib.gis import admin
+
+try:
+    from django.db.models import JSONField
+except ImportError:
+    from django.contrib.postgres.fields import JSONField
 
 from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, Session, RemoteRepository, DataProcessor, SiteSettings
 
@@ -11,17 +18,29 @@ class GameAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'slug', 'is_template',)
     list_filter = ('is_template',)
 
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
+
 @admin.register(GameVersion)
 class GameVersionAdmin(admin.OSMGeoAdmin):
     list_display = ('game', 'created', 'creator')
     search_fields = ['definition']
     list_filter = ('created', 'creator',)
 
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
+
 @admin.register(InteractionCardCategory)
 class InteractionCardCategoryAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'priority',)
 
     search_fields = ['name']
+
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
 
 @admin.register(InteractionCard)
 class InteractionCardAdmin(admin.OSMGeoAdmin):
@@ -43,6 +62,10 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
             'fields': ('repository_definition',),
         }),
     )
+
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
 
     actions = ['update_interaction_card', 'refresh_interaction_card', 'enable_interaction_card', 'disable_interaction_card']
 
@@ -92,9 +115,17 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
 class PlayerAdmin(admin.OSMGeoAdmin):
     list_display = ('identifier',)
 
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
+
 @admin.register(Session)
 class SessionAdmin(admin.OSMGeoAdmin):
     list_display = ('player', 'game_version', 'started', 'completed')
+
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
 
 @admin.register(RemoteRepository)
 class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
@@ -119,6 +150,10 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
             'fields': ('repository_definition', 'metadata',),
         }),
     )
+
+    formfield_overrides = {
+        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+    }
 
     actions = ['update_data_processor', 'enable_data_processor', 'disable_data_processor']
 
