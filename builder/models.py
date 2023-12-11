@@ -806,7 +806,7 @@ class GameVersion(models.Model):
                         return True
         return False
 
-    def fetch_interrupt(self, payload, session, extras):
+    def fetch_interrupt(self, payload, session, extras): # pylint: disable=unused-argument
         if extras is None:
             extras = {}
 
