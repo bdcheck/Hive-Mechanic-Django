@@ -1307,6 +1307,7 @@ class Session(models.Model):
 
         self.advance_to(terms_interrupt)
 
+@python_2_unicode_compatible
 class DataProcessor(models.Model):
     name = models.CharField(max_length=4096, unique=True)
     identifier = models.SlugField(max_length=4096, unique=True)
@@ -1322,7 +1323,7 @@ class DataProcessor(models.Model):
 
     version = models.FloatField(default=0.0)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name + ' (' + self.identifier + ')'
 
     def issues(self): # pylint: disable=no-self-use
@@ -1419,6 +1420,26 @@ class DataProcessor(models.Model):
                 print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
             print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+
+class DataProcessorLog(models.Model):
+    data_processor = models.ForeignKey(DataProcessor, related_name='log_items', null=True, blank=True, on_delete=models.SET_NULL)
+    url = models.CharField(max_length=4096)
+    method = models.CharField(max_length=4096, default='GET')
+    requested = models.DateTimeField()
+
+    request_payload = models.TextField(max_length=(1024 *1024 * 4))
+
+    response_status = models.IntegerField()
+    response_payload = models.TextField(max_length=(1024 *1024 * 4))
+
+    context = models.TextField(max_length=(1024 *1024 * 4), null=True, blank=True)
+
+    session = models.ForeignKey(Session, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+    game = models.ForeignKey(Game, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+    player = models.ForeignKey(Player, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+
+    def update_session_id(self, session_id):
+        pass
 
 class SiteSettings(models.Model):
     name = models.CharField(max_length=1024)

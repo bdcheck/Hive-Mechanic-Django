@@ -11,7 +11,14 @@ try:
 except ImportError:
     from django.contrib.postgres.fields import JSONField
 
-from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, Session, RemoteRepository, DataProcessor, SiteSettings
+from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, \
+                    Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings
+
+@admin.register(DataProcessorLog)
+class DataProcessorLogAdmin(admin.OSMGeoAdmin):
+    list_display = ('data_processor', 'url', 'requested', 'response_status')
+    list_filter = ('requested', 'response_status', 'data_processor')
+    search_fields = ('url', 'request_payload', 'response_payload')
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
