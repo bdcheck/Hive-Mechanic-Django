@@ -120,7 +120,6 @@ def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-local
 
                             email.send()
 
-
         except AttributeError:
             pass
 

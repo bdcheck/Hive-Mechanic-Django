@@ -164,7 +164,9 @@ class Integration(models.Model):
 
             print('TERMS: %s -- %s' % (session.visited_terms(), session.accepted_terms()))
 
-            if session.visited_terms() is False and session.accepted_terms() is False:
+            # Skip terms if call...
+
+            if extras.get('message_type', 'text') != 'call' and session.visited_terms() is False and session.accepted_terms() is False:
                 session.advance_to_terms(payload=payload)
 
                 session.process_incoming(self, None)
