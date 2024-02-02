@@ -427,7 +427,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
     return False
 
-def cancel_session(integration, payload): # pylint: disable=too-many-branches
+def close_sessions(integration, payload): # pylint: disable=too-many-branches
     player_identifier = None
 
     if 'CallStatus' in payload:
@@ -440,4 +440,4 @@ def cancel_session(integration, payload): # pylint: disable=too-many-branches
             six.raise_from(RuntimeError('Twilio integration is missing phone number.'), None)
 
     if player_identifier is not None:
-        integration.cancel_player_sessions('twilio_player', player_identifier)
+        integration.close_player_sessions('twilio_player', player_identifier)

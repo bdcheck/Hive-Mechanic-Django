@@ -213,18 +213,29 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
                         print('SAVED %s' % filename)
 
+                        log_metadata = {}
+
+                        log_metadata['phone_number'] = post_dict.get('To', None)
+                        log_metadata['phone_number'] = post_dict.get('To', None)
+                        log_metadata['direction'] = post_dict.get('Direction', None)
+                        log_metadata['call_status'] = post_dict.get('CallStatus', None)
+
                         call_command('nudge_active_sessions')
 
                         break
 
-        elif integration_match is not None:
+        print('integration_match: %s' % integration_match)
+
+        if integration_match is not None:
             if post_dict.get('CallStatus', None) == 'completed':
                 deleted = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).delete()
 
-                print('Hangup deleted: %s' % deleted)
+                print('Hangup deleted: %s' % str(deleted))
 
-                integration_match.cancel_session(post_dict)
+                integration_match.close_sessions(post_dict)
             else:
+                print('Processing Call')
+
                 # If response empty - clear out pending outgoing call objects
                 # Reset position in dialog to Voice Start Card
 

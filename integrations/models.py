@@ -99,11 +99,11 @@ class Integration(models.Model):
 
         return self.enabled
 
-    def cancel_session(self, payload):
+    def close_sessions(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
-            from twilio_support.models import cancel_session as twilio_cancel_session # pylint: disable=import-outside-toplevel
+            from twilio_support.models import close_sessions as twilio_close_sessions # pylint: disable=import-outside-toplevel
 
-            return twilio_cancel_session(self, payload) # pylint: disable=no-value-for-parameter
+            return twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
 
 
     def process_incoming(self, payload):
