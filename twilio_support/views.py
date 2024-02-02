@@ -217,116 +217,123 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
                         break
 
-        if integration_match is not None:
-            # If response empty - clear out pending outgoing call objects
-            # Reset position in dialog to Voice Start Card
+        elif integration_match is not None:
+            if post_dict.get('CallStatus', None) == 'completed':
+                deleted = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).delete()
 
-            if (post_dict.get('RecordingUrl', None) is None) and (post_dict.get('Digits', None) is None):
-                updated = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
+                print('Hangup deleted: %s' % deleted)
 
-                print('CLEARED %s' % updated)
+                integration_match.cancel_session(post_dict)
+            else:
+                # If response empty - clear out pending outgoing call objects
+                # Reset position in dialog to Voice Start Card
 
-            integration_match.process_incoming(post_dict)
+                if (post_dict.get('RecordingUrl', None) is None) and (post_dict.get('Digits', None) is None):
+                    updated = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
 
-            now = timezone.now()
+                    print('CLEARED %s' % updated)
 
-            # pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).order_by('send_date')
-            pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).order_by('send_date')
+                integration_match.process_incoming(post_dict)
 
-            while pending_calls.count() > 0:
-                print('PENDING[0]: %s' % pending_calls.count())
+                now = timezone.now()
 
-                do_nudge = True
+                # pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).order_by('send_date')
+                pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).order_by('send_date')
 
-                for call in pending_calls:
-                    if call.next_action != 'gather':
-                        if call.message is not None and call.message != '':
-                            if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
-                                response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
-                            else:
-                                response.say(call.message)
-                        elif call.file is not None and call.file != '':
-                            pass
+                while pending_calls.count() > 0:
+                    print('PENDING[0]: %s' % pending_calls.count())
 
-                    call.sent_date = timezone.now()
-                    call.save()
+                    do_nudge = True
 
-                    if call.next_action == 'pause':
-                        response.pause(length=call.pause_length)
-                    elif call.next_action == 'gather':
-                        do_nudge = False
+                    for call in pending_calls:
+                        if call.next_action != 'gather':
+                            if call.message is not None and call.message != '':
+                                if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
+                                    response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
+                                else:
+                                    response.say(call.message)
+                            elif call.file is not None and call.file != '':
+                                pass
 
-                        args = {
-                            'input': call.gather_input,
-                            'barge_in': True,
-                            'num_digits': 1,
-                            'action_on_empty_result': True
-                        }
+                        call.sent_date = timezone.now()
+                        call.save()
 
-                        if call.gather_timeout is not None:
-                            args['timeout'] = call.gather_timeout
+                        if call.next_action == 'pause':
+                            response.pause(length=call.pause_length)
+                        elif call.next_action == 'gather':
+                            do_nudge = False
 
-                        # if call.gather_finish_on_key is not None:
-                        #    args['finish_on_key'] = call.gather_finish_on_key
+                            args = {
+                                'input': call.gather_input,
+                                'barge_in': True,
+                                'num_digits': 1,
+                                'action_on_empty_result': True
+                            }
 
-                        # if call.gather_num_digits is not None:
-                        #    args['num_digits'] = call.gather_num_digits
+                            if call.gather_timeout is not None:
+                                args['timeout'] = call.gather_timeout
 
-                        if call.gather_speech_timeout is not None:
-                            args['speech_timeout'] = call.gather_speech_timeout
+                            # if call.gather_finish_on_key is not None:
+                            #    args['finish_on_key'] = call.gather_finish_on_key
 
-                        if call.gather_speech_model is not None:
-                            args['speech_model'] = call.gather_speech_model
+                            # if call.gather_num_digits is not None:
+                            #    args['num_digits'] = call.gather_num_digits
 
-                        gather = Gather(**args)
+                            if call.gather_speech_timeout is not None:
+                                args['speech_timeout'] = call.gather_speech_timeout
 
-                        if call.message is not None and call.message != '':
-                            if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
-                                gather.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0], loop=call.gather_loop)
-                            else:
-                                gather.say(call.message, loop=call.gather_loop)
-                        elif call.file is not None and call.file != '':
-                            pass
+                            if call.gather_speech_model is not None:
+                                args['speech_model'] = call.gather_speech_model
 
-                        response.append(gather)
+                            gather = Gather(**args)
 
+                            if call.message is not None and call.message != '':
+                                if call.message.lower().startswith('http://') or call.message.lower().startswith('https://'):
+                                    gather.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0], loop=call.gather_loop)
+                                else:
+                                    gather.say(call.message, loop=call.gather_loop)
+                            elif call.file is not None and call.file != '':
+                                pass
+
+                            response.append(gather)
+
+                            break
+                        elif call.next_action == 'record':
+                            do_nudge = False
+
+                            args = {
+                                'action': reverse('incoming_twilio_call'),
+                                'timeout': 10,
+                            }
+
+                            response.record(**args)
+
+                            break
+                        elif call.next_action == 'hangup':
+                            do_nudge = False
+
+                            response.hangup()
+                            break
+
+                    if do_nudge:
+                        print('PENDING[1]: %s' % pending_calls.count())
+
+                        pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).order_by('send_date')
+
+                        call_command('nudge_active_sessions')
+
+                        print('PENDING[2]: %s' % pending_calls.count())
+                    else:
                         break
-                    elif call.next_action == 'record':
-                        do_nudge = False
 
-                        args = {
-                            'action': reverse('incoming_twilio_call'),
-                            'timeout': 10,
-                        }
+                if len(response.verbs) == 0: # pylint: disable=len-as-condition
+                    log_metadata = {}
 
-                        response.record(**args)
+                    log_metadata['phone_number'] = post_dict.get('To', None)
+                    log_metadata['direction'] = post_dict.get('Direction', None)
+                    log_metadata['call_status'] = post_dict.get('CallStatus', None)
 
-                        break
-                    elif call.next_action == 'hangup':
-                        do_nudge = False
-
-                        response.hangup()
-                        break
-
-                if do_nudge:
-                    print('PENDING[1]: %s' % pending_calls.count())
-
-                    pending_calls = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).order_by('send_date')
-
-                    call_command('nudge_active_sessions')
-
-                    print('PENDING[2]: %s' % pending_calls.count())
-                else:
-                    break
-
-            if len(response.verbs) == 0: # pylint: disable=len-as-condition
-                log_metadata = {}
-
-                log_metadata['phone_number'] = post_dict.get('To', None)
-                log_metadata['direction'] = post_dict.get('Direction', None)
-                log_metadata['call_status'] = post_dict.get('CallStatus', None)
-
-                log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
+                    log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
 
     print('OUTGOING: %s' % str(response))
 

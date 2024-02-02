@@ -99,6 +99,13 @@ class Integration(models.Model):
 
         return self.enabled
 
+    def cancel_session(self, payload):
+        if self.type == 'twilio': # pylint: disable=no-else-return
+            from twilio_support.models import cancel_session as twilio_cancel_session # pylint: disable=import-outside-toplevel
+
+            return twilio_cancel_session(self, payload) # pylint: disable=no-value-for-parameter
+
+
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
@@ -318,6 +325,17 @@ class Integration(models.Model):
 
         return statistics
 
+    def close_player_sessions(self, player_lookup_key, player_lookup_value):
+        player_match = None
+
+        for player in Player.objects.all():
+            if player_lookup_key in player.player_state:
+                if player.player_state[player_lookup_key] == player_lookup_value:
+                    player_match = player
+
+        if player_match is not None:
+            for session in player_match.sessions.filter(completed=None):
+                session.complete()
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
