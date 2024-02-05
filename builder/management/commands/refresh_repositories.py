@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 auth_headers = json.loads(repository.http_auth_headers)
 
                 headers.update(auth_headers)
-            except: # pylint: disable=bare-except # nosec
+            except: # nosec # pylint: disable=bare-except
                 pass
 
             response = requests.get(repository.url, headers=headers, timeout=120)
