@@ -24,7 +24,7 @@ from django_dialog_engine.models import Dialog
 
 from integrations.models import Integration
 
-from .models import Game, GameVersion, Player, Session
+from .models import Game, GameVersion, Player, Session, CachedFile
 
 def cache_url(original_url, description=None):
     description_str = 'Retrieved originally from %s.' % original_url
@@ -65,7 +65,7 @@ def cache_url(original_url, description=None):
             with tempfile.NamedTemporaryFile(delete=False, prefix=tokens[0], suffix=('%s' % tokens[1])) as temp_file:
                 temp_file.write(response.content)
 
-            cache_file = filemodels.File.objects.create(description=description_str, mime_type=content_type)
+            cache_file = CachedFile.objects.create(description=description_str, mime_type=content_type, original_url=original_url)
             cache_file.original_filename = filename
             cache_file.save()
 

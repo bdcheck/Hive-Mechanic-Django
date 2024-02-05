@@ -1,6 +1,7 @@
 # pylint: disable=line-too-long
 # -*- coding: utf-8 -*-
 
+from filer.admin.fileadmin import FileAdmin
 from prettyjson import PrettyJSONWidget
 
 from django.contrib import messages
@@ -12,7 +13,8 @@ except ImportError:
     from django.contrib.postgres.fields import JSONField
 
 from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, \
-                    Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings
+                    Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings, \
+                    CachedFile
 
 @admin.register(DataProcessorLog)
 class DataProcessorLogAdmin(admin.OSMGeoAdmin):
@@ -151,7 +153,7 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
             'fields': ('name', 'identifier', 'enabled', 'version',)
         }),
         ('Implementaion', {
-            'fields': ('processor_function',),
+            'fields': ('processor_function', 'log_summary_function',),
         }),
         ('Miscellaneous', {
             'fields': ('repository_definition', 'metadata',),
@@ -191,3 +193,8 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
         self.message_user(request, str(queryset.count()) + ' data processor(s) disabled.')
 
     disable_data_processor.short_description = "Disable selected data processors"
+
+@admin.register(CachedFile)
+class CachedFileAdmin(FileAdmin):
+    list_display = ('original_url',)
+    search_fields = ['original_url',]

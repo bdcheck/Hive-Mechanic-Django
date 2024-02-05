@@ -16,6 +16,7 @@ from future import standard_library
 
 import requests
 
+from filer.models.filemodels import File
 from six import python_2_unicode_compatible
 
 from django.conf import settings
@@ -32,6 +33,7 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
@@ -189,6 +191,8 @@ class RemoteRepository(models.Model):
     priority = models.IntegerField(default=0)
 
     repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
+
+    http_auth_headers = models.TextField(max_length=1048576, default='{}')
 
     last_updated = models.DateTimeField(null=True, blank=True)
 
@@ -1317,6 +1321,7 @@ class DataProcessor(models.Model):
     enabled = models.BooleanField(default=True)
 
     processor_function = models.TextField(max_length=1048576, default='return None, [], None')
+    log_summary_function = models.TextField(max_length=1048576, default='None', help_text='Generates summary of data processor API calls, in a human-readable format.')
 
     metadata = models.TextField(max_length=1048576, null=True, blank=True)
     repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
@@ -1441,6 +1446,39 @@ class DataProcessorLog(models.Model):
     def update_session_id(self, session_id):
         pass
 
+    def fetch_summary(self):
+        if self.data_processor is None:
+            return 'Error: Missing data processor for log item %s.' % self.pk
+
+        try:
+            local_env = {
+                'context': {},
+                'status_code': self.response_status,
+                'request': json.loads(self.request_payload),
+                'response': json.loads(self.response_payload),
+            }
+
+            if self.context is not None:
+                local_env['context'] = json.loads(self.context)
+
+            code = compile(smart_str(self.data_processor.log_summary_function), '<string>', 'exec')
+
+            eval(code, local_env, {}) # nosec # pylint: disable=eval-used
+        except json.decoder.JSONDecodeError:
+            return 'Error: Unable to fully parse log item %s. (json.decoder.JSONDecodeError)' % self.pk
+
+        summary = local_env.get('context', {}).get('log_summary', None)
+
+        preview = local_env.get('context', {}).get('log_preview', None)
+
+        if preview is not None:
+            cached_file = CachedFile.objects.filter(original_url=preview).order_by('-pk').first()
+
+            if cached_file is not None:
+                preview = cached_file.url
+
+        return summary, preview
+
 class SiteSettings(models.Model):
     name = models.CharField(max_length=1024)
     message_of_the_day = models.TextField(max_length=(1024 * 1024), default='Welcome to Hive Mechanic. You may customize this message in the site settings.')
@@ -1450,3 +1488,7 @@ class SiteSettings(models.Model):
 
     total_message_limit = models.IntegerField(null=True, blank=True, help_text='Total of incoming and outgoing messages, plus voice calls')
     count_messages_since = models.DateTimeField(null=True, blank=True)
+
+
+class CachedFile(File):
+    original_url = models.CharField(max_length=4096, null=True, blank=True)
