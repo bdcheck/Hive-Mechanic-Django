@@ -103,7 +103,7 @@ class Integration(models.Model):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import close_sessions as twilio_close_sessions # pylint: disable=import-outside-toplevel
 
-            return twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
+            twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
 
 
     def process_incoming(self, payload):
