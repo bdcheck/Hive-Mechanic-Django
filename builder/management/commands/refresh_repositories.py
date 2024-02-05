@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
             repository_def = response.json()
 
-            if repository_def != json.loads(repository.repository_definition):
+            if repository.repository_definition is None or repository_def != json.loads(repository.repository_definition):
                 repository.repository_definition = json.dumps(repository_def, indent=2)
 
                 repository.last_updated = timezone.now()
