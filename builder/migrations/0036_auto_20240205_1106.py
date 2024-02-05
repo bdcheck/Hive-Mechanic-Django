@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filer', '0015_auto_20240205_1106'),
+        # ('filer', '0015_auto_20240205_1106'),
         ('builder', '0035_alter_dataprocessor_log_summary_function'),
     ]
 
