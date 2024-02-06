@@ -325,7 +325,7 @@ class Integration(models.Model):
 
         return statistics
 
-    def close_player_sessions(self, player_lookup_key, player_lookup_value):
+    def close_player_sessions(self, player_lookup_key, player_lookup_value): # pylint: disable=no-self-use
         player_match = None
 
         for player in Player.objects.all():
