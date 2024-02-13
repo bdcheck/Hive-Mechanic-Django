@@ -4,7 +4,6 @@ from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
 
 import datetime
-import json
 import mimetypes
 import time
 
@@ -223,7 +222,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
         if integration_match is not None:
             if post_dict.get('CallStatus', None) == 'completed':
-                deleted = OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).delete()
+                OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).delete()
 
                 integration_match.close_sessions(post_dict)
             else:
@@ -231,7 +230,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 # Reset position in dialog to Voice Start Card
 
                 if (post_dict.get('RecordingUrl', None) is None) and (post_dict.get('Digits', None) is None):
-                    updated = OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
+                    OutgoingCall.objects.filter(destination=source, sent_date=None, send_date__lte=now, integration=integration_match).update(sent_date=now)
 
             for call in pending_calls:
                 if call.next_action != 'gather':
