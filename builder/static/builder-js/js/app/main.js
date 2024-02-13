@@ -42,6 +42,20 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
   let dialogIsDirty = false
 
+  window.onbeforeunload = function (e) {
+    if (dialogIsDirty) {
+      e = e || window.event
+
+      // For IE and Firefox prior to version 4
+      if (e) {
+        e.returnValue = 'Activity has unsaved changes. Close?'
+      }
+
+      // For Safari
+      return 'Activity has unsaved changes. Close?'
+    }
+  }
+
   const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
 
   const topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'))
@@ -123,6 +137,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   }, 1000)
 
   function onSequenceChanged (changedId) {
+    dialogIsDirty = true
+
     $('#action_save').text('save')
 
     if (window.dialogBuilder.definition.sequences !== undefined) {
@@ -462,6 +478,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
             window.dialogBuilder.reloadSequences()
             window.dialogBuilder.loadSequence(seq[0], null)
             window.dialogBuilder.editSequenceDialog.unlisten('MDCDialog:closed', this)
+
+            dialogIsDirty = true
           }
         }
       }
@@ -510,6 +528,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
             window.dialogBuilder.addSequenceDialog.unlisten('MDCDialog:closed', this)
 
             drawer.open = false
+
+            dialogIsDirty = true
           }
         }
       }
@@ -836,6 +856,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     warning.addEventListener('click', (event) => {
       const clean = cleanDefinition(window.dialogBuilder.definition)
+
+      dialogIsDirty = false
 
       window.dialogBuilder.update(clean, function (data) {
         warningDialog.close()
@@ -1379,13 +1401,9 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           dialogIsDirty = true
         })
 
-        console.log(`incoming_call_interrupt: ${window.dialogBuilder.definition.incoming_call_interrupt}`)
-
         if ([undefined, null, '', 'no-card-destination'].includes(window.dialogBuilder.definition.incoming_call_interrupt)) {
           voiceCardSelect.value = 'no-card-destination'
-          console.log('set[0]: ni;')
         } else {
-          console.log(`set: ${window.dialogBuilder.definition.incoming_call_interrupt}`)
           voiceCardSelect.value = window.dialogBuilder.definition.incoming_call_interrupt
         }
       }

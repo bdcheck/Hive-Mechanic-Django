@@ -218,15 +218,19 @@ class OutgoingCall(models.Model): # pylint: disable=too-many-instance-attributes
 
             ongoing = False
 
-            incoming_call_records = client.calls.list(to=self.destination)
+            incoming_call_records = client.calls.list(to=self.destination, limit=1)
 
             for call_record in incoming_call_records:
+                print('INCOMING CALL RECORD: (%s to %s) %s' % (call_record.start_time, call_record.end_time, call_record.status))
+
                 if call_record.status in ('ringing', 'in-progress', 'queued'):
                     ongoing = True
 
-            outgoing_call_records = client.calls.list(from_=self.destination)
+            outgoing_call_records = client.calls.list(from_=self.destination, limit=1)
 
             for call_record in outgoing_call_records:
+                print('OUTGOING CALL RECORD: (%s to %s) %s' % (call_record.start_time, call_record.end_time, call_record.status))
+
                 if call_record.status in ('ringing', 'in-progress', 'queued'):
                     ongoing = True
 
@@ -237,7 +241,11 @@ class OutgoingCall(models.Model): # pylint: disable=too-many-instance-attributes
                     from_=self.integration.configuration['phone_number']
                 )
 
+                time.sleep(3)
+
                 self.transmission_metadata['twilio_sid'] = call.sid
+
+                # self.sent_date = timezone.now()
 
                 self.errored = False
                 self.save()
@@ -268,7 +276,6 @@ class IncomingCallMedia(models.Model):
     content_file = models.FileField(upload_to='incoming_call_media', null=True, blank=True)
     content_url = models.CharField(max_length=1024, null=True, blank=True)
     content_type = models.CharField(max_length=128, default='application/octet-stream')
-
 
 def process_incoming(integration, payload): # pylint: disable=too-many-branches
     message_type = 'text'
@@ -335,6 +342,8 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
 
 def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
+
+    print('execute_action: %s' % action)
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
         outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
@@ -412,12 +421,13 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
                 outgoing.pause_length = 30
 
         if integration.enabled is False:
-            outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
                 'error': 'Unable to send, integration is disabled.'
             }
 
         outgoing.save()
+
+        print('INIT CALL: %s' % outgoing)
 
         if integration.enabled:
             outgoing.transmit()
@@ -425,3 +435,18 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
         return True
 
     return False
+
+def close_sessions(integration, payload): # pylint: disable=too-many-branches
+    player_identifier = None
+
+    if 'CallStatus' in payload:
+        if 'phone_number' in integration.configuration:
+            if payload['From'] == integration.configuration['phone_number']:
+                player_identifier = payload['To']
+            else:
+                player_identifier = payload['From']
+        else:
+            six.raise_from(RuntimeError('Twilio integration is missing phone number.'), None)
+
+    if player_identifier is not None:
+        integration.close_player_sessions('twilio_player', player_identifier)

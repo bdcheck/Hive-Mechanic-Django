@@ -23,17 +23,24 @@ class Command(BaseCommand):
                 'Pragma': 'no-cache'
             }
 
+            try:
+                auth_headers = json.loads(repository.http_auth_headers)
+
+                headers.update(auth_headers)
+            except: # nosec # pylint: disable=bare-except
+                pass
+
             response = requests.get(repository.url, headers=headers, timeout=120)
 
-            repository_content = response.content
+            print('%s: %s' % (repository.url, response.content))
 
-            if repository_content != repository.repository_definition:
-                repository.repository_definition = repository_content
+            repository_def = response.json()
+
+            if repository.repository_definition is None or repository_def != json.loads(repository.repository_definition):
+                repository.repository_definition = json.dumps(repository_def, indent=2)
 
                 repository.last_updated = timezone.now()
                 repository.save()
-
-                repository_def = json.loads(repository_content)
 
                 for key in repository_def['cards'].keys():
                     card_def = repository_def['cards'][key]

@@ -30,6 +30,11 @@ class Command(BaseCommand):
         if has_preview_tag is None:
             has_preview_tag = LogTag.objects.create(tag='has_preview', name='Has Preview')
 
+        voice_message_tag = LogTag.objects.filter(tag='voice_message_tag').first()
+
+        if voice_message_tag is None:
+            voice_message_tag = LogTag.objects.create(tag='voice_message_tag', name='Voice Message')
+
         incoming_tag = LogTag.objects.filter(tag='incoming_message').first()
 
         if incoming_tag is None:
@@ -171,6 +176,7 @@ class Command(BaseCommand):
                 metadata['media_files'] = media_files
 
                 log_item.tags.add(has_preview_tag)
+                log_item.tags.add(voice_message_tag)
 
             log_item.update_metadata(metadata)
 

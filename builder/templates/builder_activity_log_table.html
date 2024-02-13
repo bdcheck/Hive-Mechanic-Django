@@ -186,15 +186,15 @@
 				</div>
 			</div>
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3 mdc-typography mdc-typography--caption">
-				<div style="position: fixed; padding-right: 16px; overflow-x: hidden; overflow-y: auto; height: calc(100vh - 88px);">
+				<div id="right_bar" style="position: fixed; padding-right: 16px; overflow-y: auto; overflow-x: hidden; height: calc(100vh - 88px);">
 					<div class="mdc-card" style="margin-bottom: 16px; padding: 8px;">
-						<div id="empty_details">
+						<div id="empty_details" style="width: 100%;">
 							Select one or more events from the left&#8230;
 						</div>
 						<div id="event_details_view">
 							<div id="event_preview">
-								<object id="event_preview_object" style="width: 100%; border: thin solid #808080; border-radius: 4px; box-sizing: border-box; aspect-ratio: 1/1; object-fit: cover;" onload="this.contentDocument.querySelector('object').pause()"></object><br>
-								<center>Open Preview</center>
+								<img src="" style="display: block; border: thin solid #808080; border-radius: 4px; max-width: 100px;">
+								<audio controls src=""></audio>
 							</div>
 
 							<strong id="event_name"></strong>

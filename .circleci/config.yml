@@ -51,6 +51,7 @@ jobs:
             pip install --upgrade wheel
             pip install -r requirements.txt
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
+            python manage.py migrate filer
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions
@@ -145,6 +146,7 @@ jobs:
             pip install --upgrade wheel
             pip install -r requirements.txt
             cp hivemechanic/circle_settings.py hivemechanic/local_settings.py
+            python manage.py migrate filer
             python manage.py migrate
             python manage.py loaddata fixtures/groups.json
             python manage.py initialize_permissions

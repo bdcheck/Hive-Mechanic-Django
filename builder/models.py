@@ -16,6 +16,7 @@ from future import standard_library
 
 import requests
 
+from filer.models.filemodels import File
 from six import python_2_unicode_compatible
 
 from django.conf import settings
@@ -32,6 +33,7 @@ from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
@@ -189,6 +191,8 @@ class RemoteRepository(models.Model):
     priority = models.IntegerField(default=0)
 
     repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
+
+    http_auth_headers = models.TextField(max_length=1048576, default='{}')
 
     last_updated = models.DateTimeField(null=True, blank=True)
 
@@ -806,9 +810,28 @@ class GameVersion(models.Model):
                         return True
         return False
 
-    def dialog_snapshot(self): # pylint: disable=too-many-branches
-        snapshot = []
+    def fetch_interrupt(self, payload, session, extras): # pylint: disable=unused-argument
+        if extras is None:
+            extras = {}
 
+        definition = json.loads(self.definition)
+
+        if 'message_type' in extras and extras['message_type'] == 'call':
+            if 'payload' in extras and 'CallStatus' in extras['payload']:
+                if extras['payload']['CallStatus'] == 'ringing':
+                    if 'incoming_call_interrupt' in definition:
+                        return definition['incoming_call_interrupt']
+
+        if 'interrupts' in definition:
+            for interrupt in definition['interrupts']:
+                for integration in self.game.integrations.all():
+                    if integration.is_interrupt(interrupt['pattern'], payload):
+                        return interrupt['action']
+
+        return None
+
+
+    def initial_card(self):
         definition = json.loads(self.definition)
 
         sequences = []
@@ -834,6 +857,23 @@ class GameVersion(models.Model):
                         initial_card = '%s#%s' % (sequence['id'], initial_card)
 
                     break
+
+        return initial_card
+
+
+    def dialog_snapshot(self): # pylint: disable=too-many-branches
+        snapshot = []
+
+        initial_card = self.initial_card()
+
+        definition = json.loads(self.definition)
+
+        sequences = []
+
+        if 'sequences' in definition:
+            sequences = definition['sequences']
+        else:
+            sequences = definition
 
         for sequence in sequences:
             for item in sequence['items']:
@@ -1196,6 +1236,19 @@ class Session(models.Model):
 
         self.player.set_variable(key, timezone.now().isoformat())
 
+        terms_payload_key = '%s__payload_key' % key
+
+        payload = self.fetch_variable(terms_payload_key)
+
+        interrupted_state_key = '%s__interrupted_state_key' % key
+
+        resume_id = self.fetch_variable(interrupted_state_key)
+
+        if resume_id is not None:
+            self.advance_to(resume_id)
+
+        self.process_incoming(None, payload)
+
     def accepted_terms(self):
         key = self.terms_key()
 
@@ -1244,8 +1297,21 @@ class Session(models.Model):
 
             self.set_variable(terms_payload_key, payload_str)
 
+        interrupted_state = self.current_node()
+
+        if interrupted_state is None:
+            interrupted_state = self.game_version.fetch_interrupt(payload, self, None)
+
+        if interrupted_state is None:
+            interrupted_state = self.game_version.initial_card()
+
+        interrupted_state_key = '%s__interrupted_state_key' % self.terms_key()
+
+        self.set_variable(interrupted_state_key, interrupted_state)
+
         self.advance_to(terms_interrupt)
 
+@python_2_unicode_compatible
 class DataProcessor(models.Model):
     name = models.CharField(max_length=4096, unique=True)
     identifier = models.SlugField(max_length=4096, unique=True)
@@ -1255,13 +1321,14 @@ class DataProcessor(models.Model):
     enabled = models.BooleanField(default=True)
 
     processor_function = models.TextField(max_length=1048576, default='return None, [], None')
+    log_summary_function = models.TextField(max_length=1048576, default='None', help_text='Generates summary of data processor API calls, in a human-readable format.')
 
     metadata = models.TextField(max_length=1048576, null=True, blank=True)
     repository_definition = models.TextField(max_length=1048576, null=True, blank=True)
 
     version = models.FloatField(default=0.0)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name + ' (' + self.identifier + ')'
 
     def issues(self): # pylint: disable=no-self-use
@@ -1359,6 +1426,59 @@ class DataProcessor(models.Model):
         except json.decoder.JSONDecodeError:
             print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
 
+class DataProcessorLog(models.Model):
+    data_processor = models.ForeignKey(DataProcessor, related_name='log_items', null=True, blank=True, on_delete=models.SET_NULL)
+    url = models.CharField(max_length=4096)
+    method = models.CharField(max_length=4096, default='GET')
+    requested = models.DateTimeField()
+
+    request_payload = models.TextField(max_length=(1024 *1024 * 4))
+
+    response_status = models.IntegerField()
+    response_payload = models.TextField(max_length=(1024 *1024 * 4))
+
+    context = models.TextField(max_length=(1024 *1024 * 4), null=True, blank=True)
+
+    session = models.ForeignKey(Session, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+    game = models.ForeignKey(Game, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+    player = models.ForeignKey(Player, related_name='processor_logs', null=True, blank=True, on_delete=models.SET_NULL)
+
+    def update_session_id(self, session_id):
+        pass
+
+    def fetch_summary(self):
+        if self.data_processor is None:
+            return 'Error: Missing data processor for log item %s.' % self.pk
+
+        try:
+            local_env = {
+                'context': {},
+                'status_code': self.response_status,
+                'request': json.loads(self.request_payload),
+                'response': json.loads(self.response_payload),
+            }
+
+            if self.context is not None:
+                local_env['context'] = json.loads(self.context)
+
+            code = compile(smart_str(self.data_processor.log_summary_function), '<string>', 'exec')
+
+            eval(code, local_env, {}) # nosec # pylint: disable=eval-used
+        except json.decoder.JSONDecodeError:
+            return 'Error: Unable to fully parse log item %s. (json.decoder.JSONDecodeError)' % self.pk
+
+        summary = local_env.get('context', {}).get('log_summary', None)
+
+        preview = local_env.get('context', {}).get('log_preview', None)
+
+        if preview is not None:
+            cached_file = CachedFile.objects.filter(original_url=preview).order_by('-pk').first()
+
+            if cached_file is not None:
+                preview = cached_file.url
+
+        return summary, preview
+
 class SiteSettings(models.Model):
     name = models.CharField(max_length=1024)
     message_of_the_day = models.TextField(max_length=(1024 * 1024), default='Welcome to Hive Mechanic. You may customize this message in the site settings.')
@@ -1368,3 +1488,7 @@ class SiteSettings(models.Model):
 
     total_message_limit = models.IntegerField(null=True, blank=True, help_text='Total of incoming and outgoing messages, plus voice calls')
     count_messages_since = models.DateTimeField(null=True, blank=True)
+
+
+class CachedFile(File):
+    original_url = models.CharField(max_length=4096, null=True, blank=True)

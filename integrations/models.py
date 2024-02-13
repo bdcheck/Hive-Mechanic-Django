@@ -99,6 +99,13 @@ class Integration(models.Model):
 
         return self.enabled
 
+    def close_sessions(self, payload):
+        if self.type == 'twilio': # pylint: disable=no-else-return
+            from twilio_support.models import close_sessions as twilio_close_sessions # pylint: disable=import-outside-toplevel
+
+            twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
+
+
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
@@ -162,8 +169,16 @@ class Integration(models.Model):
 
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
-            if session.visited_terms() is False and session.accepted_terms() is False:
-                session.advance_to_terms()
+            print('TERMS: %s -- %s' % (session.visited_terms(), session.accepted_terms()))
+
+            # Skip terms if call...
+
+            if extras.get('message_type', 'text') != 'call' and session.visited_terms() is False and session.accepted_terms() is False:
+                session.advance_to_terms(payload=payload)
+
+                session.process_incoming(self, None)
+
+                return
 
             if isinstance(payload, list):
                 actions = payload
@@ -171,6 +186,8 @@ class Integration(models.Model):
                 payload = None
 
                 self.execute_actions(session, actions)
+
+            print('PROCESS: %s -- %s' % (session.current_node(), payload))
 
             session.process_incoming(self, payload, extras)
 
@@ -308,6 +325,17 @@ class Integration(models.Model):
 
         return statistics
 
+    def close_player_sessions(self, player_lookup_key, player_lookup_value): # pylint: disable=no-self-use
+        player_match = None
+
+        for player in Player.objects.all():
+            if player_lookup_key in player.player_state:
+                if player.player_state[player_lookup_key] == player_lookup_value:
+                    player_match = player
+
+        if player_match is not None:
+            for session in player_match.sessions.filter(completed=None):
+                session.complete()
 
 def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
     if action['type'] == 'set-variable': # pylint: disable=no-else-return

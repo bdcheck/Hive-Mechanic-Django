@@ -123,11 +123,30 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     const preview = target.data('attachment')
 
+    $('#event_preview img').hide()
+    $('#event_preview audio').hide()
+
+    $('#event_preview audio').get(0).load()
+
     if (preview) {
-      $('#event_preview_object').attr('data', preview)
+      if (preview.endsWith('.mp3')) {
+        $('#event_preview audio').attr('src', preview)
+        $('#event_preview audio').get(0).load()
+        $('#event_preview audio').css('width', ($('#right_bar').width() - 16))
+        $('#event_preview audio').show()
+      } else if (preview.endsWith('.jpg') || preview.endsWith('.png') || preview.endsWith('.gif')) {
+        $('#event_preview img').attr('src', preview)
+
+        $('#event_preview img').css('max-width', $('#activity_select').width() + 'px')
+
+        $('#dialog_preview_image').attr('data', preview)
+
+        $('#event_preview img').show()
+      }
+
       $('#event_preview').show()
 
-      $('#dialog_preview_image').attr('data', preview)
+      console.log(5)
     } else {
       $('#event_preview').hide()
     }
@@ -135,6 +154,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#event_preview').click(function () {
       dialogPreview.open()
     })
+
+    console.log(6)
 
     const currentBackground = target.css('background-color')
 
@@ -257,4 +278,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     window.location = currentUrl.href
   })
+
+  $('#right_bar').css('max-width', $('#right_bar').width() + 'px')
 })
