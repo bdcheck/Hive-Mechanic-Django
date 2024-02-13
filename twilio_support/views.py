@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long
+# pylint: disable=no-member, line-too-long, no-member
 
 from builtins import str # pylint: disable=redefined-builtin
 from builtins import range # pylint: disable=redefined-builtin
@@ -132,7 +132,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
     response = VoiceResponse()
 
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
-        now = timezone.now() - datetime.timedelta(seconds=10)
+        now = timezone.now() - datetime.timedelta(seconds=20)
 
         integration_match = None
 
@@ -157,6 +157,9 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
             incoming.receive_date = now
 
             incoming.message = ''
+
+            if post_dict.get('RecordingUrl', None) is not None:
+                post_dict['Digits'] = '#'
 
             if 'Digits' in post_dict:
                 incoming.message = post_dict['Digits'].strip()
@@ -215,7 +218,6 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
                     time.sleep(1)
 
-
         if integration_match is not None:
             # If response empty - clear out pending outgoing call objects
             # Reset position in dialog to Voice Start Card
@@ -235,6 +237,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                             response.play(call.message.replace('\n', ' ').replace('\r', ' ').split(' ')[0])
                         else:
                             response.say(call.message)
+
                     elif call.file is not None and call.file != '':
                         pass
 
@@ -282,7 +285,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                 elif call.next_action == 'record':
                     args = {
                         'action': reverse('incoming_twilio_call'),
-                        'timeout': 10,
+                        'timeout': 5,
                     }
 
                     response.record(**args)

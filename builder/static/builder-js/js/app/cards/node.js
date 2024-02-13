@@ -86,6 +86,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       htmlString += this.editBody()
 
+      if (window.location.href.includes('show_id')) {
+        htmlString += '      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption" id="' + this.cardId + '_identifier">' + this.sequence.definition.id + '#' + this.id + '</div>'
+      }
+
       htmlString += '    </div>'
       htmlString += '  </div>'
       htmlString += '</div>'

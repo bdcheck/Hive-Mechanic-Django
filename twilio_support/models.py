@@ -402,6 +402,15 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
             if 'pause' in action['parameters']:
                 outgoing.pause_length = action['parameters']['pause']
 
+            if outgoing.gather_timeout == '':
+                outgoing.gather_timeout = 5
+
+            if outgoing.gather_loop == '':
+                outgoing.gather_loop = 1
+
+            if outgoing.pause_length == '':
+                outgoing.pause_length = 30
+
         if integration.enabled is False:
             outgoing.sent_date = timezone.now()
             outgoing.transmission_metadata = {
