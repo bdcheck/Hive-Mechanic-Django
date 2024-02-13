@@ -16,7 +16,7 @@ Pillow==9.0.1; python_version >= '3.0' and python_version < '3.8'
 Pillow==6.2.2; python_version < '3.0'
 py-mini-racer==0.6.0
 pygame==2.0.1
-pyOpenSSL==23.2.0; python_version >= '3.0'
+pyOpenSSL==24.0.0; python_version >= '3.0'
 pyOpenSSL==21.0.0; python_version < '3.0'
 reportlab==3.5.59; python_version < '3.0'
 reportlab==3.6.11; python_version >= '3.0'
