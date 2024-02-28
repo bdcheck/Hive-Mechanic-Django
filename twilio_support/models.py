@@ -221,16 +221,12 @@ class OutgoingCall(models.Model): # pylint: disable=too-many-instance-attributes
             incoming_call_records = client.calls.list(to=self.destination, limit=1)
 
             for call_record in incoming_call_records:
-                print('INCOMING CALL RECORD: (%s to %s) %s' % (call_record.start_time, call_record.end_time, call_record.status))
-
                 if call_record.status in ('ringing', 'in-progress', 'queued'):
                     ongoing = True
 
             outgoing_call_records = client.calls.list(from_=self.destination, limit=1)
 
             for call_record in outgoing_call_records:
-                print('OUTGOING CALL RECORD: (%s to %s) %s' % (call_record.start_time, call_record.end_time, call_record.status))
-
                 if call_record.status in ('ringing', 'in-progress', 'queued'):
                     ongoing = True
 
@@ -277,7 +273,12 @@ class IncomingCallMedia(models.Model):
     content_url = models.CharField(max_length=1024, null=True, blank=True)
     content_type = models.CharField(max_length=128, default='application/octet-stream')
 
-def process_incoming(integration, payload): # pylint: disable=too-many-branches
+def process_incoming(integration, immutable_payload): # pylint: disable=too-many-branches
+    payload = {}
+
+    for key in immutable_payload.keys():
+        payload[key] = immutable_payload.get(key, None)
+
     message_type = 'text'
 
     player_identifier = None
@@ -342,8 +343,6 @@ def process_incoming(integration, payload): # pylint: disable=too-many-branches
 
 def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
-
-    print('execute_action: %s' % action)
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
         outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
@@ -426,8 +425,6 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
             }
 
         outgoing.save()
-
-        print('INIT CALL: %s' % outgoing)
 
         if integration.enabled:
             outgoing.transmit()

@@ -221,6 +221,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                         break
 
         if integration_match is not None:
+            integration_match.process_incoming(request.POST)
+
             if post_dict.get('CallStatus', None) == 'completed':
                 OutgoingCall.objects.filter(destination=source, sent_date=None, integration=integration_match).delete()
 
