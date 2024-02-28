@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import smart_text
 
+from activity_logger.models import log
 from builder.models import Player
 from integrations.models import Integration
 
@@ -161,6 +162,10 @@ class OutgoingMessage(models.Model):
                 player = Player.objects.filter(identifier=player_id).first()
 
                 if player is not None:
+                    tags = ['twilio', 'warning', 'messaging']
+
+                    log('integration:%s' % self.integration.pk, 'Attempted to send to player who sent STOP to a phone number.', tags=tags, player=player)
+
                     for session in player.sessions.filter(completed=None):
                         session.complete()
 
