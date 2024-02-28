@@ -1114,7 +1114,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
     start = page_index * items_per_page
     end = start + items_per_page
 
-    context['total_count'] = LogItem.objects.filter(query).count()
+    context['total_count'] = LogItem.objects.filter(query).intersection(*tag_intersections).count()
 
     if end > context['total_count']:
         end = context['total_count']
@@ -1201,7 +1201,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
     for tag in tags:
         query_string['tag'].append(tag)
 
-    if context['total_count'] > items_per_page and page_index < context['page_count']:
+    if context['total_count'] > items_per_page and page_index < context['page_count'] - 1:
         query_string['page'] = page_index + 1
 
         context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
