@@ -10,6 +10,7 @@ import traceback
 import six
 
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
@@ -18,6 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import smart_text
 
+from builder.models import Player
 from integrations.models import Integration
 
 OUTGOING_CALL_NEXT_ACTIONS = (
@@ -152,6 +154,21 @@ class OutgoingMessage(models.Model):
             self.errored = False
             self.save()
 
+        except TwilioRestException as twilio_exc:
+            if 'unsubscribed' in twilio_exc.msg:
+                player_id = 'twilio_player:%s' % self.destination
+
+                player = Player.objects.filter(identifier=player_id).first()
+
+                if player is not None:
+                    for session in player.sessions.filter(completed=None):
+                        session.complete()
+
+            self.errored = True
+
+            self.transmission_metadata['error'] = traceback.format_exc().splitlines()
+
+            self.save()
         except: # pylint: disable=bare-except
             traceback.print_exc()
             self.errored = True
