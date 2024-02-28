@@ -160,11 +160,11 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
           const issue = issues[i]
 
           let item = '<li role="separator" class="mdc-list-divider outstanding-issue-item-divider"></li>'
-          item += '<li class="mdc-list-item mdc-list-item--with-two-lines prevent-menu-close outstanding-issue-item" id="builder-outstanding-issues-dialog-' + issue[2] + '">'
+          item += '<li class="mdc-list-item mdc-list-item--with-two-lines prevent-menu-close outstanding-issue-item" id="builder-outstanding-issues-dialog-' + issue[2] + '" style="height: auto;">'
           item += '  <span class="mdc-list-item__ripple"></span>'
           item += '  <span class="mdc-list-item__content">'
-          item += '    <span class="mdc-list-item__primary-text">' + issue[0] + '</span>'
-          item += '    <span class="mdc-list-item__secondary-text">' + issue[3] + '</span>'
+          item += '    <span class="mdc-list-item__primary-text" style="white-space: break-spaces">' + issue[0] + '</span>'
+          item += '    <span class="mdc-list-item__secondary-text" style="margin-bottom: 12px; margin-top: 8px;">' + issue[3] + '</span>'
           item += '  </span>'
           item += '</li>'
 
