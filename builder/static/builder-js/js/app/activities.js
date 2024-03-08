@@ -159,11 +159,11 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
     }
   })
 
-  const deleteDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_delete_game'))
+  const archiveDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_archive_game'))
 
-  deleteDialog.listen('MDCDialog:closed', function (action) {
-    if (action.detail.action === 'delete') {
-      window.location.href = '/builder/activity/' + $('#game_delete_id').val() + '/delete'
+  archiveDialog.listen('MDCDialog:closed', function (action) {
+    if (action.detail.action === 'archive') {
+      window.location.href = '/builder/activity/' + $('#game_archive_id').val() + '/archive'
     }
   })
 
@@ -193,11 +193,11 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
     menu.listen('MDCMenu:selected', function (event) {
       const data = $(event.detail.item).data()
 
-      if (data.action === 'delete') {
-        $('#delete_game_name').html(data.name)
-        $('#game_delete_id').val(data.id)
+      if (data.action === 'archive') {
+        $('#archive_game_name').html(data.name)
+        $('#game_archive_id').val(data.id)
 
-        deleteDialog.open()
+        archiveDialog.open()
       } else if (data.action === 'clone') {
         cloneNameField.value = 'Clone of ' + data.name
         $('#original_clone_id').val(data.id)

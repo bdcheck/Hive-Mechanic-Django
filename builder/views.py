@@ -127,7 +127,7 @@ def builder_activities(request): # pylint: disable=unused-argument
 
     context['query'] = search
 
-    games = Game.objects.all().order_by(Lower('name'))
+    games = Game.objects.filter(archived=None).order_by(Lower('name'))
 
     if search is not None:
         query = Q(name__icontains=search) | Q(slug__icontains=search) # pylint: disable=unsupported-binary-operation
@@ -679,14 +679,14 @@ def builder_data_processor_options(request):  # pylint: disable=unused-argument
 
 @login_required
 @user_accepted_all_terms
-def builder_activity_delete(request, slug): # pylint: disable=unused-argument
+def builder_activity_archive(request, slug): # pylint: disable=unused-argument
     if request.user.has_perm('builder.delete_game') is False:
         raise PermissionDenied('Delete game permission required.')
 
     activity = get_object_or_404(Game, slug=slug)
 
     if activity.can_edit(request.user):
-        activity.delete()
+        activity.archive()
 
         return redirect('builder_activities')
 

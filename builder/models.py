@@ -385,6 +385,8 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
     metadata = JSONField(default=dict, blank=True)
     metadata_updated = models.DateTimeField(null=True, blank=True)
 
+    archived = models.DateTimeField(null=True, blank=True)
+
     def log_id(self):
         return 'game_version:%d' % self.pk
 
@@ -393,6 +395,10 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
 
     def definition_json(self):
         return reverse('builder_game_definition_json', args=[self.slug])
+
+    def archive(self):
+        self.archived = timezone.now()
+        self.save()
 
     def fetch_metadata(self, force=False):
         now = timezone.now()

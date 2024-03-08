@@ -4,7 +4,7 @@ from django.conf.urls import url
 
 from .views import builder_game, builder_game_definition_json, builder_interaction_card, \
                    builder_home, builder_activities, builder_players, builder_sessions, \
-                   builder_add_game, builder_data_processor_options, builder_activity_delete, \
+                   builder_add_game, builder_data_processor_options, builder_activity_archive, \
                    builder_update_icon, builder_media, builder_media_upload, builder_game_templates, \
                    builder_settings, builder_game_variables, builder_integrations, builder_integrations_update, \
                    builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors, \
@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^card/(?P<card>.+)', builder_interaction_card, name='builder_interaction_card'),
     url(r'^activity/(?P<slug>.+)/view', builder_activity_view, name='builder_activity_view'),
     url(r'^activity-templates$', builder_game_templates, name="builder_game_templates"),
-    url(r'^activity/(?P<slug>.+)/delete', builder_activity_delete, name='builder_activity_delete'),
+    url(r'^activity/(?P<slug>.+)/archive', builder_activity_archive, name='builder_activity_archive'),
     url(r'^activity/(?P<game>.+)/variables.json', builder_game_variables, name='builder_game_variables'),
     url(r'^activity/(?P<activity>.+)/actions.json', builder_activity_actions_json, name='builder_activity_actions_json'),
     url(r'^activity/(?P<game>.+).json$', builder_game_definition_json, name='builder_game_definition_json'),

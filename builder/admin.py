@@ -6,6 +6,7 @@ from prettyjson import PrettyJSONWidget
 
 from django.contrib import messages
 from django.contrib.gis import admin
+from django.utils import timezone
 
 try:
     from django.db.models import JSONField
@@ -24,12 +25,34 @@ class DataProcessorLogAdmin(admin.OSMGeoAdmin):
 
 @admin.register(Game)
 class GameAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'slug', 'is_template',)
-    list_filter = ('is_template',)
+    list_display = ('name', 'slug', 'is_template', 'archived',)
+    list_filter = ('is_template', 'archived',)
 
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
     }
+
+    actions = ['archive_activity', 'restore_activity']
+
+    def archive_activity(self, request, queryset):
+        updated = queryset.filter(archived=None).update(archived=timezone.now())
+        
+        if updated == 1:
+            self.message_user(request, '1 activity archived.', messages.SUCCESS)
+        else:
+            self.message_user(request, '%s activities archived.' % updated, messages.SUCCESS)
+
+    archive_activity.short_description = "Archive activities"
+
+    def restore_activity(self, request, queryset):
+        updated = queryset.update(archived=None)
+        
+        if updated == 1:
+            self.message_user(request, '1 activity restored.', messages.SUCCESS)
+        else:
+            self.message_user(request, '%s activities restored.' % updated, messages.SUCCESS)
+
+    restore_activity.short_description = "Restore activities"
 
 @admin.register(GameVersion)
 class GameVersionAdmin(admin.OSMGeoAdmin):
