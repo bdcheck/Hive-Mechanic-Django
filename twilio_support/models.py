@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, no-member
+# pylint: disable=line-too-long, no-member, wrong-import-position
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin
@@ -23,7 +23,6 @@ if sys.version_info[0] > 2:
     from django.db.models import JSONField
 else:
     from django.contrib.postgres.fields import JSONField
-
 
 from activity_logger.models import log
 from builder.models import Player

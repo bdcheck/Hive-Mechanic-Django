@@ -5,7 +5,7 @@ import sys
 from .views import incoming_twilio, incoming_twilio_call
 
 if sys.version_info[0] > 2:
-    from django.urls import re_path
+    from django.urls import re_path # pylint: disable=no-name-in-module
 
     urlpatterns = [
         re_path(r'^incoming.xml$', incoming_twilio, name='incoming_twilio'),
