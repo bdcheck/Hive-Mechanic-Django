@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'cli_support',
     'easy_thumbnails',
     'filer',
-    'mptt',
     'django.contrib.admin',
 ]
 
