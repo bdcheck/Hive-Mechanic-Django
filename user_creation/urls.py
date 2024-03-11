@@ -3,9 +3,9 @@
 import sys
 
 if sys.version_info[0] > 2:
-    from django.urls import re_path as url
+    from django.urls import re_path as url # pylint: disable=no-name-in-module
 else:
-    from django.conf.urls import url # pylint: disable=no-name-in-module
+    from django.conf.urls import url
 
 from .views import user_required_terms, user_request_access, user_account, user_terms_view
 
