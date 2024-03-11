@@ -36,7 +36,7 @@ class GameAdmin(admin.OSMGeoAdmin):
 
     def archive_activity(self, request, queryset):
         updated = queryset.filter(archived=None).update(archived=timezone.now())
-        
+
         if updated == 1:
             self.message_user(request, '1 activity archived.', messages.SUCCESS)
         else:
@@ -46,7 +46,7 @@ class GameAdmin(admin.OSMGeoAdmin):
 
     def restore_activity(self, request, queryset):
         updated = queryset.update(archived=None)
-        
+
         if updated == 1:
             self.message_user(request, '1 activity restored.', messages.SUCCESS)
         else:

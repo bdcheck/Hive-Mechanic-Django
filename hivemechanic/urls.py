@@ -25,7 +25,7 @@ if sys.version_info[0] > 2:
 
     urlpatterns += [re_path(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
 else:
-    from django.conf.urls import url
+    from django.conf.urls import url, include
 
     urlpatterns = [
         url(r'^accounts/', include('django.contrib.auth.urls')),

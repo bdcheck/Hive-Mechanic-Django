@@ -1116,8 +1116,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 
     context['total_count'] = LogItem.objects.filter(query).intersection(*tag_intersections).count()
 
-    if end > context['total_count']:
-        end = context['total_count']
+    end = min(end, context['total_count'])
 
     context['log_items'] = LogItem.objects.filter(query).intersection(*tag_intersections).order_by(sort)[start:end]
 
