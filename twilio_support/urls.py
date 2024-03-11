@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-position
+
 import sys
 
 from .views import incoming_twilio, incoming_twilio_call

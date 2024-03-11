@@ -1,3 +1,5 @@
+# pylint: disable=wrong-import-position
+
 import sys
 
 if sys.version_info[0] > 2:
