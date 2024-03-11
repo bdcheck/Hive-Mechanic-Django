@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, no-member, wrong-import-position
+# pylint: disable=line-too-long, no-member, wrong-import-order
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin

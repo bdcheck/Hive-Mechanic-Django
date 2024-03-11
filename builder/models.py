@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long, too-many-lines
+# pylint: disable=no-member, line-too-long, too-many-lines, ungrouped-imports
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -45,7 +45,7 @@ from . import card_issues
 from .utils import fetch_cytoscape_node as fetch_cytoscape
 
 if sys.version_info[0] > 2:
-    from django.db.models import JSONField
+    from django.db.models import JSONField # pylint: disable=no-name-in-module
 else:
     from django.contrib.postgres.fields import JSONField
 
