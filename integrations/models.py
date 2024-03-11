@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, no-member
+# pylint: disable=line-too-long, no-member, ungrouped-imports
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -22,7 +22,7 @@ from activity_logger.models import log
 from builder.models import Game, Player, Session, SiteSettings
 
 if sys.version_info[0] > 2:
-    from django.db.models import JSONField
+    from django.db.models import JSONField # pylint: disable=no-name-in-module
 else:
     from django.contrib.postgres.fields import JSONField
 
