@@ -8,16 +8,22 @@ import time
 import traceback
 
 import six
+import sys
 
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
+
+if sys.version_info[0] > 2:
+    from django.db.models import JSONField
+else:
+    from django.contrib.postgres.fields import JSONField
+
 
 from activity_logger.models import log
 from builder.models import Player
@@ -345,7 +351,7 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
         }
 
     if ('CallStatus' in payload) or payload['Body'] or incoming_message.media.count() > 0: # May require revision if voice recordings come in...
-        payload_body = smart_text(payload['Body'])
+        payload_body = smart_str(payload['Body'])
 
         if payload_body == '':
             payload_body = None

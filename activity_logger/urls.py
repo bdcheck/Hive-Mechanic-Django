@@ -1,4 +1,9 @@
-from django.conf.urls import url
+import sys
+
+if sys.version_info[0] > 2:
+    from django.urls import re_path as url
+else:
+    from django.conf.urls import url
 
 from .views import intentional_error
 

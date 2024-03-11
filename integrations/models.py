@@ -7,11 +7,11 @@ from builtins import str # pylint: disable=redefined-builtin
 
 import json
 import re
+import sys
 
 from future.utils import python_2_unicode_compatible
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -20,6 +20,11 @@ from passive_data_kit.models import DataPoint
 
 from activity_logger.models import log
 from builder.models import Game, Player, Session, SiteSettings
+
+if sys.version_info[0] > 2:
+    from django.db.models import JSONField
+else:
+    from django.contrib.postgres.fields import JSONField
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),

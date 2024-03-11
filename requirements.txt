@@ -7,8 +7,8 @@ wheel
 -r simple_backup/requirements.txt
 
 django-db-logger==0.1.10
-django-filer==2.1.2; python_version >= '3.0'
-django-filer==1.7.1; python_version < '3.0'
+django-filer==3.1.1; python_version >= '3.2'
+django-filer==1.7.1; python_version < '3.2'
 easy-thumbnails==2.6; python_version < '3.0'
 easy-thumbnails==2.8.5; python_version >= '3.0'
 Pillow==10.2.0; python_version >= '3.8'

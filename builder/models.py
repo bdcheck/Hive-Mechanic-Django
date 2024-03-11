@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import pkgutil
+import sys
 import traceback
 
 from future import standard_library
@@ -22,7 +23,6 @@ from six import python_2_unicode_compatible
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.contrib.postgres.fields import JSONField
 from django.core.checks import Warning, register # pylint: disable=redefined-builtin
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -43,6 +43,11 @@ from activity_logger.models import log
 
 from . import card_issues
 from .utils import fetch_cytoscape_node as fetch_cytoscape
+
+if sys.version_info[0] > 2:
+    from django.db.models import JSONField
+else:
+    from django.contrib.postgres.fields import JSONField
 
 standard_library.install_aliases()
 

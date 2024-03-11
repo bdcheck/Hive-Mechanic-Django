@@ -1,6 +1,11 @@
 # pylint: disable=line-too-long
 
-from django.conf.urls import url
+import sys
+
+if sys.version_info[0] > 2:
+    from django.urls import re_path as url
+else:
+    from django.conf.urls import url
 
 from .views import user_required_terms, user_request_access, user_account, user_terms_view
 
