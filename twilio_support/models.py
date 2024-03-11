@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, no-member, wrong-import-order, |wrong-import-position
+# pylint: disable=line-too-long, no-member, wrong-import-order, wrong-import-position
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin
@@ -20,7 +20,7 @@ from django.utils import timezone
 from django.utils.encoding import smart_str
 
 if sys.version_info[0] > 2:
-    from django.db.models import JSONField
+    from django.db.models import JSONField # pylint: disable=no-name-in-module
 else:
     from django.contrib.postgres.fields import JSONField
 
