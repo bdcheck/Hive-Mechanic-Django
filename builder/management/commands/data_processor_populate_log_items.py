@@ -37,7 +37,7 @@ class Command(BaseCommand):
         if last_api_log is not None:
             when = last_api_log.logged
 
-        for processor_log_item in DataProcessorLog.objects.filter(requested__gte=when).order_by('requested'):
+        for processor_log_item in DataProcessorLog.objects.filter(requested__gt=when).order_by('requested'):
             summary, preview_url = processor_log_item.fetch_summary()
 
             log_item = LogItem.objects.create(source='api_call:%s' % processor_log_item.pk, message=summary, logged=processor_log_item.requested)
