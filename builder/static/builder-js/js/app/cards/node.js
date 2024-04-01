@@ -456,7 +456,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('  </div>')
       fieldLines.push('</div>')
 
-
       return fieldLines.join('\n')
     }
 
@@ -1190,10 +1189,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       const fieldLines = []
 
       $.each(fields, function (index, field) {
-        if (field.advanced) {
-          
-        } else {
-          fieldLines.push(me.createField(field))          
+        if (field.advanced === undefined || field.advanced === false) {
+          fieldLines.push(me.createField(field))
         }
       })
 
@@ -1275,7 +1272,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       //
       // return htmlString
     }
-
 
     advancedEditBody () {
       let htmlString = '<div class="mdc-layout-grid" style="margin: 0; padding: 0;">'
