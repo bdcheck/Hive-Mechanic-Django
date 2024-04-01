@@ -3,7 +3,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-
+import django.contrib.postgres.fields.jsonb
 
 class Migration(migrations.Migration):
 
@@ -17,9 +17,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('key', models.CharField(max_length=1024)),
-                ('value', models.JSONField(blank=True, null=True)),
+                ('value', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
                 ('added', models.DateTimeField()),
-                ('metadata', models.JSONField(default=dict)),
+                ('metadata', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
                 ('activity', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='state_variables', to='builder.game')),
                 ('player', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='state_variables', to='builder.player')),
                 ('session', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='state_variables', to='builder.session')),

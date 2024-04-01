@@ -2,6 +2,7 @@
 
 from django.db import migrations, models
 
+import django.contrib.postgres.fields.jsonb
 
 class Migration(migrations.Migration):
 
@@ -13,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='statevariable',
             name='metadata',
-            field=models.JSONField(blank=True, default=dict, null=True),
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict, null=True),
         ),
     ]
 # pylint: skip-file
