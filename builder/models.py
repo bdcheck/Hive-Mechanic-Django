@@ -201,6 +201,8 @@ class RemoteRepository(models.Model):
 
     last_updated = models.DateTimeField(null=True, blank=True)
 
+    enabled = models.BooleanField(default=True)
+
 @python_2_unicode_compatible
 class InteractionCardCategory(models.Model):
     name = models.CharField(max_length=4096, unique=True)
@@ -1503,3 +1505,23 @@ class SiteSettings(models.Model):
 
 class CachedFile(File):
     original_url = models.CharField(max_length=4096, null=True, blank=True)
+
+@python_2_unicode_compatible
+class StateVariable(models.Model):
+    player = models.ForeignKey(Player, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+    activity = models.ForeignKey(Game, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+
+    key = models.CharField(max_length=1024)
+    value = JSONField(null=True, blank=True)
+
+    added = models.DateTimeField()
+    metadata = JSONField(default=dict, null=True, blank=True)
+    
+    def length(self):
+        if self.value is None:
+            return 0
+
+        str_version = json.dumps(self.value)
+
+        return len(str_version)

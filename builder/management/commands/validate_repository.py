@@ -51,10 +51,11 @@ class Command(BaseCommand):
 
             for version in versions:
                 implemementation_content = requests.get(version['implementation'], timeout=120).content
+                log_summary_content = requests.get(version['log-summary'], timeout=120).content
 
                 computed_hash = hashlib.sha512()
 
-                computed_hash.update(implemementation_content)
+                computed_hash.update(implemementation_content + log_summary_content)
 
                 local_hash = computed_hash.hexdigest()
 

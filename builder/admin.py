@@ -15,7 +15,7 @@ except ImportError:
 
 from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, \
                     Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings, \
-                    CachedFile
+                    CachedFile, StateVariable
 
 @admin.register(DataProcessorLog)
 class DataProcessorLogAdmin(admin.OSMGeoAdmin):
@@ -161,7 +161,8 @@ class SessionAdmin(admin.OSMGeoAdmin):
 
 @admin.register(RemoteRepository)
 class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
-    list_display = ('name', 'url', 'priority', 'last_updated')
+    list_display = ('name', 'url', 'priority', 'last_updated', 'enabled',)
+    list_filter = ('enabled', 'last_updated',)
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.OSMGeoAdmin):
@@ -221,3 +222,9 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
 class CachedFileAdmin(FileAdmin):
     list_display = ('original_url',)
     search_fields = ['original_url',]
+
+@admin.register(StateVariable)
+class StateVariableAdmin(admin.OSMGeoAdmin):
+    list_display = ('key', 'added', 'length', 'player', 'activity', 'session')
+    search_fields = ['key', 'value', 'metadata']
+    list_filter = ('added', 'activity',)
