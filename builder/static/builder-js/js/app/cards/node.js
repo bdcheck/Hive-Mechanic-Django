@@ -434,6 +434,32 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return fieldLines.join('\n')
     }
 
+    createCheckbox (field) {
+      const me = this
+
+      const fieldLines = []
+
+      fieldLines.push(`<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-${field.width}">`)
+      fieldLines.push('  <div class="mdc-touch-target-wrapper mdc-form-field">')
+      fieldLines.push(`    <div class="mdc-checkbox mdc-checkbox--touch" id="${me.cardId}_${field.field}_field">`)
+      fieldLines.push(`      <input type="checkbox" class="mdc-checkbox__native-control" id="${me.cardId}_${field.field}_value"/>`)
+      fieldLines.push('      <div class="mdc-checkbox__background">')
+      fieldLines.push('        <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">')
+      fieldLines.push('         <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/>')
+      fieldLines.push('        </svg>')
+      fieldLines.push('        <div class="mdc-checkbox__mixedmark"></div>')
+      fieldLines.push('      </div>')
+      fieldLines.push('      <div class="mdc-checkbox__ripple"></div>')
+      fieldLines.push('      <div class="mdc-checkbox__focus-ring"></div>')
+      fieldLines.push('    </div>')
+      fieldLines.push(`    <label for="${me.cardId}_${field.field}_field">${me.fetchLocalizedValue(field.label)}</label>`)
+      fieldLines.push('  </div>')
+      fieldLines.push('</div>')
+
+
+      return fieldLines.join('\n')
+    }
+
     createTextArea (field) {
       const me = this
 
@@ -773,6 +799,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         }
       } else if (field.type === 'choice') {
         fieldLines.push(this.createSelect(field))
+      } else if (field.type === 'boolean') {
+        fieldLines.push(this.createCheckbox(field))
       } else if (field.type === 'readonly') {
         fieldLines.push(this.createReadOnly(field))
       } else if (field.type === 'card') {
@@ -918,6 +946,27 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
         $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
           const value = fieldWidget.value
+
+          me.sequence.markChanged(me.id)
+
+          onUpdate(value)
+        })
+      } else if (field.type === 'boolean') {
+        const fieldWidget = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById(`${me.cardId}_${fieldName}_field`))
+
+        console.log('BOOLEAN')
+        console.log(definition)
+        console.log(field)
+
+        if (definition[field.field] !== undefined) {
+          fieldWidget.checked = definition[field.field]
+        }
+
+        $('#' + me.cardId + '_' + fieldName + '_value').on('change', function () {
+          console.log('CHANGE')
+          console.log(fieldWidget.checked)
+
+          const value = fieldWidget.checked
 
           me.sequence.markChanged(me.id)
 
@@ -1141,7 +1190,27 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       const fieldLines = []
 
       $.each(fields, function (index, field) {
-        fieldLines.push(me.createField(field))
+        if (field.advanced) {
+          
+        } else {
+          fieldLines.push(me.createField(field))          
+        }
+      })
+
+      return fieldLines.join('\n')
+    }
+
+    advancedEditFields () {
+      const me = this
+
+      const fields = this.cardFields()
+
+      const fieldLines = []
+
+      $.each(fields, function (index, field) {
+        if (field.advanced) {
+          fieldLines.push(me.createField(field))
+        }
       })
 
       return fieldLines.join('\n')
@@ -1179,6 +1248,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           me.initializeField(field, me.definition, function () {}, null)
         } else if (field.type === 'pattern') {
           me.initializeField(field, me.definition, onUpdate, null)
+        } else if (field.type === 'boolean') {
+          me.initializeField(field, me.definition, onUpdate, null)
         } else {
           // TODO: Unknown Card Type
         }
@@ -1205,6 +1276,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       // return htmlString
     }
 
+
     advancedEditBody () {
       let htmlString = '<div class="mdc-layout-grid" style="margin: 0; padding: 0;">'
       htmlString += '  <div class="mdc-layout-grid__inner" style="row-gap: 16px;">'
@@ -1221,6 +1293,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       htmlString += '      </div>'
       htmlString += '      <div class="mdc-typography--caption" id="' + this.cardId + '_activity-identifier-warning" style="color: #B71C1C;">Invalid characters or format detected. Please use only alphanumeric characters and dashes.</div>'
       htmlString += '    </div>'
+
+      htmlString += this.advancedEditFields()
 
       htmlString += '    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
       htmlString += '      <div class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined" id="' + this.cardId + '_advanced_comment_field" style="width: 100%">'
