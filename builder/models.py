@@ -1518,6 +1518,9 @@ class StateVariable(models.Model):
     added = models.DateTimeField()
     metadata = JSONField(default=dict, null=True, blank=True)
 
+    def __str__(self):
+        return '%s (len: %s)' % (self.key, self.length())
+
     def length(self):
         if self.value is None:
             return 0
