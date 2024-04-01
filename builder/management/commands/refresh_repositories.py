@@ -120,7 +120,7 @@ class Command(BaseCommand):
                         matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
 
                         matched_processor.processor_function = requests.get(last_version['implementation'], timeout=120).content.decode("utf-8")
-                        
+
                         log_summary_url = last_version.get('log-summary', None)
 
                         if log_summary_url is not None:
@@ -149,6 +149,5 @@ class Command(BaseCommand):
                         metadata = json.loads(matched_processor.metadata)
                         metadata['updated'] = timezone.now().isoformat()
                         matched_processor.metadata = json.dumps(metadata, indent=2)
-
 
                         matched_processor.save()
