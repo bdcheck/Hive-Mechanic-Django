@@ -36,7 +36,7 @@ from integrations.models import Integration
 from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall
 from user_creation.decorators import user_accepted_all_terms
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings, StateVariable
 
 @login_required
 @user_accepted_all_terms
@@ -1219,3 +1219,123 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
         context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
     return render(request, 'builder_activity_log_table.html', context=context)
+
+@login_required
+@user_accepted_all_terms
+def builder_moderate(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements, too-many-locals
+    if request.user.has_perm('builder.builder_moderate') is False:
+        raise PermissionDenied('Moderation permission required.')
+
+    if request.method == 'POST':
+        moderated = 0
+
+        variable_ids = json.loads(request.POST.get('selected_ids', '[]'))
+
+        action = request.POST.get('action', None)
+
+        if action is not None:
+            for variable_id in variable_ids:
+                state_variable = StateVariable.objects.filter(pk=int(variable_id)).first()
+
+                if action == 'approve':
+                    state_variable.moderation_approve()
+                elif action == 'reject':
+                    state_variable.moderation_reject()
+                elif action == 'reset':
+                    state_variable.moderation_reset()
+
+                moderated += 1
+
+        response_payload = {}
+
+        if moderated == 1:
+            response_payload['message'] = '1 item moderated.'
+        else:
+            response_payload['message'] = '%s items moderated.' % moderated
+
+        return HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+    context = {}
+
+    query = Q(pk__gte=0)
+
+    search_query = request.GET.get('q', '')
+
+    if search_query != '':
+        search = (Q(key__icontains=search_query) | Q(value__icontains=search_query) | Q(metadata__icontains=search_query)) # pylint: disable=unsupported-binary-operation
+
+        query = query & search
+
+        context['query'] = search_query
+
+    status_slug = request.GET.get('status', 'pending')
+
+    if status_slug != '':
+        if status_slug == 'pending':
+            query = query & Q(metadata__moderation_status=None)
+        elif status_slug == 'approved':
+            query = query & Q(metadata__moderation_status=True)
+        elif status_slug == 'rejected':
+            query = query & Q(metadata__moderation_status=False)
+        else:
+            query = query & (Q(metadata__moderation_status=False) | Q(metadata__moderation_status=True) | Q(metadata__moderation_status=None)) # pylint: disable=unsupported-binary-operation
+
+    sort = request.GET.get('sort', '-added')
+
+    items_per_page = int(request.GET.get('size', '25'))
+    page_index = int(request.GET.get('page', '0'))
+
+    start = page_index * items_per_page
+    end = start + items_per_page
+
+    context['moderate_items'] = StateVariable.objects.filter(query).order_by(sort)[start:end]
+
+    context['total_count'] = StateVariable.objects.filter(query).count()
+
+    end = min(end, context['total_count'])
+
+    context['page_index'] = page_index
+    context['page_count'] = math.ceil(context['total_count'] / items_per_page)
+
+    context['start_item'] = start + 1
+    context['end_item'] = end
+
+    base_url = reverse('builder_moderate')
+
+    query_string = {
+        'size': items_per_page,
+    }
+
+    if sort is not None:
+        query_string['sort'] = sort
+
+        context['sort'] = sort
+
+    if search_query != '':
+        query_string['q'] = search_query
+
+    context['clear_activity_url'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+    selected_status = request.GET.get('status', 'pending')
+
+    context['selected_status'] = selected_status
+
+    if context['total_count'] > items_per_page and page_index < context['page_count'] - 1:
+        query_string['page'] = page_index + 1
+
+        context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+        if page_index + 1 < context['page_count']:
+            query_string['page'] = context['page_count'] - 1
+            context['last_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+    if context['page_index'] > 0:
+        query_string['page'] = page_index - 1
+
+        context['prior_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+        query_string['page'] = 0
+
+        context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+    return render(request, 'builder_moderate.html', context=context)

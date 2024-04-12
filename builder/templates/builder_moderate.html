@@ -1,0 +1,304 @@
+{% extends 'builder_base.html' %}
+{% load humanize %}
+{% load static %}
+{% load builder_tags %}
+
+{% block 'page_title' %}Moderate Content | Hive Mechanic{% endblock %}
+
+{% block 'page_help' %}
+	<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
+{% endblock %}
+
+{% block 'additional_css' %}
+	.selected_tag {
+		display: inline-block;
+		background-color: #6100EE;
+		border-radius: 5px;
+		color: #ffffff;
+		font-weight: bold;
+		padding-left: 5px;
+		padding-right: 5px;
+		padding-bottom: 2px;
+		margin-bottom: 2px;
+	}
+{% endblock %}
+
+{% block 'main_content' %}
+	<div class="mdc-layout-grid mdc-typography">
+		<div class="mdc-layout-grid__inner">
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography mdc-typography--caption">
+				<div>
+					<div class="mdc-card mdc-typography--caption" style="padding: 12px;">
+						<div class="mdc-layout-grid__inner">
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="padding-top: 8px;">
+								<div style="display: inline-block; padding-top: 10px;">
+									<em id="selection_label">Please select items to moderate.</em>
+								</div>
+								<span style="float: right;">
+									<button class="mdc-button mdc-button--outlined mdc-button--icon-leading" id="button_approve">
+										<span class="mdc-button__ripple"></span>
+										<span class="mdc-button__focus-ring"></span>
+										<i class="material-icons mdc-button__icon" aria-hidden="true">thumb_up</i>
+										<span class="mdc-button__label">Approve</span>
+									</button>
+									<button class="mdc-button mdc-button--outlined mdc-button--icon-leading" id="button_reject">
+										<span class="mdc-button__ripple"></span>
+										<span class="mdc-button__focus-ring"></span>
+										<i class="material-icons mdc-button__icon" aria-hidden="true">thumb_down</i>
+										<span class="mdc-button__label">Reject</span>
+									</button>
+									<button class="mdc-button mdc-button--outlined"  id="button_reset">
+										<span class="mdc-button__ripple"></span>
+										<span class="mdc-button__focus-ring"></span>
+										<span class="mdc-button__label">Reset</span>
+									</button>
+								</span>
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+								<div class="mdc-select mdc-select--outlined" id="status_select" style="width: 100%;">
+									<div class="mdc-select__anchor"	role="button" aria-haspopup="listbox" aria-expanded="false">
+										<span class="mdc-notched-outline">
+											<span class="mdc-notched-outline__leading"></span>
+											<span class="mdc-notched-outline__notch">
+											<span id="outlined-select-label" class="mdc-floating-label">Moderation status&#8230;</span>
+											</span>
+											<span class="mdc-notched-outline__trailing"></span>
+										</span>
+										<span class="mdc-select__selected-text-container">
+											<span id="demo-selected-text" class="mdc-select__selected-text"></span>
+										</span>
+										<span class="mdc-select__dropdown-icon">
+											<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">
+												<polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+												<polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+											</svg>
+										</span>
+									</div>
+									<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" style="z-index: 9999;">
+										<ul class="mdc-list" role="listbox" aria-label="Select activity&#8230;">
+											<li class="mdc-list-item {% if selected_status == 'pending' %}mdc-list-item--selected{% endif %}" data-value="pending" role="option">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__text">
+													Pending Moderation
+												</span>
+											</li>
+											<li class="mdc-list-item {% if selected_status == 'all' %}mdc-list-item--selected{% endif %}" data-value="all" role="option">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__text">
+													All Items
+												</span>
+											</li>
+											<li class="mdc-list-item {% if selected_status == 'approved' %}mdc-list-item--selected{% endif %}" data-value="approved" role="option">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__text">
+													Approved
+												</span>
+											</li>
+											<li class="mdc-list-item {% if selected_status == 'rejected' %}mdc-list-item--selected{% endif %}" data-value="rejected" role="option">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__text">
+													Rejected
+												</span>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3">
+								<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-trailing-icon" id="search_field" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="my-label-id">Search</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="search" class="mdc-text-field__input" aria-labelledby="my-label-id" value="{{ query }}">
+									{% if query %}<i class="material-icons mdc-text-field__icon mdc-text-field__icon--trailing" tabindex="0" role="button" id="search_field_clear">clear</i>{% endif %}
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+				<div class="mdc-card">
+					<div class="mdc-data-table" id="moderation_table">
+					  <div class="mdc-data-table__table-container">
+						<table class="mdc-data-table__table mdc-typography--caption" aria-label="Moderation Items" style="width: 100%">
+						  <thead>
+							<tr class="mdc-data-table__header-row">
+							  <th class="mdc-data-table__header-cell mdc-data-table__header-cell--checkbox-foo" role="columnheader" scope="col" style="width: 64px;">
+								<div class="mdc-checkbox mdc-data-table__header-row-checkbox">
+									<input type="checkbox" class="mdc-checkbox__native-control" aria-label="Toggle all rows"/>
+									<div class="mdc-checkbox__background">
+									<svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+										<path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+									</svg>
+									<div class="mdc-checkbox__mixedmark"></div>
+									</div>
+									<div class="mdc-checkbox__ripple"></div>
+								</div>
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;">
+								<strong style="vertical-align: middle;"><a href="#" id="sort_submitted">Date</a></strong>
+								{% if sort == 'added' %}
+									<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+								{% endif %}
+								{% if sort == '-added' %}
+									<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+								{% endif %}
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+								<strong style="vertical-align: middle;"><a href="#" id="sort_player">Player</a></strong>
+								{% if sort == 'player' %}
+									<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
+								{% endif %}
+								{% if sort == '-player' %}
+									<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
+								{% endif %}
+							</th>
+							<th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+							  	<strong style="vertical-align: middle;">Content</strong>
+							  </th>
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 80px; text-align: center;">
+								<strong style="vertical-align: middle;">Status</strong>
+							</th>
+							</tr>
+						  </thead>
+						  <tbody class="mdc-data-table__content">
+							{% for item in moderate_items %}
+								<tr data-row-id="variable-{{ item.pk }}" class="mdc-data-table__row" data-content="{{ item.content }}" data-date="{{ item.submitted }}" data-details='{{ item.details_json }}'>
+								  <td class="mdc-data-table__cell mdc-data-table__cell--checkbox-foo">
+									<div class="mdc-checkbox mdc-data-table__row-checkbox">
+										<input type="checkbox" class="mdc-checkbox__native-control moderate-item" aria-labelledby="variable-{{ item.pk }}" data-value="{{ item.pk }}"/>
+										<div class="mdc-checkbox__background">
+										<svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+											<path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+										</svg>
+										<div class="mdc-checkbox__mixedmark"></div>
+										</div>
+										<div class="mdc-checkbox__ripple"></div>
+									</div>
+								  </td>
+								  <td class="mdc-data-table__cell mdc-typography--caption">{{ item.added|date:'M j Y, g:iA' }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="variable-{{ item.pk }}" style="white-space: break-spaces;">{{ item.player }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.content }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="text-align: center;">
+									{% if item.metadata.moderation_status is True %}
+										<span class="material-icons">thumb_up</span>
+									{% else %}
+										{% if item.metadata.moderation_status is False %}
+											<span class="material-icons">thumb_down</span>
+										{% else %}
+											<span class="material-icons">question_mark</span>
+										{% endif %}
+									{% endif %}
+								  </td>
+								</tr>
+							{% endfor %}
+						  </tbody>
+						</table>
+					  </div>
+					  <div class="mdc-data-table__pagination">
+						<div class="mdc-data-table__pagination-trailing">
+						  <div class="mdc-data-table__pagination-rows-per-page">
+							<div class="mdc-data-table__pagination-rows-per-page-label">
+							  Items per page
+							</div>
+							<div class="mdc-select mdc-select--outlined mdc-select--no-label mdc-data-table__pagination-rows-per-page-select mdc-data-table__pagination-rows-per-page-select--outlined" id="items_per_page">
+							  <div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-labelledby="demo-pagination-select" tabindex="0">
+								<span class="mdc-select__selected-text-container">
+								  <span id="demo-pagination-select" class="mdc-select__selected-text">25</span>
+								</span>
+								<span class="mdc-select__dropdown-icon">
+								  <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5">
+									<polygon class="mdc-select__dropdown-icon-inactive"	stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>
+									<polygon class="mdc-select__dropdown-icon-active" stroke="none"	fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>
+								  </svg>
+								</span>
+								<span class="mdc-notched-outline mdc-notched-outline--notched">
+								  <span class="mdc-notched-outline__leading"></span>
+								  <span class="mdc-notched-outline__trailing"></span>
+								</span>
+							  </div>
+							  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox">
+								<ul class="mdc-list">
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--selected mdc-list-item--with-one-line" aria-selected="true" role="option" data-value="25">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">25</span>
+									</span>
+								  </li>
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--with-one-line" role="option" data-value="50">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">50</span>
+									</span>
+								  </li>
+								  <li class="mdc-select__option mdc-select__one-line-option mdc-list-item mdc-list-item--with-one-line" role="option" data-value="100">
+									<span class="mdc-list-item__ripple"></span>
+									<span class="mdc-list-item__content">
+									  <span class="mdc-list-item__primary-text">100</span>
+									</span>
+								  </li>
+								</ul>
+							  </div>
+							</div>
+						  </div>
+
+						  <div class="mdc-data-table__pagination-navigation">
+							<div class="mdc-data-table__pagination-total">
+							  {{ start_item|intcomma }} to {{ end_item|intcomma }} of {{ total_count|intcomma }}
+							</div>
+							{% if first_page %}
+								<a href="{{ first_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true">
+								  <div class="mdc-button__icon">first_page</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true" disabled>
+								  <div class="mdc-button__icon">first_page</div>
+								</button>
+							{% endif %}
+							{% if prior_page %}
+								<a href="{{ prior_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
+								  <div class="mdc-button__icon">chevron_left</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" disabled>
+								  <div class="mdc-button__icon">chevron_left</div>
+								</button>
+							{% endif %}
+							{% if next_page %}
+								<a href="{{ next_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
+								  <div class="mdc-button__icon">chevron_right</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" disabled>
+								  <div class="mdc-button__icon">chevron_right</div>
+								</button>
+							{% endif %}
+							{% if last_page %}
+								<a href="{{ last_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true">
+								  <div class="mdc-button__icon">last_page</div>
+								</a>
+							{% else %}
+								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true" disabled>
+								  <div class="mdc-button__icon">last_page</div>
+								</button>
+							{% endif %}
+						  </div>
+						</div>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block 'js_init' %}
+	<script>window.selectedActivity = '{{ selected_activity }}'</script>
+	<script data-main="{% static 'builder-js/js/app/moderate.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
+{% endblock %}

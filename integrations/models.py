@@ -353,6 +353,7 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             'session': 'session-' + str(session.pk),
             'game': str(session.game_version.game.slug),
             'player': str(session.player.identifier),
+            'metadata': action.get('metadata', None),
         }
 
         if 'scope' in action:
@@ -363,16 +364,15 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             action['translated_value'] = integration.translate_value(action['value'], session, scope)
 
             if scope == 'session':
-                session.set_variable(action['variable'], action['translated_value'])
+                session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
             elif scope == 'player':
-                session.player.set_variable(action['variable'], action['translated_value'])
+                session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
             elif scope == 'game':
-                session.game_version.game.set_variable(action['variable'], action['translated_value'])
-
+                session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 
-            session.set_variable(action['value'], action['translated_value'])
+            session.set_variable(action['value'], action['translated_value'], metadata=action.get('metadata', None))
 
         payload['value'] = action['translated_value']
 
