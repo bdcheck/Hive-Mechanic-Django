@@ -1,4 +1,4 @@
-/* global requirejs */
+/* global requirejs, alert */
 
 requirejs.config({
   shim: {
@@ -77,7 +77,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  let moderationTable = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('moderation_table'))
+  mdc.dataTable.MDCDataTable.attachTo(document.getElementById('moderation_table'))
 
   $('.mdc-data-table__row').click(function (event) {
 
@@ -154,11 +154,11 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  const fetchSelected = function() {
-    let selectedIds = []
+  const fetchSelected = function () {
+    const selectedIds = []
 
-    $('.moderate-item:checked').each(function(index, element) {
-      let selectedId = $(element).attr('data-value')
+    $('.moderate-item:checked').each(function (index, element) {
+      const selectedId = $(element).attr('data-value')
 
       if (selectedId !== undefined) {
         selectedIds.push(selectedId)
@@ -174,19 +174,19 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   $('#button_reject').prop('disabled', true)
   $('#button_reset').prop('disabled', true)
 
-  $('input[type="checkbox"]').change(function() {
+  $('input[type="checkbox"]').change(function () {
     console.log('CHANGE CHECK')
 
-    window.setTimeout(function() {
-      let selected = fetchSelected()
+    window.setTimeout(function () {
+      const selected = fetchSelected()
 
-      if (selected.length == 0) {
+      if (selected.length === 0) {
         $('#selection_label').text('Please select items to moderate.')
 
         $('#button_approve').prop('disabled', true)
         $('#button_reject').prop('disabled', true)
         $('#button_reset').prop('disabled', true)
-      } else if (selected.length == 1) {
+      } else if (selected.length === 1) {
         $('#selection_label').text('1 item selected.')
 
         $('#button_approve').prop('disabled', false)
@@ -202,50 +202,50 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }, 250)
   })
 
-  $('#button_approve').click(function(eventObj) {
-    let selected = fetchSelected()
+  $('#button_approve').click(function (eventObj) {
+    const selected = fetchSelected()
 
-    let payload = {
-        'action': 'approve',
-        'selected_ids': JSON.stringify(selected)
+    const payload = {
+      action: 'approve',
+      selected_ids: JSON.stringify(selected)
     }
 
-    $.post('/builder/moderate', payload, function(data) {
+    $.post('/builder/moderate', payload, function (data) {
       alert(data.message)
 
       window.location.reload()
     })
-  });
+  })
 
-  $('#button_reject').click(function(eventObj) {
-    let selected = fetchSelected()
+  $('#button_reject').click(function (eventObj) {
+    const selected = fetchSelected()
 
-    let payload = {
-      'action': 'reject',
-      'selected_ids': JSON.stringify(selected)
+    const payload = {
+      action: 'reject',
+      selected_ids: JSON.stringify(selected)
     }
 
-    $.post('/builder/moderate', payload, function(data) {
+    $.post('/builder/moderate', payload, function (data) {
       alert(data.message)
 
       window.location.reload()
     })
-  });
+  })
 
-  $('#button_reset').click(function(eventObj) {
-    let selected = fetchSelected()
+  $('#button_reset').click(function (eventObj) {
+    const selected = fetchSelected()
 
-    let payload = {
-      'action': 'reset',
-      'selected_ids': JSON.stringify(selected)
+    const payload = {
+      action: 'reset',
+      selected_ids: JSON.stringify(selected)
     }
 
-    $.post('/builder/moderate', payload, function(data) {
+    $.post('/builder/moderate', payload, function (data) {
       alert(data.message)
 
       window.location.reload()
     })
-  });
+  })
 
   $('#right_bar').css('max-width', $('#right_bar').width() + 'px')
 })

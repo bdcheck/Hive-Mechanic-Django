@@ -186,8 +186,8 @@
 									</div>
 								  </td>
 								  <td class="mdc-data-table__cell mdc-typography--caption">{{ item.added|date:'M j Y, g:iA' }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="variable-{{ item.pk }}" style="white-space: break-spaces;">{{ item.player_obj }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="context-{{ item.pk }}">{{ item.context }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="variable-{{ item.pk }}" style="white-space: break-spaces;">{{ item.player_obj.identifier|obfuscate_identifier }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="context-{{ item.pk }}" style="white-space: break-spaces;">{{ item.context }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.content }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row">
 									{% if item.metadata.moderation_status is True %}

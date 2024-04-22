@@ -28,7 +28,6 @@ class Command(BaseCommand):
             'delete_gameversion',
             'view_gameversion',
             'builder_login',
-            'builder_moderate_activity',
         ]
 
         editor_permissions.extend(reader_permissions)

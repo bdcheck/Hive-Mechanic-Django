@@ -1589,6 +1589,8 @@ class StateVariable(models.Model):
         return '%s: %s' % (self.key, self.value)
 
     def context(self):
+        from .templatetags.builder_tags import obfuscate_identifier
+
         if self.activity is not None:
             return 'Activity: %s' % self.activity
 
@@ -1596,7 +1598,7 @@ class StateVariable(models.Model):
             return 'Session: %s' % self.session
 
         if self.player is not None:
-            return 'Player: %s' % self.player
+            return 'Player: %s' % obfuscate_identifier(self.player.identifier)
 
         return 'Unknown'
 
