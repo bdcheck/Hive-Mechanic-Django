@@ -72,7 +72,7 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
-            bandit -c bandit.toml -r .
+            bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -164,7 +164,7 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
-            bandit -c bandit.toml -r .
+            bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -259,7 +259,7 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
-            bandit -c bandit.toml -r .
+            bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)

@@ -1,2 +1,0 @@
-[tool.bandit]
-exclude_dirs = ["node_modules"]
