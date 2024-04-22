@@ -98,3 +98,21 @@ def fetch_cytoscape_node(definition, simplify=False): # pylint: disable=too-many
         return None
 
     return json.loads(result_io.getvalue())
+
+def obfuscate_player_id(raw_identifier):
+    obfuscated = ''
+
+    number_count = 0
+
+    for character in raw_identifier[::-1]:
+        if character.isdigit():
+            if number_count < 4:
+                obfuscated = character + obfuscated
+
+                number_count += 1
+            else:
+                obfuscated = 'X' + obfuscated
+        else:
+            obfuscated = character + obfuscated
+
+    return obfuscated

@@ -42,7 +42,7 @@ from passive_data_kit.models import DataPoint
 from activity_logger.models import log
 
 from . import card_issues
-from .utils import fetch_cytoscape_node as fetch_cytoscape
+from .utils import fetch_cytoscape_node as fetch_cytoscape, obfuscate_player_id
 
 if sys.version_info[0] > 2:
     from django.db.models import JSONField # pylint: disable=no-name-in-module
@@ -1589,8 +1589,6 @@ class StateVariable(models.Model):
         return '%s: %s' % (self.key, self.value)
 
     def context(self):
-        from .templatetags.builder_tags import obfuscate_identifier
-
         if self.activity is not None:
             return 'Activity: %s' % self.activity
 
@@ -1598,7 +1596,7 @@ class StateVariable(models.Model):
             return 'Session: %s' % self.session
 
         if self.player is not None:
-            return 'Player: %s' % obfuscate_identifier(self.player.identifier)
+            return 'Player: %s' % obfuscate_player_id(self.player.identifier)
 
         return 'Unknown'
 

@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long, too-many-lines
+# pylint: disable=no-member, line-too-long, too-many-lines, unsupported-binary-operation
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin
