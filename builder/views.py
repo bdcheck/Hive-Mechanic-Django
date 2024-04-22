@@ -1294,7 +1294,7 @@ def builder_moderate(request): # pylint: disable=unused-argument, too-many-branc
         session_pks = []
 
         for activity in request.user.builder_game_editables.all():
-            activity_filter =  activity_filter | Q(activity=activity)
+            activity_filter = activity_filter | Q(activity=activity)
 
             for version in activity.versions.all():
                 for session in version.sessions.all():
