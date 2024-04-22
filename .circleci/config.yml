@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Build and validate
           command: |
-            sudo apt-get update && sudo apt-get install -y gdal-bin libsdl2-dev libsdl2-2.0-0
+            sudo apt-get update && sudo apt-get install -y gdal-bin libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev python3-setuptools python3-dev python3-numpy
             python3 -m venv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
             git submodule init
