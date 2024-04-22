@@ -558,7 +558,6 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
 
                 if moderation_status is True:
                     return state_variable.value
-
             else:
                 return state_variable.value
 
@@ -1166,8 +1165,6 @@ class Session(models.Model):
 
                 if moderation_status is True:
                     return state_variable.value
-            else:
-                return None
 
             return state_variable.value
 
