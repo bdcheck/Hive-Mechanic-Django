@@ -1223,7 +1223,7 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
 @login_required
 @user_accepted_all_terms
 def builder_moderate(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements, too-many-locals
-    if request.user.has_perm('builder.builder_moderate') is False:
+    if request.user.has_perm('builder.builder_moderate') is False and request.user.has_perm('builder.builder_moderate_activity') is False:
         raise PermissionDenied('Moderation permission required.')
 
     if request.method == 'POST':
@@ -1287,6 +1287,22 @@ def builder_moderate(request): # pylint: disable=unused-argument, too-many-branc
 
     start = page_index * items_per_page
     end = start + items_per_page
+
+    if request.user.has_perm('builder.builder_moderate') is False:
+        activity_filter = Q(pk=-1)
+
+        session_pks = []
+
+        for activity in request.user.builder_game_editables.all():
+            activity_filter =  activity_filter | Q(activity=activity)
+
+            for version in activity.versions.all():
+                for session in version.sessions.all():
+                    session_pks.append(session.pk)
+
+        activity_filter = activity_filter | Q(session__pk__in=session_pks)
+
+        query = query & activity_filter
 
     context['moderate_items'] = StateVariable.objects.filter(query).order_by(sort)[start:end]
 

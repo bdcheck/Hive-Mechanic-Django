@@ -28,6 +28,7 @@ class Command(BaseCommand):
             'delete_gameversion',
             'view_gameversion',
             'builder_login',
+            'builder_moderate_activity',
         ]
 
         editor_permissions.extend(reader_permissions)
@@ -67,6 +68,7 @@ class Command(BaseCommand):
             'view_outgoingcall',
             'view_outgoingmessage',
             'builder_login',
+            'builder_moderate',
         ]
 
         manager_group = Group.objects.filter(name='Hive Mechanic Manager').first()

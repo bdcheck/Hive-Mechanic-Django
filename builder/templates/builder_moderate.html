@@ -60,7 +60,7 @@
 										<span class="mdc-notched-outline">
 											<span class="mdc-notched-outline__leading"></span>
 											<span class="mdc-notched-outline__notch">
-											<span id="outlined-select-label" class="mdc-floating-label">Moderation status&#8230;</span>
+											<span id="outlined-select-label" class="mdc-floating-label">Show&#8230;</span>
 											</span>
 											<span class="mdc-notched-outline__trailing"></span>
 										</span>
@@ -141,7 +141,7 @@
 									<div class="mdc-checkbox__ripple"></div>
 								</div>
 							  </th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;">
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 180px;">
 								<strong style="vertical-align: middle;"><a href="#" id="sort_submitted">Date</a></strong>
 								{% if sort == 'added' %}
 									<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
@@ -150,7 +150,7 @@
 									<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
 								{% endif %}
 							  </th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
+							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 150px;">
 								<strong style="vertical-align: middle;"><a href="#" id="sort_player">Player</a></strong>
 								{% if sort == 'player' %}
 									<span class="material-icons" style="vertical-align: middle;">arrow_drop_up</span>
@@ -159,11 +159,14 @@
 									<span class="material-icons" style="vertical-align: middle;">arrow_drop_down</span>
 								{% endif %}
 							</th>
+							<th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 200px;">
+								<strong style="vertical-align: middle;">Context</strong>
+							</th>
 							<th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col">
 							  	<strong style="vertical-align: middle;">Content</strong>
-							  </th>
-							  <th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 80px; text-align: center;">
-								<strong style="vertical-align: middle;">Status</strong>
+							</th>
+							<th class="mdc-data-table__header-cell mdc-typography--caption" role="columnheader" scope="col" style="width: 100px;">
+								<strong>Status</strong>
 							</th>
 							</tr>
 						  </thead>
@@ -183,16 +186,17 @@
 									</div>
 								  </td>
 								  <td class="mdc-data-table__cell mdc-typography--caption">{{ item.added|date:'M j Y, g:iA' }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="variable-{{ item.pk }}" style="white-space: break-spaces;">{{ item.player }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="variable-{{ item.pk }}" style="white-space: break-spaces;">{{ item.player_obj }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" id="context-{{ item.pk }}">{{ item.context }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.content }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="text-align: center;">
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row">
 									{% if item.metadata.moderation_status is True %}
-										<span class="material-icons">thumb_up</span>
+										<!-- <span class="material-icons">thumb_up</span> --><span>Approved</span>
 									{% else %}
 										{% if item.metadata.moderation_status is False %}
-											<span class="material-icons">thumb_down</span>
+											<!-- <span class="material-icons">thumb_down</span> --><span>Rejected</span>
 										{% else %}
-											<span class="material-icons">question_mark</span>
+											<!-- <span class="material-icons">question_mark</span> --><span>Pending</span>
 										{% endif %}
 									{% endif %}
 								  </td>

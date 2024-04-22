@@ -366,9 +366,9 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             if scope == 'session':
                 session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
             elif scope == 'player':
-                session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+                session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
             elif scope == 'game':
-                session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+                session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 

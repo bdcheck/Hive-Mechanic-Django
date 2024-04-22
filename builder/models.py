@@ -183,7 +183,8 @@ class PermissionsSupport(models.Model):
             ('builder_access_edit', 'Edit game builder information'),
             ('builder_db_logging_view', 'View database logging entries'),
             ('builder_db_logging_edit', 'Edit database logging entries'),
-            ('builder_moderate', 'Moderate content'),
+            ('builder_moderate', 'Moderate all content'),
+            ('builder_moderate_activity', 'Moderate activity content'),
         )
 
 class RemoteRepository(models.Model):
@@ -529,7 +530,7 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
         self.refresh_from_db()
 
     @transaction.atomic
-    def set_variable(self, variable, value, metadata=None):
+    def set_variable(self, variable, value, metadata=None, session=None):
         if metadata is None:
             metadata = {}
 
@@ -543,7 +544,7 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
 
         self.state_variables.filter(key=variable, active=True).update(active=False)
 
-        StateVariable.objects.create(activity=self, key=variable, value=value, added=timezone.now(), metadata=metadata)
+        StateVariable.objects.create(activity=self, session=session, key=variable, value=value, added=timezone.now(), metadata=metadata)
 
         version = self.versions.order_by('-created').first()
 
@@ -1031,7 +1032,7 @@ class Player(models.Model):
         return 'player:%d' % self.pk
 
     @transaction.atomic
-    def set_variable(self, variable, value, metadata=None):
+    def set_variable(self, variable, value, metadata=None, session=None):
         if metadata is None:
             metadata = {}
 
@@ -1045,7 +1046,7 @@ class Player(models.Model):
 
         self.state_variables.filter(key=variable, active=True).update(active=False)
 
-        StateVariable.objects.create(player=self, key=variable, value=value, added=timezone.now(), metadata=metadata)
+        StateVariable.objects.create(player=self, key=variable, value=value, added=timezone.now(), metadata=metadata, session=session)
 
         log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=variable_metadata, player=self, session=None, game_version=None)
 
@@ -1100,6 +1101,9 @@ class Session(models.Model):
     completed = models.DateTimeField(null=True, blank=True)
 
     session_state = JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return '%s' % self.game_version.game
 
     def log_id(self):
         return 'session:%d' % self.pk
@@ -1564,6 +1568,15 @@ class StateVariable(models.Model):
     def __str__(self):
         return '%s (len: %s)' % (self.key, self.length())
 
+    def player_obj(self):
+        if self.player is not None:
+            return self.player
+
+        if self.session is not None:
+            return self.session.player
+
+        return None
+
     def length(self):
         if self.value is None:
             return 0
@@ -1574,6 +1587,18 @@ class StateVariable(models.Model):
 
     def content(self):
         return '%s: %s' % (self.key, self.value)
+
+    def context(self):
+        if self.activity is not None:
+            return 'Activity: %s' % self.activity
+
+        if self.session is not None and self.player is None:
+            return 'Session: %s' % self.session
+
+        if self.player is not None:
+            return 'Player: %s' % self.player
+
+        return 'Unknown'
 
     def moderation_approve(self):
         self.metadata['moderation_status'] = True
