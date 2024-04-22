@@ -6,8 +6,9 @@ from client import HiveClient, TriggerInterruptCommand, SetVariableCommand, Vari
 
 #INSTRUCTIONS: swap out the variables in the list below with the variables specific to your game:
 HIVE_API_URL = 'https://workshop.hivemechanic.org/http/'
-HIVE_CLIENT_TOKEN = 'testerapi481943' # nosec - This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
-#DEVICE_NAME should be a unique name for your computer or RasPi (ex. "RasPi_202A")
+# This is a placeholder for someone to fill out on their own machine. (Do not delete - see Bandit documentation.)
+HIVE_CLIENT_TOKEN = 'testerapi481943' # nosec
+# DEVICE_NAME should be a unique name for your computer or RasPi (ex. "RasPi_202A")
 DEVICE_NAME = 'pi:12345'
 AUDIO_VARIABLE_NAME = 'claimed_audio_file'
 
