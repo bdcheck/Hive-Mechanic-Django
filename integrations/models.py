@@ -5,6 +5,7 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import datetime
 import json
 import re
 import sys
@@ -314,6 +315,14 @@ class Integration(models.Model):
             'game': self.game,
             'details': []
         }
+
+        now = timezone.now()
+        day_start = now - datetime.timedelta(days=1)
+        week_start = now - datetime.timedelta(days=7)
+
+        statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
+        statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
+        statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
 
         if self.type == 'twilio':
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel

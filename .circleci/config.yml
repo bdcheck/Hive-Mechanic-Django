@@ -59,6 +59,7 @@ jobs:
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
             python manage.py install_quicksilver_tasks
+            python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit
@@ -151,6 +152,7 @@ jobs:
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
             python manage.py install_quicksilver_tasks
+            python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit
@@ -246,6 +248,7 @@ jobs:
             python manage.py install_default_repository
             python manage.py initialize_default_site_settings
             python manage.py install_quicksilver_tasks
+            python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
             pylint passive_data_kit

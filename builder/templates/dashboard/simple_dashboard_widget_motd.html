@@ -1,0 +1,7 @@
+{% with signal.latest_value as latest_value %}
+	<div class="mdc-typography mdc-typography--headline4">
+		{{ latest_value.fetch_value|safe }}
+	</div>
+{% endwith %}
+
+

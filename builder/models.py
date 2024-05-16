@@ -462,6 +462,14 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
 
         return self.metadata
 
+    def unique_users(self, since=None):
+        uniques = set()
+
+        for version in self.versions.all():
+            uniques.update(version.unique_users(since=since))
+
+        return uniques
+
     def interaction_card_modules_json(self):
         modules = []
 
@@ -1014,6 +1022,19 @@ class GameVersion(models.Model):
                 session.player.set_variable(variable['name'], variable['value'])
             else:
                 self.game.set_variable(variable['name'], variable['value'])
+
+    def unique_users(self, since=None):
+        uniques = set()
+
+        session_query = self.sessions.all()
+
+        if since is not None:
+            session_query = self.sessions.filter(started__gte=since)
+
+        for session in session_query:
+            uniques.add(session.player.pk)
+
+        return uniques
 
 @receiver(pre_save, sender=GameVersion)
 def reset_game_version_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument

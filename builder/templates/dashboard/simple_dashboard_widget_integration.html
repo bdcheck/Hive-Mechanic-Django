@@ -1,0 +1,16 @@
+{% load humanize %}
+{% with signal.latest_value as latest_value %}
+	{% if latest_value %}
+		{% with latest_value.fetch_value as value %}
+			<div class="mdc-typography mdc-typography--subtitle1">Activity: {{ value.activity }}</div>
+
+			{% for detail in value.details %}
+				<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
+			{% endfor %}
+			<div class="mdc-typography mdc-typography--body1">Integration: {{ value.type }}</div>
+		{% endwith %}
+		<div class="mdc-typography mdc-typography--caption" style="margin-top: 8px;">
+			Last updated: <strong>{{ latest_value.recorded }}</strong>
+		</div>
+	{% endif %}
+{% endwith %}

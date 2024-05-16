@@ -10,8 +10,6 @@ import os
 import urllib
 
 import arrow
-import humanize
-import numpy
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -33,7 +31,6 @@ from filer.models import filemodels
 
 from activity_logger.models import LogItem, LogTag
 from integrations.models import Integration
-from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall
 from user_creation.decorators import user_accepted_all_terms
 
 from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings, StateVariable
@@ -44,71 +41,7 @@ def builder_home(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
-    now = timezone.now()
-
     context = {}
-
-    integration_types = {}
-
-    for integration in Integration.objects.all():
-        if (integration.type in integration_types) is False:
-            integration_types[integration.type] = []
-
-        integration_types[integration.type].append(integration.fetch_statistics())
-
-    site_settings = SiteSettings.objects.all().order_by('-last_updated').first()
-
-    context['integrations'] = integration_types
-    context['site_settings'] = site_settings
-    context['incoming_messages'] = IncomingMessage.objects.all()
-    context['outgoing_messages_sent'] = OutgoingMessage.objects.exclude(sent_date=None).filter(errored=False)
-    context['outgoing_messages_pending'] = OutgoingMessage.objects.filter(sent_date=None, send_date__gte=now, errored=False)
-    context['outgoing_messages_errored'] = OutgoingMessage.objects.filter(errored=True)
-
-    if site_settings:
-        if site_settings.total_message_limit is not None:
-            context['message_limit'] = site_settings.total_message_limit
-
-            incoming_messages = IncomingMessage.objects.all()
-            outgoing_messages = OutgoingMessage.objects.all()
-            outgoing_calls = OutgoingCall.objects.all()
-
-            if site_settings.count_messages_since is not None:
-                incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
-                outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
-                outgoing_calls = OutgoingCall.objects.filter(sent_date__gte=site_settings.count_messages_since)
-
-                context['message_limit_reset'] = site_settings.count_messages_since
-
-            messages_sent = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
-            messages_remaining = site_settings.total_message_limit - messages_sent
-
-            if messages_remaining < site_settings.total_message_limit / 4:
-                context['messages_remaining_warning'] = True
-
-            context['messages_remaining'] = messages_remaining
-
-    context['active_sessions'] = Session.objects.filter(completed=None)
-    context['completed_sessions'] = Session.objects.exclude(completed=None)
-
-    context['oldest_active_session'] = Session.objects.filter(completed=None).order_by('started').first()
-    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
-
-    durations = []
-
-    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
-
-    for session in context['completed_sessions']:
-        durations.append((session.completed - session.started).total_seconds())
-
-    if len(durations) > 0: # pylint: disable=len-as-condition
-        mean_duration = numpy.mean(durations)
-
-        delta = datetime.timedelta(seconds=mean_duration)
-
-        context['average_session_duration_humanized'] = humanize.naturaldelta(delta)
-    else:
-        context['average_session_duration_humanized'] = 'Unknown, no sessions completed  yet.'
 
     return render(request, 'builder_home.html', context=context)
 
