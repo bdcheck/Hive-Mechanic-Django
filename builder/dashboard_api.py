@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, no-member
+# pylint: disable=line-too-long, no-member, len-as-condition
 
 import datetime
 
