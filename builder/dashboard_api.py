@@ -82,7 +82,7 @@ def dashboard_template(signal_name):
 
     return None
 
-def update_dashboard_signal_value(signal_name): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+def update_dashboard_signal_value(signal_name): # pylint: disable=too-many-locals, too-many-branches, too-many-statements, too-many-return-statements
     now = timezone.now()
 
     if signal_name == 'Message of the Day':
