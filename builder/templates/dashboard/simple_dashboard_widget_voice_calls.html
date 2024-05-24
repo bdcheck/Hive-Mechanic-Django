@@ -1,0 +1,12 @@
+{% load humanize %}
+{% with signal.latest_value as latest_value %}
+	{% if latest_value %}
+		{% with latest_value.fetch_value as value %}
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Outgoing Turns: <strong>{{ value.outgoing_turns|intcomma }}</strong></p>
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Incoming Turns: <strong>{{ value.incoming_turns|intcomma }}</strong></p>
+		{% endwith %}
+		<div class="mdc-typography mdc-typography--caption" style="margin-top: 8px;">
+			Last updated: <strong>{{ latest_value.recorded }}</strong>
+		</div>
+	{% endif %}
+{% endwith %}

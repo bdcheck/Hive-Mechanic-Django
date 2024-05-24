@@ -10,7 +10,7 @@ from django.utils import timezone
 from simple_dashboard.models import DashboardSignal
 
 from integrations.models import Integration
-from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall
+from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall, IncomingCallResponse
 
 from .models import SiteSettings, Session
 
@@ -46,6 +46,15 @@ def dashboard_signals():
             }
         })
 
+    if OutgoingCall.objects.all().count() > 0:
+        signals.append({
+            'name': 'Voice Calls',
+            'refresh_interval': 300,
+            'configuration': {
+                'widget_columns': 4
+            }
+        })
+
     return signals
 
 
@@ -58,6 +67,9 @@ def dashboard_template(signal_name):
 
     if signal_name == 'Message Traffic':
         return 'dashboard/simple_dashboard_widget_message_traffic.html'
+
+    if signal_name == 'Voice Calls':
+        return 'dashboard/simple_dashboard_widget_voice_calls.html'
 
     if signal_name.startswith('Integration: '):
         signal = DashboardSignal.objects.filter(name=signal_name).first()
@@ -175,5 +187,13 @@ def update_dashboard_signal_value(signal_name): # pylint: disable=too-many-local
                 }
 
                 return value
+
+    if signal_name == 'Voice Calls':
+        value = {
+            'outgoing_turns': OutgoingCall.objects.all().count(),
+            'incoming_turns': IncomingCallResponse.objects.all().count(),
+        }
+
+        return value
 
     return None
