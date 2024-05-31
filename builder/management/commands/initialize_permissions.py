@@ -28,6 +28,19 @@ class Command(BaseCommand):
             'delete_gameversion',
             'view_gameversion',
             'builder_login',
+            'add_file',
+            'add_folder',
+            'add_image',
+            'can_use_directory_listing',
+            'change_file',
+            'change_folder',
+            'change_image',
+            'delete_file',
+            'delete_folder',
+            'delete_image',
+            'view_file',
+            'view_folder',
+            'view_image',
         ]
 
         editor_permissions.extend(reader_permissions)
@@ -67,6 +80,19 @@ class Command(BaseCommand):
             'view_outgoingcall',
             'view_outgoingmessage',
             'builder_login',
+            'add_file',
+            'add_folder',
+            'add_image',
+            'can_use_directory_listing',
+            'change_file',
+            'change_folder',
+            'change_image',
+            'delete_file',
+            'delete_folder',
+            'delete_image',
+            'view_file',
+            'view_folder',
+            'view_image',
         ]
 
         manager_group = Group.objects.filter(name='Hive Mechanic Manager').first()

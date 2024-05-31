@@ -96,6 +96,113 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
                 hint='Run the "initialize_permissions" command to set up required permissions',
                 id='builder.W001',
             ))
+
+        hive_editors = Group.objects.filter(name='Hive Mechanic Game Editor').first()
+
+        if hive_editors is None:
+            warnings.append(Warning(
+                'Missing required Hive Mechanic groups',
+                hint='Run the "initialize_permissions" command to set up required permissions',
+                id='builder.W001',
+            ))
+        else:
+            editor_permissions = [
+                'add_game',
+                'change_game',
+                'delete_game',
+                'view_game',
+                'add_gameversion',
+                'change_gameversion',
+                'delete_gameversion',
+                'view_gameversion',
+                'builder_login',
+                'add_file',
+                'add_folder',
+                'add_image',
+                'can_use_directory_listing',
+                'change_file',
+                'change_folder',
+                'change_image',
+                'delete_file',
+                'delete_folder',
+                'delete_image',
+                'view_file',
+                'view_folder',
+                'view_image',
+            ]
+
+            missing_permissions = []
+
+            for permission in editor_permissions:
+                if hive_editors.permissions.filter(codename=permission).count() == 0:
+                    missing_permissions.append(permission)
+
+            for permission in missing_permissions:
+                warnings.append(Warning(
+                                'Group %s missing required permission %s' % (hive_editors, permission),
+                                hint='Run the "initialize_permissions" command to set up required permissions',
+                                id='builder.W002',
+                            ))
+
+        hive_managers = Group.objects.filter(name='Hive Mechanic Manager').first()
+
+        if hive_managers is None:
+            warnings.append(Warning(
+                'Missing required Hive Mechanic groups',
+                hint='Run the "initialize_permissions" command to set up required permissions',
+                id='builder.W001',
+            ))
+        else:
+            manager_permissions = [
+                'view_group',
+                'add_user',
+                'change_user',
+                'delete_user',
+                'view_user',
+                'add_interactioncard',
+                'change_interactioncard',
+                'delete_interactioncard',
+                'view_interactioncard',
+                'view_integration',
+                'add_execution',
+                'change_execution',
+                'delete_execution',
+                'view_execution',
+                'add_task',
+                'change_task',
+                'delete_task',
+                'view_task',
+                'view_incomingmessage',
+                'view_incomingmessagemedia',
+                'view_outgoingcall',
+                'view_outgoingmessage',
+                'builder_login',
+                'add_file',
+                'add_folder',
+                'add_image',
+                'can_use_directory_listing',
+                'change_file',
+                'change_folder',
+                'change_image',
+                'delete_file',
+                'delete_folder',
+                'delete_image',
+                'view_file',
+                'view_folder',
+                'view_image',
+            ]
+            missing_permissions = []
+
+            for permission in manager_permissions:
+                if hive_managers.permissions.filter(codename=permission).count() == 0:
+                    missing_permissions.append(permission)
+
+            for permission in missing_permissions:
+                warnings.append(Warning(
+                                'Group %s missing required permission %s' % (hive_managers, permission),
+                                hint='Run the "initialize_permissions" command to set up required permissions',
+                                id='builder.W002',
+                            ))
     except ProgrammingError: # Thrown before migration happens.
         pass
 
