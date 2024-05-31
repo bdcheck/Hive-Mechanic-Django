@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument('--silent', default=False, action='store_true')
 
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements, too-many-branches
-        for repository in RemoteRepository.objects.order_by('priority'): # pylint: disable=too-many-nested-blocks
+        for repository in RemoteRepository.objects.filter(enabled=True).order_by('priority'): # pylint: disable=too-many-nested-blocks
             headers = {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
@@ -31,8 +31,6 @@ class Command(BaseCommand):
                 pass
 
             response = requests.get(repository.url, headers=headers, timeout=120)
-
-            print('%s: %s' % (repository.url, response.content))
 
             repository_def = response.json()
 
@@ -118,9 +116,20 @@ class Command(BaseCommand):
                     if matched_processor is None:
                         if cmd_options['silent'] is False:
                             print('Adding new data processor: ' + processor_def['name'] + '...')
+
                         matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
 
                         matched_processor.processor_function = requests.get(last_version['implementation'], timeout=120).content.decode("utf-8")
+
+                        log_summary_url = last_version.get('log-summary', None)
+
+                        if log_summary_url is not None:
+                            log_summary_function = requests.get(log_summary_url, timeout=120).content.decode("utf-8")
+
+                            matched_processor.log_summary_function = log_summary_function
+                        else:
+                            matched_processor.log_summary_function = 'context[\'log_summary\'] = \'%s: Unimplemented log_summary_function\'' % processor_def['name']
+
                         matched_processor.version = last_version['version']
                         matched_processor.repository_definition = processor_json
 
@@ -140,6 +149,5 @@ class Command(BaseCommand):
                         metadata = json.loads(matched_processor.metadata)
                         metadata['updated'] = timezone.now().isoformat()
                         matched_processor.metadata = json.dumps(metadata, indent=2)
-
 
                         matched_processor.save()

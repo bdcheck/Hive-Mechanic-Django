@@ -1,0 +1,24 @@
+{% load humanize %}
+{% with signal.latest_value as latest_value %}
+	{% if latest_value %}
+		{% with latest_value.fetch_value as value %}
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Active: <strong>{{ value.active_count|intcomma }}</strong></p>
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Completed: <strong>{{ value.completed_count|intcomma }}</strong></p>
+
+			{% if value.oldest_active_session %}
+				<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Oldest: <strong>{{ value.oldest_active_session }}</strong></p>
+			{% endif %}
+
+			{% if value.most_recent %}
+				<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Most Recent: <strong>{{ value.most_recent }}</strong></p>
+			{% endif %}
+
+			{% if value.average_session_duration_humanized %}
+				<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Average Duration: <strong>{{ value.average_session_duration_humanized }}</strong></p>
+			{% endif %}
+		{% endwith %}
+		<div class="mdc-typography mdc-typography--caption" style="margin-top: 8px;">
+			Last updated: <strong>{{ latest_value.recorded }}</strong>
+		</div>
+	{% endif %}
+{% endwith %}

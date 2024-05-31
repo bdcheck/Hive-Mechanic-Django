@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long, too-many-lines
+# pylint: disable=no-member, line-too-long, too-many-lines, unsupported-binary-operation
 # -*- coding: utf-8 -*-
 
 from builtins import str # pylint: disable=redefined-builtin
@@ -10,8 +10,6 @@ import os
 import urllib
 
 import arrow
-import humanize
-import numpy
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -33,10 +31,9 @@ from filer.models import filemodels
 
 from activity_logger.models import LogItem, LogTag
 from integrations.models import Integration
-from twilio_support.models import IncomingMessage, OutgoingMessage, OutgoingCall
 from user_creation.decorators import user_accepted_all_terms
 
-from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings
+from .models import Game, GameVersion, InteractionCard, Player, Session, DataProcessor, SiteSettings, StateVariable
 
 @login_required
 @user_accepted_all_terms
@@ -44,71 +41,7 @@ def builder_home(request): # pylint: disable=unused-argument
     if request.user.has_perm('builder.builder_login') is False:
         raise PermissionDenied('View permission required.')
 
-    now = timezone.now()
-
     context = {}
-
-    integration_types = {}
-
-    for integration in Integration.objects.all():
-        if (integration.type in integration_types) is False:
-            integration_types[integration.type] = []
-
-        integration_types[integration.type].append(integration.fetch_statistics())
-
-    site_settings = SiteSettings.objects.all().order_by('-last_updated').first()
-
-    context['integrations'] = integration_types
-    context['site_settings'] = site_settings
-    context['incoming_messages'] = IncomingMessage.objects.all()
-    context['outgoing_messages_sent'] = OutgoingMessage.objects.exclude(sent_date=None).filter(errored=False)
-    context['outgoing_messages_pending'] = OutgoingMessage.objects.filter(sent_date=None, send_date__gte=now, errored=False)
-    context['outgoing_messages_errored'] = OutgoingMessage.objects.filter(errored=True)
-
-    if site_settings:
-        if site_settings.total_message_limit is not None:
-            context['message_limit'] = site_settings.total_message_limit
-
-            incoming_messages = IncomingMessage.objects.all()
-            outgoing_messages = OutgoingMessage.objects.all()
-            outgoing_calls = OutgoingCall.objects.all()
-
-            if site_settings.count_messages_since is not None:
-                incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
-                outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
-                outgoing_calls = OutgoingCall.objects.filter(sent_date__gte=site_settings.count_messages_since)
-
-                context['message_limit_reset'] = site_settings.count_messages_since
-
-            messages_sent = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
-            messages_remaining = site_settings.total_message_limit - messages_sent
-
-            if messages_remaining < site_settings.total_message_limit / 4:
-                context['messages_remaining_warning'] = True
-
-            context['messages_remaining'] = messages_remaining
-
-    context['active_sessions'] = Session.objects.filter(completed=None)
-    context['completed_sessions'] = Session.objects.exclude(completed=None)
-
-    context['oldest_active_session'] = Session.objects.filter(completed=None).order_by('started').first()
-    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
-
-    durations = []
-
-    context['most_recent_active_session'] = Session.objects.all().order_by('-started').first()
-
-    for session in context['completed_sessions']:
-        durations.append((session.completed - session.started).total_seconds())
-
-    if len(durations) > 0: # pylint: disable=len-as-condition
-        mean_duration = numpy.mean(durations)
-
-        delta = datetime.timedelta(seconds=mean_duration)
-
-        context['average_session_duration_humanized'] = humanize.naturaldelta(delta)
-    else:
-        context['average_session_duration_humanized'] = 'Unknown, no sessions completed  yet.'
 
     return render(request, 'builder_home.html', context=context)
 
@@ -1219,3 +1152,139 @@ def builder_activity_logger(request): # pylint: disable=unused-argument, too-man
         context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
     return render(request, 'builder_activity_log_table.html', context=context)
+
+@login_required
+@user_accepted_all_terms
+def builder_moderate(request): # pylint: disable=unused-argument, too-many-branches, too-many-statements, too-many-locals
+    if request.user.has_perm('builder.builder_moderate') is False and request.user.has_perm('builder.builder_moderate_activity') is False:
+        raise PermissionDenied('Moderation permission required.')
+
+    if request.method == 'POST':
+        moderated = 0
+
+        variable_ids = json.loads(request.POST.get('selected_ids', '[]'))
+
+        action = request.POST.get('action', None)
+
+        if action is not None:
+            for variable_id in variable_ids:
+                state_variable = StateVariable.objects.filter(pk=int(variable_id)).first()
+
+                if action == 'approve':
+                    state_variable.moderation_approve()
+                elif action == 'reject':
+                    state_variable.moderation_reject()
+                elif action == 'reset':
+                    state_variable.moderation_reset()
+
+                moderated += 1
+
+        response_payload = {}
+
+        if moderated == 1:
+            response_payload['message'] = '1 item moderated.'
+        else:
+            response_payload['message'] = '%s items moderated.' % moderated
+
+        return HttpResponse(json.dumps(response_payload, indent=2), content_type='application/json', status=200)
+
+    context = {}
+
+    query = Q(pk__gte=0)
+
+    search_query = request.GET.get('q', '')
+
+    if search_query != '':
+        search = (Q(key__icontains=search_query) | Q(value__icontains=search_query) | Q(metadata__icontains=search_query)) # pylint: disable=unsupported-binary-operation
+
+        query = query & search
+
+        context['query'] = search_query
+
+    status_slug = request.GET.get('status', 'pending')
+
+    if status_slug != '':
+        if status_slug == 'pending':
+            query = query & Q(metadata__moderation_status=None)
+        elif status_slug == 'approved':
+            query = query & Q(metadata__moderation_status=True)
+        elif status_slug == 'rejected':
+            query = query & Q(metadata__moderation_status=False)
+        else:
+            query = query & (Q(metadata__moderation_status=False) | Q(metadata__moderation_status=True) | Q(metadata__moderation_status=None)) # pylint: disable=unsupported-binary-operation
+
+    sort = request.GET.get('sort', '-added')
+
+    items_per_page = int(request.GET.get('size', '25'))
+    page_index = int(request.GET.get('page', '0'))
+
+    start = page_index * items_per_page
+    end = start + items_per_page
+
+    if request.user.has_perm('builder.builder_moderate') is False:
+        activity_filter = Q(pk=-1)
+
+        session_pks = []
+
+        for activity in request.user.builder_game_editables.all():
+            activity_filter = activity_filter | Q(activity=activity)
+
+            for version in activity.versions.all():
+                for session in version.sessions.all():
+                    session_pks.append(session.pk)
+
+        activity_filter = activity_filter | Q(session__pk__in=session_pks)
+
+        query = query & activity_filter
+
+    context['moderate_items'] = StateVariable.objects.filter(query).order_by(sort)[start:end]
+
+    context['total_count'] = StateVariable.objects.filter(query).count()
+
+    end = min(end, context['total_count'])
+
+    context['page_index'] = page_index
+    context['page_count'] = math.ceil(context['total_count'] / items_per_page)
+
+    context['start_item'] = start + 1
+    context['end_item'] = end
+
+    base_url = reverse('builder_moderate')
+
+    query_string = {
+        'size': items_per_page,
+    }
+
+    if sort is not None:
+        query_string['sort'] = sort
+
+        context['sort'] = sort
+
+    if search_query != '':
+        query_string['q'] = search_query
+
+    context['clear_activity_url'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string))
+
+    selected_status = request.GET.get('status', 'pending')
+
+    context['selected_status'] = selected_status
+
+    if context['total_count'] > items_per_page and page_index < context['page_count'] - 1:
+        query_string['page'] = page_index + 1
+
+        context['next_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+        if page_index + 1 < context['page_count']:
+            query_string['page'] = context['page_count'] - 1
+            context['last_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+    if context['page_index'] > 0:
+        query_string['page'] = page_index - 1
+
+        context['prior_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+        query_string['page'] = 0
+
+        context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
+
+    return render(request, 'builder_moderate.html', context=context)

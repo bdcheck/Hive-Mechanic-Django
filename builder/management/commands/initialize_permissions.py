@@ -93,6 +93,7 @@ class Command(BaseCommand):
             'view_file',
             'view_folder',
             'view_image',
+            'builder_moderate',
         ]
 
         manager_group = Group.objects.filter(name='Hive Mechanic Manager').first()

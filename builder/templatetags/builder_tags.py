@@ -11,6 +11,7 @@ from django.utils import dateparse
 from django.utils.safestring import mark_safe
 
 from ..models import SiteSettings
+from ..utils import obfuscate_player_id
 
 register = template.Library()
 
@@ -59,22 +60,7 @@ def builder_site_login_banner():
 
 @register.filter
 def obfuscate_identifier(raw_identifier):
-    obfuscated = ''
-
-    number_count = 0
-
-    for character in raw_identifier[::-1]:
-        if character.isdigit():
-            if number_count < 4:
-                obfuscated = character + obfuscated
-
-                number_count += 1
-            else:
-                obfuscated = 'X' + obfuscated
-        else:
-            obfuscated = character + obfuscated
-
-    return obfuscated
+    return obfuscate_player_id(raw_identifier)
 
 @register.filter
 def humanize_file_size(original_size):

@@ -1,0 +1,27 @@
+{% load humanize %}
+{% with signal.latest_value as latest_value %}
+	{% if latest_value %}
+		{% with latest_value.fetch_value as value %}
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Received: <strong>{{ value.incoming_count|intcomma }}</strong></p>
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Sent: <strong>{{ value.outgoing_count|intcomma }}</strong></p>
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
+				<span class="material-icons">error</span>
+				Messages Sent Errors: <strong {% if value.error_count > 0 %}style="color: #B71C1C;"{% endif %}>{{ value.error_count|intcomma }}</strong>
+			</p>
+			<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Scheduled Messages: <strong>{{ value.pending_count|intcomma }}</strong></p>
+			{% if value.message_limit %}
+				<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
+					Limit Remaining: <strong {% if messages_remaining_warning %}style="color: #B71C1C;"{% endif %}>{{ value.messages_remaining }} (of {{ value.message_limit }})*</strong>
+					{% if message_limit_reset %}
+						<br />
+						<span class="mdc-typography mdc-typography--caption">Since {{ value.message_limit_reset }}</span>
+					{% endif %}
+				</p>
+				<p class="mdc-typography mdc-typography--caption" style="margin-bottom: 0px;">* (Messages will cease when the limit reaches 0 – contact an administrator to reset the limit.)</p>
+			{% endif %}
+		{% endwith %}
+		<div class="mdc-typography mdc-typography--caption" style="margin-top: 8px;">
+			Last updated: <strong>{{ latest_value.recorded }}</strong>
+		</div>
+	{% endif %}
+{% endwith %}

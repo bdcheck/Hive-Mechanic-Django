@@ -42,7 +42,7 @@ from passive_data_kit.models import DataPoint
 from activity_logger.models import log
 
 from . import card_issues
-from .utils import fetch_cytoscape_node as fetch_cytoscape
+from .utils import fetch_cytoscape_node as fetch_cytoscape, obfuscate_player_id
 
 if sys.version_info[0] > 2:
     from django.db.models import JSONField # pylint: disable=no-name-in-module
@@ -277,7 +277,6 @@ def file_cleanup(sender, **kwargs):
                 if (hasattr(file_field, 'path') and os.path.exists(file_field.path) and not field_manager.filter(**{'%s__exact' % fieldname: getattr(inst, fieldname)}).exclude(pk=inst._get_pk_val())): # pylint: disable=protected-access
                     default_storage.delete(file_field.path)
 
-
 class PermissionsSupport(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
         managed = False
@@ -291,6 +290,8 @@ class PermissionsSupport(models.Model):
             ('builder_access_edit', 'Edit game builder information'),
             ('builder_db_logging_view', 'View database logging entries'),
             ('builder_db_logging_edit', 'Edit database logging entries'),
+            ('builder_moderate', 'Moderate all content'),
+            ('builder_moderate_activity', 'Moderate activity content'),
         )
 
 class RemoteRepository(models.Model):
@@ -307,6 +308,8 @@ class RemoteRepository(models.Model):
     http_auth_headers = models.TextField(max_length=1048576, default='{}')
 
     last_updated = models.DateTimeField(null=True, blank=True)
+
+    enabled = models.BooleanField(default=True)
 
 @python_2_unicode_compatible
 class InteractionCardCategory(models.Model):
@@ -566,6 +569,14 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
 
         return self.metadata
 
+    def unique_users(self, since=None):
+        uniques = set()
+
+        for version in self.versions.all():
+            uniques.update(version.unique_users(since=since))
+
+        return uniques
+
     def interaction_card_modules_json(self):
         modules = []
 
@@ -629,33 +640,43 @@ class Game(models.Model):  # pylint: disable=too-many-public-methods
         self.game_state = {} # pylint: disable=unsupported-assignment-operation
         self.save()
 
+        self.state_variables.all().update(active=False)
+
         self.refresh_from_db()
 
     @transaction.atomic
-    def set_variable(self, variable, value):
-        old_value = self.game_state.get(variable, None)
+    def set_variable(self, variable, value, metadata=None, session=None):
+        if metadata is None:
+            metadata = {}
 
-        self.game_state[variable] = value # pylint: disable=unsupported-assignment-operation
-        self.save()
+        old_value = self.fetch_variable(variable)
 
-        self.refresh_from_db()
-
-        metadata = {
+        variable_metadata = {
             'variable_name': variable,
             'old_value': old_value,
             'new_value': value
         }
 
+        self.state_variables.filter(key=variable, active=True).update(active=False)
+
+        StateVariable.objects.create(activity=self, session=session, key=variable, value=value, added=timezone.now(), metadata=metadata)
+
         version = self.versions.order_by('-created').first()
 
-        log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value), tags=['game', 'variable'], metadata=metadata, player=None, session=None, game_version=version)
+        log(self.log_id(), 'Set game variable (%s = %s).' % (variable, value), tags=['game', 'variable'], metadata=variable_metadata, player=None, session=None, game_version=version)
 
     @transaction.atomic
     def fetch_variable(self, variable):
-        if variable in self.game_state: # pylint: disable=unsupported-membership-test
-            return self.game_state[variable] # pylint: disable=unsubscriptable-object
+        for state_variable in self.state_variables.filter(activity=self, key=variable).order_by('-added'):
+            if 'moderation_status' in state_variable.metadata:
+                moderation_status = state_variable.metadata['moderation_status']
 
-        return None
+                if moderation_status is True:
+                    return state_variable.value
+            else:
+                return state_variable.value
+
+        return self.game_state.get(variable, None)
 
     def active_session_count(self):
         count = 0
@@ -948,7 +969,6 @@ class GameVersion(models.Model):
 
         return None
 
-
     def initial_card(self):
         definition = json.loads(self.definition)
 
@@ -977,7 +997,6 @@ class GameVersion(models.Model):
                     break
 
         return initial_card
-
 
     def dialog_snapshot(self): # pylint: disable=too-many-branches
         snapshot = []
@@ -1111,6 +1130,19 @@ class GameVersion(models.Model):
             else:
                 self.game.set_variable(variable['name'], variable['value'])
 
+    def unique_users(self, since=None):
+        uniques = set()
+
+        session_query = self.sessions.all()
+
+        if since is not None:
+            session_query = self.sessions.filter(started__gte=since)
+
+        for session in session_query:
+            uniques.add(session.player.pk)
+
+        return uniques
+
 @receiver(pre_save, sender=GameVersion)
 def reset_game_version_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument
     if instance.game is not None:
@@ -1127,28 +1159,36 @@ class Player(models.Model):
         return 'player:%d' % self.pk
 
     @transaction.atomic
-    def set_variable(self, variable, value):
-        old_value = self.player_state.get(variable, None)
+    def set_variable(self, variable, value, metadata=None, session=None):
+        if metadata is None:
+            metadata = {}
 
-        self.player_state[variable] = value # pylint: disable=unsupported-assignment-operation
-        self.save()
+        old_value = self.fetch_variable(variable)
 
-        self.refresh_from_db()
-
-        metadata = {
+        variable_metadata = {
             'variable_name': variable,
             'old_value': old_value,
             'new_value': value
         }
 
-        log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=metadata, player=self, session=None, game_version=None)
+        self.state_variables.filter(key=variable, active=True).update(active=False)
+
+        StateVariable.objects.create(player=self, key=variable, value=value, added=timezone.now(), metadata=metadata, session=session)
+
+        log(self.log_id(), 'Set player variable (%s = %s).' % (variable, value), tags=['player', 'variable'], metadata=variable_metadata, player=self, session=None, game_version=None)
 
     @transaction.atomic
     def fetch_variable(self, variable):
-        if variable in self.player_state: # pylint: disable=unsupported-membership-test
-            return self.player_state[variable] # pylint: disable=unsubscriptable-object
+        for state_variable in self.state_variables.filter(player=self, key=variable).order_by('-added'):
+            if 'moderation_status' in state_variable.metadata:
+                moderation_status = state_variable.metadata['moderation_status']
 
-        return None
+                if moderation_status is True:
+                    return state_variable.value
+            else:
+                return state_variable.value
+
+        return self.player_state.get(variable, None)
 
     def __str__(self):
         return self.identifier.split(':')[-1]
@@ -1189,6 +1229,9 @@ class Session(models.Model):
 
     session_state = JSONField(default=dict, blank=True)
 
+    def __str__(self):
+        return '%s' % self.game_version.game
+
     def log_id(self):
         return 'session:%d' % self.pk
 
@@ -1215,24 +1258,26 @@ class Session(models.Model):
         self.process_incoming(None, None)
 
     @transaction.atomic
-    def set_variable(self, variable, value):
-        old_value = self.session_state.get(variable, None)
+    def set_variable(self, variable, value, metadata=None):
+        if metadata is None:
+            metadata = {}
 
-        self.session_state[variable] = value # pylint: disable=unsupported-assignment-operation
-        self.save()
+        old_value = self.fetch_variable(variable)
 
-        self.refresh_from_db()
-
-        metadata = {
+        variable_metadata = {
             'variable_name': variable,
             'old_value': old_value,
             'new_value': value
         }
 
-        log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value), tags=['session', 'variable'], metadata=metadata, player=self.player, session=self, game_version=self.game_version)
+        self.state_variables.filter(key=variable, active=True).update(active=False)
+
+        StateVariable.objects.create(session=self, key=variable, value=value, added=timezone.now(), metadata=metadata)
+
+        log(self.log_id(), 'Set session variable (%s = %s).' % (variable, value), tags=['session', 'variable'], metadata=variable_metadata, player=self.player, session=self, game_version=self.game_version)
 
     @transaction.atomic
-    def fetch_variable(self, variable):
+    def fetch_variable(self, variable): # pylint: disable=too-many-return-statements
         if variable.startswith('[') and variable.endswith(']'):
             value = None
 
@@ -1242,14 +1287,29 @@ class Session(models.Model):
 
             return value
 
-        if variable in self.session_state: # pylint: disable=unsupported-membership-test
-            return self.session_state[variable]  # pylint: disable=unsubscriptable-object
+        for state_variable in self.state_variables.filter(session=self, key=variable).order_by('-added'):
+            if 'moderation_status' in state_variable.metadata:
+                moderation_status = state_variable.metadata['moderation_status']
 
-        if variable in self.player.player_state:
-            return self.player.player_state[variable]
+                if moderation_status is True:
+                    return state_variable.value
 
-        if variable in self.game_version.game.game_state:
-            return self.game_version.game.game_state[variable]
+            return state_variable.value
+
+        state_variable_value = self.session_state.get(variable, None)
+
+        if state_variable_value is not None:
+            return state_variable_value
+
+        state_variable_value = self.player.fetch_variable(variable)
+
+        if state_variable_value is not None:
+            return state_variable_value
+
+        state_variable_value = self.game_version.game.fetch_variable(variable)
+
+        if state_variable_value is not None:
+            return state_variable_value
 
         return None
 
@@ -1347,7 +1407,12 @@ class Session(models.Model):
         return '__accepted_terms__%d' % self.game_version.game.pk
 
     def fetch_game_context(self):
-        return self.game_version.game.game_state.copy()
+        context = {}
+
+        for variable in self.game_version.game.state_variables.filter(active=True).order_by('added'):
+            context[variable.key] = variable.value
+
+        return context
 
     def accept_terms(self):
         key = self.terms_key()
@@ -1610,3 +1675,67 @@ class SiteSettings(models.Model):
 
 class CachedFile(File):
     original_url = models.CharField(max_length=4096, null=True, blank=True)
+
+@python_2_unicode_compatible
+class StateVariable(models.Model):
+    player = models.ForeignKey(Player, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+    activity = models.ForeignKey(Game, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, related_name='state_variables', null=True, blank=True, on_delete=models.CASCADE)
+
+    key = models.CharField(max_length=1024)
+    value = JSONField(null=True, blank=True)
+
+    active = models.BooleanField(default=True)
+
+    added = models.DateTimeField()
+    metadata = JSONField(default=dict, null=True, blank=True)
+
+    def __str__(self):
+        return '%s (len: %s)' % (self.key, self.length())
+
+    def player_obj(self):
+        if self.player is not None:
+            return self.player
+
+        if self.session is not None:
+            return self.session.player
+
+        return None
+
+    def length(self):
+        if self.value is None:
+            return 0
+
+        str_version = json.dumps(self.value)
+
+        return len(str_version)
+
+    def content(self):
+        return '%s: %s' % (self.key, self.value)
+
+    def context(self):
+        if self.activity is not None:
+            return 'Activity: %s' % self.activity
+
+        if self.session is not None and self.player is None:
+            return 'Session: %s' % self.session
+
+        if self.player is not None:
+            return 'Player: %s' % obfuscate_player_id(self.player.identifier)
+
+        return 'Unknown'
+
+    def moderation_approve(self):
+        self.metadata['moderation_status'] = True
+
+        self.save()
+
+    def moderation_reject(self):
+        self.metadata['moderation_status'] = False
+
+        self.save()
+
+    def moderation_reset(self):
+        self.metadata['moderation_status'] = None
+
+        self.save()

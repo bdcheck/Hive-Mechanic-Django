@@ -95,7 +95,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
       const selected = $('input[type=radio][name=activity-template]:checked').val()
 
       const payload = {
-        name: name,
+        name,
         template: selected
       }
 
@@ -131,7 +131,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
       const name = cloneNameField.value
 
       const payload = {
-        name: name,
+        name,
         template: $('#original_clone_id').val()
       }
 

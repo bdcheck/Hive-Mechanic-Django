@@ -4,6 +4,7 @@
 import sys
 
 from django.db import migrations, models
+import django.contrib.postgres.fields.jsonb
 
 
 class Migration(migrations.Migration):
@@ -17,22 +18,22 @@ class Migration(migrations.Migration):
             migrations.AlterField(
                 model_name='game',
                 name='game_state',
-                field=models.JSONField(blank=True, default=dict),
+                field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict),
             ),
             migrations.AlterField(
                 model_name='game',
                 name='metadata',
-                field=models.JSONField(blank=True, default=dict),
+                field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict),
             ),
             migrations.AlterField(
                 model_name='player',
                 name='player_state',
-                field=models.JSONField(blank=True, default=dict),
+                field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict),
             ),
             migrations.AlterField(
                 model_name='session',
                 name='session_state',
-                field=models.JSONField(blank=True, default=dict),
+                field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=dict),
             ),
         ]
     else:

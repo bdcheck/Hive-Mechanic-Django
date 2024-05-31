@@ -1,11 +1,11 @@
 {
   "dependencies": {
     "botium-cli": "^1.1.0",
-    "botium-core": "^1.12.3",
-    "eslint-config-standard": "^16.0.3",
+    "botium-core": "^1.1.6",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
-    "standard": "^16.0.4"
+    "eslint-plugin-promise": "^6.1.1",
+    "standard": "^17.1.0"
   }
 }

@@ -45,11 +45,11 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
-            
+
             a {
             	text-decoration: none;
             }
-            
+
             .floating-action-button {
             	position: absolute;
             	bottom: 16px;
@@ -127,6 +127,15 @@
 						</i>
 	                    <span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Activity Log</span>
 					</li>
+					{% if perms.builder.builder_moderate or perms.builder.builder_moderate_activity %}
+						<li class="mdc-list-item mdc-list-item--with-one-line" data-href="{% url 'builder_moderate' %}">
+							<span class="mdc-list-item__ripple"></span>
+							<i class="mdc-list-item__start material-icons" aria-hidden="true">
+								assignment_turned_in
+							</i>
+							<span class="mdc-list-item__text mdc-list-item__end" style="margin-left: 16px;">Moderate</span>
+						</li>
+					{% endif %}
 					<li class="mdc-list-item mdc-list-item--with-one-line" data-href="{% url 'builder_authors' %}">
    						<span class="mdc-list-item__ripple"></span>
 						<i class="mdc-list-item__start material-icons" aria-hidden="true">
@@ -165,7 +174,7 @@
 				{% endblock %}
             </main>
         </div>
-        
+
 		<div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-content" id="base-dialog">
 			<div class="mdc-dialog__container">
 				<div class="mdc-dialog__surface">
@@ -182,16 +191,14 @@
 			</div>
 			<div class="mdc-dialog__scrim"></div>
 		</div>
-        
+
 		{% block 'js_init' %}
 			<script data-main="{% static 'builder-js/js/app/home.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script>
 		{% endblock %}
-		
+
 		<script>
 			$(document).ready(function() {
 				$('.mdc-drawer__content .mdc-list-item[data-href="' + window.location.pathname + '"]').addClass('mdc-list-item--selected')
-				
-				console.log("SELECTED CURRENT ITEM")
 			});
 		</script>
     </body>

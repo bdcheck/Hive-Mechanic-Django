@@ -5,6 +5,7 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import datetime
 import json
 import re
 import sys
@@ -315,6 +316,14 @@ class Integration(models.Model):
             'details': []
         }
 
+        now = timezone.now()
+        day_start = now - datetime.timedelta(days=1)
+        week_start = now - datetime.timedelta(days=7)
+
+        statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
+        statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
+        statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
+
         if self.type == 'twilio':
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
 
@@ -353,6 +362,7 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             'session': 'session-' + str(session.pk),
             'game': str(session.game_version.game.slug),
             'player': str(session.player.identifier),
+            'metadata': action.get('metadata', None),
         }
 
         if 'scope' in action:
@@ -363,16 +373,15 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             action['translated_value'] = integration.translate_value(action['value'], session, scope)
 
             if scope == 'session':
-                session.set_variable(action['variable'], action['translated_value'])
+                session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
             elif scope == 'player':
-                session.player.set_variable(action['variable'], action['translated_value'])
+                session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
             elif scope == 'game':
-                session.game_version.game.set_variable(action['variable'], action['translated_value'])
-
+                session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 
-            session.set_variable(action['value'], action['translated_value'])
+            session.set_variable(action['value'], action['translated_value'], metadata=action.get('metadata', None))
 
         payload['value'] = action['translated_value']
 

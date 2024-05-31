@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django_dialog_engine',
     'nagios_monitor',
     'simple_backup',
+    'simple_dashboard',
     'user_creation',
     'builder',
     'activity_logger',
@@ -78,7 +79,7 @@ TEMPLATES = [
             ],
             'debug': True,
             'libraries' : {
-                'staticfiles': 'django.templatetags.static', 
+                'staticfiles': 'django.templatetags.static',
             }
         },
     },

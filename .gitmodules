@@ -16,3 +16,6 @@
 [submodule "simple_backup"]
 	path = simple_backup
 	url = https://github.com/audacious-software/Simple-Backup-Django.git
+[submodule "simple_dashboard"]
+	path = simple_dashboard
+	url = https://github.com/audacious-software/Simple-Dashboard-Django.git

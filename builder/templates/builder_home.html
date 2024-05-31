@@ -1,6 +1,7 @@
 {% extends 'builder_base.html' %}
 {% load humanize %}
 {% load static %}
+{% load simple_dashboard %}
 
 {% block 'page_title' %}Dashboard | Interaction Builder{% endblock %}
 
@@ -13,110 +14,7 @@
 {% block 'main_content' %}
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
-			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-				<div class="mdc-card mdc-typography mdc-typography--body1" style="padding: 16px;">
-					<div>{{ site_settings.message_of_the_day|safe }}</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="mdc-layout-grid">
-		<div class="mdc-layout-grid__inner">
-			<!-- <div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-8">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Response Funnel</div>
-					<p class="mdc-typography mdc-typography--body1">Chart collective progress through message sequence.</p>
-				</div>
-			</div> -->
-			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Sessions</div>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Active: <strong>{{ active_sessions.count|intcomma }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Completed: <strong>{{ completed_sessions.count|intcomma }}</strong></p>
-
-					{% if oldest_active_session %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Oldest: <strong>XXX @ {{ oldest_active_session.game_version.game }}</strong> (since {{ oldest_active_session.started }})</p>
-					{% endif %}
-
-					{% if most_recent_active_session %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Most Recent: <strong>XXX @ {{ most_recent_active_session.game_version.game }}</strong> (since {{ oldest_active_session.started }})</p>
-					{% endif %}
-
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Average Duration: <strong>{{ average_session_duration_humanized }}</strong></p>
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Message Traffic</div>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Messages Sent: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
-					{% with outgoing_messages_errored.count as error_count %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
-							<span class="material-icons">error</span>
-							Messages Sent Errors: <strong {% if error_count > 0 %}style="color: #B71C1C;"{% endif %}>{{ error_count|intcomma }}</strong></p>
-					{% endwith %}
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Scheduled Messages: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
-					{% if message_limit %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
-							Limit Remaining: <strong {% if messages_remaining_warning %}style="color: #B71C1C;"{% endif %}>{{ messages_remaining }} (of {{ message_limit }})*</strong>
-							{% if message_limit_reset %}
-								<br />
-								<span class="mdc-typography mdc-typography--caption">Since {{ message_limit_reset.date }}</span>
-							{% endif %}
-						</p>
-						<p class="mdc-typography mdc-typography--caption" style="margin-bottom: 0px;">* (Messages will cease when the limit reaches 0 – contact an administrator to reset the limit.)</p>
-					{% endif %}
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-				<div class="mdc-card mdc-layout-grid__cell--span-3" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">Phone Calls</div>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Calls: <strong>XX</strong> (made) / <strong>XX</strong> (received)</p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Average Call Duration: <strong>XX</strong></p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Total Call Minutes: <strong>XX</strong></p>
-					{% if message_limit %}
-						<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">
-							Limit Remaining: <strong {% if messages_remaining_warning %}style="color: #B71C1C;"{% endif %}>{{ messages_remaining }} (of {{ message_limit }})</strong>
-							{% if message_limit_reset %}
-								<br />
-								<span class="mdc-typography mdc-typography--caption">Since {{ message_limit_reset.date }}</span>
-							{% endif %}
-						</p>
-					{% endif %}
-				</div>
-			</div>
-			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-				<div class="mdc-card" style="padding: 16px;">
-					<div class="mdc-typography mdc-typography--headline6">API Calls</div>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Calls Received: <strong>{{ incoming_messages.count|intcomma }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Calls Sent: <strong>{{ outgoing_messages_sent.count|intcomma }}</strong></p>
-					<p class="mdc-typography mdc-typography--body1" style="margin-bottom: 0px;">Average Call Count: <strong>{{ outgoing_messages_pending.count|intcomma }}</strong></p>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<div class="mdc-layout-grid">
-		<div class="mdc-layout-grid__inner">
-			{% for type_name, type_integrations in integrations.items %}
-				{% for integration in type_integrations %}
-					<div class=" mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-						<div class="mdc-card" style="padding: 16px;">
-							<div class="mdc-typography mdc-typography--headline6">
-								{{ integration.name }}
-							</div>
-							<div class="mdc-typography mdc-typography--subtitle1">{{ integration.game }} ({{ integration.type }})</div>
-
-							{% for detail in integration.details %}
-								<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
-							{% endfor %}
-							<div class="mdc-typography mdc-typography--body1">Integration: {{ type_integrations.0.type }}</div>
-						</div>
-					</div>
-				{% endfor %}
-			{% endfor %}
+			{% simple_dashboard_active_signals %}
 		</div>
 	</div>
 {% endblock %}
