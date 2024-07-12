@@ -140,10 +140,10 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
 
             for permission in missing_permissions:
                 warnings.append(Warning(
-                                'Group %s missing required permission %s' % (hive_editors, permission),
-                                hint='Run the "initialize_permissions" command to set up required permissions',
-                                id='builder.W002',
-                            ))
+                    'Group %s missing required permission %s' % (hive_editors, permission),
+                    hint='Run the "initialize_permissions" command to set up required permissions',
+                    id='builder.W002',
+                ))
 
         hive_managers = Group.objects.filter(name='Hive Mechanic Manager').first()
 
