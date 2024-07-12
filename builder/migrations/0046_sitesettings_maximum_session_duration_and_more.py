@@ -4,6 +4,11 @@
 import datetime
 from django.db import migrations, models
 
+try:
+    from django.db.models import JSONField
+except ImportError:
+    from django.contrib.postgres.fields import JSONField
+
 
 class Migration(migrations.Migration):
 
@@ -20,31 +25,31 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='game',
             name='game_state',
-            field=models.JSONField(blank=True, default=dict),
+            field=JSONField(blank=True, default=dict),
         ),
         migrations.AlterField(
             model_name='game',
             name='metadata',
-            field=models.JSONField(blank=True, default=dict),
+            field=JSONField(blank=True, default=dict),
         ),
         migrations.AlterField(
             model_name='player',
             name='player_state',
-            field=models.JSONField(blank=True, default=dict),
+            field=JSONField(blank=True, default=dict),
         ),
         migrations.AlterField(
             model_name='session',
             name='session_state',
-            field=models.JSONField(blank=True, default=dict),
+            field=JSONField(blank=True, default=dict),
         ),
         migrations.AlterField(
             model_name='statevariable',
             name='metadata',
-            field=models.JSONField(blank=True, default=dict, null=True),
+            field=JSONField(blank=True, default=dict, null=True),
         ),
         migrations.AlterField(
             model_name='statevariable',
             name='value',
-            field=models.JSONField(blank=True, null=True),
+            field=JSONField(blank=True, null=True),
         ),
     ]
