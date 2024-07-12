@@ -559,8 +559,6 @@ define(modules, function (mdc, Node) {
     insertBefore (originalId, newId, transferLinks) {
       const me = this
 
-      console.log('INSERT BEFORE: ' + originalId + ' -- ' + newId + ' -- ' + transferLinks)
-
       let originalCard = null
       let newCard = null
 

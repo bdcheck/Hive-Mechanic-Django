@@ -175,8 +175,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   $('#button_reset').prop('disabled', true)
 
   $('input[type="checkbox"]').change(function () {
-    console.log('CHANGE CHECK')
-
     window.setTimeout(function () {
       const selected = fetchSelected()
 

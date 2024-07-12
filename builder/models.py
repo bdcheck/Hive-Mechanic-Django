@@ -5,6 +5,7 @@ from __future__ import print_function
 
 from builtins import str # pylint: disable=redefined-builtin
 
+import datetime
 import difflib
 import hashlib
 import json
@@ -1565,6 +1566,7 @@ class SiteSettings(models.Model):
     total_message_limit = models.IntegerField(null=True, blank=True, help_text='Total of incoming and outgoing messages, plus voice calls')
     count_messages_since = models.DateTimeField(null=True, blank=True)
 
+    maximum_session_duration = models.DurationField(default=datetime.timedelta(days=14))
 
 class CachedFile(File):
     original_url = models.CharField(max_length=4096, null=True, blank=True)

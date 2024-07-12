@@ -10,6 +10,8 @@ import json
 import re
 import sys
 
+import phonenumbers
+
 from future.utils import python_2_unicode_compatible
 
 from django.conf import settings
@@ -175,8 +177,6 @@ class Integration(models.Model):
 
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
-            print('TERMS: %s -- %s' % (session.visited_terms(), session.accepted_terms()))
-
             # Skip terms if call...
 
             if extras.get('message_type', 'text') != 'call' and session.visited_terms() is False and session.accepted_terms() is False:
@@ -192,8 +192,6 @@ class Integration(models.Model):
                 payload = None
 
                 self.execute_actions(session, actions)
-
-            print('PROCESS: %s -- %s' % (session.current_node(), payload))
 
             session.process_incoming(self, payload, extras)
 
@@ -351,7 +349,7 @@ class Integration(models.Model):
             for session in player_match.sessions.filter(completed=None):
                 session.complete()
 
-def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
+def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements, too-many-statements
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
@@ -421,6 +419,63 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         return True
     elif action['type'] == 'accept-terms':
         session.accept_terms()
+
+        return True
+    elif action['type'] == 'launch-session':
+        print('LAUNCHING SESSION: %s' % action)
+
+        activity_param = action.get('activity', None)
+        player_param = action.get('player', None)
+
+
+        activity_param = integration.translate_value(activity_param, session)
+        player_param = integration.translate_value(player_param, session)
+
+        player_id = player_param
+
+        player = Player.objects.filter(identifier=player_id).first()
+
+        if player is None:
+            try:
+                parsed = phonenumbers.parse(player_param, settings.PHONE_NUMBER_REGION)
+
+                formatted = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+
+                player_id = 'twilio_player:%s' % formatted
+
+                player = Player.objects.filter(identifier=player_id).first()
+
+                if player is None:
+                    player = Player.objects.create(identifier=player_id)
+
+                    player.player_state = {
+                        'twilio_player': formatted
+                    }
+
+                    player.save()
+            except phonenumbers.phonenumberutil.NumberParseException:
+                if player_id == '[PLAYER:SELF]':
+                    player = session.player
+
+        print('PLAYER: %s' % player)
+
+        activity = Game.objects.filter(slug=activity_param).first()
+
+        print('ACTIVITY: %s' % activity)
+
+        if player is not None and activity is not None:
+            existing_session = activity.current_active_session(player=player)
+
+            print('EXISTING SESSION: %s' % session)
+
+            if existing_session is not None:
+                existing_session.complete()
+
+            new_session = Session.objects.create(game_version=activity.versions.order_by('-created').first(), player=player, started=timezone.now())
+
+            print('NEW SESSION: %s' % new_session)
+
+            new_session.nudge()
 
         return True
 

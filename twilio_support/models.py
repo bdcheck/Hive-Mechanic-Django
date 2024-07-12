@@ -162,6 +162,8 @@ class OutgoingMessage(models.Model):
 
         except TwilioRestException as twilio_exc:
             if 'unsubscribed' in twilio_exc.msg:
+                OutgoingMessage.objects.filter(sent_date=None, destination=self.destination).delete()
+
                 player_id = 'twilio_player:%s' % self.destination
 
                 player = Player.objects.filter(identifier=player_id).first()

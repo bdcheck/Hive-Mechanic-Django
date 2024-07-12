@@ -155,6 +155,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+PHONE_NUMBER_REGION = 'US'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGOUT_REDIRECT_URL = '/'
