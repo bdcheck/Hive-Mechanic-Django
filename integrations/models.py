@@ -320,9 +320,10 @@ class Integration(models.Model):
         day_start = now - datetime.timedelta(days=1)
         week_start = now - datetime.timedelta(days=7)
 
-        statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
-        statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
-        statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
+        if self.game is not None:
+            statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
+            statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
+            statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
 
         if self.type == 'twilio':
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
