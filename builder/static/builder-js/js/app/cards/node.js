@@ -1191,7 +1191,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     advancedEditFields () {
-      if (this.cardFields == undefined) {
+      if (this.cardFields === undefined) {
         return ''
       }
 
