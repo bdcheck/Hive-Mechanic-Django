@@ -953,18 +953,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       } else if (field.type === 'boolean') {
         const fieldWidget = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById(`${me.cardId}_${fieldName}_field`))
 
-        console.log('BOOLEAN')
-        console.log(definition)
-        console.log(field)
-
         if (definition[field.field] !== undefined) {
           fieldWidget.checked = definition[field.field]
         }
 
         $('#' + me.cardId + '_' + fieldName + '_value').on('change', function () {
-          console.log('CHANGE')
-          console.log(fieldWidget.checked)
-
           const value = fieldWidget.checked
 
           me.sequence.markChanged(me.id)
@@ -1198,6 +1191,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     advancedEditFields () {
+      if (this.cardFields === undefined) {
+        return ''
+      }
+
       const me = this
 
       const fields = this.cardFields()

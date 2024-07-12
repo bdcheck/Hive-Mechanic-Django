@@ -72,9 +72,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   const clearVariablesDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_clear_variables'))
 
   clearVariablesDialog.listen('MDCDialog:closed', function (action) {
-    console.log('action')
-    console.log(action)
-
     if (action.detail.action === 'clear_variables') {
       const which = $('input[type=radio][name=clear-variables]:checked').val()
 
@@ -82,9 +79,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
         id: selectedClearId,
         clear: which
       }
-
-      console.log('payload')
-      console.log(payload)
 
       $.post('/builder/clear-variables.json', payload, function (response) {
         if (response.success) {
@@ -94,8 +88,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
         }
 
         $('#dialog-content').html(response.message)
-
-        console.log(response)
 
         baseDialog.listen('MDCDialog:closed', function () {
 
