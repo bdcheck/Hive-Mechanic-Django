@@ -9,6 +9,7 @@ import datetime
 import json
 import re
 import sys
+import traceback
 
 import phonenumbers
 
@@ -234,6 +235,13 @@ class Integration(models.Model):
             while '[LAST-MESSAGE-TYPE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
 
+            if '[LAST-RESPONDER]' in translated_value:
+                last_responder = session.last_message_responder()
+
+                if last_responder is not None:
+                    while '[LAST-RESPONDER]' in translated_value:
+                        translated_value = translated_value.replace('[LAST-RESPONDER]', last_responder)
+
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')
 
@@ -294,7 +302,9 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            pass # Attempting to translate non-string
+            # pass # Attempting to translate non-string
+
+            traceback.print_exc()
 
         return translated_value
 
@@ -423,8 +433,6 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
 
         return True
     elif action['type'] == 'launch-session':
-        print('LAUNCHING SESSION: %s' % action)
-
         activity_param = action.get('activity', None)
         player_param = action.get('player', None)
 
@@ -458,23 +466,15 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 if player_id == '[PLAYER:SELF]':
                     player = session.player
 
-        print('PLAYER: %s' % player)
-
         activity = Game.objects.filter(slug=activity_param).first()
-
-        print('ACTIVITY: %s' % activity)
 
         if player is not None and activity is not None:
             existing_session = activity.current_active_session(player=player)
-
-            print('EXISTING SESSION: %s' % session)
 
             if existing_session is not None:
                 existing_session.complete()
 
             new_session = Session.objects.create(game_version=activity.versions.order_by('-created').first(), player=player, started=timezone.now())
-
-            print('NEW SESSION: %s' % new_session)
 
             new_session.nudge()
 

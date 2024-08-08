@@ -200,10 +200,10 @@ def permissions_check(app_configs, **kwargs): # pylint: disable=unused-argument
 
             for permission in missing_permissions:
                 warnings.append(Warning(
-                                'Group %s missing required permission %s' % (hive_managers, permission),
-                                hint='Run the "initialize_permissions" command to set up required permissions',
-                                id='builder.W002',
-                            ))
+                    'Group %s missing required permission %s' % (hive_managers, permission),
+                    hint='Run the "initialize_permissions" command to set up required permissions',
+                    id='builder.W002',
+                ))
     except ProgrammingError: # Thrown before migration happens.
         pass
 
@@ -1221,7 +1221,7 @@ class Player(models.Model):
 
         return None
 
-class Session(models.Model):
+class Session(models.Model): # pylint: disable=too-many-public-methods
     player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)
     game_version = models.ForeignKey(GameVersion, related_name='sessions', on_delete=models.CASCADE)
 
@@ -1389,6 +1389,21 @@ class Session(models.Model):
 
         if last_message is not None:
             return last_message['type']
+
+        return None
+
+    def last_message_responder(self):
+        last_message = None
+
+        for integration in self.game_version.game.integrations.all():
+            last_integration_message = integration.last_message_for_player(self.player)
+
+            if last_integration_message is not None:
+                if last_message is None or last_message['date'] < last_integration_message['date']: # pylint: disable=unsubscriptable-object
+                    last_message = last_integration_message
+
+        if last_message is not None:
+            return last_message.get('metadata', {}).get('From', None)
 
         return None
 
