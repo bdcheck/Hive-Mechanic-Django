@@ -1325,7 +1325,7 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
                     values.append(session_value)
         elif scope == 'player':
             for player in Player.objects.all():
-                player_value = session.fetch_variable(variable)
+                player_value = player.fetch_variable(variable)
 
                 if player_value is not None:
                     values.append(player_value)
