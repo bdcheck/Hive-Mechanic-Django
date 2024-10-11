@@ -1314,7 +1314,7 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
 
         return None
 
-    def fetch_values(self, variable, scope):
+    def fetch_values(self, variable, scope): # pylint: disable=no-self-use
         values = []
 
         if scope == 'session':
