@@ -434,6 +434,27 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return fieldLines.join('\n')
     }
 
+    createIntegerField (field) {
+      const me = this
+
+      const fieldLines = []
+
+      fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" type="number"/>')
+      fieldLines.push('    <div class="mdc-notched-outline">')
+      fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
+      fieldLines.push('      <div class="mdc-notched-outline__notch">')
+      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('      </div>')
+      fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
+      fieldLines.push('    </div>')
+      fieldLines.push('  </div>')
+      fieldLines.push('</div>')
+
+      return fieldLines.join('\n')
+    }
+
     createCheckbox (field) {
       const me = this
 
@@ -787,9 +808,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
 
       if (field.type === 'integer') {
-        if (field.input === 'text') {
-          fieldLines.push(this.createTextField(field))
-        }
+        fieldLines.push(this.createIntegerField(field))
       } else if (field.type === 'text') {
         if (field.multiline) {
           fieldLines.push(this.createTextArea(field))
