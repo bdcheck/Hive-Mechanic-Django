@@ -1314,6 +1314,30 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
 
         return None
 
+    def fetch_values(self, variable, scope): # pylint: disable=no-self-use
+        values = []
+
+        if scope == 'session':
+            for session in Session.objects.all():
+                session_value = session.fetch_variable(variable)
+
+                if session_value is not None:
+                    values.append(session_value)
+        elif scope == 'player':
+            for player in Player.objects.all():
+                player_value = player.fetch_variable(variable)
+
+                if player_value is not None:
+                    values.append(player_value)
+        elif scope == 'activity':
+            for activity in Game.objects.all():
+                activity_value = activity.fetch_variable(variable)
+
+                if activity_value is not None:
+                    values.append(activity_value)
+
+        return values
+
     def dialog(self):
         dialog_key = 'session-' + str(self.pk)
 
