@@ -441,16 +441,12 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
 
         return True
     elif action['type'] == 'echo': # pylint: disable=no-else-return
-        print(integration.translate_value(action['message'], session))
-
         return True
     elif action['type'] == 'nudge': # pylint: disable=no-else-return
         session.nudge()
 
         return True
     elif action['type'] == 'echo-image':
-        print(action['image-url'])
-
         return True
     elif action['type'] == 'accept-terms':
         session.accept_terms()
