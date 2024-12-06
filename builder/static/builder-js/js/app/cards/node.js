@@ -147,7 +147,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       // Implement in subclasses...
     }
 
-    initialize () {
+    initialize() {
       const me = this
 
       mdc.menuSurface.MDCMenuSurface.attachTo(document.getElementById(this.cardId + '_menu'))
