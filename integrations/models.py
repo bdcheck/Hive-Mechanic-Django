@@ -360,7 +360,7 @@ class Integration(models.Model):
             for session in player_match.sessions.filter(completed=None):
                 session.complete()
 
-def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements, too-many-statements
+def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements, too-many-statements, too-many-locals
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
@@ -387,6 +387,30 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
             elif scope == 'game':
                 session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+
+            elif scope == 'active_sessions':
+                for other_session in Session.objects.filter(completed=None):
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'others_active_sessions':
+                for other_session in Session.objects.filter(completed=None).exclude(pk=session.pk):
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'all_sessions':
+                for other_session in Session.objects.all():
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'active_players':
+                for player in Player.objects.all():
+                    if player.sessions.filter(complete=None).count() > 0:
+                        player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'other_active_players':
+                for player in Player.objects.exclude(pk=session.player.pk):
+                    if player.sessions.filter(complete=None).count() > 0:
+                        player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'all_players':
+                for player in Player.objects.all():
+                    player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'all_activities':
+                for activity in Game.objects.all():
+                    activity.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 
