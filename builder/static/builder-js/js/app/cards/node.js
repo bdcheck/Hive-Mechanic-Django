@@ -947,13 +947,13 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         if (Array.isArray(field.options)) {
           const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName))
 
-          if (definition[field.field] !== undefined) {
+          if (definition[field.field] !== undefined && definition[field.field] !== null) {
             choiceField.value = definition[field.field]
+
+            me.onFieldUpdated(field.field, choiceField.value)
           }
 
           choiceField.listen('MDCSelect:change', function () {
-            console.log(`choiceField.change: ${field.field} = ${choiceField.value}`)
-
             me.onFieldUpdated(field.field, choiceField.value)
 
             onUpdate(choiceField.value)
