@@ -143,11 +143,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return issues
     }
 
-    onFieldUpdated(field, value) {
+    onFieldUpdated (field, value) {
       // Implement in subclasses...
     }
 
-    initialize() {
+    initialize () {
       const me = this
 
       mdc.menuSurface.MDCMenuSurface.attachTo(document.getElementById(this.cardId + '_menu'))
