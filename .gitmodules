@@ -19,3 +19,12 @@
 [submodule "simple_dashboard"]
 	path = simple_dashboard
 	url = https://github.com/audacious-software/Simple-Dashboard-Django.git
+[submodule "simple_messaging"]
+	path = simple_messaging
+	url = https://github.com/audacious-software/Simple-Messaging-Django.git
+[submodule "simple_messaging_switchboard"]
+	path = simple_messaging_switchboard
+	url = https://github.com/audacious-software/Simple-Messaging-Switchboard
+[submodule "simple_messaging_twilio"]
+	path = simple_messaging_twilio
+	url = https://github.com/audacious-software/Simple-Messaging-Django-Twilio.git

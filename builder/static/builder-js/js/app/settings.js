@@ -61,6 +61,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#banner_file').click()
   })
 
+  const newPlayerMessageField = mdc.textField.MDCTextField.attachTo(document.getElementById('new_player_msg_field'))
+
   mdc.textField.MDCTextField.attachTo(document.getElementById('name_field'))
   const motdField = mdc.textField.MDCTextField.attachTo(document.getElementById('motd_field'))
 
@@ -68,6 +70,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     const fileData = new FormData()
     fileData.append('site_name', $('#site_name').val())
     fileData.append('site_motd', motdField.value)
+    fileData.append('site_new_player_message', newPlayerMessageField.value)
 
     if ($('#banner_file').get(0).files[0] !== undefined) {
       fileData.append('site_banner', $('#banner_file').get(0).files[0])

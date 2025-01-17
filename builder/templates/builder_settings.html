@@ -50,13 +50,25 @@
 							<form enctype="multipart/form-data" style="display: none;" id="site_settings_form" method="post" action="{% url 'builder_settings' %}">
 								{% csrf_token %}
 								<input name="banner_file" id="banner_file" type="file" accept="image/*" onchange="document.getElementById('banner_image').src = window.URL.createObjectURL(this.files[0]);">
-							</form>											
+							</form>
+						</div>
+						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+							<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" style="width: 100%; margin-top: 16px;" id="new_player_msg_field">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__notch">
+										<span class="mdc-floating-label" id="new_player_msg_id">New Player Outgoing Introduction</span>
+									</span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<textarea class="mdc-text-field__input" rows="4" aria-labelledby="motd_id" aria-label="New Player Outgoing Introduction">{% if settings %}{{ settings.new_player_message }}{% endif %}</textarea>
+							</label>
 						</div>
 						<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 							<button class="mdc-button mdc-button--raised" id="update_button">
 								<span class="mdc-button__ripple"></span>
 								<span class="mdc-button__label">Update Site Settings</span>
-							</button>			
+							</button>
 						</div>
 					</div>
 				</div>

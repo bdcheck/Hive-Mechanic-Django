@@ -114,7 +114,6 @@ class Integration(models.Model):
 
             twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
 
-
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
@@ -456,13 +455,14 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
         activity_param = action.get('activity', None)
         player_param = action.get('player', None)
 
-
         activity_param = integration.translate_value(activity_param, session)
         player_param = integration.translate_value(player_param, session)
 
         player_id = player_param
 
         player = Player.objects.filter(identifier=player_id).first()
+
+        new_player_created = False
 
         if player is None:
             try:
@@ -482,6 +482,9 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                     }
 
                     player.save()
+
+                    new_player_created = True
+
             except phonenumbers.phonenumberutil.NumberParseException:
                 if player_id == '[PLAYER:SELF]':
                     player = session.player
@@ -495,6 +498,16 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 existing_session.complete()
 
             new_session = Session.objects.create(game_version=activity.versions.order_by('-created').first(), player=player, started=timezone.now())
+
+            if new_player_created:
+                site_settings = SiteSettings.objects.all().first()
+
+                new_actions = [{
+                    'type': 'echo',
+                    'message': site_settings.new_player_message
+                }]
+
+                integration.execute_actions(new_session, new_actions)
 
             new_session.nudge()
 

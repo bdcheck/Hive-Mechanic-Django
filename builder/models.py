@@ -1709,6 +1709,8 @@ class SiteSettings(models.Model):
     created = models.DateTimeField()
     last_updated = models.DateTimeField()
 
+    new_player_message = models.TextField(max_length=(1024 * 1024), default='Incoming message from Hive Mechanic. Reply STOP to block further messages.')
+
     total_message_limit = models.IntegerField(null=True, blank=True, help_text='Total of incoming and outgoing messages, plus voice calls')
     count_messages_since = models.DateTimeField(null=True, blank=True)
 

@@ -7,6 +7,7 @@ import datetime
 import time
 import traceback
 
+import phonenumbers
 import six
 import sys
 
@@ -25,7 +26,7 @@ else:
     from django.contrib.postgres.fields import JSONField
 
 from activity_logger.models import log
-from builder.models import Player
+from builder.models import Player, SiteSettings
 from integrations.models import Integration
 
 OUTGOING_CALL_NEXT_ACTIONS = (
@@ -47,6 +48,7 @@ GATHER_SPEECH_MODELS = (
     ('phone_call', 'Phone Call'),
 )
 
+# TO CONVERT
 def last_message_for_player(game, player):
     integration = Integration.objects.filter(game=game).first()
 
@@ -380,8 +382,44 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
         if action.get('destinations', '') != '':
             for destination in action.get('destinations', '').split('\n'):
+                destination = integration.translate_value(destination, session)
+
                 if len(destination) >= 10:
-                    destinations.append(integration.translate_value(destination, session))
+                    parsed = phonenumbers.parse(destination, settings.PHONE_NUMBER_REGION)
+
+                    destination = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+
+                    identifier = 'twilio_player:%s' % destination
+
+                    existing_player = Player.objects.filter(identifier=identifier.first())
+
+                    if existing_player is None:
+                        new_player = Player.objects.create(identifier=identifier.first())
+                        new_player.player_state = {
+                            'twilio_player': destination
+                        }
+
+                        new_player.save()
+
+                        site_settings = SiteSettings.objects.all().first()
+
+                        outgoing = OutgoingMessage(destination=destination)
+                        outgoing.send_date = timezone.now()
+                        outgoing.message = integration.translate_value(site_settings.new_player_message, session)
+                        outgoing.integration = integration
+
+                        if integration.enabled is False:
+                            outgoing.sent_date = timezone.now()
+                            outgoing.transmission_metadata = {
+                                'error': 'Unable to send, integration is disabled.'
+                            }
+
+                        outgoing.save()
+
+                        if integration.enabled:
+                            outgoing.transmit()
+
+                    destinations.append(destination)
         else:
             destinations.append(player.player_state['twilio_player'])
 

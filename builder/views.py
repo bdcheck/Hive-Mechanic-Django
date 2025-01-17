@@ -747,6 +747,7 @@ def builder_settings(request): # pylint: disable=unused-argument
 
         site_settings.name = request.POST.get('site_name', 'Hive Mechanic')
         site_settings.message_of_the_day = request.POST.get('site_motd', '')
+        site_settings.new_player_message = request.POST.get('site_new_player_message', 'Incoming message from Hive Mechanic. Reply STOP to block further messages.')
         site_settings.last_updated = now
         site_settings.save()
 
