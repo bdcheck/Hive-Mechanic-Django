@@ -9,7 +9,6 @@ import datetime
 import json
 import re
 import sys
-import traceback
 
 import phonenumbers
 
@@ -273,7 +272,7 @@ class Integration(models.Model):
                     if variable_value is None:
                         variable_value = '???'
 
-                    translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, str(variable_value))
 
             while '[PLAYER:' in translated_value:
                 start = translated_value.find('[PLAYER:')
@@ -290,7 +289,7 @@ class Integration(models.Model):
                     if variable_value is None:
                         variable_value = '???'
 
-                    translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, str(variable_value))
 
             if translated_value != value:
                 metadata = {
@@ -301,9 +300,9 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            # pass # Attempting to translate non-string
+            pass # Attempting to translate non-string
 
-            traceback.print_exc()
+            # traceback.print_exc()
 
         return translated_value
 
