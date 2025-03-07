@@ -50,3 +50,5 @@ HIVE_CLIENT_TOKEN = 'abc12345' # nosec
 # TEST_RUNNER = 'hivemechanic.no_db_test_runner.NoDbTestRunner'
 
 DEFAULT_FROM_MAIL_ADDRESS = 'Hive Mechanic <noreply@hivemechanic.net>'
+
+ADDITIONAL_APPS = []
