@@ -63,3 +63,5 @@ HIVE_CLIENT_TOKEN = 'abc12345' # nosec
 DEFAULT_FROM_MAIL_ADDRESS = 'Hive Mechanic <noreply@hivemechanic.net>'
 
 ADDITIONAL_APPS = []
+
+SIMPLE_DASHBOARD_SITE_NAME = "Hive Mechanic Circle CI"
