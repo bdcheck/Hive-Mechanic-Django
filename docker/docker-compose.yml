@@ -1,0 +1,75 @@
+name: small-steps
+services:
+#  db:
+#    image: postgres:16.3
+#    hostname: db
+#    volumes:
+#      - hivemechanic-db:/var/lib/postgresql/data
+#    environment:
+#      - POSTGRES_DB=${PG_DB}
+#      - POSTGRES_USER=${PG_USER}
+#      - POSTGRES_PASSWORD=${PG_PASSWORD}
+#    healthcheck:
+#      test: "pg_isready -U ${PG_USER} -d ${PG_DB}"
+#      interval: 1s
+#      timeout: 5s
+#      retries: 10
+
+  django:
+    platform: linux/amd64
+    hostname: django
+    build:
+      context: ..
+      dockerfile: docker/django/Dockerfile
+    env_file: .env
+    command: bash /app/django.sh
+    volumes:
+      - hivemechanic-media:/app/media
+      - hivemechanic-static:/app/static
+      - hivemechanic-db:/app/database
+#    depends_on:
+#      db:
+#        condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:${DJANGO_WEB_PORT}/admin/ || exit 1
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
+
+  nginx:
+    image: nginx
+    env_file: .env
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - hivemechanic-media:/var/www/media
+      - hivemechanic-static:/var/www/static
+    ports:
+      - "${NGINX_WEB_PORT}:${NGINX_WEB_PORT}"
+    environment:
+      - NGINX_WEB_HOST=${NGINX_WEB_HOST}
+      - NGINX_WEB_PORT=${NGINX_WEB_PORT}
+      - DJANGO_WEB_PORT=${DJANGO_WEB_PORT}
+    depends_on:
+      django:
+        condition: service_healthy
+
+  cron:
+    platform: linux/amd64
+    build:
+      context: ..
+      dockerfile: docker/cron/Dockerfile
+    env_file: .env
+    command: bash /app/run.sh
+    volumes:
+      - hivemechanic-media:/app/media
+      - hivemechanic-static:/app/static
+      - hivemechanic-db:/app/database
+    depends_on:
+      django:
+        condition: service_healthy
+
+volumes:
+  hivemechanic-db:
+  hivemechanic-media:
+  hivemechanic-static:

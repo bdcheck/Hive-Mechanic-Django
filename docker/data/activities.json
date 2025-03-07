@@ -1,0 +1,68 @@
+[
+    {
+        "model": "builder.game",
+        "pk": 1,
+        "fields": {
+            "name": "New Blank Activity",
+            "slug": "new-blank-activity",
+            "game_state": {},
+            "icon": "",
+            "is_template": true,
+            "metadata": {
+                "name": "New Blank Activity",
+                "slug": "new-blank-activity",
+                "creator": "Admin User",
+                "versions_count": 2,
+                "last_saved": "2025-03-07T15:48:37.682Z",
+                "last_saved_by": "Admin User",
+                "active_sessions": 0,
+                "inactive_sessions": 0,
+                "all_sessions": 0,
+                "active_players": 0,
+                "all_players": 0,
+                "integrations": []
+            },
+            "metadata_updated": null,
+            "archived": null,
+            "cards": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24
+            ],
+            "editors": [],
+            "viewers": []
+        }
+    },
+    {
+        "model": "builder.gameversion",
+        "pk": 3,
+        "fields": {
+            "game": 1,
+            "created": "2025-03-07T15:49:24.190Z",
+            "definition": "{  \"sequences\": [    {      \"type\": \"sequence\",      \"id\": \"new-sequence\",      \"name\": \"New Sequence\",      \"items\": [        {          \"name\": \"Hello World\",          \"context\": \"Start building your game here.\",          \"message\": \"Hello World\",          \"type\": \"send-message\",          \"id\": \"hello-world\",          \"next\": \"09-End\"        },        {          \"name\": \"09. End\",          \"type\": \"game-over\",          \"id\": \"09-End\"        }      ]    }  ],  \"interrupts\": [],  \"name\": \"New Blank Activity\",  \"identifier\": \"new-blank-activity-1\",  \"initial-card\": \"new-sequence#hello-world\",  \"variables\": [],  \"incoming_call_interrupt\": \"new-sequence#hello-world\"}",
+            "cached_cytoscape": null,
+            "creator": 1
+        }
+    }
+]
