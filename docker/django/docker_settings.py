@@ -91,6 +91,8 @@ STATIC_ROOT = '/app/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/app/media/'
 
+PHONE_REGION = os.getenv('PHONE_REGION', 'US')
+
 SILENCED_SYSTEM_CHECKS = [
     'security.W005',
     'security.W008',

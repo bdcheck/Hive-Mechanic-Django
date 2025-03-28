@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'simple_messaging',
     'simple_messaging_loopback',
     'simple_messaging_switchboard',
+    'simple_messaging_hive',
     'docker_utils',
     'user_creation',
     'builder',

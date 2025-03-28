@@ -8,6 +8,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import datetime
 import difflib
 import hashlib
+import importlib
 import json
 import os
 import pkgutil
@@ -1533,6 +1534,19 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
         self.set_variable(interrupted_state_key, interrupted_state)
 
         self.advance_to(terms_interrupt)
+
+    def messaging_link(self):
+        for app in settings.INSTALLED_APPS:
+            try:
+                hive_api = importlib.import_module(app + '.hive_api')
+
+                return hive_api.messages_ui_for_player(self)
+            except ImportError:
+                pass
+            except AttributeError:
+                pass
+
+        return None
 
 @python_2_unicode_compatible
 class DataProcessor(models.Model):

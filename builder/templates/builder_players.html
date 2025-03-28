@@ -39,6 +39,9 @@
 												<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.active_session_count }}</td>
 												<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.inactive_session_count }}</td>
 												<td class="mdc-data-table__cell" style="vertical-align: middle;">
+													{% if player.messaging_link %}
+														<a href="{{ player.messaging_link }}" class="material-icons"  aria-hidden="true" title="Review transcript">question_answer</a>
+													{% endif %}
 													<a href="#" class="material-icons action_clear_variables" data-id="{{ player.pk }}" aria-hidden="true" title="Clear variables">phonelink_erase</a>
 													<a href="#" class="material-icons action_delete_player" data-id="{{ player.pk }}" aria-hidden="true" title="Delete participant">delete_forever</a>
 												</td>
@@ -64,7 +67,7 @@
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--body1">
 				                Please select which variables to clear:
 				            </div>
-				            
+
 							<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 								<div class="mdc-radio">
 									<input class="mdc-radio__native-control" type="radio" id="clear-variables-all" value="all" name="clear-variables">
@@ -103,8 +106,8 @@
 								<label for="clear-variables-activity" class="mdc-typography--body1">Clear <strong>only activity variables</strong></label>
 							</div>
 							<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12 mdc-typography--caption">
-				                <strong>Site variables</strong> include terms &amp; conditions acceptances and other variables set by Hive Mechanic internally. 
-				                <strong>Activity variables</strong> include variables set by the activities themselves for internal activity usage. 
+				                <strong>Site variables</strong> include terms &amp; conditions acceptances and other variables set by Hive Mechanic internally.
+				                <strong>Activity variables</strong> include variables set by the activities themselves for internal activity usage.
 				            </div>
 				        </div>
 					</div>
