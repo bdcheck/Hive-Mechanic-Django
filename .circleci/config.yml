@@ -74,6 +74,14 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
+            pylint simple_backup
+            pylint simple_dashboard
+            pylint simple_messaging
+            pylint simple_messaging_azure
+            pylint simple_messaging_hive
+            pylint simple_messaging_loopback
+            pylint simple_messaging_switchboard
+            pylint simple_messaging_twilio
             bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
@@ -167,6 +175,14 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
+            pylint simple_backup
+            pylint simple_dashboard
+            pylint simple_messaging
+            pylint simple_messaging_azure
+            pylint simple_messaging_hive
+            pylint simple_messaging_loopback
+            pylint simple_messaging_switchboard
+            pylint simple_messaging_twilio
             bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
@@ -260,6 +276,14 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
+            pylint simple_backup
+            pylint simple_dashboard
+            pylint simple_messaging
+            pylint simple_messaging_azure
+            pylint simple_messaging_hive
+            pylint simple_messaging_loopback
+            pylint simple_messaging_switchboard
+            pylint simple_messaging_twilio
             bandit -r .
             npx eslint builder/static/builder-js/js
       - run:
@@ -356,6 +380,14 @@ jobs:
             pylint http_support
             pylint twilio_support
             pylint user_creation
+            pylint simple_backup
+            pylint simple_dashboard
+            pylint simple_messaging
+            pylint simple_messaging_azure
+            pylint simple_messaging_hive
+            pylint simple_messaging_loopback
+            pylint simple_messaging_switchboard
+            pylint simple_messaging_twilio
             bandit -r .
             npx eslint builder/static/builder-js/js
       - run:

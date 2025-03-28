@@ -27,7 +27,7 @@
 											<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Joined</th>
 											<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Active Sessions</th>
 											<th class="mdc-data-table__header-cell mdc-data-table__header-cell--numeric" role="columnheader" scope="col">Inactive Sessions</th>
-											<th class="mdc-data-table__header-cell" role="columnheader" scope="col" style="width: 96px;"></th>
+											<th class="mdc-data-table__header-cell" role="columnheader" scope="col" style="width: 160px; text-align: right;">Actions</th>
 										</tr>
 									</thead>
 									<tbody class="mdc-data-table__content">
@@ -38,7 +38,7 @@
 												<td class="mdc-data-table__cell">{{ player.earliest_session.started }}</a></td>
 												<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.active_session_count }}</td>
 												<td class="mdc-data-table__cell mdc-data-table__cell--numeric">{{ player.inactive_session_count }}</td>
-												<td class="mdc-data-table__cell" style="vertical-align: middle;">
+												<td class="mdc-data-table__cell" style="vertical-align: middle; text-align: right;">
 													{% if player.messaging_link %}
 														<a href="{{ player.messaging_link }}" class="material-icons"  aria-hidden="true" title="Review transcript">question_answer</a>
 													{% endif %}
