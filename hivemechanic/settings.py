@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_db_logger',
     'prettyjson',
+    'django_filters',
     'quicksilver',
     'passive_data_kit',
     'django_dialog_engine',
