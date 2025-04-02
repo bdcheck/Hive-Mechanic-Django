@@ -129,7 +129,7 @@ def process(dialog, response, extras):
     integration = Integration.objects.filter(game=game).first()
 
     if integration is None:
-        integration = Integration.objects.create(url_slug=dialog.key, name=dialog.key + ' Botium Integration', type='other', game=game)
+        integration = Integration.objects.create(url_slug=dialog.key, name=dialog.key + ' Botium Integration', type='command_line', game=game)
 
     player_match = Player.objects.filter(identifier=extras['player']).first()
 

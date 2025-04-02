@@ -344,8 +344,6 @@ jobs:
       - run:
           name: Install NPM dependencies
           command: |
-            nvm install 17.9.1
-            nvm use 18.20.8
             npm install -g -s botium-cli botium-core
             npm install
       - restore_cache:
@@ -353,7 +351,6 @@ jobs:
       - run:
           name: Build and validate
           command: |
-            nvm use 18.20.8
             sudo apt-get update && sudo apt-get install -y gdal-bin
             virtualenv --copies /home/circleci/venv
             . /home/circleci/venv/bin/activate
@@ -408,7 +405,6 @@ jobs:
       - run:
           name: Test dialog content (Hive Mechanic)
           command: |
-            nvm use 18.20.8
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-hive-builder"
