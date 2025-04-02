@@ -10,6 +10,8 @@ import json
 import re
 import sys
 
+import phonenumbers
+
 from future.utils import python_2_unicode_compatible
 
 from django.conf import settings
@@ -29,6 +31,7 @@ else:
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
+    ('simple_messaging', 'Simple Messaging'),
     ('http', 'HTTP'),
     ('command_line', 'Command Line'),
     ('other', 'Other'),
@@ -103,6 +106,30 @@ class Integration(models.Model):
                     self.enabled = False
                     self.save()
 
+        if self.type == 'simple_messaging': # pylint: disable=no-else-return
+            site_settings = SiteSettings.objects.all().first()
+
+            if site_settings.total_message_limit is not None:
+                from simple_messaging.models import IncomingMessage, OutgoingMessage # pylint: disable=import-outside-toplevel
+
+                incoming_messages = IncomingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
+
+                outgoing_messages = OutgoingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
+
+                total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
+
+                if total >= site_settings.total_message_limit:
+                    print('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+
+                    self.enabled = False
+                    self.save()
+
         return self.enabled
 
     def close_sessions(self, payload):
@@ -111,12 +138,15 @@ class Integration(models.Model):
 
             twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
 
-
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
 
             return twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'simple_messaging':
+            from simple_messaging_hive.models import process_incoming as simple_messaging_incoming # pylint: disable=import-outside-toplevel
+
+            return simple_messaging_incoming(self, payload) # pylint: disable=no-value-for-parameter
         elif self.type == 'http':
             from http_support.models import process_incoming as http_incoming # pylint: disable=import-outside-toplevel
 
@@ -175,8 +205,6 @@ class Integration(models.Model):
 
             log(self.log_id(), 'Processing incoming payload.', tags=['integration'], metadata=payload, player=player_match, session=session, game_version=session.game_version)
 
-            print('TERMS: %s -- %s' % (session.visited_terms(), session.accepted_terms()))
-
             # Skip terms if call...
 
             if extras.get('message_type', 'text') != 'call' and session.visited_terms() is False and session.accepted_terms() is False:
@@ -193,8 +221,6 @@ class Integration(models.Model):
 
                 self.execute_actions(session, actions)
 
-            print('PROCESS: %s -- %s' % (session.current_node(), payload))
-
             session.process_incoming(self, payload, extras)
 
     def execute_actions(self, session, actions): # pylint: disable=no-self-use, unused-argument
@@ -206,6 +232,10 @@ class Integration(models.Model):
                     from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
                     processed = twilio_execute(self, session, action)
+                if self.type == 'simple_messaging':
+                    from simple_messaging_hive.models import execute_action as simple_messaging_execute # pylint: disable=import-outside-toplevel
+
+                    processed = simple_messaging_execute(self, session, action)
                 elif self.type == 'http':
                     from http_support.models import execute_action as http_execute # pylint: disable=import-outside-toplevel
 
@@ -235,6 +265,13 @@ class Integration(models.Model):
 
             while '[LAST-MESSAGE-TYPE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
+
+            if '[LAST-RESPONDER]' in translated_value:
+                last_responder = session.last_message_responder()
+
+                if last_responder is not None:
+                    while '[LAST-RESPONDER]' in translated_value:
+                        translated_value = translated_value.replace('[LAST-RESPONDER]', last_responder)
 
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')
@@ -268,7 +305,7 @@ class Integration(models.Model):
                     if variable_value is None:
                         variable_value = '???'
 
-                    translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, str(variable_value))
 
             while '[PLAYER:' in translated_value:
                 start = translated_value.find('[PLAYER:')
@@ -285,7 +322,7 @@ class Integration(models.Model):
                     if variable_value is None:
                         variable_value = '???'
 
-                    translated_value = translated_value.replace(tag, variable_value)
+                    translated_value = translated_value.replace(tag, str(variable_value))
 
             if translated_value != value:
                 metadata = {
@@ -298,11 +335,18 @@ class Integration(models.Model):
         except TypeError:
             pass # Attempting to translate non-string
 
+            # traceback.print_exc()
+
         return translated_value
 
     def last_message_for_player(self, player):
         if self.type == 'twilio':
             from twilio_support.models import last_message_for_player # pylint: disable=import-outside-toplevel
+
+            return last_message_for_player(self.game, player)
+
+        if self.type == 'simple_messaging':
+            from simple_messaging_hive.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
 
@@ -320,12 +364,17 @@ class Integration(models.Model):
         day_start = now - datetime.timedelta(days=1)
         week_start = now - datetime.timedelta(days=7)
 
-        statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
-        statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
-        statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
+        if self.game is not None:
+            statistics['details'].append(('Unique Users (All)', len(self.game.unique_users()),))
+            statistics['details'].append(('Unique Users (Last 24 Hours)', len(self.game.unique_users(since=day_start)),))
+            statistics['details'].append(('Unique Users (Last 7 Days)', len(self.game.unique_users(since=week_start)),))
 
         if self.type == 'twilio':
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
+
+            annotate_statistics(self, statistics)
+        elif self.type == 'simple_messaging':
+            from simple_messaging_hive.models import annotate_statistics # pylint: disable=import-outside-toplevel
 
             annotate_statistics(self, statistics)
         elif self.type == 'http':
@@ -351,7 +400,7 @@ class Integration(models.Model):
             for session in player_match.sessions.filter(completed=None):
                 session.complete()
 
-def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements
+def execute_action(integration, session, action): # pylint: disable=unused-argument, too-many-branches, too-many-return-statements, too-many-statements, too-many-locals
     if action['type'] == 'set-variable': # pylint: disable=no-else-return
         scope = 'session'
 
@@ -378,6 +427,30 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 session.player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
             elif scope == 'game':
                 session.game_version.game.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+
+            elif scope == 'active_sessions':
+                for other_session in Session.objects.filter(completed=None):
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'others_active_sessions':
+                for other_session in Session.objects.filter(completed=None).exclude(pk=session.pk):
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'all_sessions':
+                for other_session in Session.objects.all():
+                    other_session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
+            elif scope == 'active_players':
+                for player in Player.objects.all():
+                    if player.sessions.filter(complete=None).count() > 0:
+                        player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'other_active_players':
+                for player in Player.objects.exclude(pk=session.player.pk):
+                    if player.sessions.filter(complete=None).count() > 0:
+                        player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'all_players':
+                for player in Player.objects.all():
+                    player.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
+            elif scope == 'all_activities':
+                for activity in Game.objects.all():
+                    activity.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
             action['translated_value'] = integration.translate_value(action['variable'], session)
 
@@ -408,19 +481,62 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
 
         return True
     elif action['type'] == 'echo': # pylint: disable=no-else-return
-        print(integration.translate_value(action['message'], session))
-
         return True
     elif action['type'] == 'nudge': # pylint: disable=no-else-return
         session.nudge()
 
         return True
     elif action['type'] == 'echo-image':
-        print(action['image-url'])
-
         return True
     elif action['type'] == 'accept-terms':
         session.accept_terms()
+
+        return True
+    elif action['type'] == 'launch-session':
+        activity_param = action.get('activity', None)
+        player_param = action.get('player', None)
+
+
+        activity_param = integration.translate_value(activity_param, session)
+        player_param = integration.translate_value(player_param, session)
+
+        player_id = player_param
+
+        player = Player.objects.filter(identifier=player_id).first()
+
+        if player is None:
+            try:
+                parsed = phonenumbers.parse(player_param, settings.PHONE_NUMBER_REGION)
+
+                formatted = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+
+                player_id = 'twilio_player:%s' % formatted
+
+                player = Player.objects.filter(identifier=player_id).first()
+
+                if player is None:
+                    player = Player.objects.create(identifier=player_id)
+
+                    player.player_state = {
+                        'twilio_player': formatted
+                    }
+
+                    player.save()
+            except phonenumbers.phonenumberutil.NumberParseException:
+                if player_id == '[PLAYER:SELF]':
+                    player = session.player
+
+        activity = Game.objects.filter(slug=activity_param).first()
+
+        if player is not None and activity is not None:
+            existing_session = activity.current_active_session(player=player)
+
+            if existing_session is not None:
+                existing_session.complete()
+
+            new_session = Session.objects.create(game_version=activity.versions.order_by('-created').first(), player=player, started=timezone.now())
+
+            new_session.nudge()
 
         return True
 

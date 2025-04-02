@@ -32,7 +32,15 @@ class LogItem(models.Model):
         return '%s[%s]: %s (%s)' % (self.source, self.logged, self.message, self.tags_str())
 
     def tags_str(self): # pylint: disable=no-self-use
-        return '(Coming soon)'
+        item_tags = ''
+
+        for tag in self.tags.all():
+            if item_tags != '':
+                item_tags += '; '
+
+            item_tags += tag.name
+
+        return item_tags
 
     def player_str(self):
         metadata = self.fetch_metadata()

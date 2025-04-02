@@ -61,6 +61,7 @@ def last_message_for_player(game, player):
             'message': incoming_message.message,
             'received': incoming_message.receive_date,
             'type': 'sms-text-message',
+            'metadata': incoming_message.transmission_metadata,
         }
 
     incoming_call_response = IncomingCallResponse.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
@@ -74,6 +75,7 @@ def last_message_for_player(game, player):
                 'message': incoming_call_response.message,
                 'received': incoming_call_response.receive_date,
                 'type': 'phone-call',
+                'metadata': incoming_call_response.transmission_metadata,
             }
 
     return last_incoming
@@ -162,6 +164,8 @@ class OutgoingMessage(models.Model):
 
         except TwilioRestException as twilio_exc:
             if 'unsubscribed' in twilio_exc.msg:
+                OutgoingMessage.objects.filter(sent_date=None, destination=self.destination).delete()
+
                 player_id = 'twilio_player:%s' % self.destination
 
                 player = Player.objects.filter(identifier=player_id).first()
@@ -372,21 +376,31 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
     player = session.player
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
-        outgoing = OutgoingMessage(destination=player.player_state['twilio_player'])
-        outgoing.send_date = timezone.now()
-        outgoing.message = integration.translate_value(action['message'], session)
-        outgoing.integration = integration
+        destinations = []
 
-        if integration.enabled is False:
-            outgoing.sent_date = timezone.now()
-            outgoing.transmission_metadata = {
-                'error': 'Unable to send, integration is disabled.'
-            }
+        if action.get('destinations', '') != '':
+            for destination in action.get('destinations', '').split('\n'):
+                if len(destination) >= 10:
+                    destinations.append(integration.translate_value(destination, session))
+        else:
+            destinations.append(player.player_state['twilio_player'])
 
-        outgoing.save()
+        for destination in destinations:
+            outgoing = OutgoingMessage(destination=destination)
+            outgoing.send_date = timezone.now()
+            outgoing.message = integration.translate_value(action['message'], session)
+            outgoing.integration = integration
 
-        if integration.enabled:
-            outgoing.transmit()
+            if integration.enabled is False:
+                outgoing.sent_date = timezone.now()
+                outgoing.transmission_metadata = {
+                    'error': 'Unable to send, integration is disabled.'
+                }
+
+            outgoing.save()
+
+            if integration.enabled:
+                outgoing.transmit()
 
         return True
     elif action['type'] == 'echo-image':

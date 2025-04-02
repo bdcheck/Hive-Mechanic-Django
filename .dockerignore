@@ -1,0 +1,18 @@
+.git
+node_modules/
+
+# Exclude local build outputs
+build/
+dist/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Exclude IDE settings
+.vscode/
+
+# Exclude logs
+*.log
+logs/
+venv

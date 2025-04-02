@@ -143,6 +143,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return issues
     }
 
+    onFieldUpdated (field, value) {
+      // Implement in subclasses...
+    }
+
     initialize () {
       const me = this
 
@@ -155,6 +159,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const value = $('#' + me.cardId + '_name_value').val()
 
         me.definition.name = value
+
+        me.onFieldUpdated('name', value)
 
         me.sequence.markChanged(me.id)
       })
@@ -195,6 +201,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           me.definition.id = newId
           me.id = newId
 
+          me.onFieldUpdated('id', newId)
+
           me.sequence.markChanged(me.id)
         }
       })
@@ -217,6 +225,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         me.definition.comment = value
 
         me.updateCommentDisplay(me.definition.comment)
+
+        me.onFieldUpdated('comment', value)
 
         me.sequence.markChanged(me.id)
       })
@@ -421,6 +431,27 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
       fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
       fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" />')
+      fieldLines.push('    <div class="mdc-notched-outline">')
+      fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
+      fieldLines.push('      <div class="mdc-notched-outline__notch">')
+      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('      </div>')
+      fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
+      fieldLines.push('    </div>')
+      fieldLines.push('  </div>')
+      fieldLines.push('</div>')
+
+      return fieldLines.join('\n')
+    }
+
+    createIntegerField (field) {
+      const me = this
+
+      const fieldLines = []
+
+      fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" type="number"/>')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
@@ -749,6 +780,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         me.initializeField(templateField, itemDefinition, function (newValue) {
           itemDefinition[templateField.original_field] = newValue
 
+          me.onFieldUpdated(templateField.original_field, newValue)
+
           me.sequence.markChanged(me.id)
         }, onDelete)
       })
@@ -767,6 +800,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       me.initializeField(field, itemDefinition, function (newValue) {
         itemDefinition[fieldName] = newValue
+
+        me.onFieldUpdated(fieldName, newValue)
 
         me.sequence.markChanged(me.id)
       }, null)
@@ -787,9 +822,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
 
       if (field.type === 'integer') {
-        if (field.input === 'text') {
-          fieldLines.push(this.createTextField(field))
-        }
+        fieldLines.push(this.createIntegerField(field))
       } else if (field.type === 'text') {
         if (field.multiline) {
           fieldLines.push(this.createTextArea(field))
@@ -846,6 +879,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
           me.sequence.markChanged(me.id)
 
+          me.onFieldUpdated(field.field, value)
+
           onUpdate(parseInt(value))
         })
       } else if (field.type === 'image-url') {
@@ -878,6 +913,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
           $('#' + me.cardId + '_' + field.field + '_preview').attr('src', value)
 
+          me.onFieldUpdated(field.field, value)
+
           me.sequence.markChanged(me.id)
 
           onUpdate(value)
@@ -900,6 +937,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
           $('#' + me.cardId + '_' + field.field + '_preview').attr('src', value)
 
+          me.onFieldUpdated(field.field, value)
+
           me.sequence.markChanged(me.id)
 
           onUpdate(value)
@@ -908,15 +947,19 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         if (Array.isArray(field.options)) {
           const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName))
 
-          if (definition[field.field] !== undefined) {
+          if (definition[field.field] !== undefined && definition[field.field] !== null) {
             choiceField.value = definition[field.field]
+
+            me.onFieldUpdated(field.field, choiceField.value)
           }
 
           choiceField.listen('MDCSelect:change', function () {
-            onUpdate(choiceField.value)
-          })
+            me.onFieldUpdated(field.field, choiceField.value)
 
-          me.sequence.markChanged(me.id)
+            onUpdate(choiceField.value)
+
+            me.sequence.markChanged(me.id)
+          })
         } else {
           // Fetch values and update structure and re-render
           $.get(field.options, function (data) {
@@ -946,6 +989,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
           const value = fieldWidget.value
 
+          me.onFieldUpdated(field.field, value)
+
           me.sequence.markChanged(me.id)
 
           onUpdate(value)
@@ -953,19 +998,14 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       } else if (field.type === 'boolean') {
         const fieldWidget = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById(`${me.cardId}_${fieldName}_field`))
 
-        console.log('BOOLEAN')
-        console.log(definition)
-        console.log(field)
-
         if (definition[field.field] !== undefined) {
           fieldWidget.checked = definition[field.field]
         }
 
         $('#' + me.cardId + '_' + fieldName + '_value').on('change', function () {
-          console.log('CHANGE')
-          console.log(fieldWidget.checked)
-
           const value = fieldWidget.checked
+
+          me.onFieldUpdated(field.field, value)
 
           me.sequence.markChanged(me.id)
 
@@ -977,6 +1017,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         $('#' + me.cardId + '_' + fieldName + '_edit').on('click', function () {
           me.sequence.refreshDestinationMenu(function (destination) {
             window.dialogBuilder.chooseDestinationDialog.close()
+
+            me.onFieldUpdated(field.field, destination)
 
             onUpdate(destination)
 
@@ -1198,6 +1240,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     advancedEditFields () {
+      if (this.cardFields === undefined) {
+        return ''
+      }
+
       const me = this
 
       const fields = this.cardFields()
@@ -1221,6 +1267,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       $.each(fields, function (index, field) {
         const onUpdate = function (newValue) {
           me.definition[field.field] = newValue
+
+          if (me.onFieldUpdated !== undefined) {
+            me.onFieldUpdated(field, newValue)
+          }
 
           me.sequence.markChanged(me.id)
         }

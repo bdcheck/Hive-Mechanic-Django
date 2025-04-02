@@ -37,8 +37,6 @@ requirejs.config({
 })
 
 requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc, Cookies, cytoscape, cytoscapeDagre) {
-  console.log(mdc)
-
   const drawer = mdc.drawer.MDCDrawer.attachTo(document.querySelector('.mdc-drawer'))
 
   const itemsList = mdc.list.MDCList.attachTo(document.getElementById('sequences_list'))
@@ -108,8 +106,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
         $('#dialog-content').html(response.message)
 
-        console.log(response)
-
         baseDialog.listen('MDCDialog:closed', function () {
           if (response.success) {
             if (response.redirect !== undefined) {
@@ -143,8 +139,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
         }
 
         $('#dialog-content').html(response.message)
-
-        console.log(response)
 
         baseDialog.listen('MDCDialog:closed', function () {
           if (response.success) {

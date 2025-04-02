@@ -1,11 +1,19 @@
 {% load humanize %}
+{% load simple_dashboard %}
 {% with signal.latest_value as latest_value %}
 	{% if latest_value %}
 		{% with latest_value.fetch_value as value %}
 			<div class="mdc-typography mdc-typography--subtitle1">Activity: {{ value.activity }}</div>
 
 			{% for detail in value.details %}
-				<div class="mdc-typography mdc-typography--body1">{{ detail.0 }}: {{ detail.1 }}</div>
+				<div class="mdc-typography mdc-typography--body1">
+					{{ detail.0 }}:
+					{% if detail.1|simple_dashboard_is_date %}
+						<span class="dashboard_date">{{ detail.1 }}</span>
+					{% else %}
+						{{ detail.1 }}
+					{% endif %}
+				</div>
 			{% endfor %}
 			<div class="mdc-typography mdc-typography--body1">Integration: {{ value.type }}</div>
 		{% endwith %}
@@ -14,3 +22,19 @@
 		</div>
 	{% endif %}
 {% endwith %}
+
+<script>
+	$(document).ready(function() {
+		$('.dashboard_date').each(function(index, element) {
+			console.log('PROCESS: ' + $(element).text())
+			
+			const parsed = moment($(element).text())
+			
+			if (parsed.isValid()) {
+				$(element).html(parsed.format('llll'))
+			}
+			
+			$(element).removeClass('dashboard_date')
+		})
+	})
+</script>

@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     'nagios_monitor',
     'simple_backup',
     'simple_dashboard',
+    'simple_messaging',
+    'simple_messaging_loopback',
+    'simple_messaging_switchboard',
+    'simple_messaging_hive',
+    'docker_utils',
     'user_creation',
     'builder',
     'activity_logger',
@@ -156,6 +161,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+PHONE_NUMBER_REGION = 'US'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGOUT_REDIRECT_URL = '/'
@@ -205,6 +212,9 @@ TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
 
 from .local_settings import *
+
+for app in ADDITIONAL_APPS:
+    INSTALLED_APPS.append(app)
 
 # Suppress pygame notifications...
 

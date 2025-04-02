@@ -16,6 +16,8 @@ class Command(BaseCommand):
             permission = Permission.objects.filter(codename=codename).first()
 
             if permission is not None:
+                print('Adding permission "%s" to %s...' % (permission, reader_group))
+
                 reader_group.permissions.add(permission)
 
         editor_permissions = [
@@ -54,6 +56,8 @@ class Command(BaseCommand):
             permission = Permission.objects.filter(codename=codename).first()
 
             if permission is not None:
+                print('Adding permission "%s" to %s...' % (permission, editor_group))
+
                 editor_group.permissions.add(permission)
 
         manager_permissions = [
@@ -105,4 +109,6 @@ class Command(BaseCommand):
             permission = Permission.objects.filter(codename=codename).first()
 
             if permission is not None:
+                print('Adding permission "%s" to %s...' % (permission, manager_group))
+
                 manager_group.permissions.add(permission)

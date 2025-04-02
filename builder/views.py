@@ -612,6 +612,22 @@ def builder_data_processor_options(request):  # pylint: disable=unused-argument
 
 @login_required
 @user_accepted_all_terms
+def builder_activity_options(request):  # pylint: disable=unused-argument
+    options = []
+
+    for activity in Game.objects.filter(is_template=False).order_by('name'):
+        options.append({
+            'value': activity.slug,
+            'label': {
+                'en': activity.name
+            }
+        })
+
+    return HttpResponse(json.dumps(options, indent=2), content_type='application/json', status=200)
+
+
+@login_required
+@user_accepted_all_terms
 def builder_activity_archive(request, slug): # pylint: disable=unused-argument
     if request.user.has_perm('builder.delete_game') is False:
         raise PermissionDenied('Delete game permission required.')

@@ -22,8 +22,6 @@ requirejs.config({
 })
 
 requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
-  console.log(mdc)
-
   mdc.textField.MDCTextField.attachTo(document.getElementById('field_password'))
   mdc.textField.MDCTextField.attachTo(document.getElementById('field_password_confirm'))
 

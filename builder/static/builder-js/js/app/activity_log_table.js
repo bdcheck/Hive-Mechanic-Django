@@ -118,8 +118,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#event_preview').hide()
 
     const dialogPreview = mdc.dialog.MDCDialog.attachTo(document.getElementById('dialog_preview'))
-    console.log('dialogPreview')
-    console.log(dialogPreview)
 
     const preview = target.data('attachment')
 
@@ -145,8 +143,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
       }
 
       $('#event_preview').show()
-
-      console.log(5)
     } else {
       $('#event_preview').hide()
     }
@@ -154,8 +150,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#event_preview').click(function () {
       dialogPreview.open()
     })
-
-    console.log(6)
 
     const currentBackground = target.css('background-color')
 
@@ -195,9 +189,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
   mdc.textField.MDCTextField.attachTo(document.getElementById('search_field'))
   // const clearSearch = mdc.textField.MDCTextFieldIcon(document.getElementById('search_field_clear'));
-
-  console.log('mdc')
-  console.log(mdc)
 
   const activitySelect = mdc.select.MDCSelect.attachTo(document.getElementById('activity_select'))
 
