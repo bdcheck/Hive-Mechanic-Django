@@ -32,7 +32,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev
       - checkout
-      - node/install
+      - node/install:
+          node-version: '18.17'
       - browser-tools/install-browser-tools
       - run:
           name: Install NPM dependencies
@@ -133,7 +134,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev
       - checkout
-      - node/install
+      - node/install:
+          node-version: '18.17'
       - browser-tools/install-browser-tools
       - run:
           name: Install NPM dependencies
@@ -234,7 +236,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libfreetype6-dev libportmidi-dev libjpeg-dev
       - checkout
-      - node/install
+      - node/install:
+          node-version: '18.17'
       - browser-tools/install-browser-tools
       - run:
           name: Install NPM dependencies
@@ -335,7 +338,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install libasound2 libsdl2-dev
       - checkout
-      - node/install
+      - node/install:
+          node-version: '18.17'
       - browser-tools/install-browser-tools
       - run:
           name: Install NPM dependencies
