@@ -344,6 +344,7 @@ jobs:
       - run:
           name: Install NPM dependencies
           command: |
+            nvm install 17
             npm install -g -s botium-cli botium-core
             npm install
       - restore_cache:
@@ -394,7 +395,6 @@ jobs:
       - run:
           name: Test dialog content (Django Dialog Engine)
           command: |
-            nvm use 18.20.8
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester"
@@ -405,6 +405,7 @@ jobs:
       - run:
           name: Test dialog content (Hive Mechanic)
           command: |
+            nvm use 17
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
             export BOTIUM_DDE_DIALOG_USER_ID="circle-ci:tester-hive-builder"
