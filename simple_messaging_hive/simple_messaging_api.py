@@ -22,6 +22,8 @@ def process_incoming_message(message):
         except json.JSONDecodeError:
             pass
 
+        transmission_metadata['integration'] = 'integration:%s' % integration_match.pk
+
         message.transmission_metadata = json.dumps(transmission_metadata, indent=3)
         message.save()
 
@@ -47,7 +49,7 @@ def process_incoming_message(message):
         payload = {
             'Body': message.current_message(),
             'From': message.current_sender(),
-            'simple_messagging_incoming_pk': message.pk
+            'simple_messaging_incoming_pk': message.pk
         }
 
         integration_match.process_incoming(payload)

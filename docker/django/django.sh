@@ -21,6 +21,9 @@ python3 manage.py docker_update_data docker/data/users.json --skip-checks
 echo Hive Mechanic: Creating/updating Quicksilver tasks...
 python3 manage.py install_quicksilver_tasks --skip-checks
 
+echo Hive Mechanic: Clearing any left-over ongoing executions from past runs...
+python3 manage.py clear_ongoing_executions --before_minutes 0 --skip-checks
+
 echo Hive Mechanic: Creating/updating groups...
 python3 manage.py loaddata fixtures/groups.json --skip-checks
 

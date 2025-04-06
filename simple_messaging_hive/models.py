@@ -31,7 +31,7 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
 
     last_message = None
 
-    existing_pk = payload.get('simple_messagging_incoming_pk', None)
+    existing_pk = payload.get('simple_messaging_incoming_pk', None)
 
     incoming_message = None
 
@@ -81,6 +81,8 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
         else:
             destinations.append(player.player_state['messaging_player'])
 
+        print('simepl_messaging_hive.execute_action: %s -- %s' % (action, destinations))
+
         for destination in destinations:
             outgoing = OutgoingMessage(destination=destination)
             outgoing.send_date = timezone.now()
@@ -94,9 +96,11 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
                 outgoing.sent_date = timezone.now()
                 transmission_metadata['error'] = 'Unable to send, integration is disabled.'
 
-            outgoing.transmission_metadata = transmission_metadata
+            outgoing.transmission_metadata = json.dumps(transmission_metadata, indent=2)
 
             outgoing.save()
+
+            print('simepl_messaging_hive.execute_action: %s' % outgoing)
 
             if integration.enabled:
                 outgoing.transmit()
@@ -122,7 +126,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
             outgoing.sent_date = timezone.now()
             transmission_metadata['error'] = 'Unable to send, integration is disabled.'
 
-        outgoing.transmission_metadata = transmission_metadata
+        outgoing.transmission_metadata = json.dumps(transmission_metadata, indent=2)
 
         outgoing.save()
 
@@ -138,7 +142,22 @@ def last_message_for_player(game, player):
 
     phone = player.player_state.get('simple_messaging', None)
 
-    incoming_message = IncomingMessage.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
+    incoming_message = None
+
+    integration_match_str = 'integration:%s' % integration.pk
+
+    for message in IncomingMessage.objects.filter(sender=phone).order_by('-receive_date'):
+        transmission_metadata = {}
+
+        try:
+            transmission_metadata = json.loads(message.transmission_metadata)
+        except json.JSONDecodeError:
+            pass
+
+        if integration_match_str == transmission_metadata.get('integration', ''):
+            incoming_message = message
+
+            break
 
     last_incoming = None
 
