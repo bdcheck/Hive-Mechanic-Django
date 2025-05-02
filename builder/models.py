@@ -8,6 +8,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import datetime
 import difflib
 import hashlib
+import importlib
 import json
 import os
 import pkgutil
@@ -1218,6 +1219,19 @@ class Player(models.Model):
 
         if direction == 'incoming':
             return IncomingMessage.objects.filter(source=source_id).order_by('-receive_date').first()
+
+        return None
+
+    def messaging_link(self):
+        for app in settings.INSTALLED_APPS:
+            try:
+                hive_api = importlib.import_module(app + '.hive_api')
+
+                return hive_api.messages_ui_for_player(self)
+            except ImportError:
+                pass
+            except AttributeError:
+                pass
 
         return None
 

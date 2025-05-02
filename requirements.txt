@@ -1,33 +1,41 @@
 wheel
 
 -r django_dialog_engine/requirements.txt
+-r docker_utils/requirements.txt
 -r nagios_monitor/requirements.txt
 -r passive_data_kit/requirements.txt
 -r quicksilver/requirements.txt
 -r simple_backup/requirements.txt
 -r simple_dashboard/requirements.txt
+-r simple_messaging/requirements.txt
+-r simple_messaging_azure/requirements.txt
+-r simple_messaging_loopback/requirements.txt
+-r simple_messaging_switchboard/requirements.txt
+-r simple_messaging_twilio/requirements.txt
 
 django-db-logger==0.1.10
 django-filer==3.3.0; python_version >= '3.2'
 django-filer==1.7.1; python_version < '3.2'
+django-filter==1.1.0; python_version < '3.0'
+django-filter==24.2; python_version >= '3.0' and python_version < '3.9'
+django-filter==25.1; python_version >= '3.9'
 easy-thumbnails==2.6; python_version < '3.0'
 easy-thumbnails==2.8.5; python_version >= '3.0'
-Pillow==10.3.0; python_version >= '3.8'
+Pillow==11.1.0; python_version >= '3.9'
+Pillow==10.3.0; python_version == '3.8'
 Pillow==9.0.1; python_version >= '3.0' and python_version < '3.8'
 Pillow==6.2.2; python_version < '3.0'
-phonenumbers==8.13.40
 py-mini-racer==0.6.0
-pygame==2.5.2; python_version >= '3.0'
+pygame==2.6.1; python_version >= '3.0'
 pygame==2.0.3; python_version < '3.0'
 pyOpenSSL==24.2.1; python_version >= '3.0'
 pyOpenSSL==21.0.0; python_version < '3.0'
 reportlab==3.5.59; python_version < '3.0'
-reportlab==3.6.11; python_version >= '3.0'
+reportlab==3.6.11; python_version >= '3.0' and python_version < '3.7'
+reportlab==4.3.1; python_version >= '3.7'
 selenium==3.141.0
 sh==1.14.2
 svglib==0.9.4; python_version < '3.0'
 svglib==1.4.1; python_version >= '3.0'
-twilio==6.63.2; python_version < '3.0'
-twilio==7.4.0; python_version >= '3.0'
 validators==0.16.0; python_version < '3.0'
 validators==0.28.1; python_version >= '3.0'

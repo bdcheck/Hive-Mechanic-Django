@@ -22,7 +22,7 @@ def execute_action(integration, session, action):
     elif action['type'] == 'end-activity':
         session.complete()
 
-        raise HiveActivityFinishedException('Activity finished normally')
+        return True
 
     return False
 

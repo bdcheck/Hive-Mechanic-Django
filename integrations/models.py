@@ -31,6 +31,7 @@ else:
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
+    ('simple_messaging', 'Simple Messaging'),
     ('http', 'HTTP'),
     ('command_line', 'Command Line'),
     ('other', 'Other'),
@@ -105,6 +106,30 @@ class Integration(models.Model):
                     self.enabled = False
                     self.save()
 
+        if self.type == 'simple_messaging': # pylint: disable=no-else-return
+            site_settings = SiteSettings.objects.all().first()
+
+            if site_settings.total_message_limit is not None:
+                from simple_messaging.models import IncomingMessage, OutgoingMessage # pylint: disable=import-outside-toplevel
+
+                incoming_messages = IncomingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    incoming_messages = IncomingMessage.objects.filter(receive_date__gte=site_settings.count_messages_since)
+
+                outgoing_messages = OutgoingMessage.objects.all()
+
+                if site_settings.count_messages_since is not None:
+                    outgoing_messages = OutgoingMessage.objects.filter(sent_date__gte=site_settings.count_messages_since)
+
+                total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
+
+                if total >= site_settings.total_message_limit:
+                    print('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+
+                    self.enabled = False
+                    self.save()
+
         return self.enabled
 
     def close_sessions(self, payload):
@@ -113,12 +138,15 @@ class Integration(models.Model):
 
             twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
 
-
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
 
             return twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'simple_messaging':
+            from simple_messaging_hive.models import process_incoming as simple_messaging_incoming # pylint: disable=import-outside-toplevel
+
+            return simple_messaging_incoming(self, payload) # pylint: disable=no-value-for-parameter
         elif self.type == 'http':
             from http_support.models import process_incoming as http_incoming # pylint: disable=import-outside-toplevel
 
@@ -204,6 +232,10 @@ class Integration(models.Model):
                     from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
                     processed = twilio_execute(self, session, action)
+                if self.type == 'simple_messaging':
+                    from simple_messaging_hive.models import execute_action as simple_messaging_execute # pylint: disable=import-outside-toplevel
+
+                    processed = simple_messaging_execute(self, session, action)
                 elif self.type == 'http':
                     from http_support.models import execute_action as http_execute # pylint: disable=import-outside-toplevel
 
@@ -316,6 +348,11 @@ class Integration(models.Model):
 
             return last_message_for_player(self.game, player)
 
+        if self.type == 'simple_messaging':
+            from simple_messaging_hive.models import last_message_for_player # pylint: disable=import-outside-toplevel
+
+            return last_message_for_player(self.game, player)
+
         return None
 
     def fetch_statistics(self):
@@ -337,6 +374,10 @@ class Integration(models.Model):
 
         if self.type == 'twilio':
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
+
+            annotate_statistics(self, statistics)
+        elif self.type == 'simple_messaging':
+            from simple_messaging_hive.models import annotate_statistics # pylint: disable=import-outside-toplevel
 
             annotate_statistics(self, statistics)
         elif self.type == 'http':

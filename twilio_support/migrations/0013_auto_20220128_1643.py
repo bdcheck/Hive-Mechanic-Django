@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE;'),    
+        # migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE;'),
         migrations.AlterField(
             model_name='outgoingcall',
             name='gather_finish_on_key',
@@ -32,5 +32,5 @@ class Migration(migrations.Migration):
             name='gather_timeout',
             field=models.IntegerField(default=5),
         ),
-        migrations.RunSQL('SET CONSTRAINTS ALL DEFERRED;'),
+        # migrations.RunSQL('SET CONSTRAINTS ALL DEFERRED;'),
     ]
