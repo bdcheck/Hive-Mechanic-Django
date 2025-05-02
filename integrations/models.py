@@ -234,6 +234,9 @@ class Integration(models.Model):
             while '[LAST-MESSAGE-TYPE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
 
+            while '[LAST-MESSAGE-IMAGE-PATH]' in translated_value:
+                translated_value = translated_value.replace('[LAST-MESSAGE-IMAGE-PATH]', session.last_message_image_path())
+
             if '[LAST-RESPONDER]' in translated_value:
                 last_responder = session.last_message_responder()
 
