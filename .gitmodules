@@ -28,3 +28,6 @@
 [submodule "simple_messaging_twilio"]
 	path = simple_messaging_twilio
 	url = https://github.com/audacious-software/Simple-Messaging-Django-Twilio.git
+[submodule "simple_messaging_loopback"]
+	path = simple_messaging_loopback
+	url = https://github.com/audacious-software/Simple-Messaging-Django-Loopback.git

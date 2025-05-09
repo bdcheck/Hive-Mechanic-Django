@@ -31,6 +31,7 @@ else:
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
+    ('simple_messaging', 'Simple Messaging'),
     ('http', 'HTTP'),
     ('command_line', 'Command Line'),
     ('other', 'Other'),
@@ -104,6 +105,8 @@ class Integration(models.Model):
 
                     self.enabled = False
                     self.save()
+        elif self.type == 'simple_messaging':
+            pass
 
         return self.enabled
 
@@ -112,12 +115,16 @@ class Integration(models.Model):
             from twilio_support.models import close_sessions as twilio_close_sessions # pylint: disable=import-outside-toplevel
 
             twilio_close_sessions(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'simple_messaging':
+            pass
 
     def process_incoming(self, payload):
         if self.type == 'twilio': # pylint: disable=no-else-return
             from twilio_support.models import process_incoming as twilio_incoming # pylint: disable=import-outside-toplevel
 
             return twilio_incoming(self, payload) # pylint: disable=no-value-for-parameter
+        elif self.type == 'simple_messaging':
+            pass
         elif self.type == 'http':
             from http_support.models import process_incoming as http_incoming # pylint: disable=import-outside-toplevel
 
@@ -203,6 +210,8 @@ class Integration(models.Model):
                     from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
                     processed = twilio_execute(self, session, action)
+                elif self.type == 'simple_messaging':
+                    pass
                 elif self.type == 'http':
                     from http_support.models import execute_action as http_execute # pylint: disable=import-outside-toplevel
 
@@ -311,6 +320,8 @@ class Integration(models.Model):
             from twilio_support.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
+        elif self.type == 'simple_messaging':
+            pass
 
         return None
 
@@ -335,6 +346,8 @@ class Integration(models.Model):
             from twilio_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
 
             annotate_statistics(self, statistics)
+        elif self.type == 'simple_messaging':
+            pass
         elif self.type == 'http':
             from http_support.models import annotate_statistics # pylint: disable=import-outside-toplevel
 

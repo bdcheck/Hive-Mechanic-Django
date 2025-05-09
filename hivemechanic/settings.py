@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'nagios_monitor',
     'simple_backup',
     'simple_dashboard',
+    'simple_messaging',
+    'simple_messaging_switchboard',
+    'simple_messaging_loopback',
+    'simple_messaging_twilio',
     'user_creation',
     'builder',
     'activity_logger',
@@ -204,6 +208,8 @@ CSRF_COOKIE_SECURE = True
 TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 
 QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
+
+SIMPLE_MESSAGING_COUNTRY_CODE = 'us'
 
 from .local_settings import *
 
