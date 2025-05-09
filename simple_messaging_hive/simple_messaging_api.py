@@ -30,7 +30,7 @@ def process_incoming_message(message):
         if 'mirror_emails' in integration_match.game.game_state:
             if settings.BUILDER_MIRROR_MESSAGES:
                 if message.media.all().count() > 0 or settings.BUILDER_MIRROR_MESSAGES_REQUIRE_MEDIA is False:
-                    message_body = ' -- Message Content --\nTODO'
+                    message_body = ' -- Message Content --\n'
 
                     subject = '[' + integration_match.game.name + '] New SMS Message'
 

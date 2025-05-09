@@ -273,6 +273,20 @@ class Integration(models.Model):
                     while '[LAST-RESPONDER]' in translated_value:
                         translated_value = translated_value.replace('[LAST-RESPONDER]', last_responder)
 
+            while '[MEDIA-PATH:' in translated_value: # [MEDIA-PATH:3] -> /var/www/.../media/file.png
+                start = translated_value.find('[MEDIA-PATH:')
+
+                end = translated_value.find(']', start)
+
+                if end != -1:
+                    tag = translated_value[start:(end + 1)]
+
+                    identifier = tag[9:-1]
+
+                    # fetch media item w/ identifier
+
+                    translated_value = media_item.path
+
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')
 

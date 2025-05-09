@@ -81,7 +81,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
         else:
             destinations.append(player.player_state['messaging_player'])
 
-        print('simepl_messaging_hive.execute_action: %s -- %s' % (action, destinations))
+        print('simple_messaging_hive.execute_action: %s -- %s' % (action, destinations))
 
         for destination in destinations:
             outgoing = OutgoingMessage(destination=destination)
@@ -100,7 +100,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
             outgoing.save()
 
-            print('simepl_messaging_hive.execute_action: %s' % outgoing)
+            print('simple_messaging_hive.execute_action: %s' % outgoing)
 
             if integration.enabled:
                 outgoing.transmit()
