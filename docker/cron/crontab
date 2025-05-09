@@ -1,0 +1,7 @@
+SHELL=/bin/bash
+MAILTO=CRON_MAIL_RECIPIENT
+MAILFROM=CRON_FROM_EMAIL
+
+* * * * *    root   . /etc/environment && . /app/venv/bin/activate && echo "run_task_queue[default]" >> /var/log/cron.log && python3 /app/hivemechanic/manage.py run_task_queue
+* * * * *    root   . /etc/environment && . /app/venv/bin/activate && echo "run_task_queue[data-export]" >> /var/log/cron.log && python3 /app/hivemechanic/manage.py run_task_queue --task-queue data-export
+* * * * *    root   . /etc/environment && . /app/venv/bin/activate && echo "run_task_queue[simple-dashboard]" >> /var/log/cron.log && python3 /app/hivemechanic/manage.py run_task_queue --task-queue simple-dashboard

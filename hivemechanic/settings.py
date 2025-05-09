@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_db_logger',
     'prettyjson',
+    'django_filters',
     'quicksilver',
     'passive_data_kit',
     'django_dialog_engine',
@@ -42,11 +43,14 @@ INSTALLED_APPS = [
     'simple_backup',
     'simple_dashboard',
     'simple_messaging',
+    'simple_messaging_azure',
     'simple_messaging_switchboard',
     'simple_messaging_loopback',
     'simple_messaging_twilio',
+    'docker_utils',
     'user_creation',
     'builder',
+    'simple_dashboard',
     'activity_logger',
     'integrations',
     'twilio_support',
@@ -212,6 +216,9 @@ QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
 SIMPLE_MESSAGING_COUNTRY_CODE = 'us'
 
 from .local_settings import *
+
+for app in ADDITIONAL_APPS:
+    INSTALLED_APPS.append(app)
 
 # Suppress pygame notifications...
 

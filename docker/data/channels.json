@@ -1,0 +1,22 @@
+[
+    {
+      "model": "simple_messaging_switchboard.channeltype",
+      "pk": 2,
+      "fields": {
+        "name": "Loopback",
+        "package_name": "simple_messaging_loopback"
+      }
+    },
+    {
+      "model": "simple_messaging_switchboard.channel",
+      "pk": 2,
+      "fields": {
+        "name": "Loopback",
+        "identifier": "loopback",
+        "channel_type": 2,
+        "is_enabled": true,
+        "is_default": true,
+        "configuration": "{\r\n  \"phone_number\": \"loopback\"\r\n}"
+      }
+    }
+  ]

@@ -8,6 +8,7 @@ from builtins import str # pylint: disable=redefined-builtin
 import datetime
 import difflib
 import hashlib
+import importlib
 import json
 import os
 import pkgutil
@@ -1221,6 +1222,19 @@ class Player(models.Model):
 
         return None
 
+    def messaging_link(self):
+        for app in settings.INSTALLED_APPS:
+            try:
+                hive_api = importlib.import_module(app + '.hive_api')
+
+                return hive_api.messages_ui_for_player(self)
+            except ImportError:
+                pass
+            except AttributeError:
+                pass
+
+        return None
+
 class Session(models.Model): # pylint: disable=too-many-public-methods
     player = models.ForeignKey(Player, related_name='sessions', on_delete=models.CASCADE)
     game_version = models.ForeignKey(GameVersion, related_name='sessions', on_delete=models.CASCADE)
@@ -1431,6 +1445,21 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
 
         return None
 
+    def last_message_image_path(self):
+        last_message = None
+
+        for integration in self.game_version.game.integrations.all():
+            last_integration_message = integration.last_message_for_player(self.player)
+
+            if last_integration_message is not None:
+                if last_message is None or last_message['date'] < last_integration_message['date']: # pylint: disable=unsubscriptable-object
+                    last_message = last_integration_message
+
+        if last_message is not None:
+            return last_message.get('image_path', '')
+
+        return ''
+
     def advance_to(self, destination):
         actions = self.dialog().advance_to(destination)
 
@@ -1438,10 +1467,22 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
             game_integration.execute_actions(self, actions)
 
     def fetch_session_context(self):
-        return self.session_state.copy()
+        context = {}
+
+        context.update(self.session_state)
+
+        for variable in self.state_variables.filter(active=True).order_by('added'):
+            context[variable.key] = variable.value
+
+        return context
 
     def fetch_player_context(self):
-        return self.player.player_state.copy()
+        context = {}
+
+        context.update(self.player.player_state)
+
+        for variable in self.player.state_variables.filter(active=True).order_by('added'):
+            context[variable.key] = variable.value
 
     def terms_key(self):
         return '__accepted_terms__%d' % self.game_version.game.pk

@@ -1,0 +1,25 @@
+# upstream django {
+#    server django:${DJANGO_WEB_PORT};
+# }
+
+server {
+    listen ${NGINX_WEB_PORT};
+
+    access_log ${NGINX_WEB_ACCESS_LOG};
+
+    location /media {
+        alias /var/www/media;
+    }
+
+    location /static {
+        alias /var/www/static;
+    }
+
+    location / { #@proxy_to_app {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+      proxy_pass http://django:${DJANGO_WEB_PORT};
+    }
+}

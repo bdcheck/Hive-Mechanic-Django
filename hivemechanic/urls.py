@@ -1,7 +1,6 @@
 import sys
 
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -21,6 +20,7 @@ if sys.version_info[0] > 2:
         re_path(r'^access/', include('user_creation.urls')),
         re_path(r'^monitor/', include('nagios_monitor.urls')),
         re_path(r'^activity/', include('activity_logger.urls')),
+        re_path(r'^messages/', include('simple_messaging.urls')),
     ]
 
     urlpatterns += [re_path(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
@@ -39,6 +39,7 @@ else:
         url(r'^access/', include('user_creation.urls')),
         url(r'^monitor/', include('nagios_monitor.urls')),
         url(r'^activity/', include('activity_logger.urls')),
+        url(r'^messages/', include('simple_messaging.urls')),
     ]
 
     urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]

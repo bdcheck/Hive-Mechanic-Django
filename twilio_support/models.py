@@ -66,6 +66,10 @@ def last_message_for_player(game, player):
             'metadata': incoming_message.transmission_metadata,
         }
 
+        for media_item in incoming_message.media.all():
+            if media_item.content_type.lower().startswith('image/'):
+                last_incoming['image_path'] = media_item.content_file.path
+
     incoming_call_response = IncomingCallResponse.objects.filter(source=phone, integration=integration).order_by('-receive_date').first()
 
     if incoming_call_response is None:

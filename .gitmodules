@@ -22,12 +22,18 @@
 [submodule "simple_messaging"]
 	path = simple_messaging
 	url = https://github.com/audacious-software/Simple-Messaging-Django.git
-[submodule "simple_messaging_switchboard"]
-	path = simple_messaging_switchboard
-	url = https://github.com/audacious-software/Simple-Messaging-Switchboard
 [submodule "simple_messaging_twilio"]
 	path = simple_messaging_twilio
 	url = https://github.com/audacious-software/Simple-Messaging-Django-Twilio.git
+[submodule "simple_messaging_azure"]
+	path = simple_messaging_azure
+	url = https://github.com/audacious-software/Simple-Messaging-Django-Azure.git
 [submodule "simple_messaging_loopback"]
 	path = simple_messaging_loopback
-	url = https://github.com/audacious-software/Simple-Messaging-Django-Loopback.git
+	url = https://github.com/audacious-software/Simple-Messaging-Django-Loopback
+[submodule "simple_messaging_switchboard"]
+	path = simple_messaging_switchboard
+	url = https://github.com/audacious-software/Simple-Messaging-Switchboard.git
+[submodule "docker_utils"]
+	path = docker_utils
+	url = https://github.com/audacious-software/Docker-Utils-Django.git

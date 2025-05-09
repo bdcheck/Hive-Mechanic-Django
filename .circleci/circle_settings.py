@@ -37,7 +37,20 @@ MEDIA_ROOT = BASE_DIR + '/media/'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
-SILENCED_SYSTEM_CHECKS = ['security.W019', 'security.W005', 'security.W021', 'fields.W904', 'simple_backup.W001', 'simple_backup.W002', 'builder.W002',]
+SILENCED_SYSTEM_CHECKS = [
+    'security.W019',
+    'security.W005',
+    'security.W021',
+    'fields.W904',
+    'simple_backup.W001',
+    'simple_backup.W002',
+    'builder.W002',
+    'simple_messaging.E001',
+    'simple_messaging.E002',
+    'simple_messaging.E003',
+    'simple_messaging_switchboard.E001',
+    'simple_messaging_switchboard.E002',
+]
 
 PDK_DASHBOARD_ENABLED = True
 
@@ -50,3 +63,7 @@ HIVE_CLIENT_TOKEN = 'abc12345' # nosec
 # TEST_RUNNER = 'hivemechanic.no_db_test_runner.NoDbTestRunner'
 
 DEFAULT_FROM_MAIL_ADDRESS = 'Hive Mechanic <noreply@hivemechanic.net>'
+
+ADDITIONAL_APPS = []
+
+SIMPLE_DASHBOARD_SITE_NAME = "Hive Mechanic Circle CI"
