@@ -9,7 +9,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 DEBUG = (os.getenv('DJANGO_DEBUG', 'False').lower() == 'true')
 
-ALLOWED_HOSTS = [ os.getenv('DJANGO_ALLOWED_HOST', 'localhost') ]
+ALLOWED_HOSTS = [ os.getenv('DJANGO_ALLOWED_HOST', 'localhost'), 'localhost' ]
 CSRF_TRUSTED_ORIGINS = [ 'https://%s' % os.getenv('DJANGO_ALLOWED_HOST', 'localhost') ]
 
 ADMINS = [(os.getenv('DJANGO_ADMIN_NAME', 'Hive Mechanic Admin'), os.getenv('DJANGO_ADMIN_EMAIL', 'hive-user@example.com'),)]

@@ -16,7 +16,7 @@ services:
 #      retries: 10
 
   django:
-    platform: linux/amd64
+    # platform: linux/amd64
     hostname: django
     build:
       context: ..
@@ -55,7 +55,7 @@ services:
         condition: service_healthy
 
   cron:
-    platform: linux/amd64
+    # platform: linux/amd64
     build:
       context: ..
       dockerfile: docker/cron/Dockerfile
