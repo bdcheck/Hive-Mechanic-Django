@@ -12,6 +12,7 @@ import sys
 
 import phonenumbers
 
+from filer.models import filemodels
 from future.utils import python_2_unicode_compatible
 
 from django.conf import settings
@@ -253,7 +254,7 @@ class Integration(models.Model):
 
                 log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
 
-    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches
+    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches, too-many-statements
         translated_value = value
 
         try:
@@ -286,9 +287,14 @@ class Integration(models.Model):
 
                     identifier = tag[9:-1]
 
-                    # fetch media item w/ identifier
+                    media_file = None
 
-                    translated_value = media_item.path
+                    try:
+                        filemodels.File.objects.filter(pk=int(identifier))
+
+                        translated_value = media_file.name
+                    except ValueError:
+                        translated_value = '(Unable to locate file with identifier "%s".)' % identifier
 
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')

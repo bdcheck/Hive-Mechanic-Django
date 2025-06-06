@@ -13,7 +13,7 @@ wheel
 -r simple_messaging_switchboard/requirements.txt
 -r simple_messaging_twilio/requirements.txt
 
-django-db-logger==0.1.10
+django-db-logger==0.1.13
 django-filer==3.3.0; python_version >= '3.2'
 django-filer==1.7.1; python_version < '3.2'
 django-filter==1.1.0; python_version < '3.0'

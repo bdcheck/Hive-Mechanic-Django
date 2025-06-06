@@ -21,6 +21,7 @@ if sys.version_info[0] > 2:
         re_path(r'^monitor/', include('nagios_monitor.urls')),
         re_path(r'^activity/', include('activity_logger.urls')),
         re_path(r'^messages/', include('simple_messaging.urls')),
+        re_path(r'^docker-utils/', include('docker_utils.urls')),
     ]
 
     urlpatterns += [re_path(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
@@ -40,6 +41,7 @@ else:
         url(r'^monitor/', include('nagios_monitor.urls')),
         url(r'^activity/', include('activity_logger.urls')),
         url(r'^messages/', include('simple_messaging.urls')),
+        url(r'^docker-utils/', include('docker_utils.urls')),
     ]
 
     urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]

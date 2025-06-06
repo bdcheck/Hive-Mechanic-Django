@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, ungrouped-imports
 # -*- coding: utf-8 -*-
 
 from filer.admin.fileadmin import FileAdmin
@@ -13,6 +13,11 @@ try:
 except ImportError:
     from django.contrib.postgres.fields import JSONField
 
+try:
+    from docker_utils.admin import PortableModelAdmin as ModelAdmin
+except ImportError:
+    from django.contrib.admin import ModelAdmin as ModelAdmin # pylint: disable=useless-import-alias
+
 from .models import Game, GameVersion, InteractionCard, InteractionCardCategory, Player, \
                     Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings, \
                     CachedFile, StateVariable
@@ -24,7 +29,7 @@ class DataProcessorLogAdmin(admin.OSMGeoAdmin):
     search_fields = ('url', 'request_payload', 'response_payload')
 
 @admin.register(Game)
-class GameAdmin(admin.OSMGeoAdmin):
+class GameAdmin(ModelAdmin):
     list_display = ('name', 'slug', 'is_template', 'archived',)
     list_filter = ('is_template', 'archived',)
 
@@ -32,7 +37,12 @@ class GameAdmin(admin.OSMGeoAdmin):
         JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
     }
 
-    actions = ['archive_activity', 'restore_activity']
+    actions = ['export_objects', 'archive_activity', 'restore_activity']
+
+    def export_objects(self, request, queryset):
+        return self.portable_model_export_items(request, queryset)
+
+    export_objects.short_description = 'Export selected activities'
 
     def archive_activity(self, request, queryset):
         updated = queryset.filter(archived=None).update(archived=timezone.now())
@@ -144,12 +154,19 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
     disable_interaction_card.short_description = "Disable selected cards"
 
 @admin.register(Player)
-class PlayerAdmin(admin.OSMGeoAdmin):
+class PlayerAdmin(ModelAdmin):
     list_display = ('identifier',)
 
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
     }
+
+    def export_objects(self, request, queryset):
+        return self.portable_model_export_items(request, queryset)
+
+    export_objects.short_description = 'Export selected players'
+
+    actions = ['export_objects']
 
 @admin.register(Session)
 class SessionAdmin(admin.OSMGeoAdmin):
@@ -169,7 +186,7 @@ class SiteSettingsAdmin(admin.OSMGeoAdmin):
     list_display = ('name', 'created', 'last_updated', 'total_message_limit', 'count_messages_since')
 
 @admin.register(DataProcessor)
-class DataProcessorAdmin(admin.OSMGeoAdmin):
+class DataProcessorAdmin(ModelAdmin):
     list_display = ('name', 'identifier', 'enabled', 'version', 'issues', 'available_update',)
 
     fieldsets = (
@@ -188,7 +205,12 @@ class DataProcessorAdmin(admin.OSMGeoAdmin):
         JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
     }
 
-    actions = ['update_data_processor', 'enable_data_processor', 'disable_data_processor']
+    actions = ['export_objects', 'update_data_processor', 'enable_data_processor', 'disable_data_processor']
+
+    def export_objects(self, request, queryset):
+        return self.portable_model_export_items(request, queryset)
+
+    export_objects.short_description = 'Export selected data processors'
 
     def update_data_processor(self, request, queryset): # pylint: disable=unused-argument
         add_messages = []
