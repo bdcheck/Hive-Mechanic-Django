@@ -298,7 +298,7 @@ class PermissionsSupport(models.Model):
 
 class RemoteRepository(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
-        verbose_name_plural = 'Remote Repositories'
+        verbose_name_plural = 'Remote repositories'
 
     name = models.CharField(max_length=4096, unique=True)
     url = models.URLField(max_length=4096, unique=True)
@@ -1744,6 +1744,9 @@ class DataProcessorLog(models.Model):
         return summary, preview
 
 class SiteSettings(models.Model):
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
+        verbose_name_plural = 'Site settings'
+
     name = models.CharField(max_length=1024)
     message_of_the_day = models.TextField(max_length=(1024 * 1024), default='Welcome to Hive Mechanic. You may customize this message in the site settings.')
     banner = models.ImageField(upload_to='site_banners', null=True, blank=True)
