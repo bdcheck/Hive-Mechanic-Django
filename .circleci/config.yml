@@ -87,6 +87,8 @@ jobs:
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
+          environment:
+            PYTHONWARNINGS: ignore
           command: |
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
@@ -97,6 +99,8 @@ jobs:
             botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
       - run:
           name: Test dialog content (Hive Mechanic)
+          environment:
+            PYTHONWARNINGS: ignore
           command: |
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
