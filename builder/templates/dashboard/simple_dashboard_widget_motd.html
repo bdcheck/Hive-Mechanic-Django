@@ -1,5 +1,5 @@
 {% with signal.latest_value as latest_value %}
-	<div class="mdc-typography mdc-typography--headline4">
+	<div class="mdc-typography mdc-typography--headline4" style="margin-top: 16px;">
 		{{ latest_value.fetch_value|safe }}
 	</div>
 {% endwith %}

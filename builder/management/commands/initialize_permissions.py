@@ -15,8 +15,8 @@ class Command(BaseCommand):
         for codename in reader_permissions:
             permission = Permission.objects.filter(codename=codename).first()
 
-            if permission is not None:
-                print('Adding permission "%s" to %s...' % (permission, reader_group))
+            if permission is not None and reader_group.permissions.filter(codename=codename).count() == 0:
+                print('Adding permission "%s (%s)" to %s...' % (permission, permission.codename, reader_group))
 
                 reader_group.permissions.add(permission)
 
@@ -55,8 +55,8 @@ class Command(BaseCommand):
         for codename in editor_permissions:
             permission = Permission.objects.filter(codename=codename).first()
 
-            if permission is not None:
-                print('Adding permission "%s" to %s...' % (permission, editor_group))
+            if permission is not None and editor_group.permissions.filter(codename=codename).count() == 0:
+                print('Adding permission "%s (%s)" to %s...' % (permission, permission.codename, editor_group))
 
                 editor_group.permissions.add(permission)
 
@@ -108,7 +108,7 @@ class Command(BaseCommand):
         for codename in manager_permissions:
             permission = Permission.objects.filter(codename=codename).first()
 
-            if permission is not None:
-                print('Adding permission "%s" to %s...' % (permission, manager_group))
+            if permission is not None and manager_group.permissions.filter(codename=codename).count() == 0:
+                print('Adding permission "%s (%s)" to %s...' % (permission, permission.codename, manager_group))
 
                 manager_group.permissions.add(permission)
