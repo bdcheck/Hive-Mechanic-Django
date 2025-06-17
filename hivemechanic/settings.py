@@ -217,8 +217,8 @@ for app in ADDITIONAL_APPS:
     INSTALLED_APPS.append(app)
 
 # Suppress pygame notifications...
-
-from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
-
-import pygame  # it is important to import pygame after that
+#
+# from os import environ
+# environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+#
+# import pygame  # it is important to import pygame after that

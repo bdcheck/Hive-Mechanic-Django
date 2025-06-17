@@ -24,9 +24,9 @@ services:
     env_file: .env
     command: bash /app/django.sh
     volumes:
-      - hivemechanic-media:/app/media
-      - hivemechanic-static:/app/static
-      - hivemechanic-db:/app/database
+      - media:/app/media
+      - static:/app/static
+      - db:/app/database
 #    depends_on:
 #      db:
 #        condition: service_healthy
@@ -42,8 +42,8 @@ services:
     env_file: .env
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - hivemechanic-media:/var/www/media
-      - hivemechanic-static:/var/www/static
+      - media:/var/www/media
+      - static:/var/www/static
     ports:
       - "${NGINX_WEB_PORT}:${NGINX_WEB_PORT}"
     environment:
@@ -62,14 +62,14 @@ services:
     env_file: .env
     command: bash /app/run.sh
     volumes:
-      - hivemechanic-media:/app/media
-      - hivemechanic-static:/app/static
-      - hivemechanic-db:/app/database
+      - media:/app/media
+      - static:/app/static
+      - db:/app/database
     depends_on:
       django:
         condition: service_healthy
 
 volumes:
-  hivemechanic-db:
-  hivemechanic-media:
-  hivemechanic-static:
+  db:
+  media:
+  static:
