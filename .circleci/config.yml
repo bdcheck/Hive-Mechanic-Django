@@ -11,7 +11,7 @@ workflows:
       - build-313
       - build-310
       - build-38
-      - build-27
+      # - build-27
 
 jobs:
   build-313:
