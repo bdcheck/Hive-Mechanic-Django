@@ -83,6 +83,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -188,6 +189,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -289,6 +291,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -390,6 +393,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)

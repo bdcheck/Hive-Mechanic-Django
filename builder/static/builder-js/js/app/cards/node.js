@@ -1474,7 +1474,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-          return new classObj(definition, sequence) // eslint-disable-line new-cap
+          return new classObj(definition, sequence)
         }
       }
 

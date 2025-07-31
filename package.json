@@ -1,11 +1,15 @@
 {
+  "standard": {
+    "globals": [
+      "$",
+      "jQuery",
+      "define"
+    ]
+  },
   "dependencies": {
     "botium-cli": "^1.1.0",
     "botium-core": "^1.15.4",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.6.0",
+    "eslint": "^9.32.0",
     "standard": "^17.1.2"
   }
 }
