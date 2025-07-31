@@ -64,7 +64,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -170,7 +169,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -272,7 +270,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -374,7 +371,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger

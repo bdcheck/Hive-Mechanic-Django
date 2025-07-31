@@ -39,7 +39,6 @@ from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
-from passive_data_kit.models import DataPoint
 
 from activity_logger.models import log
 
@@ -915,9 +914,6 @@ class GameVersion(models.Model):
                             'player': str(session.player.identifier),
                         }
 
-                        point = DataPoint.objects.create_data_point('hive-incoming-call', session.player.identifier, payload, user_agent='Hive Mechanic')
-                        point.save()
-
                         session.advance_to(definition['incoming_call_interrupt'])
 
                         session.nudge()
@@ -939,10 +935,6 @@ class GameVersion(models.Model):
                             'game': str(session.game_version.game.slug),
                             'player': str(session.player.identifier),
                         }
-
-                        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
-                        point.secondary_identifier = payload['variable']
-                        point.save()
 
                         session.advance_to(interrupt['action'])
 

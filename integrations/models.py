@@ -20,8 +20,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from passive_data_kit.models import DataPoint
-
 from activity_logger.models import log
 from builder.models import Game, Player, Session, SiteSettings
 
@@ -480,10 +478,6 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
             session.set_variable(action['value'], action['translated_value'], metadata=action.get('metadata', None))
 
         payload['value'] = action['translated_value']
-
-        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
-        point.secondary_identifier = payload['variable']
-        point.save()
 
         return True
     elif action['type'] == 'continue':
