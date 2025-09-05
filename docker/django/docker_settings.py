@@ -2,6 +2,7 @@
 
 import json
 import os
+import tempfile
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
@@ -71,6 +72,8 @@ EMAIL_HOST_PASSWORD = os.getenv('CRON_MAIL_PASSWORD', 'CHANGE-ME')
 TIME_ZONE = os.getenv('DJANGO_TIME_ZONE', 'America/Chicago')
 
 SITE_URL = 'https://%s' % ALLOWED_HOSTS[0]
+
+QUICKSILVER_LOCK_DIR = '/app/tmp'
 
 SIMPLE_DATA_EXPORTER_SITE_NAME = os.getenv('SIMPLE_DATA_EXPORTER_SITE_NAME', 'Hive Mechanic')
 SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = True

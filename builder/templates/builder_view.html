@@ -4,10 +4,10 @@
     <body style="padding: 0px; margin: 0px; background-color: rgba(0, 0, 0, 0);">
 		<div id="cytoscape_canvas" style="padding: 0px; margin: 0px; background-color: rgba(0, 0, 0, 0);">
     </body>
-    
+
     <script>
         window.visualizationOptions = {
-            name: "{{ dialog.name }}",
+            name: "{{ activity.name }}",
             source: {{ activity.cytoscape_json|safe }},
             container: "#cytoscape_canvas"
         };

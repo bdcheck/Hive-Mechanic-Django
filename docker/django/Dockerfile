@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 WORKDIR /app
 
 RUN apt-get update
-RUN apt-get install -y gettext apt-utils curl git build-essential python3-dev python3-venv libldap2-dev libsasl2-dev slapd ldap-utils cron gdal-bin ssmtp mailutils moreutils libsqlite3-mod-spatialite
+RUN apt-get install -y gettext apt-utils curl git build-essential python3-dev python3-venv libldap2-dev libsasl2-dev slapd ldap-utils cron gdal-bin ssmtp mailutils moreutils libsqlite3-mod-spatialite nodejs
 WORKDIR /app
 
 RUN python3 -m venv /app/venv

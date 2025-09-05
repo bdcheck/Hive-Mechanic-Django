@@ -1086,7 +1086,7 @@ class GameVersion(models.Model):
         return incomplete_id
 
     def cytoscape_json(self, indent=0, simplify=False, compute=False):
-        if self.cached_cytoscape == 'null':
+        if self.cached_cytoscape in ('null', '', None):
             self.cached_cytoscape = None
 
         if compute is False or self.cached_cytoscape is not None:
@@ -1136,6 +1136,9 @@ class GameVersion(models.Model):
             uniques.add(session.player.pk)
 
         return uniques
+
+    def size(self):
+        return len(self.dialog_snapshot())
 
 @receiver(pre_save, sender=GameVersion)
 def reset_game_version_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument

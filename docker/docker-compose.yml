@@ -27,6 +27,7 @@ services:
       - media:/app/media
       - static:/app/static
       - db:/app/database
+      - tmp:/app/tmp
 #    depends_on:
 #      db:
 #        condition: service_healthy
@@ -65,6 +66,7 @@ services:
       - media:/app/media
       - static:/app/static
       - db:/app/database
+      - tmp:/app/tmp
     depends_on:
       django:
         condition: service_healthy
@@ -73,3 +75,4 @@ volumes:
   db:
   media:
   static:
+  tmp:

@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'prettyjson',
     'django_filters',
     'quicksilver',
-    'passive_data_kit',
     'django_dialog_engine',
     'nagios_monitor',
     'simple_backup',

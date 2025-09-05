@@ -71,6 +71,9 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
 def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
 
+    if ('messaging_player' in player.player_state) is False:
+        return False
+
     if action['type'] == 'echo': # pylint: disable=no-else-return
         destinations = []
 
@@ -107,56 +110,70 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
         return True
     elif action['type'] == 'echo-image':
-        outgoing = OutgoingMessage(destination=player.player_state['simple_messaging'])
-        outgoing.send_date = timezone.now()
-        outgoing.save()
+        destinations = []
 
-        media = OutgoingMessageMedia.objects.create(message=outgoing)
+        if action.get('destinations', '') != '':
+            for destination in action.get('destinations', '').split('\n'):
+                if len(destination) >= 10:
+                    destinations.append(integration.translate_value(destination, session))
+        else:
+            destinations.append(player.player_state['messaging_player'])
 
-        response = requests.get(integration.translate_value(action['image-url'], session), timeout=60)
+        for destination in destinations:
+            outgoing = OutgoingMessage(destination=destination)
+            outgoing.send_date = timezone.now()
+            outgoing.save()
 
-        media.content_type = response.headers['content-type']
-        media.content_file.save('media_%s.%s' % (media.pk, media.content_type.split('/')[-1]), ContentFile(response.content))
+            media = OutgoingMessageMedia.objects.create(message=outgoing)
 
-        transmission_metadata = {
-            'integration': 'integration:%s' % integration.pk
-        }
+            response = requests.get(integration.translate_value(action['image-url'], session), timeout=60)
 
-        if integration.enabled is False:
-            outgoing.sent_date = timezone.now()
-            transmission_metadata['error'] = 'Unable to send, integration is disabled.'
+            media.content_type = response.headers['content-type']
+            media.content_file.save('media_%s.%s' % (media.pk, media.content_type.split('/')[-1]), ContentFile(response.content))
 
-        outgoing.transmission_metadata = json.dumps(transmission_metadata, indent=2)
+            transmission_metadata = {
+                'integration': 'integration:%s' % integration.pk
+            }
 
-        outgoing.save()
+            if integration.enabled is False:
+                outgoing.sent_date = timezone.now()
+                transmission_metadata['error'] = 'Unable to send, integration is disabled.'
 
-        if integration.enabled:
-            outgoing.transmit()
+            outgoing.transmission_metadata = json.dumps(transmission_metadata, indent=2)
+
+            outgoing.save()
+
+            if integration.enabled:
+                outgoing.transmit()
 
         return True
 
     return False
 
 def last_message_for_player(game, player):
-    integration = Integration.objects.filter(game=game).first()
-
-    phone = player.player_state.get('simple_messaging', None)
-
     incoming_message = None
 
-    integration_match_str = 'integration:%s' % integration.pk
+    for integration in Integration.objects.filter(game=game):
+        phone = player.player_state.get('simple_messaging', None)
 
-    for message in IncomingMessage.objects.filter(sender=phone).order_by('-receive_date'):
-        transmission_metadata = {}
+        incoming_message = None
 
-        try:
-            transmission_metadata = json.loads(message.transmission_metadata)
-        except json.JSONDecodeError:
-            pass
+        integration_match_str = 'integration:%s' % integration.pk
 
-        if integration_match_str == transmission_metadata.get('integration', ''):
-            incoming_message = message
+        for message in IncomingMessage.objects.filter(sender=phone).order_by('-receive_date'):
+            transmission_metadata = {}
 
+            try:
+                transmission_metadata = json.loads(message.transmission_metadata)
+            except json.JSONDecodeError:
+                pass
+
+            if integration_match_str == transmission_metadata.get('integration', ''):
+                incoming_message = message
+
+                break
+
+        if incoming_message is not None:
             break
 
     last_incoming = None

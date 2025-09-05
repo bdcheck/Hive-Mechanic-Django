@@ -379,6 +379,9 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
 def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
 
+    if ('twilio_player' in player.player_state) is False:
+        return False
+
     if action['type'] == 'echo': # pylint: disable=no-else-return
         destinations = []
 

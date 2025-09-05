@@ -6,5 +6,5 @@ from django.contrib.gis import admin
 from .models import ApiClient
 
 @admin.register(ApiClient)
-class ApiClientAdmin(admin.OSMGeoAdmin):
+class ApiClientAdmin(admin.GISModelAdmin):
     list_display = ('name', 'start_date', 'end_date',)

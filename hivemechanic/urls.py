@@ -11,7 +11,6 @@ if sys.version_info[0] > 2:
     urlpatterns = [
         re_path(r'^accounts/', include('django.contrib.auth.urls')),
         re_path(r'^admin/', admin.site.urls),
-        re_path(r'^data/', include('passive_data_kit.urls')),
         re_path(r'^builder/', include('builder.urls')),
         re_path(r'^quicksilver/', include('quicksilver.urls')),
         re_path(r'^twilio/', include('twilio_support.urls')),
@@ -31,7 +30,6 @@ else:
     urlpatterns = [
         url(r'^accounts/', include('django.contrib.auth.urls')),
         url(r'^admin/', admin.site.urls),
-        url(r'^data/', include('passive_data_kit.urls')),
         url(r'^builder/', include('builder.urls')),
         url(r'^quicksilver/', include('quicksilver.urls')),
         url(r'^twilio/', include('twilio_support.urls')),

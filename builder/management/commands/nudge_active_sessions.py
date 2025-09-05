@@ -13,8 +13,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         for session in Session.objects.filter(completed=None):
             if 'is_testing' in session.session_state and session.session_state['is_testing'] is True:

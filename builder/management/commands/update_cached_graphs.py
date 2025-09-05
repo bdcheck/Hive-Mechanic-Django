@@ -12,10 +12,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
-        query = Q(cached_cytoscape=None) | Q(cached_cytoscape='null')
+        query = Q(cached_cytoscape=None) | Q(cached_cytoscape='null') | Q(cached_cytoscape='')
 
         for version in GameVersion.objects.filter(query):
             version.cytoscape_json(simplify=False, compute=True)

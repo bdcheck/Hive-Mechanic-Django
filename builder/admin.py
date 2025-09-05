@@ -7,6 +7,7 @@ from prettyjson import PrettyJSONWidget
 from django.contrib import messages
 from django.contrib.gis import admin
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 try:
     from django.db.models import JSONField
@@ -22,11 +23,39 @@ from .models import Game, GameVersion, InteractionCard, InteractionCardCategory,
                     Session, RemoteRepository, DataProcessor, DataProcessorLog, SiteSettings, \
                     CachedFile, StateVariable
 
+
+class PrettyJSONWidgetFixed(PrettyJSONWidget):
+    def render(self, name, value, attrs=None, **kwargs):
+        return mark_safe(super(PrettyJSONWidgetFixed, self).render(name, value, attrs=None, **kwargs)) # nosec
+
 @admin.register(DataProcessorLog)
-class DataProcessorLogAdmin(admin.OSMGeoAdmin):
+class DataProcessorLogAdmin(admin.GISModelAdmin):
     list_display = ('data_processor', 'url', 'requested', 'response_status')
     list_filter = ('requested', 'response_status', 'data_processor')
     search_fields = ('url', 'request_payload', 'response_payload')
+
+class GameVersionInline(admin.TabularInline):
+    model = GameVersion
+
+    verbose_name = 'Version'
+    verbose_name_plural = 'Versions'
+    template = 'admin_inlines/versions_tabular.html'
+
+    show_change_link = True
+
+    fields = ['created', 'creator', 'size']
+    readonly_fields = ['created', 'creator', 'size']
+    ordering = ('-created',)
+
+    def has_add_permission(self, request, obj=None): # pylint: disable=arguments-differ,unused-argument
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Game)
 class GameAdmin(ModelAdmin):
@@ -34,8 +63,12 @@ class GameAdmin(ModelAdmin):
     list_filter = ('is_template', 'archived',)
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
+
+    inlines = [
+        GameVersionInline,
+    ]
 
     actions = ['export_objects', 'archive_activity', 'restore_activity']
 
@@ -65,27 +98,29 @@ class GameAdmin(ModelAdmin):
     restore_activity.short_description = "Restore activities"
 
 @admin.register(GameVersion)
-class GameVersionAdmin(admin.OSMGeoAdmin):
+class GameVersionAdmin(admin.GISModelAdmin):
     list_display = ('game', 'created', 'creator')
     search_fields = ['definition']
     list_filter = ('created', 'creator',)
 
+    readonly_fields = ['game']
+
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
 @admin.register(InteractionCardCategory)
-class InteractionCardCategoryAdmin(admin.OSMGeoAdmin):
+class InteractionCardCategoryAdmin(admin.GISModelAdmin):
     list_display = ('name', 'priority',)
 
     search_fields = ['name']
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
 @admin.register(InteractionCard)
-class InteractionCardAdmin(admin.OSMGeoAdmin):
+class InteractionCardAdmin(admin.GISModelAdmin):
     list_display = ('name', 'identifier', 'category', 'enabled', 'version', 'issues', 'available_update',)
     list_filter = ('enabled', 'category',)
     search_fields = ['name', 'identifier']
@@ -106,7 +141,7 @@ class InteractionCardAdmin(admin.OSMGeoAdmin):
     )
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
     actions = ['update_interaction_card', 'refresh_interaction_card', 'enable_interaction_card', 'disable_interaction_card']
@@ -158,7 +193,7 @@ class PlayerAdmin(ModelAdmin):
     list_display = ('identifier',)
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
     def export_objects(self, request, queryset):
@@ -169,20 +204,20 @@ class PlayerAdmin(ModelAdmin):
     actions = ['export_objects']
 
 @admin.register(Session)
-class SessionAdmin(admin.OSMGeoAdmin):
+class SessionAdmin(admin.GISModelAdmin):
     list_display = ('player', 'game_version', 'started', 'completed')
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
 @admin.register(RemoteRepository)
-class RemoteRepositoryAdmin(admin.OSMGeoAdmin):
+class RemoteRepositoryAdmin(admin.GISModelAdmin):
     list_display = ('name', 'url', 'priority', 'last_updated', 'enabled',)
     list_filter = ('enabled', 'last_updated',)
 
 @admin.register(SiteSettings)
-class SiteSettingsAdmin(admin.OSMGeoAdmin):
+class SiteSettingsAdmin(admin.GISModelAdmin):
     list_display = ('name', 'created', 'last_updated', 'total_message_limit', 'count_messages_since')
 
 @admin.register(DataProcessor)
@@ -202,7 +237,7 @@ class DataProcessorAdmin(ModelAdmin):
     )
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
     actions = ['export_objects', 'update_data_processor', 'enable_data_processor', 'disable_data_processor']
@@ -246,7 +281,7 @@ class CachedFileAdmin(FileAdmin):
     search_fields = ['original_url',]
 
 @admin.register(StateVariable)
-class StateVariableAdmin(admin.OSMGeoAdmin):
+class StateVariableAdmin(admin.GISModelAdmin):
     list_display = ('key', 'added', 'length', 'player', 'activity', 'session')
     search_fields = ['key', 'value', 'metadata']
     list_filter = ('added', 'activity',)

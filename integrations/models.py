@@ -6,9 +6,11 @@ from __future__ import print_function
 from builtins import str # pylint: disable=redefined-builtin
 
 import datetime
+import logging
 import json
 import re
 import sys
+import traceback
 
 import phonenumbers
 
@@ -227,6 +229,8 @@ class Integration(models.Model):
             for action in actions:
                 processed = False
 
+                logging.info('integrations.execute_actions: %s (%s) -- %s', self, self.url_slug, action)
+
                 if self.type == 'twilio':
                     from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
@@ -250,7 +254,8 @@ class Integration(models.Model):
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process', action)
 
-                log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
+                if processed:
+                    log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches, too-many-statements
         translated_value = value
@@ -354,9 +359,7 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            pass # Attempting to translate non-string
-
-            # traceback.print_exc()
+            traceback.print_exc()
 
         return translated_value
 

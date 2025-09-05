@@ -84,6 +84,13 @@ def process_incoming_message(message):
 
                     email.send()
 
+        # log_metadata = {}
+
+        # log_metadata['phone_number'] = message.current_sender()
+        # log_metadata['direction'] = 'incoming'
+
+        # log('simple_messaging_hive:process_incoming_message', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
+
         payload = {
             'Body': message.current_message(),
             'From': message.current_sender(),
