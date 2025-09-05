@@ -210,6 +210,8 @@ TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 
 QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
 
+QUICKSILVER_LOCK_DIR = tempfile.gettempdir()
+
 from .local_settings import *
 
 for app in ADDITIONAL_APPS:
