@@ -99,8 +99,6 @@ def incoming_http(request, slug):
         response['game'] = payload
 
     elif request.method == 'POST':
-        player = request.POST.get('player', 'unknown-player')
-
         issues = integration_match.process_incoming(request.POST)
     else:
         issues = ['Unsupported HTTP verb: ' + request.method + '.']
