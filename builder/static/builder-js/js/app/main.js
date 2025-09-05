@@ -1,4 +1,4 @@
-/* global requirejs, alert, FormData */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {
@@ -136,6 +136,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     drawer.open = true
   }, 1000)
 
+  // eslint-disable-next-line no-unused-vars
   function onSequenceChanged (changedId) {
     dialogIsDirty = true
 
@@ -359,8 +360,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     let selectedSequenceOption = -1
 
+    // eslint-disable-next-line no-unused-vars
     const menuListener = function (event) {
-
     }
 
     $('button.sequence-menu-open').on('click', (event) => {
@@ -504,6 +505,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.add_sequence').off('click')
+    // eslint-disable-next-line no-unused-vars
     $('.add_sequence').click(function (eventObj) {
       const listener = {
         handleEvent: function (event) {
@@ -540,6 +542,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.go_home').off('click')
+    // eslint-disable-next-line no-unused-vars
     $('.go_home').click(function (eventObj) {
       window.location.href = '/builder/'
     })
@@ -854,6 +857,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     const warning = document.getElementById('builder-outstanding-issues-dialog-save')
 
+    // eslint-disable-next-line no-unused-vars
     warning.addEventListener('click', (event) => {
       const clean = cleanDefinition(window.dialogBuilder.definition)
 
@@ -902,9 +906,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     } else if (pattern.startsWith('^(?!') && pattern.endsWith(')$')) {
       operationField.value = 'not_equals'
       patternField.value = pattern.replace('^(?!', '').replace(')$', '')
-    } else if (pattern.startsWith('(?!') && pattern.endsWith(')')) {
-      operationField.value = 'not_contains'
-      patternField.value = pattern.replace('(?!', '').replace(')', '')
     } else if (pattern.startsWith('(?!') && pattern.endsWith(')')) {
       operationField.value = 'not_contains'
       patternField.value = pattern.replace('(?!', '').replace(')', '')
@@ -1580,6 +1581,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   const helpDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('annotated-help-dialog'))
 
   $('#action_annotated_help').off('click')
+  // eslint-disable-next-line no-unused-vars
   $('#action_annotated_help').click(function (eventObj) {
     helpDialog.open()
   })

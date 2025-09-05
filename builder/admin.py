@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long, ungrouped-imports
+# pylint: disable=line-too-long, ungrouped-imports, super-with-arguments
 # -*- coding: utf-8 -*-
 
 from filer.admin.fileadmin import FileAdmin

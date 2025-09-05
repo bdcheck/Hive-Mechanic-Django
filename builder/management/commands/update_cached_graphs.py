@@ -15,7 +15,7 @@ class Command(BaseCommand):
     @handle_schedule
     @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
-        query = Q(cached_cytoscape=None) | Q(cached_cytoscape='null') | Q(cached_cytoscape='')
+        query = Q(cached_cytoscape=None) | Q(cached_cytoscape='null') | Q(cached_cytoscape='') # pylint: disable=unsupported-binary-operation
 
         for version in GameVersion.objects.filter(query):
             version.cytoscape_json(simplify=False, compute=True)

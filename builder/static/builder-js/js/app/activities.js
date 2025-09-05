@@ -1,4 +1,4 @@
-/* global requirejs, alert */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {
@@ -70,6 +70,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
 
+  // eslint-disable-next-line no-unused-vars
   $('input[type=radio][name=activity-template]').change(function (eventObj) {
     const selected = $('input[type=radio][name=activity-template]:checked')
 
@@ -207,6 +208,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   $('.toggle_integration_content').hide()
 
+  // eslint-disable-next-line no-unused-vars
   $('.toggle_integration').click(function (eventObj) {
     const visible = $('.toggle_integration_content:visible')
 
@@ -225,6 +227,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   cytoscapeDagre(cytoscape) // register extension
 
+  // eslint-disable-next-line no-unused-vars
   $('.builder_game_preview').each(function (index) {
     const definition = $(this).data('definition')
 
@@ -239,6 +242,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
       }
     })
 
+    // eslint-disable-next-line no-unused-vars
     cy.ready(function (event) {
       cy.center()
       cy.autolock(true)

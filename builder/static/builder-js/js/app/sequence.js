@@ -1,3 +1,5 @@
+/* global define, $ */
+
 const modules = ['material', 'cards/node', 'jquery']
 
 if (window.dialogBuilder.cards !== undefined) {

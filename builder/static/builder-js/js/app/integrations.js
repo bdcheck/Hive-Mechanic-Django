@@ -1,4 +1,4 @@
-/* global requirejs, alert */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {

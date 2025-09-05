@@ -1,3 +1,5 @@
+/* global define, $, jQuery */
+
 define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slugifyExt, marked, purify) {
   class Node {
     constructor (definition, sequence) {
@@ -38,6 +40,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
+    // eslint-disable-next-line no-unused-vars
     destinationDescription (nodeId) {
       return 'Go to...'
     }
@@ -143,6 +146,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return issues
     }
 
+    // eslint-disable-next-line no-unused-vars
     onFieldUpdated (field, value) {
       // Implement in subclasses...
     }
@@ -289,6 +293,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
+    // eslint-disable-next-line no-unused-vars
     updateReferences (oldId, newId) {
       console.log('TODO: Implement "updateReferences" in ' + this.cardName())
     }
@@ -371,6 +376,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return term
     }
 
+    // eslint-disable-next-line no-unused-vars
     addTerms (terms) {
       // Override in subclasses...
     }
@@ -903,7 +909,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
               $('#' + me.cardId + '_' + field.field + '_preview').show()
             }
-          } catch (error) {
+          } catch (error) { // eslint-disable-line no-unused-vars
 
           }
         }
@@ -1132,9 +1138,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       } else if (pattern.startsWith('^(?!') && pattern.endsWith(')$')) {
         newOperationValue = 'not_equals'
         newPatternValue = pattern.replace('^(?!', '').replace(')$', '')
-      } else if (pattern.startsWith('(?!') && pattern.endsWith(')')) {
-        newOperationValue = 'not_contains'
-        newPatternValue = pattern.replace('(?!', '').replace(')', '')
       } else if (pattern.startsWith('(?!') && pattern.endsWith(')')) {
         newOperationValue = 'not_contains'
         newPatternValue = pattern.replace('(?!', '').replace(')', '')
@@ -1395,10 +1398,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return ''
     }
 
+    // eslint-disable-next-line no-unused-vars
     destinationNodes (sequence) {
       return []
     }
 
+    // eslint-disable-next-line no-unused-vars
     setDefaultDestination (originalId) {
       // replace nodes in def.
     }
@@ -1440,6 +1445,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     onClick (callback) {
+      // eslint-disable-next-line no-unused-vars
       $('#' + this.cardId).click(function (eventObj) {
         callback()
       })
@@ -1474,13 +1480,14 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-          return new classObj(definition, sequence)
+          return new classObj(definition, sequence) // eslint-disable-line new-cap
         }
       }
 
       return new Node(definition, sequence)
     }
 
+    // eslint-disable-next-line no-unused-vars
     static canCreateCard (definition, sequence) {
       if (window.dialogBuilder.cardMapping !== undefined) {
         const classObj = window.dialogBuilder.cardMapping[definition.type]
