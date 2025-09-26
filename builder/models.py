@@ -46,8 +46,6 @@ if sys.version_info[0] > 2:
 else:
     from django.contrib.postgres.fields import JSONField
 
-standard_library.install_aliases()
-
 logger = logging.getLogger(__name__)
 
 CYTOSCAPE_DIALOG_PLACEHOLDER = [{
