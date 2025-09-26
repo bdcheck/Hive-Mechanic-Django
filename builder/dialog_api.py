@@ -118,7 +118,7 @@ def create_dialog_from_path(file_path, dialog_key=None):
 
                 return test_dialog
     except: # pylint: disable=bare-except
-        traceback.six.print__exc()
+        traceback.print_exc()
 
     return None
 

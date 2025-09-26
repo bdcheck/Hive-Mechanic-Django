@@ -356,7 +356,7 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            traceback.six.print__exc()
+            traceback.print_exc()
 
         return translated_value
 

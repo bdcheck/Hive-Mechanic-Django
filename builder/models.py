@@ -1,8 +1,6 @@
 # pylint: disable=no-member, line-too-long, too-many-lines, ungrouped-imports
 # -*- coding: utf-8 -*-
 
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
 import difflib
 import hashlib
@@ -437,7 +435,7 @@ class InteractionCard(models.Model):
     def refresh_card(self):
         return self.update_card(force=True)
 
-    def six.print__repository_diffs(self):
+    def print_repository_diffs(self):
         try:
             repo_metadata = json.loads(self.repository_definition)
 
@@ -1109,7 +1107,7 @@ class GameVersion(models.Model):
 
             return self.cached_cytoscape
         except: # nosec # pylint: disable=bare-except
-            traceback.six.print__exc()
+            traceback.print_exc()
 
         return None
 
@@ -1661,7 +1659,7 @@ class DataProcessor(models.Model):
 
         return messages
 
-    def six.print__repository_diffs(self):
+    def print_repository_diffs(self):
         try:
             repo_metadata = json.loads(self.repository_definition)
 
