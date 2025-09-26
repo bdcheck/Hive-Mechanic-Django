@@ -10,6 +10,7 @@ import difflib
 import hashlib
 import importlib
 import json
+import logging
 import os
 import pkgutil
 import sys
@@ -51,6 +52,8 @@ else:
     from django.contrib.postgres.fields import JSONField
 
 standard_library.install_aliases()
+
+logger = logging.getLogger(__name__)
 
 CYTOSCAPE_DIALOG_PLACEHOLDER = [{
     'data': {
@@ -1255,6 +1258,8 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
             extras = {}
 
         extras['__integration'] = integration
+
+        logger.info('session.process_incoming: %s -- %s -- %s', integration, payload, extras)
 
         actions = self.game_version.process_incoming(self, payload, extras)
 

@@ -296,7 +296,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                             do_nudge = False
 
                             args = {
-                                'action': reverse('incoming_twilio_call'),
+                                'action': '%s%s' % (settings.SITE_URL, reverse('incoming_twilio_call')),
                                 'timeout': 10,
                             }
 

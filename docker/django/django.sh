@@ -39,7 +39,7 @@ python3 manage.py install_default_repository --skip-checks
 
 echo Hive Mechanic: Creating/updating default activity...
 # python3 manage.py docker_update_data docker/data/activities.json --skip-checks
-python3 manage.py docker_update_data docker/data/games.json --skip-checks
+python3 manage.py docker_update_data docker/data/activities.json --skip-checks
 
 echo Hive Mechanic: Creating/updating channels...
 python3 manage.py docker_update_data docker/data/channels.json --skip-checks

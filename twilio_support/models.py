@@ -364,7 +364,7 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
             payload_body = None
 
         if payload_body is None and ('CallStatus' in payload) is False and incoming_message.media.count() > 0:
-            payload_body = '^^^'
+            payload_body = ''
 
         integration.process_player_incoming('twilio_player', player_identifier, payload_body, {
             'last_message': last_message,

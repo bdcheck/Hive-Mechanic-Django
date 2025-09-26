@@ -56,7 +56,7 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
             payload_body = None
 
         if payload_body is None and incoming_message.media.count() > 0:
-            payload_body = '^^^'
+            payload_body = ''
 
         integration.process_player_incoming('messaging_player', phone_number, payload_body, {
             'last_message': last_message,

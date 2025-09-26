@@ -88,7 +88,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   })
 
   // const fileFilterField = mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
-  mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
+  // mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
 
   // $('#image-filter').on('keyup', function () {
   //  const val = $(this).val().toLowerCase()
@@ -99,7 +99,12 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   // })
 
   $('.clipboard-copy').click(function () { // catch the form's submit event
+    console.log(`Click .clipboard-copy...`)
+
     const copyText = $(this).attr('data-url')
+
+    console.log(`Copy ${copyText}...`)
+    console.log(navigator.clipboard)
 
     navigator.clipboard.writeText(copyText).then(function () {
       alert('URL copied to clipboard.')

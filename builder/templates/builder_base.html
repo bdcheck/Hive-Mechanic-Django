@@ -71,7 +71,12 @@
 						<a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Help" id="action_help">help</a>
 					{% endblock %}
 
-					<a href="{% url 'logout' %}" class="material-icons mdc-top-app-bar__action-item" aria-label="Logout" id="action_logout" style="margin-left: 11px;">exit_to_app</a>
+					<form method="post" action="{% url 'logout' %}">
+						{% csrf_token %}
+    					<button type="submit" style="margin-left: 11px;" class="material-icons">exit_to_app</button>
+					</form>
+
+					<!-- <a href="{% url 'logout' %}" class="material-icons mdc-top-app-bar__action-item" aria-label="Logout" id="action_logout" style="margin-left: 11px;">exit_to_app</a> -->
                 </section>
             </div>
         </header>

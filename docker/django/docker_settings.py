@@ -66,6 +66,7 @@ LOGGING = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = os.getenv('CRON_MAIL_SERVER', 'mail.example.com')
+EMAIL_PORT = int(os.getenv('CRON_MAIL_SERVER_PORT', '25'))
 EMAIL_HOST_USER = os.getenv('CRON_MAIL_USERNAME', 'postmaster')
 EMAIL_HOST_PASSWORD = os.getenv('CRON_MAIL_PASSWORD', 'CHANGE-ME')
 
