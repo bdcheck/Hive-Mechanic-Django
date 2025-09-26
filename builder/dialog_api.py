@@ -8,7 +8,6 @@ import tempfile
 import traceback
 
 import requests
-import six
 
 from filer.models import filemodels
 from six.moves import urllib
