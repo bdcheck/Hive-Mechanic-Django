@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long, no-member, wrong-import-order, wrong-import-position
 # -*- coding: utf-8 -*-
 
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
 import time
 import traceback

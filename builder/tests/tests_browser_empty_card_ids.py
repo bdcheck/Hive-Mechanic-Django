@@ -1,10 +1,6 @@
 # pylint: disable=line-too-long, no-member
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from builtins import super # pylint: disable=redefined-builtin
-
 import json
 import sys
 
@@ -249,13 +245,13 @@ class BrowserEmptyCardIdTests(StaticLiveServerTestCase):
 
             self.assertIn('New Send Message Card', next_send_title.get_attribute('outerHTML'))
         except TimeoutException:
-            print(self.selenium.execute_script("return document.body.outerHTML;"))
+            six.print_(self.selenium.execute_script("return document.body.outerHTML;"))
 
-            print('--------')
+            six.print_('--------')
 
             log_messages = self.selenium.get_log('browser')
 
-            print('LOG: ' + json.dumps(log_messages, indent=2))
+            six.print_('LOG: ' + json.dumps(log_messages, indent=2))
 
             ex_type, ex_value, ex_traceback = sys.exc_info()
 

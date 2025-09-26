@@ -1,7 +1,5 @@
 # pylint: disable=line-too-long
 
-from __future__ import print_function
-
 import bz2
 import gc
 import importlib
@@ -9,6 +7,8 @@ import io
 import os
 import sys
 import tempfile
+
+import six
 
 from django.conf import settings
 from django.core import management
@@ -32,7 +32,7 @@ def load_backup(filename, content):
 
         os.remove(path)
     else:
-        print('[hive_builder.pdk_api.load_backup] Unknown file type: ' + filename)
+        six.print_('[hive_builder.pdk_api.load_backup] Unknown file type: ' + filename)
 
 def incremental_backup(parameters): # pylint: disable=too-many-locals, too-many-statements
     to_transmit = []
@@ -69,7 +69,7 @@ def incremental_backup(parameters): # pylint: disable=too-many-locals, too-many-
         pass
 
     for app in dumpdata_apps:
-        print('[hive_builder] Backing up ' + app + '...')
+        six.print_('[hive_builder] Backing up ' + app + '...')
         sys.stdout.flush()
 
         buf = io.StringIO()
@@ -111,7 +111,7 @@ def compile_report(generator, sources, data_start=None, data_end=None, date_type
         try:
             output_file = generator_module.compile_report(generator, sources, data_start=data_start, data_end=data_end, date_type=date_type)
         except TypeError:
-            print('TODO: Update ' + generator + '.compile_report to support data_start, data_end, and date_type parameters!')
+            six.print_('TODO: Update ' + generator + '.compile_report to support data_start, data_end, and date_type parameters!')
 
             output_file = generator_module.compile_report(generator, sources)
 

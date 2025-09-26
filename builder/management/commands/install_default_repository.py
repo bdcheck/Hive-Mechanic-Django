@@ -1,8 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
-
-from future.moves.urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse
 
 from django.core.management import call_command
 from django.core.management.base import BaseCommand

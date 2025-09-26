@@ -1,9 +1,9 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
-
 import json
 import os
+
+import six
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -22,19 +22,19 @@ class Command(BaseCommand):
 
         card_path = os.path.join(settings.MEDIA_ROOT, 'interaction_cards')
 
-        print(json.dumps(in_use, indent=2))
+        six.print_(json.dumps(in_use, indent=2))
 
-        print(card_path)
+        six.print_(card_path)
 
         files = list(os.listdir(card_path))
 
-        print(json.dumps(files, indent=2))
+        six.print_(json.dumps(files, indent=2))
 
         for js_file in files:
             js_path = os.path.join(card_path, js_file)
 
             if (js_path in in_use) is False:
-                print('Clearing %s...' % js_path)
+                six.print_('Clearing %s...' % js_path)
                 os.remove(js_path)
             else:
-                print('Retaining %s...' % js_path)
+                six.print_('Retaining %s...' % js_path)

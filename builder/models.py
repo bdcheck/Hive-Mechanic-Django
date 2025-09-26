@@ -1,8 +1,6 @@
 # pylint: disable=no-member, line-too-long, too-many-lines, ungrouped-imports
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 from builtins import str # pylint: disable=redefined-builtin
 
 import datetime
@@ -16,9 +14,8 @@ import pkgutil
 import sys
 import traceback
 
-from future import standard_library
-
 import requests
+import six
 
 from filer.models.filemodels import File
 from six import python_2_unicode_compatible
@@ -433,14 +430,14 @@ class InteractionCard(models.Model):
             except TypeError:
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
             except json.decoder.JSONDecodeError:
-                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
+                six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
         return messages
 
     def refresh_card(self):
         return self.update_card(force=True)
 
-    def print_repository_diffs(self):
+    def six.print__repository_diffs(self):
         try:
             repo_metadata = json.loads(self.repository_definition)
 
@@ -464,22 +461,22 @@ class InteractionCard(models.Model):
                         client_diff = list(difflib.unified_diff(repo_client.splitlines(), local_client.splitlines(), lineterm=''))
 
                         if entry_diff:
-                            print('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(entry_diff))
+                            six.print_('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(entry_diff))
 
                         if eval_diff:
-                            print('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(eval_diff))
+                            six.print_('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(eval_diff))
 
                         if client_diff:
-                            print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(client_diff))
+                            six.print_('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(client_diff))
                 else:
-                    print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
+                    six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
             else:
-                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [2]')
+                six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [2]')
         except json.decoder.JSONDecodeError:
-            print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
+            six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
 post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.interaction_card.file_cleanup')
 
@@ -1112,7 +1109,7 @@ class GameVersion(models.Model):
 
             return self.cached_cytoscape
         except: # nosec # pylint: disable=bare-except
-            traceback.print_exc()
+            traceback.six.print__exc()
 
         return None
 
@@ -1664,7 +1661,7 @@ class DataProcessor(models.Model):
 
         return messages
 
-    def print_repository_diffs(self):
+    def six.print__repository_diffs(self):
         try:
             repo_metadata = json.loads(self.repository_definition)
 
@@ -1681,14 +1678,14 @@ class DataProcessor(models.Model):
                     implementation_diff = list(difflib.unified_diff(repo_implementation.splitlines(), self.processor_function.splitlines(), lineterm=''))
 
                     if implementation_diff:
-                        print('--- Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                        print('    ' + '\n    '.join(implementation_diff))
+                        six.print_('--- Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        six.print_('    ' + '\n    '.join(implementation_diff))
                 else:
-                    print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
+                    six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
             else:
-                print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
+                six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
-            print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+            six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
 
 class DataProcessorLog(models.Model):
     data_processor = models.ForeignKey(DataProcessor, related_name='log_items', null=True, blank=True, on_delete=models.SET_NULL)

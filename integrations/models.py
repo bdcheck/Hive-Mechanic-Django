@@ -1,10 +1,6 @@
 # pylint: disable=line-too-long, no-member, ungrouped-imports
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
 import logging
 import json
@@ -13,9 +9,10 @@ import sys
 import traceback
 
 import phonenumbers
+import six
 
 from filer.models import filemodels
-from future.utils import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 
 from django.conf import settings
 from django.db import models
@@ -102,7 +99,7 @@ class Integration(models.Model):
                 total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
 
                 if total >= site_settings.total_message_limit:
-                    print('Disabling %s: Twilio traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+                    six.print_('Disabling %s: Twilio traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
 
                     self.enabled = False
                     self.save()
@@ -126,7 +123,7 @@ class Integration(models.Model):
                 total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
 
                 if total >= site_settings.total_message_limit:
-                    print('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+                    six.print_('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
 
                     self.enabled = False
                     self.save()
@@ -359,7 +356,7 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            traceback.print_exc()
+            traceback.six.print__exc()
 
         return translated_value
 

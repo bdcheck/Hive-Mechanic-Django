@@ -1,6 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
+import six
 
 from django.core.management.base import BaseCommand
 
@@ -14,4 +14,4 @@ class Command(BaseCommand):
                     card.enabled = True
                     card.save()
 
-                    print('Enabled card "%s".' % card)
+                    six.print_('Enabled card "%s".' % card)

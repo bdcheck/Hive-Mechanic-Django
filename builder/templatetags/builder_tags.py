@@ -2,9 +2,8 @@
 
 import re
 
-from future.utils import raise_from, raise_with_traceback
-
 import humanize
+import six
 
 from django import template
 from django.utils import dateparse
@@ -29,7 +28,7 @@ def setvar(parser, token): # pylint: disable=unused-argument
     try:
         tag_name, arg = token.contents.split(None, 1)
     except ValueError as exc:
-        raise_from(template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0]), exc)
+        six.raise_from(template.TemplateSyntaxError("%r tag requires arguments" % token.contents.split()[0]), exc)
 
     matched = re.search(r'(.*?) as (\w+)', arg)
 
@@ -39,7 +38,7 @@ def setvar(parser, token): # pylint: disable=unused-argument
     new_val, var_name = matched.groups()
 
     if not (new_val[0] == new_val[-1] and new_val[0] in ('"', "'")):
-        raise_with_traceback(template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name))
+        six.raise_(template.TemplateSyntaxError("%r tag's argument should be in quotes" % tag_name))
 
     return SetVarNode(new_val[1:-1], var_name)
 

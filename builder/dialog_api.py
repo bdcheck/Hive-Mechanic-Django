@@ -1,7 +1,5 @@
 # pylint: disable=line-too-long, no-member
 
-from __future__ import print_function
-
 import json
 import io
 import mimetypes
@@ -10,6 +8,7 @@ import tempfile
 import traceback
 
 import requests
+import six
 
 from filer.models import filemodels
 from six.moves import urllib
@@ -119,7 +118,7 @@ def create_dialog_from_path(file_path, dialog_key=None):
 
                 return test_dialog
     except: # pylint: disable=bare-except
-        traceback.print_exc()
+        traceback.six.print__exc()
 
     return None
 

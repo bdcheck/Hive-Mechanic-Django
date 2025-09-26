@@ -1,7 +1,7 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 
-from future.utils import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 
 from django.conf import settings
 from django.core.management import call_command

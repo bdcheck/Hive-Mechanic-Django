@@ -1,8 +1,5 @@
 # pylint: disable=no-member, line-too-long, no-member
 
-from builtins import str # pylint: disable=redefined-builtin
-from builtins import range # pylint: disable=redefined-builtin
-
 import datetime
 import mimetypes
 import time

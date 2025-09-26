@@ -1,11 +1,11 @@
-from __future__ import print_function
-
 import bz2
 import gc
 import io
 import os
 import sys
 import tempfile
+
+import six
 
 from django.conf import settings
 from django.core import management
@@ -29,7 +29,7 @@ def load_backup(filename, content):
 
         os.remove(path)
     else:
-        print('[hive_integrations.pdk_api.load_backup] Unknown file type: ' + filename)
+        six.print_('[hive_integrations.pdk_api.load_backup] Unknown file type: ' + filename)
 
 def incremental_backup(parameters): # pylint: disable=too-many-locals, too-many-statements
     to_transmit = []
@@ -60,7 +60,7 @@ def incremental_backup(parameters): # pylint: disable=too-many-locals, too-many-
         pass
 
     for app in dumpdata_apps:
-        print('[hive_integrations] Backing up ' + app + '...')
+        six.print_('[hive_integrations] Backing up ' + app + '...')
         sys.stdout.flush()
 
         buf = io.StringIO()
