@@ -10,10 +10,12 @@ from simple_messaging_switchboard.models import Channel
 
 from integrations.models import Integration
 
+logger = logging.getLogger(__name__)
+
 def send_via(outgoing_message):
     metadata = json.loads(outgoing_message.transmission_metadata)
 
-    logging.error('Looking for channel for %s from %s', outgoing_message, metadata)
+    logging.debug('Looking for channel for %s from %s', outgoing_message, metadata)
 
     integration_str = metadata.get('integration', None)
 
@@ -32,7 +34,7 @@ def send_via(outgoing_message):
             if channel is not None:
                 return channel.identifier
 
-    logging.error('no channel found')
+    logging.debug('no channel found')
 
     return None
 

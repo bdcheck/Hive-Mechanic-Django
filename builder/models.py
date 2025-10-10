@@ -1252,8 +1252,6 @@ class Session(models.Model): # pylint: disable=too-many-public-methods
 
         extras['__integration'] = integration
 
-        logger.info('session.process_incoming: %s -- %s -- %s', integration, payload, extras)
-
         actions = self.game_version.process_incoming(self, payload, extras)
 
         if integration is not None:

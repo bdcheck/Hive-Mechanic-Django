@@ -126,7 +126,10 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
 
             media = OutgoingMessageMedia.objects.create(message=outgoing)
 
-            response = requests.get(integration.translate_value(action['image-url'], session), timeout=60)
+            url_session = requests.Session()
+            url_session.headers['User-Agent'] = 'Hive Mechanic/2.0'
+
+            response = url_session.get(integration.translate_value(action['image-url'], session), timeout=60)
 
             media.content_type = response.headers['content-type']
             media.content_file.save('media_%s.%s' % (media.pk, media.content_type.split('/')[-1]), ContentFile(response.content))
@@ -154,19 +157,23 @@ def last_message_for_player(game, player):
     incoming_message = None
 
     for integration in Integration.objects.filter(game=game):
-        phone = player.player_state.get('simple_messaging', None)
+        phone = player.player_state.get('messaging_player', None)
 
         incoming_message = None
 
         integration_match_str = 'integration:%s' % integration.pk
 
-        for message in IncomingMessage.objects.filter(sender=phone).order_by('-receive_date'):
+        logging.warning('last_message_for_player[phone]: %s', phone)
+
+        for message in IncomingMessage.objects.filter(sender__endswith=phone).order_by('-receive_date'):
             transmission_metadata = {}
 
             try:
                 transmission_metadata = json.loads(message.transmission_metadata)
             except json.JSONDecodeError:
                 pass
+
+            logging.warning('last_message_for_player[%s]: %s -- %s', message, integration_match_str, transmission_metadata)
 
             if integration_match_str == transmission_metadata.get('integration', ''):
                 incoming_message = message
@@ -176,14 +183,20 @@ def last_message_for_player(game, player):
         if incoming_message is not None:
             break
 
+    logging.warning('last_message_for_player[last_incoming]: %s', incoming_message)
+
     last_incoming = None
 
     transmission_metadata = {}
 
-    try:
-        transmission_metadata = json.loads(incoming_message.transmission_metadata)
-    except json.JSONDecodeError:
-        pass
+    if incoming_message is None:
+        return None
+
+    if incoming_message.transmission_metadata is not None:
+        try:
+            transmission_metadata = json.loads(incoming_message.transmission_metadata)
+        except json.JSONDecodeError:
+            pass
 
     if incoming_message is not None:
         last_incoming = {

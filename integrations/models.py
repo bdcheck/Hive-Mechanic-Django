@@ -27,6 +27,8 @@ if sys.version_info[0] > 2:
 else:
     from django.contrib.postgres.fields import JSONField
 
+logger = logging.getLogger(__name__)
+
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
     ('simple_messaging', 'Simple Messaging'),
@@ -262,7 +264,12 @@ class Integration(models.Model):
                 translated_value = translated_value.replace('[ME]', session.player.identifier)
 
             while '[LAST-MESSAGE]' in translated_value:
-                translated_value = translated_value.replace('[LAST-MESSAGE]', session.last_message())
+                last_message = session.last_message()
+
+                if last_message is None:
+                    translated_value = translated_value.replace('[LAST-MESSAGE]', '???')
+                else:
+                    translated_value = translated_value.replace('[LAST-MESSAGE]', last_message)
 
             while '[LAST-MESSAGE-TYPE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
@@ -356,7 +363,7 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            traceback.print_exc()
+            logger.error(traceback.format_exc())
 
         return translated_value
 
@@ -473,9 +480,9 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 for activity in Game.objects.all():
                     activity.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
-            action['translated_value'] = integration.translate_value(action['variable'], session)
+            action['translated_value'] = integration.translate_value(action['value'], session)
 
-            session.set_variable(action['value'], action['translated_value'], metadata=action.get('metadata', None))
+            session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
 
         payload['value'] = action['translated_value']
 
