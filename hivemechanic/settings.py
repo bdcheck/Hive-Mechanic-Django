@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'cli_support',
     'easy_thumbnails',
     'filer',
+    'django.contrib.sites',
     'django.contrib.admin',
 ]
 
@@ -212,6 +213,8 @@ TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
 
 QUICKSILVER_LOCK_DIR = tempfile.gettempdir()
+
+SITE_ID = 1
 
 from .local_settings import *
 

@@ -257,7 +257,7 @@ class Integration(models.Model):
                     log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
 
     def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches, too-many-statements
-        translated_value = value
+        translated_value = '%s' % value
 
         try:
             while '[ME]' in translated_value:
