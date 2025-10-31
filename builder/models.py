@@ -21,6 +21,7 @@ from six import python_2_unicode_compatible
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
 from django.core.checks import Warning, register # pylint: disable=redefined-builtin
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -235,6 +236,29 @@ def site_settings_check(app_configs, **kwargs): # pylint: disable=unused-argumen
             ))
     except ProgrammingError: # Thrown before migration happens.
         pass
+
+    return warnings
+
+@register()
+def django_site_check(app_configs, **kwargs): # pylint: disable=unused-argument
+    warnings = []
+
+    needs_match = Site.objects.all().count()
+
+    try:
+
+        for site in Site.objects.all():
+            if site.domain in settings.ALLOWED_HOSTS:
+                needs_match -= 1
+    except ProgrammingError: # Thrown before migration happens.
+        pass
+
+    if needs_match > 0:
+        warnings.append(Warning(
+            'Django site mismatch',
+            hint='Site objects configured that are not reflected in ALLOWED_HOSTS. Check the domain names.',
+            id='builder.W004',
+        ))
 
     return warnings
 
