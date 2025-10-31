@@ -1,25 +1,23 @@
 # pylint: disable=line-too-long, no-member, ungrouped-imports
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
+import logging
 import json
 import re
 import sys
+import traceback
 
 import phonenumbers
+import six
 
-from future.utils import python_2_unicode_compatible
+from filer.models import filemodels
+from six import python_2_unicode_compatible
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
-
-from passive_data_kit.models import DataPoint
 
 from activity_logger.models import log
 from builder.models import Game, Player, Session, SiteSettings
@@ -28,6 +26,8 @@ if sys.version_info[0] > 2:
     from django.db.models import JSONField # pylint: disable=no-name-in-module
 else:
     from django.contrib.postgres.fields import JSONField
+
+logger = logging.getLogger(__name__)
 
 INTEGRATION_TYPES = (
     ('twilio', 'Twilio'),
@@ -101,7 +101,7 @@ class Integration(models.Model):
                 total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
 
                 if total >= site_settings.total_message_limit:
-                    print('Disabling %s: Twilio traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+                    six.print_('Disabling %s: Twilio traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
 
                     self.enabled = False
                     self.save()
@@ -127,7 +127,7 @@ class Integration(models.Model):
                 total = incoming_messages.count() + outgoing_messages.count() + outgoing_calls.count()
 
                 if total >= site_settings.total_message_limit:
-                    print('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
+                    six.print_('Disabling %s: Messaging traffic of %d exceeds site limit of %d.' % (self, total, site_settings.total_message_limit))
 
                     self.enabled = False
                     self.save()
@@ -230,6 +230,8 @@ class Integration(models.Model):
             for action in actions:
                 processed = False
 
+                logging.info('integrations.execute_actions: %s (%s) -- %s', self, self.url_slug, action)
+
                 if self.type == 'twilio':
                     from twilio_support.models import execute_action as twilio_execute # pylint: disable=import-outside-toplevel
 
@@ -253,17 +255,23 @@ class Integration(models.Model):
                 if processed is False:
                     settings.FETCH_LOGGER().warn('TODO: Process', action)
 
-                log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
+                if processed:
+                    log(self.log_id(), 'Executed action.', tags=['integration', 'action'], metadata=action, player=session.player, session=session, game_version=session.game_version)
 
-    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches
-        translated_value = value
+    def translate_value(self, value, session, scope='session'): # pylint: disable=unused-argument, no-self-use, too-many-branches, too-many-statements
+        translated_value = '%s' % value
 
         try:
             while '[ME]' in translated_value:
                 translated_value = translated_value.replace('[ME]', session.player.identifier)
 
             while '[LAST-MESSAGE]' in translated_value:
-                translated_value = translated_value.replace('[LAST-MESSAGE]', session.last_message())
+                last_message = session.last_message()
+
+                if last_message is None:
+                    translated_value = translated_value.replace('[LAST-MESSAGE]', '???')
+                else:
+                    translated_value = translated_value.replace('[LAST-MESSAGE]', last_message)
 
             while '[LAST-MESSAGE-TYPE]' in translated_value:
                 translated_value = translated_value.replace('[LAST-MESSAGE-TYPE]', session.last_message_type())
@@ -288,9 +296,14 @@ class Integration(models.Model):
 
                     identifier = tag[9:-1]
 
-                    # fetch media item w/ identifier
+                    media_file = None
 
-                    translated_value = media_item.path
+                    try:
+                        filemodels.File.objects.filter(pk=int(identifier))
+
+                        translated_value = media_file.name
+                    except ValueError:
+                        translated_value = '(Unable to locate file with identifier "%s".)' % identifier
 
             while '[SESSION:' in translated_value:
                 start = translated_value.find('[SESSION:')
@@ -352,9 +365,7 @@ class Integration(models.Model):
                 log(self.log_id(), 'Translated value.', tags=['integration', 'translate'], metadata=metadata, player=session.player, session=session, game_version=session.game_version)
 
         except TypeError:
-            pass # Attempting to translate non-string
-
-            # traceback.print_exc()
+            logger.error(traceback.format_exc())
 
         return translated_value
 
@@ -473,15 +484,11 @@ def execute_action(integration, session, action): # pylint: disable=unused-argum
                 for activity in Game.objects.all():
                     activity.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None), session=session)
         else:
-            action['translated_value'] = integration.translate_value(action['variable'], session)
+            action['translated_value'] = integration.translate_value(action['value'], session)
 
-            session.set_variable(action['value'], action['translated_value'], metadata=action.get('metadata', None))
+            session.set_variable(action['variable'], action['translated_value'], metadata=action.get('metadata', None))
 
         payload['value'] = action['translated_value']
-
-        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
-        point.secondary_identifier = payload['variable']
-        point.save()
 
         return True
     elif action['type'] == 'continue':

@@ -1,23 +1,19 @@
 # pylint: disable=no-member, line-too-long, too-many-lines, ungrouped-imports
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
 import difflib
 import hashlib
 import importlib
 import json
+import logging
 import os
 import pkgutil
 import sys
 import traceback
 
-from future import standard_library
-
 import requests
+import six
 
 from filer.models.filemodels import File
 from six import python_2_unicode_compatible
@@ -39,7 +35,6 @@ from django.utils.encoding import smart_str
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.models import Dialog, DialogStateTransition
-from passive_data_kit.models import DataPoint
 
 from activity_logger.models import log
 
@@ -51,7 +46,7 @@ if sys.version_info[0] > 2:
 else:
     from django.contrib.postgres.fields import JSONField
 
-standard_library.install_aliases()
+logger = logging.getLogger(__name__)
 
 CYTOSCAPE_DIALOG_PLACEHOLDER = [{
     'data': {
@@ -298,7 +293,7 @@ class PermissionsSupport(models.Model):
 
 class RemoteRepository(models.Model):
     class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
-        verbose_name_plural = 'Remote Repositories'
+        verbose_name_plural = 'Remote repositories'
 
     name = models.CharField(max_length=4096, unique=True)
     url = models.URLField(max_length=4096, unique=True)
@@ -431,7 +426,7 @@ class InteractionCard(models.Model):
             except TypeError:
                 messages.append('[Error] ' + self.identifier + ': Unable to parse update information.')
             except json.decoder.JSONDecodeError:
-                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
+                six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
         return messages
 
@@ -462,22 +457,22 @@ class InteractionCard(models.Model):
                         client_diff = list(difflib.unified_diff(repo_client.splitlines(), local_client.splitlines(), lineterm=''))
 
                         if entry_diff:
-                            print('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(entry_diff))
+                            six.print_('--- Entry Actions: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(entry_diff))
 
                         if eval_diff:
-                            print('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(eval_diff))
+                            six.print_('--- Evaluation Function: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(eval_diff))
 
                         if client_diff:
-                            print('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                            print('    ' + '\n    '.join(client_diff))
+                            six.print_('--- Client Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                            six.print_('    ' + '\n    '.join(client_diff))
                 else:
-                    print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
+                    six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [3]')
             else:
-                print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [2]')
+                six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [2]')
         except json.decoder.JSONDecodeError:
-            print('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
+            six.print_('No repository definition for ' + self.name + ' ('' + self.identifier + ''). [1]')
 
 post_delete.connect(file_cleanup, sender=InteractionCard, dispatch_uid='builder.interaction_card.file_cleanup')
 
@@ -915,9 +910,6 @@ class GameVersion(models.Model):
                             'player': str(session.player.identifier),
                         }
 
-                        point = DataPoint.objects.create_data_point('hive-incoming-call', session.player.identifier, payload, user_agent='Hive Mechanic')
-                        point.save()
-
                         session.advance_to(definition['incoming_call_interrupt'])
 
                         session.nudge()
@@ -939,10 +931,6 @@ class GameVersion(models.Model):
                             'game': str(session.game_version.game.slug),
                             'player': str(session.player.identifier),
                         }
-
-                        point = DataPoint.objects.create_data_point('hive-set-variable', session.player.identifier, payload, user_agent='Hive Mechanic')
-                        point.secondary_identifier = payload['variable']
-                        point.save()
 
                         session.advance_to(interrupt['action'])
 
@@ -1094,7 +1082,7 @@ class GameVersion(models.Model):
         return incomplete_id
 
     def cytoscape_json(self, indent=0, simplify=False, compute=False):
-        if self.cached_cytoscape == 'null':
+        if self.cached_cytoscape in ('null', '', None):
             self.cached_cytoscape = None
 
         if compute is False or self.cached_cytoscape is not None:
@@ -1144,6 +1132,9 @@ class GameVersion(models.Model):
             uniques.add(session.player.pk)
 
         return uniques
+
+    def size(self):
+        return len(self.dialog_snapshot())
 
 @receiver(pre_save, sender=GameVersion)
 def reset_game_version_metadata(sender, instance, *args, **kwargs): # pylint: disable=unused-argument
@@ -1681,14 +1672,14 @@ class DataProcessor(models.Model):
                     implementation_diff = list(difflib.unified_diff(repo_implementation.splitlines(), self.processor_function.splitlines(), lineterm=''))
 
                     if implementation_diff:
-                        print('--- Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
-                        print('    ' + '\n    '.join(implementation_diff))
+                        six.print_('--- Implementation: ' + self.identifier + '[' + str(latest_version['version']) + '] ---')
+                        six.print_('    ' + '\n    '.join(implementation_diff))
                 else:
-                    print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
+                    six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [3]')
             else:
-                print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
+                six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [2]')
         except json.decoder.JSONDecodeError:
-            print('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
+            six.print_('No repository definition for ' + self.name + ' ("' + self.identifier + '"). [1]')
 
 class DataProcessorLog(models.Model):
     data_processor = models.ForeignKey(DataProcessor, related_name='log_items', null=True, blank=True, on_delete=models.SET_NULL)
@@ -1744,6 +1735,9 @@ class DataProcessorLog(models.Model):
         return summary, preview
 
 class SiteSettings(models.Model):
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
+        verbose_name_plural = 'Site settings'
+
     name = models.CharField(max_length=1024)
     message_of_the_day = models.TextField(max_length=(1024 * 1024), default='Welcome to Hive Mechanic. You may customize this message in the site settings.')
     banner = models.ImageField(upload_to='site_banners', null=True, blank=True)

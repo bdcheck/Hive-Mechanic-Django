@@ -1,4 +1,4 @@
-/* global requirejs, alert */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {
@@ -72,6 +72,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#upload_button').click(function (eventObj) {
     $('#upload_field').off('change')
 
@@ -87,7 +88,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   })
 
   // const fileFilterField = mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
-  mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
+  // mdc.textField.MDCTextField.attachTo(document.getElementById('file_filter'))
 
   // $('#image-filter').on('keyup', function () {
   //  const val = $(this).val().toLowerCase()

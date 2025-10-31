@@ -1,9 +1,7 @@
 # pylint: disable=no-member, line-too-long, no-member
 
-from builtins import str # pylint: disable=redefined-builtin
-from builtins import range # pylint: disable=redefined-builtin
-
 import datetime
+import logging
 import mimetypes
 import time
 
@@ -25,6 +23,8 @@ from activity_logger.models import log
 from integrations.models import Integration
 
 from .models import IncomingMessage, IncomingMessageMedia, OutgoingCall, IncomingCallResponse, IncomingCallMedia
+
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def incoming_twilio(request): # pylint: disable=too-many-branches,too-many-locals,too-many-statements
@@ -138,6 +138,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
         post_dict = request.POST.dict()
 
+        logger.error('post_dict[1]: %s', post_dict)
+
         source = post_dict['From']
         destination = post_dict['To']
 
@@ -151,6 +153,8 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
 
                     post_dict['From'] = source
                     post_dict['To'] = destination
+
+        logger.error('post_dict[2]: %s', post_dict)
 
         if post_dict.get('CallStatus', None) is not None:
             incoming = IncomingCallResponse(source=source)
@@ -296,7 +300,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                             do_nudge = False
 
                             args = {
-                                'action': reverse('incoming_twilio_call'),
+                                'action': '%s%s' % (settings.SITE_URL, reverse('incoming_twilio_call')),
                                 'timeout': 10,
                             }
 
@@ -324,5 +328,7 @@ def incoming_twilio_call(request): # pylint: disable=too-many-branches, too-many
                     log_metadata['call_status'] = post_dict.get('CallStatus', None)
 
                     log('twilio:incoming_twilio_call', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
+
+    logger.error('response[2]: %s', response)
 
     return HttpResponse(str(response), content_type='text/xml')

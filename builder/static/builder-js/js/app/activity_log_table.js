@@ -1,4 +1,4 @@
-/* global requirejs */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {
@@ -171,6 +171,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   const startDate = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
   const endDate = mdc.textField.MDCTextField.attachTo(document.getElementById('end_date'))
 
+  // eslint-disable-next-line no-unused-vars
   $('#filter_date_button').click(function (eventObj) {
     if (startDate.value !== '' && endDate.value !== '' && endDate.value < startDate.value) {
       const endValue = endDate.value
@@ -214,6 +215,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#search_field_clear').click(function (eventObj) {
     const currentUrl = new URL(window.location)
 
@@ -222,6 +224,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#sort_source').click(function (eventObj) {
     const currentUrl = new URL(window.location)
 
@@ -234,6 +237,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#sort_player').click(function (eventObj) {
     const currentUrl = new URL(window.location)
 
@@ -246,6 +250,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#sort_message').click(function (eventObj) {
     const currentUrl = new URL(window.location)
 
@@ -258,6 +263,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
+  // eslint-disable-next-line no-unused-vars
   $('#sort_logged').click(function (eventObj) {
     const currentUrl = new URL(window.location)
 

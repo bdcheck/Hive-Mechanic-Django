@@ -2,6 +2,7 @@
 
 import json
 import os
+import tempfile
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
@@ -9,7 +10,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 DEBUG = (os.getenv('DJANGO_DEBUG', 'False').lower() == 'true')
 
-ALLOWED_HOSTS = [ os.getenv('DJANGO_ALLOWED_HOST', 'localhost') ]
+ALLOWED_HOSTS = [ os.getenv('DJANGO_ALLOWED_HOST', 'localhost'), 'localhost' ]
 CSRF_TRUSTED_ORIGINS = [ 'https://%s' % os.getenv('DJANGO_ALLOWED_HOST', 'localhost') ]
 
 ADMINS = [(os.getenv('DJANGO_ADMIN_NAME', 'Hive Mechanic Admin'), os.getenv('DJANGO_ADMIN_EMAIL', 'hive-user@example.com'),)]
@@ -65,12 +66,15 @@ LOGGING = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = os.getenv('CRON_MAIL_SERVER', 'mail.example.com')
+EMAIL_PORT = int(os.getenv('CRON_MAIL_SERVER_PORT', '25'))
 EMAIL_HOST_USER = os.getenv('CRON_MAIL_USERNAME', 'postmaster')
 EMAIL_HOST_PASSWORD = os.getenv('CRON_MAIL_PASSWORD', 'CHANGE-ME')
 
 TIME_ZONE = os.getenv('DJANGO_TIME_ZONE', 'America/Chicago')
 
 SITE_URL = 'https://%s' % ALLOWED_HOSTS[0]
+
+QUICKSILVER_LOCK_DIR = '/app/tmp'
 
 SIMPLE_DATA_EXPORTER_SITE_NAME = os.getenv('SIMPLE_DATA_EXPORTER_SITE_NAME', 'Hive Mechanic')
 SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = True
@@ -103,6 +107,8 @@ SILENCED_SYSTEM_CHECKS = [
     'simple_messaging_twilio.E002',
     'simple_messaging_twilio.E003',
     'simple_messaging.E001',
+    'simple_messaging.W002',
+
 ]
 
 if os.getenv('DJANGO_DEBUG', '') != '':

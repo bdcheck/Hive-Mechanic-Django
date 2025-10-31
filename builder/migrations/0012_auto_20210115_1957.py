@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='remoterepository',
-            options={'verbose_name_plural': 'Remote Repositories'},
+            options={'verbose_name_plural': ''},
         ),
         migrations.AddField(
             model_name='game',

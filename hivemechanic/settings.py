@@ -38,13 +38,12 @@ INSTALLED_APPS = [
     'prettyjson',
     'django_filters',
     'quicksilver',
-    'passive_data_kit',
     'django_dialog_engine',
     'nagios_monitor',
     'simple_backup',
     'simple_dashboard',
     'simple_messaging',
-    'simple_messaging_azure',
+    'simple_messaging_hive',
     'simple_messaging_switchboard',
     'simple_messaging_loopback',
     'docker_utils',
@@ -57,6 +56,7 @@ INSTALLED_APPS = [
     'cli_support',
     'easy_thumbnails',
     'filer',
+    'django.contrib.sites',
     'django.contrib.admin',
 ]
 
@@ -217,14 +217,16 @@ SIMPLE_DASHBOARD_SITE_NAME = 'Hive Mechanic'
 
 QUICKSILVER_LOCK_DIR = tempfile.gettempdir()
 
+SITE_ID = 1
+
 from .local_settings import *
 
 for app in ADDITIONAL_APPS:
     INSTALLED_APPS.append(app)
 
 # Suppress pygame notifications...
-
-from os import environ
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
-
-import pygame  # it is important to import pygame after that
+#
+# from os import environ
+# environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+#
+# import pygame  # it is important to import pygame after that

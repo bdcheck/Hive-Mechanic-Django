@@ -11,8 +11,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         for game in Game.objects.all():
             game.fetch_metadata(force=True)

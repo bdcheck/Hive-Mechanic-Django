@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long, no-member, wrong-import-order, wrong-import-position
 # -*- coding: utf-8 -*-
 
-from builtins import str # pylint: disable=redefined-builtin
-
 import datetime
 import time
 import traceback
@@ -366,7 +364,7 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
             payload_body = None
 
         if payload_body is None and ('CallStatus' in payload) is False and incoming_message.media.count() > 0:
-            payload_body = '^^^'
+            payload_body = ''
 
         integration.process_player_incoming('twilio_player', player_identifier, payload_body, {
             'last_message': last_message,
@@ -380,6 +378,9 @@ def process_incoming(integration, immutable_payload): # pylint: disable=too-many
 
 def execute_action(integration, session, action): # pylint: disable=too-many-branches, too-many-statements
     player = session.player
+
+    if ('twilio_player' in player.player_state) is False:
+        return False
 
     if action['type'] == 'echo': # pylint: disable=no-else-return
         destinations = []

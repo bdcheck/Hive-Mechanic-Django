@@ -1,9 +1,9 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
-
 import json
 import zipfile
+
+import six
 
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
@@ -34,11 +34,11 @@ class Command(BaseCommand):
 
                     if (card is None) or ('update_existing' in cmd_options and cmd_options['update_existing']):
                         if card is None:
-                            print('Creating card for "' + identifier + '"...')
+                            six.print_('Creating card for "' + identifier + '"...')
 
                             card = InteractionCard(identifier=identifier)
                         else:
-                            print('Updating card for "' + identifier + '"...')
+                            six.print_('Updating card for "' + identifier + '"...')
 
                         card.name = value['name']
 
@@ -50,4 +50,4 @@ class Command(BaseCommand):
                         card.client_implementation.save(identifier + '.js', ContentFile(import_files.read(identifier + '.js')))
                         card.save()
                     else:
-                        print('Skipping update for "' + identifier + '"...')
+                        six.print_('Skipping update for "' + identifier + '"...')

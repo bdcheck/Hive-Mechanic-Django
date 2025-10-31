@@ -1,6 +1,3 @@
-[submodule "passive_data_kit"]
-	path = passive_data_kit
-	url = https://github.com/audacious-software/PassiveDataKit-Django.git
 [submodule "dialog_engine"]
 	path = django_dialog_engine
 	url = https://github.com/audacious-software/Django-Dialog-Engine.git

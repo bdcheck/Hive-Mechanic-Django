@@ -1,10 +1,9 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
-
 import json
 
 import requests
+import six
 
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
@@ -53,7 +52,7 @@ class Command(BaseCommand):
 
                     if matched_card is None:
                         if cmd_options['silent'] is False:
-                            print('Adding new card: ' + card_def['name'] + '...')
+                            six.print_('Adding new card: ' + card_def['name'] + '...')
                         matched_card = InteractionCard(identifier=card_def['identifier'], name=card_def['name'], enabled=False)
 
                         matched_card.entry_actions = requests.get(last_version['entry-actions'], timeout=120).content.decode("utf-8")
@@ -76,7 +75,7 @@ class Command(BaseCommand):
                         matched_card.save()
                     elif last_version['version'] != matched_card.version or matched_card.repository_definition != card_json:
                         if cmd_options['silent'] is False:
-                            print('Update available for existing card: ' + card_def['name'] + '...')
+                            six.print_('Update available for existing card: ' + card_def['name'] + '...')
 
                         matched_card.repository_definition = card_json
 
@@ -115,7 +114,7 @@ class Command(BaseCommand):
 
                     if matched_processor is None:
                         if cmd_options['silent'] is False:
-                            print('Adding new data processor: ' + processor_def['name'] + '...')
+                            six.print_('Adding new data processor: ' + processor_def['name'] + '...')
 
                         matched_processor = DataProcessor(identifier=processor_def['identifier'], name=processor_def['name'], enabled=False)
 
@@ -142,7 +141,7 @@ class Command(BaseCommand):
                         matched_processor.save()
                     elif last_version['version'] != matched_processor.version or matched_processor.repository_definition != processor_json:
                         if cmd_options['silent'] is False:
-                            print('Update available for existing data processor: ' + processor_def['name'] + '...')
+                            six.print_('Update available for existing data processor: ' + processor_def['name'] + '...')
 
                         matched_processor.repository_definition = processor_json
 

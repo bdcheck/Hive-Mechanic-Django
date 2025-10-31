@@ -1,6 +1,5 @@
 # pylint: disable=no-member, line-too-long
 
-from builtins import str # pylint: disable=redefined-builtin
 import json
 import re
 
@@ -9,8 +8,6 @@ from django.http import HttpResponse, Http404, HttpResponseForbidden, HttpRespon
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.urls import reverse
-
-from passive_data_kit.models import DataPoint
 
 from builder.models import Player
 from integrations.models import Integration
@@ -98,15 +95,9 @@ def incoming_http(request, slug):
 
                 payload['sessions'].append(session_def)
 
-                DataPoint.objects.create_data_point('hive-http-get', session.player.identifier, dict(request.GET), user_agent='Hive Mechanic Client Library')
-
         response['game'] = payload
 
     elif request.method == 'POST':
-        player = request.POST.get('player', 'unknown-player')
-
-        DataPoint.objects.create_data_point('hive-http-post', player, dict(request.POST), user_agent='Hive Mechanic Client Library')
-
         issues = integration_match.process_incoming(request.POST)
     else:
         issues = ['Unsupported HTTP verb: ' + request.method + '.']

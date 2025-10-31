@@ -1,7 +1,5 @@
 # pylint: disable=line-too-long, no-member
 
-from __future__ import print_function
-
 import bz2
 import datetime
 import gc
@@ -9,6 +7,8 @@ import io
 import os
 import sys
 import tempfile
+
+import six
 
 from django.conf import settings
 from django.core import management
@@ -42,7 +42,7 @@ def incremental_backup(parameters):
         pass
 
     for app in dumpdata_apps:
-        print('[user_creation] Backing up ' + app + '...')
+        six.print_('[user_creation] Backing up ' + app + '...')
         sys.stdout.flush()
 
         buf = io.StringIO()

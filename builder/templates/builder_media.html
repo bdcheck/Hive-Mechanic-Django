@@ -25,7 +25,7 @@
 										<span class="mdc-notched-outline__trailing"></span>
 									</span>
 									<input class="mdc-text-field__input" type="text" aria-label="Search" placeholder="Search&#8230;" style="width: 100%;" name="q" value="{% if query %}{{ query }}{% endif %}">
-								</label>	
+								</label>
 							</form>
 						</div>
 
@@ -62,7 +62,7 @@
 													<video controls style="width: 100%;">
 													  <source src="{{ media_file.url }}" type="{{ media_file.mime_type }} ">
 													  Your browser does not support the video tag.
-													</video> 
+													</video>
 												{% endif %}
 											{% endif %}
 										{% endif %}
@@ -70,6 +70,7 @@
 									<div class= mdc-layout-grid__cell--span-9 mdc-typography--body2">
 										<div>
 											Filename: <a href="{% absolute_uri media_file.url request %}">{{ media_file.original_filename }}</a> -- {{ media_file.mime_type }}<br />
+											Identifier: {{ media_file.pk }}<br />
 											Uploaded By: {{ media_file.owner }}<br />
 											Description: {% if media_file.description %} {{ media_file.description }} {% endif %}<br />
 											Uploaded At: {{ media_file.uploaded_at }}<br />
@@ -80,7 +81,7 @@
 										</div>
 
 										<div style="margin-top: 1em; margin-bottom: 1em;">
-											File URL: <a href="{% absolute_uri media_file.url request %}" target="_blank">{% absolute_uri media_file.url request %}</a>		
+											File URL: <a href="{% absolute_uri media_file.url request %}" target="_blank">{% absolute_uri media_file.url request %}</a>
 										</div>
 
 										<button class="mdc-button mdc-button--raised mdc-button--icon-leading clipboard-copy" id="upload_button" data-url="{% absolute_uri media_file.url request %}">
@@ -110,7 +111,7 @@
 			Upload file
 		</div>
 	</div>
-	
+
 	<form method="post" id="upload_file_form" enctype="multipart/form-data" action="{% url 'builder_media_upload' %}" style="display: none;">
 		{% csrf_token %}
 		<input class="mdc-form-field" id="upload_field" type="file" name="file"/>
@@ -155,7 +156,7 @@
 		<div class="mdc-dialog__scrim"></div>
 	</div>
 
-	
+
 {% endblock %}
 
 {% block 'old_main_content' %}

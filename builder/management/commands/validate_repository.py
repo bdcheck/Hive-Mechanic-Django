@@ -1,8 +1,8 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
-
 import hashlib
+
+import six
 
 import arrow
 import requests
@@ -37,12 +37,12 @@ class Command(BaseCommand):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash != version['sha512-hash']:
-                    print('[Card: ' + key + ' / ' + str(version['version']) + '] Computed local hash \'' + local_hash + '\'. Found \'' + version['sha512-hash'] + '\' instead.')
+                    six.print_('[Card: ' + key + ' / ' + str(version['version']) + '] Computed local hash \'' + local_hash + '\'. Found \'' + version['sha512-hash'] + '\' instead.')
 
                 try:
                     arrow.get(version['created'])
                 except: # pylint: disable=bare-except
-                    print('[Card: ' + key + ' / ' + str(version['version']) + '] Unable to parse created date: ' + str(version['created']))
+                    six.print_('[Card: ' + key + ' / ' + str(version['version']) + '] Unable to parse created date: ' + str(version['created']))
 
         for key in repository['data_processors'].keys():
             processor_def = repository['data_processors'][key]
@@ -60,9 +60,9 @@ class Command(BaseCommand):
                 local_hash = computed_hash.hexdigest()
 
                 if local_hash != version['sha512-hash']:
-                    print('[Data Processor: ' + key + ' / ' + str(version['version']) + '] Computed local hash \'' + local_hash + '\'. Found \'' + version['sha512-hash'] + '\' instead.')
+                    six.print_('[Data Processor: ' + key + ' / ' + str(version['version']) + '] Computed local hash \'' + local_hash + '\'. Found \'' + version['sha512-hash'] + '\' instead.')
 
                 try:
                     arrow.get(version['created'])
                 except: # pylint: disable=bare-except
-                    print('[Data Processor: ' + key + ' / ' + str(version['version']) + '] Unable to parse created date: ' + str(version['created']))
+                    six.print_('[Data Processor: ' + key + ' / ' + str(version['version']) + '] Unable to parse created date: ' + str(version['created']))

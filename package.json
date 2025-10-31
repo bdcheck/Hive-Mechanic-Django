@@ -1,11 +1,15 @@
 {
   "dependencies": {
     "botium-cli": "^1.1.0",
-    "botium-core": "^1.15.4",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.6.0",
-    "standard": "^17.1.2"
+    "standard": "^17.1.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "eslint": "^9.35.0",
+    "globals": "^16.3.0"
+  },
+  "standard": {
+    "globals": ["alert", "confirm"]
   }
 }

@@ -1,7 +1,7 @@
 # pylint: disable=no-member, line-too-long
 # -*- coding: utf-8 -*-
 
-from future.utils import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 
 from django.conf import settings
 from django.core.management import call_command
@@ -11,6 +11,10 @@ from integrations.models import Integration
 
 @python_2_unicode_compatible
 class ApiClient(models.Model):
+    class Meta: # pylint: disable=old-style-class, no-init, too-few-public-methods
+        verbose_name_plural = 'API clients'
+        verbose_name = 'API client'
+
     name = models.CharField(max_length=4096, unique=True)
 
     editors = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='http_api_client_editables')

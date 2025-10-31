@@ -1,6 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
+import six
 
 from django.contrib import auth
 from django.contrib.auth import get_user_model
@@ -19,4 +19,4 @@ class Command(BaseCommand):
         sorted_list_of_permissions = sorted(list(permissions))
 
         for permission in sorted_list_of_permissions:
-            print(permission)
+            six.print_(permission)

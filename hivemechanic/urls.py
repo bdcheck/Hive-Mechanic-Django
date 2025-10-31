@@ -11,7 +11,6 @@ if sys.version_info[0] > 2:
     urlpatterns = [
         re_path(r'^accounts/', include('django.contrib.auth.urls')),
         re_path(r'^admin/', admin.site.urls),
-        re_path(r'^data/', include('passive_data_kit.urls')),
         re_path(r'^builder/', include('builder.urls')),
         re_path(r'^quicksilver/', include('quicksilver.urls')),
         re_path(r'^twilio/', include('twilio_support.urls')),
@@ -21,6 +20,7 @@ if sys.version_info[0] > 2:
         re_path(r'^monitor/', include('nagios_monitor.urls')),
         re_path(r'^activity/', include('activity_logger.urls')),
         re_path(r'^messages/', include('simple_messaging.urls')),
+        re_path(r'^docker-utils/', include('docker_utils.urls')),
     ]
 
     urlpatterns += [re_path(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]
@@ -30,7 +30,6 @@ else:
     urlpatterns = [
         url(r'^accounts/', include('django.contrib.auth.urls')),
         url(r'^admin/', admin.site.urls),
-        url(r'^data/', include('passive_data_kit.urls')),
         url(r'^builder/', include('builder.urls')),
         url(r'^quicksilver/', include('quicksilver.urls')),
         url(r'^twilio/', include('twilio_support.urls')),
@@ -40,6 +39,7 @@ else:
         url(r'^monitor/', include('nagios_monitor.urls')),
         url(r'^activity/', include('activity_logger.urls')),
         url(r'^messages/', include('simple_messaging.urls')),
+        url(r'^docker-utils/', include('docker_utils.urls')),
     ]
 
     urlpatterns += [url(r'^.*$', RedirectView.as_view(pattern_name='builder_home', permanent=False), name='index')]

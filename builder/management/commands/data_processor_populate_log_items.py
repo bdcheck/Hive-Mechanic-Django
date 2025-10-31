@@ -17,8 +17,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-branches, too-many-statements
         api_calls_tag = LogTag.objects.filter(tag='api-calls').first()
 

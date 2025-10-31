@@ -1,18 +1,58 @@
 # pylint: disable=no-member, line-too-long
 
 import json
+import logging
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 
+from simple_messaging_switchboard.models import Channel
+
 from integrations.models import Integration
+
+logger = logging.getLogger(__name__)
+
+def send_via(outgoing_message):
+    metadata = json.loads(outgoing_message.transmission_metadata)
+
+    logging.debug('Looking for channel for %s from %s', outgoing_message, metadata)
+
+    integration_str = metadata.get('integration', None)
+
+    if integration_str is not None:
+        integration_pk = int(integration_str.replace('integration:', ''))
+
+        integration_match = Integration.objects.filter(pk=integration_pk).first()
+
+        if integration_match is not None:
+            channel_identifier = integration_match.configuration.get('channel_identifier', None)
+
+            channel = Channel.objects.filter(identifier=channel_identifier).first()
+
+            logging.error('channel: %s', channel)
+
+            if channel is not None:
+                return channel.identifier
+
+    logging.debug('no channel found')
+
+    return None
 
 def process_incoming_message(message):
     integration_match = None
 
     for integration in Integration.objects.filter(type='simple_messaging'):
-        if 'phone_number' in integration.configuration and message.recipient == integration.configuration['phone_number']:
-            integration_match = integration
+        channel_identifier = integration.configuration.get('channel_identifier', None)
+
+        channel = Channel.objects.filter(identifier=channel_identifier).first()
+
+        if channel is not None:
+            channel_config = json.loads(channel.configuration)
+
+            if channel_config.get('phone_number', None) == message.recipient:
+                integration_match = integration
+
+                break
 
     if integration_match is not None:
         transmission_metadata = {}
@@ -45,6 +85,13 @@ def process_incoming_message(message):
                         email.attach(media_obj.content_file.filename, media_obj.content_file.read(), media_obj.content_type)
 
                     email.send()
+
+        # log_metadata = {}
+
+        # log_metadata['phone_number'] = message.current_sender()
+        # log_metadata['direction'] = 'incoming'
+
+        # log('simple_messaging_hive:process_incoming_message', 'Sending empty voice response back to Twilio. (Tip: verify that you are not stuck on a process response or other card awaiting user input.)', tags=['twilio', 'voice', 'warning'], metadata=log_metadata)
 
         payload = {
             'Body': message.current_message(),

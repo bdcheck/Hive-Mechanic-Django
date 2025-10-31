@@ -1,7 +1,5 @@
 # pylint: disable=line-too-long, no-member
 
-from __future__ import print_function
-
 import json
 import io
 import mimetypes

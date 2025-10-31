@@ -1,6 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
-from __future__ import print_function
+import six
 
 from django.core.management.base import BaseCommand
 
@@ -15,4 +15,4 @@ class Command(BaseCommand):
 
         game = Game.objects.get(slug=game_slug)
 
-        print(game_slug + ': ' + game.cytoscape_json(indent=2))
+        six.print_(game_slug + ': ' + game.cytoscape_json(indent=2))

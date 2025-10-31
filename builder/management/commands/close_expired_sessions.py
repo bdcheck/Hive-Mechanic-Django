@@ -16,8 +16,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         pass
 
-    @handle_lock
     @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument
         duration = datetime.timedelta(days=14)
 

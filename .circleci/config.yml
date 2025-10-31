@@ -11,13 +11,13 @@ workflows:
       - build-313
       - build-310
       - build-38
-      - build-27
+      # - build-27
 
 jobs:
   build-313:
     docker:
       - image: cimg/python:3.13
-      - image: cimg/postgres:12.18-postgis
+      - image: cimg/postgres:14.18-postgis
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
@@ -64,7 +64,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -84,9 +83,12 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
+          environment:
+            PYTHONWARNINGS: ignore
           command: |
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./django_dialog_engine/botium/dialog_scripts/hello_world.json"
@@ -97,6 +99,8 @@ jobs:
             botium-cli run -c django_dialog_engine/botium/botium.json -C django_dialog_engine/botium/convos/prompt_test/
       - run:
           name: Test dialog content (Hive Mechanic)
+          environment:
+            PYTHONWARNINGS: ignore
           command: |
             . /home/circleci/venv/bin/activate
             export BOTIUM_DDE_DIALOG_SCRIPT_PATH="./builder/botium/dialog_scripts/hello_world.json"
@@ -119,7 +123,7 @@ jobs:
   build-310:
     docker:
       - image: cimg/python:3.10
-      - image: cimg/postgres:12.18-postgis
+      - image: cimg/postgres:14.18-postgis
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
@@ -166,7 +170,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -186,6 +189,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -268,7 +272,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -288,6 +291,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
@@ -370,7 +374,6 @@ jobs:
             python manage.py simple_dashboard_update_values
             # python manage.py test --parallel 2
             pylint nagios_monitor
-            pylint passive_data_kit
             pylint quicksilver
             pylint simple_backup
             pylint activity_logger
@@ -390,6 +393,7 @@ jobs:
             pylint simple_messaging_switchboard
             pylint simple_messaging_twilio
             bandit -r .
+            npx standard builder/static/builder-js/js
             npx eslint builder/static/builder-js/js
       - run:
           name: Test dialog content (Django Dialog Engine)
