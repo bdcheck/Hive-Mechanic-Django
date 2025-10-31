@@ -243,22 +243,22 @@ def site_settings_check(app_configs, **kwargs): # pylint: disable=unused-argumen
 def django_site_check(app_configs, **kwargs): # pylint: disable=unused-argument
     warnings = []
 
-    needs_match = Site.objects.all().count()
-
     try:
+        needs_match = Site.objects.all().count()
 
         for site in Site.objects.all():
             if site.domain in settings.ALLOWED_HOSTS:
                 needs_match -= 1
+
+        if needs_match > 0:
+            warnings.append(Warning(
+                'Django site mismatch',
+                hint='Site objects configured that are not reflected in ALLOWED_HOSTS. Check the domain names.',
+                id='builder.W004',
+            ))
     except ProgrammingError: # Thrown before migration happens.
         pass
 
-    if needs_match > 0:
-        warnings.append(Warning(
-            'Django site mismatch',
-            hint='Site objects configured that are not reflected in ALLOWED_HOSTS. Check the domain names.',
-            id='builder.W004',
-        ))
 
     return warnings
 
