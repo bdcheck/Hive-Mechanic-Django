@@ -374,7 +374,8 @@ class Integration(models.Model):
             from twilio_support.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
-        elif self.type == 'simple_messaging':
+
+        if self.type == 'simple_messaging':
             from simple_messaging_hive.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
