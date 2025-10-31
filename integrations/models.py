@@ -73,7 +73,7 @@ class Integration(models.Model):
     def log_id(self):
         return 'integration:%d' % self.pk
 
-    def is_enabled(self):
+    def is_enabled(self): # pylint: disable=too-many-branches
         if self.enabled is not True:
             return self.enabled
 
@@ -375,9 +375,6 @@ class Integration(models.Model):
 
             return last_message_for_player(self.game, player)
         elif self.type == 'simple_messaging':
-            pass
-
-        if self.type == 'simple_messaging':
             from simple_messaging_hive.models import last_message_for_player # pylint: disable=import-outside-toplevel
 
             return last_message_for_player(self.game, player)
