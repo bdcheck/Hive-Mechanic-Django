@@ -147,6 +147,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       // Implement in subclasses...
     }
 
+    onFieldDeleted (field) {
+      // Implement in subclasses...
+      console.log(`[TODO] Delete ${field}...`)
+    }
+
     initialize () {
       const me = this
 
@@ -617,6 +622,20 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return fieldLines.join('\n')
     }
 
+    createDeleteReference (field) {
+      const me = this
+
+      const fieldLines = []
+
+      fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '" style="text-align: right; display: flex; align-items: center; justify-content: right;">')
+      fieldLines.push('  <button class="mdc-icon-button" id="' + me.cardId + '_' + field.field + '_delete">')
+      fieldLines.push('    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">delete</i>')
+      fieldLines.push('  </button>')
+      fieldLines.push('</div>')
+
+      return fieldLines.join('\n')
+    }
+
     createList (field) {
       const me = this
 
@@ -837,6 +856,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         fieldLines.push(this.createReadOnly(field))
       } else if (field.type === 'card') {
         fieldLines.push(this.createCardReference(field))
+      } else if (field.type === 'delete') {
+        fieldLines.push(this.createDeleteReference(field))
       } else if (field.type === 'list') {
         fieldLines.push(this.createList(field))
       } else if (field.type === 'structure') {
@@ -1048,6 +1069,13 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         } else {
           $('#' + me.cardId + '_' + fieldName + '_goto').show()
         }
+      } else if (field.type === 'delete') {
+        $('#' + me.cardId + '_' + fieldName + '_delete').on('click', function () {
+          me.onFieldDeleted(field.field)
+
+          me.sequence.markChanged(me.id)
+          me.sequence.loadNode(me.definition)
+        })
       } else if (field.type === 'list') {
         $('#' + me.cardId + '__' + fieldName + '__add_item').on('click', function () {
           definition[field.field].push({})

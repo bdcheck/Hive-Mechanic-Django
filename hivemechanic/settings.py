@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import logging
 import os
 import sys
+import tempfile
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,11 +47,9 @@ INSTALLED_APPS = [
     'simple_messaging_azure',
     'simple_messaging_switchboard',
     'simple_messaging_loopback',
-    'simple_messaging_twilio',
     'docker_utils',
     'user_creation',
     'builder',
-    'simple_dashboard',
     'activity_logger',
     'integrations',
     'twilio_support',
@@ -214,6 +213,9 @@ TEXT_MESSAGE_WARNING_FILE_SIZE = 5 * 1024 * 1024
 QUICKSILVER_MIN_CYCLE_SLEEP_SECONDS = 2.5
 
 SIMPLE_MESSAGING_COUNTRY_CODE = 'us'
+SIMPLE_DASHBOARD_SITE_NAME = 'Hive Mechanic'
+
+QUICKSILVER_LOCK_DIR = tempfile.gettempdir()
 
 from .local_settings import *
 
