@@ -51,6 +51,7 @@ SILENCED_SYSTEM_CHECKS = [
     'simple_messaging.W002',
     'simple_messaging_switchboard.E001',
     'simple_messaging_switchboard.E002',
+    'builder.W004',
 ]
 
 PDK_DASHBOARD_ENABLED = True
