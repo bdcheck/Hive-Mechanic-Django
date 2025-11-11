@@ -777,7 +777,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       const templateLines = []
 
-      templateLines.push('<div class="' + me.cardId + '__' + fieldName + '__item mdc-layout-grid__inner" style="row-gap: 8px; margin-top: 8px;">')
+      templateLines.push('<div class="' + me.cardId + '__' + fieldName + '__item mdc-layout-grid__inner" style="row-gap: 8px; column-gap: 0px; margin-top: 8px;">')
 
       $.each(field.template, function (index, template) {
         const templateField = jQuery.extend(true, {}, template)
