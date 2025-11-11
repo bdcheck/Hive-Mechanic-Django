@@ -382,7 +382,7 @@ def execute_action(integration, session, action): # pylint: disable=too-many-bra
     if ('twilio_player' in player.player_state) is False:
         return False
 
-    if action['type'] == 'echo': # pylint: disable=no-else-return
+    if action['type'] == 'echo': # pylint: disable=no-else-return,too-many-nested-blocks
         destinations = []
 
         if action.get('destinations', '') != '':
