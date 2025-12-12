@@ -894,7 +894,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       if (field.type === 'integer') {
         try {
-	      const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+          const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
 
           if (definition[field.field] === undefined && definition[field.default] !== undefined) {
             definition[field.field] = field.default
@@ -1271,29 +1271,29 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       const fieldLines = []
 
-	  const evalInContext = function(js, context) {
-	    const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context))
+      const evalInContext = function (js, context) {
+        const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context)) // eslint-disable-line no-new-func
 
-	    return result
-	  }
+        return result
+      }
 
       $.each(fields, function (index, field) {
         if (field.advanced === undefined || field.advanced === false) {
           const visibleConditions = field.visible
 
           if (['', undefined, null].includes(visibleConditions) === false) {
-			// visible: 'wait_for_response === "wait"',
+            // visible: 'wait_for_response === "wait"',
 
-			try {
-			  if (evalInContext(visibleConditions, me.definition)) {
-	            fieldLines.push(me.createField(field))
-			  }
-			} catch (error) {
-			  console.log(error)
-			}
+            try {
+              if (evalInContext(visibleConditions, me.definition)) {
+                fieldLines.push(me.createField(field))
+              }
+            } catch (error) {
+              console.log(error)
+            }
           } else {
-	        fieldLines.push(me.createField(field))
-	      }
+            fieldLines.push(me.createField(field))
+          }
         }
       })
 
@@ -1538,7 +1538,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-          return new classObj(definition, sequence)
+          return new classObj(definition, sequence) // eslint-disable-line new-cap
         }
       }
 
