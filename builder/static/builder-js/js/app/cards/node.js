@@ -1272,31 +1272,18 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       const fieldLines = []
 
 	  const evalInContext = function(js, context) {
-	    //# Return the results of the in-line anonymous function we .call with the passed context
-	    console.log('evalInContext')
-	    console.log(js)
-	    console.log(context)
-	    
 	    const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context))
 
-	    console.log('result')
-	    console.log(result)
-	    
 	    return result
-	    
-    	// return function() { return eval(js); }.call(context);
 	  }
 
       $.each(fields, function (index, field) {
         if (field.advanced === undefined || field.advanced === false) {
-          console.log('field')
-          console.log(field)
-          
           const visibleConditions = field.visible
-          
+
           if (['', undefined, null].includes(visibleConditions) === false) {
 			// visible: 'wait_for_response === "wait"',
-			
+
 			try {
 			  if (evalInContext(visibleConditions, me.definition)) {
 	            fieldLines.push(me.createField(field))
@@ -1551,7 +1538,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-          return new classObj(definition, sequence) // eslint-disable-line new-cap
+          return new classObj(definition, sequence)
         }
       }
 
