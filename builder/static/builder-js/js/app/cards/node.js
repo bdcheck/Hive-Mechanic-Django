@@ -248,6 +248,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       advancedDialog.listen('MDCDialog:closed', function (event) {
         if (event.detail.action === 'delete') {
           me.sequence.removeCard(me.id)
+        } else {
+          me.sequence.loadNode(me.definition)
         }
       })
 
@@ -891,25 +893,29 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
 
       if (field.type === 'integer') {
-        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+        try {
+	      const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
 
-        if (definition[field.field] === undefined && definition[field.default] !== undefined) {
-          definition[field.field] = field.default
+          if (definition[field.field] === undefined && definition[field.default] !== undefined) {
+            definition[field.field] = field.default
+          }
+
+          if (definition[field.field] !== undefined) {
+            fieldWidget.value = definition[field.field]
+          }
+
+          $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
+            const value = $('#' + me.cardId + '_' + fieldName + '_value').val()
+
+            me.sequence.markChanged(me.id)
+
+            me.onFieldUpdated(field.field, value)
+
+            onUpdate(parseInt(value))
+          })
+        } catch (error) {
+          console.log(error)
         }
-
-        if (definition[field.field] !== undefined) {
-          fieldWidget.value = definition[field.field]
-        }
-
-        $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
-          const value = $('#' + me.cardId + '_' + fieldName + '_value').val()
-
-          me.sequence.markChanged(me.id)
-
-          me.onFieldUpdated(field.field, value)
-
-          onUpdate(parseInt(value))
-        })
       } else if (field.type === 'image-url') {
         const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
 
@@ -971,40 +977,44 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           onUpdate(value)
         })
       } else if (field.type === 'choice') {
-        if (Array.isArray(field.options)) {
-          const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName))
+        try {
+          if (Array.isArray(field.options)) {
+            const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName))
 
-          if (definition[field.field] !== undefined && definition[field.field] !== null) {
-            choiceField.value = definition[field.field]
+            if (definition[field.field] !== undefined && definition[field.field] !== null) {
+              choiceField.value = definition[field.field]
 
-            me.onFieldUpdated(field.field, choiceField.value)
-          }
+              me.onFieldUpdated(field.field, choiceField.value)
+            }
 
-          choiceField.listen('MDCSelect:change', function () {
-            me.onFieldUpdated(field.field, choiceField.value)
+            choiceField.listen('MDCSelect:change', function () {
+              me.onFieldUpdated(field.field, choiceField.value)
 
-            onUpdate(choiceField.value)
+              onUpdate(choiceField.value)
 
-            me.sequence.markChanged(me.id)
-          })
-        } else {
-          // Fetch values and update structure and re-render
-          $.get(field.options, function (data) {
-            field.options = data
-
-            const optionLines = []
-
-            $.each(data, function (index, option) {
-              optionLines.push('          <li class="mdc-list-item" data-value="' + option.value + '" role="option">')
-              optionLines.push('            <span class="mdc-list-item__ripple"></span>                ')
-              optionLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option.label) + '<span>')
-              optionLines.push('          </li>')
+              me.sequence.markChanged(me.id)
             })
+          } else {
+            // Fetch values and update structure and re-render
+            $.get(field.options, function (data) {
+              field.options = data
 
-            $('#' + me.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join(''))
+              const optionLines = []
 
-            me.initializeField(field, definition, onUpdate, null)
-          })
+              $.each(data, function (index, option) {
+                optionLines.push('          <li class="mdc-list-item" data-value="' + option.value + '" role="option">')
+                optionLines.push('            <span class="mdc-list-item__ripple"></span>                ')
+                optionLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option.label) + '<span>')
+                optionLines.push('          </li>')
+              })
+
+              $('#' + me.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join(''))
+
+              me.initializeField(field, definition, onUpdate, null)
+            })
+          }
+        } catch (error) {
+          console.log(error)
         }
       } else if (field.type === 'text') {
         const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
@@ -1261,9 +1271,42 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       const fieldLines = []
 
+	  const evalInContext = function(js, context) {
+	    //# Return the results of the in-line anonymous function we .call with the passed context
+	    console.log('evalInContext')
+	    console.log(js)
+	    console.log(context)
+	    
+	    const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context))
+
+	    console.log('result')
+	    console.log(result)
+	    
+	    return result
+	    
+    	// return function() { return eval(js); }.call(context);
+	  }
+
       $.each(fields, function (index, field) {
         if (field.advanced === undefined || field.advanced === false) {
-          fieldLines.push(me.createField(field))
+          console.log('field')
+          console.log(field)
+          
+          const visibleConditions = field.visible
+          
+          if (['', undefined, null].includes(visibleConditions) === false) {
+			// visible: 'wait_for_response === "wait"',
+			
+			try {
+			  if (evalInContext(visibleConditions, me.definition)) {
+	            fieldLines.push(me.createField(field))
+			  }
+			} catch (error) {
+			  console.log(error)
+			}
+          } else {
+	        fieldLines.push(me.createField(field))
+	      }
         }
       })
 
