@@ -2,16 +2,14 @@
 
 import logging
 
-import arrow
-
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
-from builder.models import Player, Session
+from builder.models import Session
 
-from ...models import LogTag, LogItem
+from ...models import LogItem
 
 class Command(BaseCommand):
     @add_qs_arguments
@@ -28,13 +26,13 @@ class Command(BaseCommand):
 
         log_query = LogItem.objects.filter(session=None).exclude(player=None)
 
-        logger.info('Processing %s log items missing sessions...' % log_query.count())
+        logger.info('Processing %s log items missing sessions...', log_query.count())
 
         for log_item in log_query:
             query_params = Q(player=log_item.player) & Q(started__lte=log_item.logged) & (Q(completed=None) | Q(completed__gte=log_item.logged))
             query = Session.objects.filter(query_params)
 
-            logger.info('Found %s / %s sessions...' % (query.count(), log_item.pk))
+            logger.info('Found %s / %s sessions...', (query.count(), log_item.pk))
 
             if query.count() == 1:
                 log_item.session = query.first()
