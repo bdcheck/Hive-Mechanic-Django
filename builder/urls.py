@@ -14,7 +14,8 @@ from .views import builder_game, builder_game_definition_json, builder_interacti
                    builder_update_icon, builder_media, builder_media_upload, builder_game_templates, \
                    builder_settings, builder_game_variables, builder_integrations, builder_integrations_update, \
                    builder_activity_view, builder_activity_actions_json, builder_sessions_action, builder_authors, \
-                   builder_activity_logger, builder_clear_variables, builder_moderate, builder_activity_options
+                   builder_activity_logger, builder_clear_variables, builder_moderate, builder_activity_options, \
+                   builder_download
 
 urlpatterns = [
     url(r'add-game.json$', builder_add_game, name='builder_add_game'),
@@ -43,6 +44,7 @@ urlpatterns = [
     url(r'^clear-variables.json', builder_clear_variables, name='builder_clear_variables'),
     url(r'moderate$', builder_moderate, name='builder_moderate'),
     url(r'activity-options.json$', builder_activity_options, name='builder_activity_options'),
+    url(r'download$', builder_download, name='builder_download'),
 
     url(r'^', builder_home, name='builder_home'),
 ]

@@ -28,7 +28,7 @@ class Command(BaseCommand):
         has_preview_tag = LogTag.objects.filter(tag='has_preview').first()
 
         if has_preview_tag is None:
-            has_preview_tag = LogTag.objects.create(tag='has_preview', name='Has Preview')
+            has_preview_tag = LogTag.objects.create(tag='has_preview', name='Has Attachment')
 
         last_api_log = api_calls_tag.log_items.order_by('-logged').first()
 

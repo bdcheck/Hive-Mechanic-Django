@@ -79,10 +79,10 @@
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.player_str }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.message }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">{{ item.logged|date:'M j Y, g:iA' }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">
+								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top; text-align: center;">
 								  	{% with item.preview_count as preview_count %}
 								  		{% if preview_count > 0 %}
-											<center>{{ preview_count }}</center>
+											{{ preview_count }}
 										{% endif %}
 									{% endwith %}
 								  </td>
@@ -195,17 +195,26 @@
 							<div id="event_preview">
 								<img src="" style="display: block; border: thin solid #808080; border-radius: 4px; max-width: 100px;">
 								<audio controls src=""></audio>
+								<div style="border: thin solid #404040; border-radius: 4px; background-color: #808080; color: #fff; padding: 8px;">
+									No preview for <strong>FILENAME</strong> file.
+								</div>
 							</div>
 
 							<strong id="event_name"></strong>
 							<div id="event_summary"></div>
-					
+
 							<p id="event_date" class="mdc-typography--caption"></p>
-					
+
 							<p class="mdc-typography--caption" style="margin-bottom: 0;">
 								<strong>Details</strong><br />
-							
+
 								<div id="event_details"></div>
+
+								<div id="download_attachment">
+									<a href="#" id="download_attachment_link" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 8px;" id="filter_date_button">
+										Save Attachment
+									</a>
+								</div>
 							</p>
 						</div>
 					</div>
@@ -247,7 +256,7 @@
 								<span class="mdc-button__ripple"></span>
 								<span class="mdc-button__focus-ring"></span>
 								<span class="mdc-button__label">Filter by date</span>
-							</button>							
+							</button>
 						</p>
 						<p>
 							<strong>Tags</strong>{% if tags %} <a href="{{ clear_tag_url }}" style="float: right;">Clear</a>{% endif %}<br />

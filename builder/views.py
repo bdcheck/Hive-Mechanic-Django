@@ -4,10 +4,14 @@
 import datetime
 import json
 import math
+import mimetypes
 import os
 import urllib
 
+from urllib.parse import urlparse
+
 import arrow
+import requests
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -1303,3 +1307,44 @@ def builder_moderate(request): # pylint: disable=unused-argument, too-many-branc
         context['first_page'] = '%s?%s' % (base_url, urllib.parse.urlencode(query_string, doseq=True))
 
     return render(request, 'builder_moderate.html', context=context)
+
+@login_required
+@user_accepted_all_terms
+def builder_download(request):
+    url_path = request.GET.get('path', None)
+
+    if url_path.startswith('/'):
+        url_path = '%s%s' % (settings.SITE_URL, url_path)
+
+    if url_path is None:
+        raise Http404('No path provided.')
+
+    url_response = requests.get(url_path)
+
+    if 200 >= url_response.status_code < 300:
+        parsed = urlparse(url_path)
+
+        path_tokens = parsed.path.split('/')
+
+        filename = path_tokens[-1]
+
+        content_type = (url_response.headers.get('content-type', 'application/octet-stream'),)
+
+        if content_type is None:
+            content_type = mimetypes.guess_type(url_path)
+
+        extension = ''
+
+        if content_type[0] is not None:
+            extension = mimetypes.guess_extension(content_type[0])
+
+            if filename.endswith(extension) is False:
+                filename = '%s%s' % (filename, extension)
+
+        headers = {
+            'Content-Disposition': 'attachment; filename="%s"' % filename
+        }
+
+        return HttpResponse(url_response.content, content_type=url_response.headers.get('content-type', 'application/octet-stream'), status=url_response.status_code, headers=headers)
+
+    raise Http404('Received invalid status code: %s' % url_response.status_code)

@@ -87,8 +87,15 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
 
     $('#event_name').html(target.data('name'))
-    $('#event_summary').html(target.data('message'))
     $('#event_date').html(target.data('date'))
+
+    let message = target.data('message')
+
+    if (message.includes('(Blank or no message provided.)')) {
+      message = ''
+    }
+
+    $('#event_summary').html(message)
 
     const details = target.data('details')
 
@@ -123,6 +130,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     $('#event_preview img').hide()
     $('#event_preview audio').hide()
+    $('#event_preview div').hide()
 
     $('#event_preview audio').get(0).load()
 
@@ -140,11 +148,25 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
         $('#dialog_preview_image').attr('data', preview)
 
         $('#event_preview img').show()
+      } else {
+        const tokens = preview.split('/')
+
+        const filename = tokens[tokens.length - 1]
+
+        const fileComponents = filename.split('.')
+
+        $('#event_preview strong').text(fileComponents[fileComponents.length - 1].toUpperCase())
+
+        $('#event_preview div').show()
       }
 
+      $('#download_attachment_link').attr('href', `/builder/download?path=${encodeURIComponent(preview)}`)
+
       $('#event_preview').show()
+      $('#download_attachment').show()
     } else {
       $('#event_preview').hide()
+      $('#download_attachment').hide()
     }
 
     $('#event_preview').click(function () {
