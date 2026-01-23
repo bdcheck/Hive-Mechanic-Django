@@ -32,7 +32,7 @@ class Command(BaseCommand):
             query_params = Q(player=log_item.player) & Q(started__lte=log_item.logged) & (Q(completed=None) | Q(completed__gte=log_item.logged))
             query = Session.objects.filter(query_params)
 
-            logger.info('Found %s / %s sessions...', (query.count(), log_item.pk))
+            logger.info('Found %s / %s sessions...', query.count(), log_item.pk)
 
             if query.count() == 1:
                 log_item.session = query.first()
