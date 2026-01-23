@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     @handle_lock
     @handle_schedule
-    def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-branches, too-many-statements
+    def handle(self, *args, **options): # pylint: disable=unused-argument, too-many-locals, too-many-branches, too-many-statements
         logger = logging.getLogger()
 
         if options['verbosity'] > 1:
@@ -85,7 +85,7 @@ class Command(BaseCommand):
 
             log_item.update_metadata(metadata)
 
-            logger.info('Created incoming message log item for %s' % log_item.source)
+            logger.info('Created incoming message log item for %s', log_item.source)
 
         outgoing_tag = LogTag.objects.filter(tag='outgoing_message').first()
 
@@ -124,4 +124,4 @@ class Command(BaseCommand):
 
             log_item.update_metadata(metadata)
 
-            logger.info('Created outgoing message item for %s' % log_item.source)
+            logger.info('Created outgoing message item for %s', log_item.source)

@@ -1319,7 +1319,7 @@ def builder_download(request):
     if url_path is None:
         raise Http404('No path provided.')
 
-    url_response = requests.get(url_path)
+    url_response = requests.get(url_path, timeout=300)
 
     if 200 >= url_response.status_code < 300:
         parsed = urlparse(url_path)
