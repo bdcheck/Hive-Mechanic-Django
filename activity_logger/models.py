@@ -43,8 +43,6 @@ class LogItem(models.Model):
         return item_tags
 
     def player_str(self):
-        metadata = self.fetch_metadata()
-
         if self.player is not None:
             tokens = self.player.identifier.split(':')
 
