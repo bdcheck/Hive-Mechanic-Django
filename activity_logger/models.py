@@ -45,23 +45,24 @@ class LogItem(models.Model):
     def player_str(self):
         metadata = self.fetch_metadata()
 
-        if metadata is not None and isinstance(metadata, dict):
-            player = metadata.get('player', None)
+        if self.player is not None:
+            tokens = self.player.identifier.split(':')
 
-            if player is not None:
-                return 'twilio_player:XXXXXX%s' % player[-4:]
+            return '%s:XXXXX%s' % (tokens[0], tokens[1][-4:])
 
         return ''
 
     def details_json(self):
         details = {}
 
-        metadata = self.fetch_metadata()
+        if self.player is not None:
+            details['hive_player'] = self.player_str()
 
-        if metadata is not None and isinstance(metadata, dict):
-            details['hive_player'] = metadata.get('player', '')
-            details['hive_session'] = '(Coming soon)'
-            details['game_version'] = metadata.get('game', '')
+        if self.session is not None:
+            details['hive_session'] = self.session.pk
+
+        if self.game_version is not None:
+            details['game_version'] = '%s' % self.game_version.game
 
         return json.dumps(details)
 

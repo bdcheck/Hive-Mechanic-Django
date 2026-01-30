@@ -1,17 +1,19 @@
 # pylint: disable=no-member, line-too-long
 
+import json
 import logging
 
 import arrow
 
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
 
 from activity_logger.models import LogTag, LogItem
 from builder.models import Player
 
-from ...models import IncomingMessage, OutgoingMessage
+from simple_messaging.models import IncomingMessage, OutgoingMessage
 
 class Command(BaseCommand):
     @add_qs_arguments
@@ -44,7 +46,7 @@ class Command(BaseCommand):
         simple_messaging_tag = LogTag.objects.filter(tag='simple_messaging').first()
 
         if simple_messaging_tag is None:
-            simple_messaging_tag = LogTag.objects.create(tag='simple_messaging_tag', name='Simple Messaging')
+            simple_messaging_tag = LogTag.objects.create(tag='simple_messaging', name='Simple Messaging')
 
         last_incoming_log = simple_messaging_tag.log_items.order_by('-logged').first()
 
@@ -56,28 +58,45 @@ class Command(BaseCommand):
         for message in IncomingMessage.objects.filter(receive_date__gt=when).order_by('receive_date'):
             log_item = LogItem.objects.create(source='simple_messaging_incoming_message:%s' % message.pk, message=message.message, logged=message.receive_date)
             log_item.tags.add(incoming_tag)
-            log_item.tags.add(messaging_tag)
+            log_item.tags.add(simple_messaging_tag)
 
             if log_item.message is None or log_item.message == '':
                 log_item.message = '(Blank or no message provided.)'
 
             metadata = log_item.fetch_metadata()
-            metadata['player'] = 'messaging_player:%s' % message.source
+            metadata['player'] = message.sender
 
-            log_item.player = Player.objects.filter(identifier=metadata['player']).first()
+            if ':' in message.recipient:
+                tokens = message.recipient.split(':')
 
-            if message.integration is not None:
-                metadata['game'] = '%s' % message.integration.game
+                tag = 'simple_messaging_%s' % tokens[0]
 
-                if message.integration.game is not None:
-                    log_item.game_version = message.integration.game.versions.order_by('-pk').first()
+                sender_tag = LogTag.objects.filter(tag=tag).first()
+
+                if sender_tag is None:
+                    sender_tag = LogTag.objects.create(tag=tag, name='Simple Messaging: %s' % tokens[0])
+
+                log_item.tags.add(sender_tag)
+
+            log_item.player = Player.objects.filter(identifier='messaging_player:%s' % metadata['player']).first()
+
+            if log_item.player is not None:
+                query = Q(started__lte=message.receive_date) & (Q(completed__gte=message.receive_date) | Q(completed=None))
+
+                session = log_item.player.sessions.filter(query).order_by('-started').first()
+
+                if session is not None:
+                    log_item.session = session
+                    log_item.game_version = session.game_version
 
             if message.media.count() > 0:
                 media_files = []
 
                 for media_item in message.media.all():
-                    if media_item.content_file is not None:
+                    try:
                         media_files.append(media_item.content_file.url)
+                    except ValueError:
+                        pass
 
                 metadata['media_files'] = media_files
 
@@ -95,7 +114,7 @@ class Command(BaseCommand):
         for message in OutgoingMessage.objects.filter(sent_date__gt=when).order_by('sent_date'):
             log_item = LogItem.objects.create(source='simple_messaging_outgoing_message:%s' % message.pk, message=message.message, logged=message.sent_date)
             log_item.tags.add(outgoing_tag)
-            log_item.tags.add(messaging_tag)
+            log_item.tags.add(simple_messaging_tag)
 
             if log_item.message is None or log_item.message == '':
                 log_item.message = '(Blank or no message provided.)'
@@ -103,13 +122,32 @@ class Command(BaseCommand):
             metadata = log_item.fetch_metadata()
             metadata['player'] = 'messaging_player:%s' % message.destination
 
+            transmission_metadata = json.loads(message.transmission_metadata)
+
+            msg_destination = transmission_metadata.get('destination', message.destination)
+
+            if ':' in msg_destination:
+                tokens = msg_destination.split(':')
+
+                tag = 'simple_messaging_%s' % tokens[0]
+
+                sender_tag = LogTag.objects.filter(tag=tag).first()
+
+                if sender_tag is None:
+                    sender_tag = LogTag.objects.create(tag=tag, name='Simple Messaging: %s' % tokens[0])
+
+                log_item.tags.add(sender_tag)
+
             log_item.player = Player.objects.filter(identifier=metadata['player']).first()
 
-            if message.integration is not None:
-                metadata['game'] = '%s' % message.integration.game
+            if log_item.player is not None:
+                query = Q(started__lte=message.sent_date) & (Q(completed__gte=message.sent_date) | Q(completed=None))
 
-                if message.integration.game is not None:
-                    log_item.game_version = message.integration.game.versions.order_by('-pk').first()
+                session = log_item.player.sessions.filter(query).order_by('-started').first()
+
+                if session is not None:
+                    log_item.session = session
+                    log_item.game_version = session.game_version
 
             if log_item.message.startswith('image:'):
                 media_files = []

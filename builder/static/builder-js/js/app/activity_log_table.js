@@ -111,11 +111,11 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
       if (key === 'hive_player') {
         key = 'Player'
 
-        value = 'twilio_player:XXXXXX' + value.slice(-4)
+        value = value
       } else if (key === 'hive_session') {
         key = 'Session'
       } else if (key === 'game_version') {
-        key = 'Game'
+        key = 'Activity'
       }
 
       detailsHtml += '<strong>' + key + ':</strong> ' + value
