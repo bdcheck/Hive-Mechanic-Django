@@ -33,7 +33,7 @@
 									<span class="mdc-button__label">Previous Page</span>
 								</a>
 							{% endif %}
-							
+
 							{% if prior_page and next_page %}
 								&bull;
 							{% endif %}
@@ -71,7 +71,7 @@
 											{% endif %}
 
 											{% if item.game_version %}
-												Game: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
+												Activity: <a href="?game={{ item.game_version.game.pk }}">{{ item.game_version.game }}</a><br />
 											{% endif %}
 
 											{% if item.session %}
