@@ -79,8 +79,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
   mdc.dataTable.MDCDataTable.attachTo(document.getElementById('moderation_table'))
 
-  // eslint-disable-next-line no-unused-vars
-  $('.mdc-data-table__row').click(function (event) {
+   
+  $('.mdc-data-table__row').click(function (event) { // eslint-disable-line @typescript-eslint/no-unused-vars
 
   })
 
@@ -111,8 +111,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#search_field_clear').click(function (eventObj) {
+   
+  $('#search_field_clear').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     currentUrl.searchParams.set('q', '')
@@ -120,8 +120,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_player').click(function (eventObj) {
+   
+  $('#sort_player').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'player') {
@@ -133,8 +133,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_content').click(function (eventObj) {
+   
+  $('#sort_content').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'content') {
@@ -146,8 +146,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_submitted').click(function (eventObj) {
+   
+  $('#sort_submitted').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'submitted') {
@@ -205,8 +205,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }, 250)
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#button_approve').click(function (eventObj) {
+   
+  $('#button_approve').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 
     const payload = {
@@ -221,8 +221,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     })
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#button_reject').click(function (eventObj) {
+   
+  $('#button_reject').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 
     const payload = {
@@ -237,8 +237,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     })
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#button_reset').click(function (eventObj) {
+   
+  $('#button_reset').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 
     const payload = {

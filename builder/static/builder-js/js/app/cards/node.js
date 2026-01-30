@@ -40,8 +40,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
-    // eslint-disable-next-line no-unused-vars
-    destinationDescription (nodeId) {
+
+    destinationDescription (nodeId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       return 'Go to...'
     }
 
@@ -146,8 +146,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return issues
     }
 
-    // eslint-disable-next-line no-unused-vars
-    onFieldUpdated (field, value) {
+
+    onFieldUpdated (field, value) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // Implement in subclasses...
     }
 
@@ -157,62 +157,60 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     initialize () {
-      const me = this
-
       mdc.menuSurface.MDCMenuSurface.attachTo(document.getElementById(this.cardId + '_menu'))
 
       const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_name'))
       nameField.value = this.cardName()
 
-      $('#' + this.cardId + '_name_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_name_value').val()
+      $('#' + this.cardId + '_name_value').on('change keyup paste', () => {
+        const value = $('#' + this.cardId + '_name_value').val()
 
-        me.definition.name = value
+        this.definition.name = value
 
-        me.onFieldUpdated('name', value)
+        this.onFieldUpdated('name', value)
 
-        me.sequence.markChanged(me.id)
+        this.sequence.markChanged(this.id)
       })
 
       const idField = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_advanced_identifier'))
       idField.value = this.id
 
-      $('#' + this.cardId + '_advanced_identifier_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_advanced_identifier_value').val()
+      $('#' + this.cardId + '_advanced_identifier_value').on('change keyup paste', () => {
+        const value = $('#' + this.cardId + '_advanced_identifier_value').val()
 
         const slugged = slugifyExt(value, {
           remove: /[*+~.()'"!:@]/g,
           trim: false
         })
 
-        let oldId = me.definition.id
+        let oldId = this.definition.id
 
         if (slugged !== value) {
-          $('#' + me.cardId + '_activity-identifier-warning').show()
+          $('#' + this.cardId + '_activity-identifier-warning').show()
         } else {
-          $('#' + me.cardId + '_activity-identifier-warning').hide()
+          $('#' + this.cardId + '_activity-identifier-warning').hide()
 
           const newId = slugged
-          const newFullId = me.sequence.definition.id + '#' + newId
+          const newFullId = this.sequence.definition.id + '#' + newId
 
-          const sources = me.sourceNodes(me.sequence)
-
-          for (let i = 0; i < sources.length; i++) {
-            sources[i].updateReferences(oldId, newFullId)
-          }
-
-          oldId = me.sequence.definition.id + '#' + oldId
+          const sources = this.sourceNodes(this.sequence)
 
           for (let i = 0; i < sources.length; i++) {
             sources[i].updateReferences(oldId, newFullId)
           }
 
-          me.definition.id = newId
-          me.id = newId
+          oldId = this.sequence.definition.id + '#' + oldId
 
-          me.onFieldUpdated('id', newId)
+          for (let i = 0; i < sources.length; i++) {
+            sources[i].updateReferences(oldId, newFullId)
+          }
 
-          me.sequence.markChanged(me.id)
+          this.definition.id = newId
+          this.id = newId
+
+          this.onFieldUpdated('id', newId)
+
+          this.sequence.markChanged(this.id)
         }
       })
 
@@ -228,16 +226,16 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         this.updateCommentDisplay('')
       }
 
-      $('#' + this.cardId + '_advanced_comment_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_advanced_comment_value').val()
+      $('#' + this.cardId + '_advanced_comment_value').on('change keyup paste', () => {
+        const value = $('#' + this.cardId + '_advanced_comment_value').val()
 
-        me.definition.comment = value
+        this.definition.comment = value
 
-        me.updateCommentDisplay(me.definition.comment)
+        this.updateCommentDisplay(this.definition.comment)
 
-        me.onFieldUpdated('comment', value)
+        this.onFieldUpdated('comment', value)
 
-        me.sequence.markChanged(me.id)
+        this.sequence.markChanged(this.id)
       })
 
       const element = $('#' + this.cardId + '-advanced-dialog').detach()
@@ -245,11 +243,11 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       const advancedDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById(this.cardId + '-advanced-dialog'))
 
-      advancedDialog.listen('MDCDialog:closed', function (event) {
+      advancedDialog.listen('MDCDialog:closed', (event) => {
         if (event.detail.action === 'delete') {
-          me.sequence.removeCard(me.id)
+          this.sequence.removeCard(this.id)
         } else {
-          me.sequence.loadNode(me.definition)
+          this.sequence.loadNode(this.definition)
         }
       })
 
@@ -258,20 +256,20 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       const menu = mdc.menu.MDCMenu.attachTo(document.getElementById(this.cardId + '_menu'))
       menu.setFixedPosition(true)
 
-      menu.listen('MDCMenu:selected', function (event) {
+      menu.listen('MDCMenu:selected', (event) => {
         if (event.detail.index === 0) { // Insert Before
           $('.add_card_context').hide()
           $('#add_card_context_before').show()
 
-          me.sequence.addCard(function (newCardId) {
+          this.sequence.addCard((newCardId) => {
             const connectExisting = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById('add_card_context_connect_existing'))
 
-            me.sequence.insertBefore(me.id, newCardId, connectExisting.checked)
+            this.sequence.insertBefore(this.id, newCardId, connectExisting.checked)
 
             //              insertBeforeDialog.listen('MDCDialog:closed', function (event) {
             //                if (event.detail.action === 'transfer') {
             //                } else { // Keep
-            //                  me.sequence.insertBefore(me.id, newCardId, false)
+            //                  this.sequence.insertBefore(this.id, newCardId, false)
             //                }
             //
             //                insertBeforeDialog.unlisten('MDCDialog:closed', this)
@@ -300,8 +298,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
-    // eslint-disable-next-line no-unused-vars
-    updateReferences (oldId, newId) {
+
+    updateReferences (oldId, newId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       console.log('TODO: Implement "updateReferences" in ' + this.cardName())
     }
 
@@ -383,26 +381,24 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return term
     }
 
-    // eslint-disable-next-line no-unused-vars
-    addTerms (terms) {
+
+    addTerms (terms) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // Override in subclasses...
     }
 
     createImageUrlField (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
       fieldLines.push('  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('    <img src="https://via.placeholder.com/150" id="' + me.cardId + '_' + field.field + '_preview" style="max-width: 100%; margin-bottom: 8px;">')
+      fieldLines.push('    <img src="https://via.placeholder.com/150" id="' + this.cardId + '_' + field.field + '_preview" style="max-width: 100%; margin-bottom: 8px;">')
       fieldLines.push('  </div>')
-      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
-      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" />')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + this.cardId + '_' + field.field + '_value" />')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
-      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('        <label for="' + this.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + this.fetchLocalizedValue(field.label) + '</label>')
       fieldLines.push('      </div>')
       fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
       fieldLines.push('    </div>')
@@ -413,20 +409,18 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createSoundUrlField (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
       fieldLines.push('  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('    <audio controls src="" id="' + me.cardId + '_' + field.field + '_preview" style="max-width: 100%; margin-bottom: 8px;"> </audio>')
+      fieldLines.push('    <audio controls src="" id="' + this.cardId + '_' + field.field + '_preview" style="max-width: 100%; margin-bottom: 8px;"> </audio>')
       fieldLines.push('  </div>')
-      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
-      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" />')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + this.cardId + '_' + field.field + '_value" />')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
-      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('        <label for="' + this.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + this.fetchLocalizedValue(field.label) + '</label>')
       fieldLines.push('      </div>')
       fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
       fieldLines.push('    </div>')
@@ -437,17 +431,15 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createTextField (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
-      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
-      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" />')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + this.cardId + '_' + field.field + '_value" />')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
-      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('        <label for="' + this.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + this.fetchLocalizedValue(field.label) + '</label>')
       fieldLines.push('      </div>')
       fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
       fieldLines.push('    </div>')
@@ -458,17 +450,15 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createIntegerField (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
-      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
-      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + field.field + '_value" type="number"/>')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + this.cardId + '_' + field.field + '_value" type="number"/>')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
-      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</label>')
+      fieldLines.push('        <label for="' + this.cardId + '_' + field.field + '_value" class="mdc-floating-label">' + this.fetchLocalizedValue(field.label) + '</label>')
       fieldLines.push('      </div>')
       fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
       fieldLines.push('    </div>')
@@ -479,14 +469,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createCheckbox (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push(`<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-${field.width}">`)
       fieldLines.push('  <div class="mdc-touch-target-wrapper mdc-form-field">')
-      fieldLines.push(`    <div class="mdc-checkbox mdc-checkbox--touch" id="${me.cardId}_${field.field}_field">`)
-      fieldLines.push(`      <input type="checkbox" class="mdc-checkbox__native-control" id="${me.cardId}_${field.field}_value"/>`)
+      fieldLines.push(`    <div class="mdc-checkbox mdc-checkbox--touch" id="${this.cardId}_${field.field}_field">`)
+      fieldLines.push(`      <input type="checkbox" class="mdc-checkbox__native-control" id="${this.cardId}_${field.field}_value"/>`)
       fieldLines.push('      <div class="mdc-checkbox__background">')
       fieldLines.push('        <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">')
       fieldLines.push('         <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/>')
@@ -496,7 +484,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('      <div class="mdc-checkbox__ripple"></div>')
       fieldLines.push('      <div class="mdc-checkbox__focus-ring"></div>')
       fieldLines.push('    </div>')
-      fieldLines.push(`    <label for="${me.cardId}_${field.field}_field">${me.fetchLocalizedValue(field.label)}</label>`)
+      fieldLines.push(`    <label for="${this.cardId}_${field.field}_field">${this.fetchLocalizedValue(field.label)}</label>`)
       fieldLines.push('  </div>')
       fieldLines.push('</div>')
 
@@ -504,21 +492,19 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createTextArea (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '">')
-      fieldLines.push('  <label class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined" id="' + me.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('  <label class="mdc-text-field mdc-text-field--textarea mdc-text-field--outlined" id="' + this.cardId + '_' + field.field + '_field" style="width: 100%; margin-top: 4px;">')
       fieldLines.push('    <span class="mdc-notched-outline">')
       fieldLines.push('      <span class="mdc-notched-outline__leading"></span>')
       fieldLines.push('      <span class="mdc-notched-outline__notch">')
-      fieldLines.push('        <span class="mdc-floating-label" for="' + me.cardId + '_' + field.field + '_value">' + me.fetchLocalizedValue(field.label) + '</span>')
+      fieldLines.push('        <span class="mdc-floating-label" for="' + this.cardId + '_' + field.field + '_value">' + this.fetchLocalizedValue(field.label) + '</span>')
       fieldLines.push('      </span>')
       fieldLines.push('      <span class="mdc-notched-outline__trailing"></span>')
       fieldLines.push('    </span>')
       fieldLines.push('    <span class="mdc-text-field__resizer">')
-      fieldLines.push('      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="' + me.cardId + '_' + field.field + '_value"></textarea>')
+      fieldLines.push('      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="' + this.cardId + '_' + field.field + '_value"></textarea>')
       fieldLines.push('    </span>')
       fieldLines.push('  </label>')
       fieldLines.push('</div>')
@@ -527,8 +513,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createReadOnly (field) {
-      const me = this
-
       const fieldLines = []
 
       let style = 'caption'
@@ -555,7 +539,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         fieldLines.push('</div>')
       } else {
         fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + ' mdc-typography--' + style + ' ' + helpClass + ' ' + addClasses + '" style="display: flex; align-items: center;">')
-        fieldLines.push('  <div>' + me.fetchLocalizedValue(field.value) + '</div>')
+        fieldLines.push('  <div>' + this.fetchLocalizedValue(field.value) + '</div>')
         fieldLines.push('</div>')
       }
 
@@ -567,18 +551,16 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createSelect (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + ' mdc-typography--caption">')
 
-      fieldLines.push('  <div class="mdc-select mdc-select--outlined" id="' + me.cardId + '_' + field.field + '" style="width: 100%; margin-top: 4px;">')
+      fieldLines.push('  <div class="mdc-select mdc-select--outlined" id="' + this.cardId + '_' + field.field + '" style="width: 100%; margin-top: 4px;">')
       fieldLines.push('    <div class="mdc-select__anchor">')
       fieldLines.push('      <span class="mdc-notched-outline">')
       fieldLines.push('        <span class="mdc-notched-outline__leading"></span>')
       fieldLines.push('        <span class="mdc-notched-outline__notch">')
-      fieldLines.push('          <span class="mdc-floating-label">' + me.fetchLocalizedValue(field.label) + '</span>')
+      fieldLines.push('          <span class="mdc-floating-label">' + this.fetchLocalizedValue(field.label) + '</span>')
       fieldLines.push('        </span>')
       fieldLines.push('        <span class="mdc-notched-outline__trailing"></span>')
       fieldLines.push('      </span>')
@@ -597,10 +579,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('      <ul class="mdc-list" role="listbox">')
 
       if (Array.isArray(field.options)) {
-        $.each(field.options, function (index, option) {
+        $.each(field.options, (index, option) => {
           fieldLines.push('          <li class="mdc-list-item" data-value="' + option.value + '" role="option">')
           fieldLines.push('            <span class="mdc-list-item__ripple"></span>                ')
-          fieldLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option.label) + '<span>')
+          fieldLines.push('            <span class="mdc-list-item__text">' + this.fetchLocalizedValue(option.label) + '<span>')
           fieldLines.push('          </li>')
         })
       }
@@ -614,15 +596,13 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createCardReference (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '" style="text-align: right; display: flex; align-items: center; justify-content: right;">')
-      fieldLines.push('  <button class="mdc-icon-button" id="' + me.cardId + '_' + field.field + '_edit">')
+      fieldLines.push('  <button class="mdc-icon-button" id="' + this.cardId + '_' + field.field + '_edit">')
       fieldLines.push('    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">link</i>')
       fieldLines.push('  </button>')
-      fieldLines.push('  <button class="mdc-icon-button" id="' + me.cardId + '_' + field.field + '_goto">')
+      fieldLines.push('  <button class="mdc-icon-button" id="' + this.cardId + '_' + field.field + '_goto">')
       fieldLines.push('    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">keyboard_arrow_right</i>')
       fieldLines.push('  </button>')
       fieldLines.push('</div>')
@@ -631,12 +611,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createDeleteReference (field) {
-      const me = this
-
       const fieldLines = []
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.width + '" style="text-align: right; display: flex; align-items: center; justify-content: right;">')
-      fieldLines.push('  <button class="mdc-icon-button" id="' + me.cardId + '_' + field.field + '_delete">')
+      fieldLines.push('  <button class="mdc-icon-button" id="' + this.cardId + '_' + field.field + '_delete">')
       fieldLines.push('    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">delete</i>')
       fieldLines.push('  </button>')
       fieldLines.push('</div>')
@@ -645,23 +623,21 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createList (field) {
-      const me = this
-
       const fieldLines = []
 
       const fieldName = field.field
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('  <div class="mdc-typography--subtitle2">' + me.fetchLocalizedValue(field.label) + '</div>')
+      fieldLines.push('  <div class="mdc-typography--subtitle2">' + this.fetchLocalizedValue(field.label) + '</div>')
       fieldLines.push('</div>')
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('  <div id="' + me.cardId + '__' + fieldName + '__items"></div>')
+      fieldLines.push('  <div id="' + this.cardId + '__' + fieldName + '__items"></div>')
       fieldLines.push('</div>')
 
       if (field.add_item_text !== undefined) {
         fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6 ">')
-        fieldLines.push('  <span class="mdc-typography--caption">' + me.fetchLocalizedValue(field.add_item_text) + '</span>')
+        fieldLines.push('  <span class="mdc-typography--caption">' + this.fetchLocalizedValue(field.add_item_text) + '</span>')
         fieldLines.push('</div>')
       } else {
         fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6"></div>')
@@ -669,8 +645,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       if (field.add_item_label !== undefined) {
         fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6" style="text-align: right;">')
-        fieldLines.push('  <button class="mdc-button mdc-button--raised" id="' + me.cardId + '__' + fieldName + '__add_item">')
-        fieldLines.push('    <span class="mdc-button__label">' + me.fetchLocalizedValue(field.add_item_label) + '</span>')
+        fieldLines.push('  <button class="mdc-button mdc-button--raised" id="' + this.cardId + '__' + fieldName + '__add_item">')
+        fieldLines.push('    <span class="mdc-button__label">' + this.fetchLocalizedValue(field.add_item_label) + '</span>')
         fieldLines.push('  </button>')
         fieldLines.push('</div>')
       }
@@ -679,26 +655,22 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     createStructure (field) {
-      const me = this
-
       const fieldLines = []
 
       const fieldName = field.field
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('  <div class="mdc-typography--subtitle2">' + me.fetchLocalizedValue(field.label) + '</div>')
+      fieldLines.push('  <div class="mdc-typography--subtitle2">' + this.fetchLocalizedValue(field.label) + '</div>')
       fieldLines.push('</div>')
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">')
-      fieldLines.push('  <div id="' + me.cardId + '__' + fieldName + '" class="mdc-layout-grid__inner"></div>')
+      fieldLines.push('  <div id="' + this.cardId + '__' + fieldName + '" class="mdc-layout-grid__inner"></div>')
       fieldLines.push('</div>')
 
       return fieldLines.join('\n')
     }
 
     createPattern (field) {
-      const me = this
-
       const fieldLines = []
 
       const fieldName = field.field
@@ -717,12 +689,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.operation_width + ' mdc-typography--caption" style="margin-bottom: 8px;">')
-      fieldLines.push('  <div class="mdc-select mdc-select--outlined" id="' + me.cardId + '_' + fieldName + '__operation" style="width: 100%;">')
+      fieldLines.push('  <div class="mdc-select mdc-select--outlined" id="' + this.cardId + '_' + fieldName + '__operation" style="width: 100%;">')
       fieldLines.push('    <div class="mdc-select__anchor">')
       fieldLines.push('      <span class="mdc-notched-outline">')
       fieldLines.push('        <span class="mdc-notched-outline__leading"></span>')
       fieldLines.push('        <span class="mdc-notched-outline__notch">')
-      fieldLines.push('          <span class="mdc-floating-label">' + me.fetchLocalizedValue(field.operation_label) + '</span>')
+      fieldLines.push('          <span class="mdc-floating-label">' + this.fetchLocalizedValue(field.operation_label) + '</span>')
       fieldLines.push('        </span>')
       fieldLines.push('        <span class="mdc-notched-outline__trailing"></span>')
       fieldLines.push('      </span>')
@@ -740,10 +712,10 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('    <div class="mdc-select__menu mdc-menu mdc-menu-surface" role="listbox">')
       fieldLines.push('      <ul class="mdc-list" role="listbox">')
 
-      $.each(operations, function (index, operation) {
+      $.each(operations, (index, operation) => {
         fieldLines.push('          <li class="mdc-list-item" data-value="' + operation + '" role="option">')
         fieldLines.push('            <span class="mdc-list-item__ripple"></span>                ')
-        fieldLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedConstant(operation) + '<span>')
+        fieldLines.push('            <span class="mdc-list-item__text">' + this.fetchLocalizedConstant(operation) + '<span>')
         fieldLines.push('          </li>')
       })
 
@@ -753,12 +725,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       fieldLines.push('</div>')
 
       fieldLines.push('<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-' + field.content_width + '">')
-      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + me.cardId + '_' + fieldName + '__content_field" style="width: 100%">')
-      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + me.cardId + '_' + fieldName + '__content_value" />')
+      fieldLines.push('  <div class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_' + fieldName + '__content_field" style="width: 100%">')
+      fieldLines.push('    <input class="mdc-text-field__input"style="width: 100%" id="' + this.cardId + '_' + fieldName + '__content_value" />')
       fieldLines.push('    <div class="mdc-notched-outline">')
       fieldLines.push('      <div class="mdc-notched-outline__leading"></div>')
       fieldLines.push('      <div class="mdc-notched-outline__notch">')
-      fieldLines.push('        <label for="' + me.cardId + '_' + field.field + '__content_value" class="mdc-floating-label">' + me.fetchLocalizedValue(field.content_label) + '</label>')
+      fieldLines.push('        <label for="' + this.cardId + '_' + field.field + '__content_value" class="mdc-floating-label">' + this.fetchLocalizedValue(field.content_label) + '</label>')
       fieldLines.push('      </div>')
       fieldLines.push('      <div class="mdc-notched-outline__trailing"></div>')
       fieldLines.push('    </div>')
@@ -769,33 +741,31 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     addListFieldItem (index, field, itemDefinition, onDelete) {
-      const me = this
-
       const fieldName = field.field
 
-      const listContainerId = me.cardId + '__' + fieldName + '__items'
+      const listContainerId = this.cardId + '__' + fieldName + '__items'
 
-      const itemIndex = $('#' + listContainerId + ' .' + me.cardId + '__' + fieldName + '__item').length
+      const itemIndex = $('#' + listContainerId + ' .' + this.cardId + '__' + fieldName + '__item').length
 
       const templateLines = []
 
-      templateLines.push('<div class="' + me.cardId + '__' + fieldName + '__item mdc-layout-grid__inner" style="row-gap: 8px; column-gap: 0px; margin-top: 8px;">')
+      templateLines.push('<div class="' + this.cardId + '__' + fieldName + '__item mdc-layout-grid__inner" style="row-gap: 8px; column-gap: 0px; margin-top: 8px;">')
 
-      $.each(field.template, function (index, template) {
+      $.each(field.template, (index, template) => {
         const templateField = jQuery.extend(true, {}, template)
 
         templateField.original_field = templateField.field
 
         templateField.field = fieldName + '__' + templateField.field + '__' + itemIndex
 
-        templateLines.push(me.createField(templateField))
+        templateLines.push(this.createField(templateField))
       })
 
       templateLines.push('</div>')
 
       $('#' + listContainerId).append(templateLines.join('\n'))
 
-      $.each(field.template, function (index, template) {
+      $.each(field.template, (index, template) => {
         const templateField = jQuery.extend(true, {}, template)
 
         templateField.original_field = templateField.field
@@ -804,33 +774,31 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
         itemDefinition[templateField.field] = itemDefinition[templateField.original_field]
 
-        me.initializeField(templateField, itemDefinition, function (newValue) {
+        this.initializeField(templateField, itemDefinition, function (newValue) {
           itemDefinition[templateField.original_field] = newValue
 
-          me.onFieldUpdated(templateField.original_field, newValue)
+          this.onFieldUpdated(templateField.original_field, newValue)
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
         }, onDelete)
       })
     }
 
     addStructureFieldItem (field, itemDefinition) {
-      const me = this
-
       const fieldName = field.field
 
-      const listContainerId = me.cardId + '__' + field.parent_field
+      const listContainerId = this.cardId + '__' + field.parent_field
 
-      const fieldHtml = me.createField(field)
+      const fieldHtml = this.createField(field)
 
       $('#' + listContainerId).append(fieldHtml)
 
-      me.initializeField(field, itemDefinition, function (newValue) {
+      this.initializeField(field, itemDefinition, (newValue) => {
         itemDefinition[fieldName] = newValue
 
-        me.onFieldUpdated(fieldName, newValue)
+        this.onFieldUpdated(fieldName, newValue)
 
-        me.sequence.markChanged(me.id)
+        this.sequence.markChanged(this.id)
       }, null)
     }
 
@@ -884,8 +852,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     initializeField (field, definition, onUpdate, onDelete) {
-      const me = this
-
       let fieldName = field.field
 
       if (field.parent_field !== undefined) {
@@ -894,7 +860,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       if (field.type === 'integer') {
         try {
-          const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+          const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_' + fieldName + '_field'))
 
           if (definition[field.field] === undefined && definition[field.default] !== undefined) {
             definition[field.field] = field.default
@@ -904,12 +870,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
             fieldWidget.value = definition[field.field]
           }
 
-          $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
-            const value = $('#' + me.cardId + '_' + fieldName + '_value').val()
+          $('#' + this.cardId + '_' + fieldName + '_value').on('change keyup paste', () => {
+            const value = $('#' + this.cardId + '_' + fieldName + '_value').val()
 
-            me.sequence.markChanged(me.id)
+            this.sequence.markChanged(this.id)
 
-            me.onFieldUpdated(field.field, value)
+            this.onFieldUpdated(field.field, value)
 
             onUpdate(parseInt(value))
           })
@@ -917,7 +883,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
           console.log(error)
         }
       } else if (field.type === 'image-url') {
-        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_' + fieldName + '_field'))
 
         if (definition[field.field] === undefined && definition[field.default] !== undefined) {
           definition[field.field] = field.default
@@ -926,34 +892,34 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         if (definition[field.field] !== undefined) {
           fieldWidget.value = definition[field.field]
 
-          $('#' + me.cardId + '_' + field.field + '_preview').hide()
+          $('#' + this.cardId + '_' + field.field + '_preview').hide()
 
           try {
             const imageUrl = new URL(fieldWidget.value)
 
             if (imageUrl.protocol !== undefined && imageUrl.protocol !== null) {
-              $('#' + me.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
+              $('#' + this.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
 
-              $('#' + me.cardId + '_' + field.field + '_preview').show()
+              $('#' + this.cardId + '_' + field.field + '_preview').show()
             }
-          } catch (error) { // eslint-disable-line no-unused-vars
+          } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
 
           }
         }
 
-        $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
-          const value = $('#' + me.cardId + '_' + fieldName + '_value').val()
+        $('#' + this.cardId + '_' + fieldName + '_value').on('change keyup paste', () => {
+          const value = $('#' + this.cardId + '_' + fieldName + '_value').val()
 
-          $('#' + me.cardId + '_' + field.field + '_preview').attr('src', value)
+          $('#' + this.cardId + '_' + field.field + '_preview').attr('src', value)
 
-          me.onFieldUpdated(field.field, value)
+          this.onFieldUpdated(field.field, value)
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
 
           onUpdate(value)
         })
       } else if (field.type === 'sound-url') {
-        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_' + fieldName + '_field'))
 
         if (definition[field.field] === undefined && definition[field.default] !== undefined) {
           definition[field.field] = field.default
@@ -962,112 +928,112 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         if (definition[field.field] !== undefined) {
           fieldWidget.value = definition[field.field]
 
-          $('#' + me.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
+          $('#' + this.cardId + '_' + field.field + '_preview').attr('src', fieldWidget.value)
         }
 
-        $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
-          const value = $('#' + me.cardId + '_' + fieldName + '_value').val()
+        $('#' + this.cardId + '_' + fieldName + '_value').on('change keyup paste', () => {
+          const value = $('#' + this.cardId + '_' + fieldName + '_value').val()
 
-          $('#' + me.cardId + '_' + field.field + '_preview').attr('src', value)
+          $('#' + this.cardId + '_' + field.field + '_preview').attr('src', value)
 
-          me.onFieldUpdated(field.field, value)
+          this.onFieldUpdated(field.field, value)
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
 
           onUpdate(value)
         })
       } else if (field.type === 'choice') {
         try {
           if (Array.isArray(field.options)) {
-            const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName))
+            const choiceField = mdc.select.MDCSelect.attachTo(document.getElementById(this.cardId + '_' + fieldName))
 
             if (definition[field.field] !== undefined && definition[field.field] !== null) {
               choiceField.value = definition[field.field]
 
-              me.onFieldUpdated(field.field, choiceField.value)
+              this.onFieldUpdated(field.field, choiceField.value)
             }
 
-            choiceField.listen('MDCSelect:change', function () {
-              me.onFieldUpdated(field.field, choiceField.value)
+            choiceField.listen('MDCSelect:change', () => {
+              this.onFieldUpdated(field.field, choiceField.value)
 
               onUpdate(choiceField.value)
 
-              me.sequence.markChanged(me.id)
+              this.sequence.markChanged(this.id)
             })
           } else {
             // Fetch values and update structure and re-render
-            $.get(field.options, function (data) {
+            $.get(field.options, (data) => {
               field.options = data
 
               const optionLines = []
 
-              $.each(data, function (index, option) {
+              $.each(data, (index, option) => {
                 optionLines.push('          <li class="mdc-list-item" data-value="' + option.value + '" role="option">')
                 optionLines.push('            <span class="mdc-list-item__ripple"></span>                ')
-                optionLines.push('            <span class="mdc-list-item__text">' + me.fetchLocalizedValue(option.label) + '<span>')
+                optionLines.push('            <span class="mdc-list-item__text">' + this.fetchLocalizedValue(option.label) + '<span>')
                 optionLines.push('          </li>')
               })
 
-              $('#' + me.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join(''))
+              $('#' + this.cardId + '_' + fieldName + ' ul.mdc-list').html(optionLines.join(''))
 
-              me.initializeField(field, definition, onUpdate, null)
+              this.initializeField(field, definition, onUpdate, null)
             })
           }
         } catch (error) {
           console.log(error)
         }
       } else if (field.type === 'text') {
-        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '_field'))
+        const fieldWidget = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_' + fieldName + '_field'))
 
         if (definition[field.field] !== undefined) {
           fieldWidget.value = definition[field.field]
         }
 
-        $('#' + me.cardId + '_' + fieldName + '_value').on('change keyup paste', function () {
+        $('#' + this.cardId + '_' + fieldName + '_value').on('change keyup paste', () => {
           const value = fieldWidget.value
 
-          me.onFieldUpdated(field.field, value)
+          this.onFieldUpdated(field.field, value)
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
 
           onUpdate(value)
         })
       } else if (field.type === 'boolean') {
-        const fieldWidget = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById(`${me.cardId}_${fieldName}_field`))
+        const fieldWidget = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById(`${this.cardId}_${fieldName}_field`))
 
         if (definition[field.field] !== undefined) {
           fieldWidget.checked = definition[field.field]
         }
 
-        $('#' + me.cardId + '_' + fieldName + '_value').on('change', function () {
+        $('#' + this.cardId + '_' + fieldName + '_value').on('change', () => {
           const value = fieldWidget.checked
 
-          me.onFieldUpdated(field.field, value)
+          this.onFieldUpdated(field.field, value)
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
 
           onUpdate(value)
         })
       } else if (field.type === 'readonly') {
         // Do nothing...
       } else if (field.type === 'card') {
-        $('#' + me.cardId + '_' + fieldName + '_edit').on('click', function () {
-          me.sequence.refreshDestinationMenu(function (destination) {
+        $('#' + this.cardId + '_' + fieldName + '_edit').on('click', () => {
+          this.sequence.refreshDestinationMenu((destination) => {
             window.dialogBuilder.chooseDestinationDialog.close()
 
-            me.onFieldUpdated(field.field, destination)
+            this.onFieldUpdated(field.field, destination)
 
             onUpdate(destination)
 
-            me.sequence.markChanged(me.id)
-            me.sequence.loadNode(me.definition)
+            this.sequence.markChanged(this.id)
+            this.sequence.loadNode(this.definition)
           })
 
           window.dialogBuilder.chooseDestinationDialog.open()
         })
 
-        $('#' + me.cardId + '_' + fieldName + '_goto').on('click', function () {
-          const destinationNodes = me.destinationNodes(me.sequence)
+        $('#' + this.cardId + '_' + fieldName + '_goto').on('click', () => {
+          const destinationNodes = this.destinationNodes(this.sequence)
 
           for (let i = 0; i < destinationNodes.length; i++) {
             const destinationNode = destinationNodes[i]
@@ -1081,44 +1047,44 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         })
 
         if (definition[field.field] === null || definition[field.field] === undefined || definition[field.field] === '') {
-          $('#' + me.cardId + '_' + fieldName + '_goto').hide()
+          $('#' + this.cardId + '_' + fieldName + '_goto').hide()
         } else {
-          $('#' + me.cardId + '_' + fieldName + '_goto').show()
+          $('#' + this.cardId + '_' + fieldName + '_goto').show()
         }
       } else if (field.type === 'delete') {
-        $('#' + me.cardId + '_' + fieldName + '_delete').on('click', function () {
-          me.onFieldDeleted(field.field)
+        $('#' + this.cardId + '_' + fieldName + '_delete').on('click', () => {
+          this.onFieldDeleted(field.field)
 
-          me.sequence.markChanged(me.id)
-          me.sequence.loadNode(me.definition)
+          this.sequence.markChanged(this.id)
+          this.sequence.loadNode(this.definition)
         })
       } else if (field.type === 'list') {
-        $('#' + me.cardId + '__' + fieldName + '__add_item').on('click', function () {
+        $('#' + this.cardId + '__' + fieldName + '__add_item').on('click', () => {
           definition[field.field].push({})
 
-          me.sequence.loadNode(me.definition)
-          me.sequence.markChanged(me.id)
+          this.sequence.loadNode(this.definition)
+          this.sequence.markChanged(this.id)
         })
 
         const fieldSequence = definition[field.field]
 
-        $.each(definition[field.field], function (index, item) {
-          me.addListFieldItem(index, field, item, function () {
+        $.each(definition[field.field], (index, item) => {
+          this.addListFieldItem(index, field, item, () => {
             fieldSequence.splice(index, 1)
 
-            me.sequence.loadNode(me.definition)
-            me.sequence.markChanged(me.id)
+            this.sequence.loadNode(this.definition)
+            this.sequence.markChanged(this.id)
           })
         })
       } else if (field.type === 'structure') {
-        $.each(field.fields, function (index, itemField) {
+        $.each(field.fields, (index, itemField) => {
           itemField.parent_field = field.field
 
-          me.addStructureFieldItem(itemField, definition[field.field])
+          this.addStructureFieldItem(itemField, definition[field.field])
         })
       } else if (field.type === 'pattern') {
-        const operationField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_' + fieldName + '__operation'))
-        const contentField = mdc.textField.MDCTextField.attachTo(document.getElementById(me.cardId + '_' + fieldName + '__content_field'))
+        const operationField = mdc.select.MDCSelect.attachTo(document.getElementById(this.cardId + '_' + fieldName + '__operation'))
+        const contentField = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_' + fieldName + '__content_field'))
 
         let actualFieldName = field.field
 
@@ -1128,18 +1094,18 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
         if (definition[actualFieldName] !== undefined) {
           contentField.value = definition[actualFieldName]
-          me.updatePatternView(contentField.value, operationField, contentField)
+          this.updatePatternView(contentField.value, operationField, contentField)
         }
 
         let lastValue = 'delete-me'
 
-        operationField.listen('MDCSelect:change', function () {
-          me.updatePatternValue(operationField.value, contentField.value, onUpdate)
+        operationField.listen('MDCSelect:change', () => {
+          this.updatePatternValue(operationField.value, contentField.value, onUpdate)
 
-          me.updatePatternView(definition[actualFieldName], operationField, contentField)
+          this.updatePatternView(definition[actualFieldName], operationField, contentField)
         })
 
-        $('#' + me.cardId + '_' + fieldName + '__content_value').on('change keyup paste', function (event) {
+        $('#' + this.cardId + '_' + fieldName + '__content_value').on('change keyup paste', (event) => {
           if (event.keyCode === 46 || event.keyCode === 8) {
             if (lastValue === '') {
               lastValue = null
@@ -1148,14 +1114,14 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
                 onDelete()
               }
             } else {
-              lastValue = $('#' + me.cardId + '_' + fieldName + '__content_value').val()
+              lastValue = $('#' + this.cardId + '_' + fieldName + '__content_value').val()
             }
           } else {
-            lastValue = $('#' + me.cardId + '_' + fieldName + '__content_value').val()
+            lastValue = $('#' + this.cardId + '_' + fieldName + '__content_value').val()
 
-            me.updatePatternValue(operationField.value, lastValue, onUpdate)
+            this.updatePatternValue(operationField.value, lastValue, onUpdate)
 
-            me.updatePatternView(definition[actualFieldName], operationField, contentField)
+            this.updatePatternView(definition[actualFieldName], operationField, contentField)
           }
         })
       } else {
@@ -1265,19 +1231,18 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     editFields () {
-      const me = this
-
       const fields = this.cardFields()
 
       const fieldLines = []
 
       const evalInContext = function (js, context) {
-        const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context)) // eslint-disable-line no-new-func
+
+        const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context))
 
         return result
       }
 
-      $.each(fields, function (index, field) {
+      $.each(fields, (index, field) => {
         if (field.advanced === undefined || field.advanced === false) {
           const visibleConditions = field.visible
 
@@ -1285,14 +1250,14 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
             // visible: 'wait_for_response === "wait"',
 
             try {
-              if (evalInContext(visibleConditions, me.definition)) {
-                fieldLines.push(me.createField(field))
+              if (evalInContext(visibleConditions, this.definition)) {
+                fieldLines.push(this.createField(field))
               }
             } catch (error) {
               console.log(error)
             }
           } else {
-            fieldLines.push(me.createField(field))
+            fieldLines.push(this.createField(field))
           }
         }
       })
@@ -1305,15 +1270,13 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         return ''
       }
 
-      const me = this
-
       const fields = this.cardFields()
 
       const fieldLines = []
 
-      $.each(fields, function (index, field) {
+      $.each(fields, (index, field) => {
         if (field.advanced) {
-          fieldLines.push(me.createField(field))
+          fieldLines.push(this.createField(field))
         }
       })
 
@@ -1323,47 +1286,45 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     initializeFields () {
       const fields = this.cardFields()
 
-      const me = this
+      $.each(fields, (index, field) => {
+        const onUpdate = (newValue) => {
+          this.definition[field.field] = newValue
 
-      $.each(fields, function (index, field) {
-        const onUpdate = function (newValue) {
-          me.definition[field.field] = newValue
-
-          if (me.onFieldUpdated !== undefined) {
-            me.onFieldUpdated(field, newValue)
+          if (this.onFieldUpdated !== undefined) {
+            this.onFieldUpdated(field, newValue)
           }
 
-          me.sequence.markChanged(me.id)
+          this.sequence.markChanged(this.id)
         }
 
         if (field.type === 'integer') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'image-url') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'sound-url') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'choice') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'text') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'readonly') {
           // Do nothing...
         } else if (field.type === 'card') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'list') {
-          me.initializeField(field, me.definition, function () {}, null)
+          this.initializeField(field, this.definition, function () {}, null)
         } else if (field.type === 'structure') {
-          me.initializeField(field, me.definition, function () {}, null)
+          this.initializeField(field, this.definition, function () {}, null)
         } else if (field.type === 'pattern') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else if (field.type === 'boolean') {
-          me.initializeField(field, me.definition, onUpdate, null)
+          this.initializeField(field, this.definition, onUpdate, null)
         } else {
           // TODO: Unknown Card Type
         }
       })
 
-      window.setTimeout(me.sequence.initializeDestinationMenu, 250)
+      window.setTimeout(this.sequence.initializeDestinationMenu, 250)
 
       if (window.dialogBuilder.helpToggle.selected) {
         $('.hive_mechanic_help').hide()
@@ -1430,10 +1391,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     viewHtml () {
-      const me = this
-
-      const updateCardBody = function (newBody) {
-        $('#' + me.cardId + ' .view-body').html(newBody)
+      const updateCardBody = (newBody) => {
+        $('#' + this.cardId + ' .view-body').html(newBody)
       }
 
       let htmlString = '<div class="mdc-card" id="' + this.cardId + '" style="' + this.style() + '"  data-node-id="' + this.id + '">'
@@ -1456,13 +1415,13 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return ''
     }
 
-    // eslint-disable-next-line no-unused-vars
-    destinationNodes (sequence) {
+
+    destinationNodes (sequence) { // eslint-disable-line @typescript-eslint/no-unused-vars
       return []
     }
 
-    // eslint-disable-next-line no-unused-vars
-    setDefaultDestination (originalId) {
+
+    setDefaultDestination (originalId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // replace nodes in def.
     }
 
@@ -1503,8 +1462,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     onClick (callback) {
-      // eslint-disable-next-line no-unused-vars
-      $('#' + this.cardId).click(function (eventObj) {
+
+      $('#' + this.cardId).click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
         callback()
       })
     }
@@ -1538,15 +1497,16 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-          return new classObj(definition, sequence) // eslint-disable-line new-cap
+
+          return new classObj(definition, sequence)
         }
       }
 
       return new Node(definition, sequence)
     }
 
-    // eslint-disable-next-line no-unused-vars
-    static canCreateCard (definition, sequence) {
+
+    static canCreateCard (definition, sequence) { // eslint-disable-line @typescript-eslint/no-unused-vars
       if (window.dialogBuilder.cardMapping !== undefined) {
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 

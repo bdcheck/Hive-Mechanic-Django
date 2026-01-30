@@ -136,8 +136,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     drawer.open = true
   }, 1000)
 
-  // eslint-disable-next-line no-unused-vars
-  function onSequenceChanged (changedId) {
+   
+  function onSequenceChanged (changedId) { // eslint-disable-line @typescript-eslint/no-unused-vars
     dialogIsDirty = true
 
     $('#action_save').text('save')
@@ -360,8 +360,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     let selectedSequenceOption = -1
 
-    // eslint-disable-next-line no-unused-vars
-    const menuListener = function (event) {
+     
+    const menuListener = function (event) { // eslint-disable-line @typescript-eslint/no-unused-vars
     }
 
     $('button.sequence-menu-open').on('click', (event) => {
@@ -505,8 +505,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.add_sequence').off('click')
-    // eslint-disable-next-line no-unused-vars
-    $('.add_sequence').click(function (eventObj) {
+     
+    $('.add_sequence').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
       const listener = {
         handleEvent: function (event) {
           if (event.detail.action === 'add_sequence') {
@@ -542,8 +542,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.go_home').off('click')
-    // eslint-disable-next-line no-unused-vars
-    $('.go_home').click(function (eventObj) {
+     
+    $('.go_home').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
       window.location.href = '/builder/'
     })
 
@@ -857,8 +857,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     const warning = document.getElementById('builder-outstanding-issues-dialog-save')
 
-    // eslint-disable-next-line no-unused-vars
-    warning.addEventListener('click', (event) => {
+     
+    warning.addEventListener('click', (event) => { // eslint-disable-line @typescript-eslint/no-unused-vars
       const clean = cleanDefinition(window.dialogBuilder.definition)
 
       dialogIsDirty = false
@@ -1581,8 +1581,8 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   const helpDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('annotated-help-dialog'))
 
   $('#action_annotated_help').off('click')
-  // eslint-disable-next-line no-unused-vars
-  $('#action_annotated_help').click(function (eventObj) {
+   
+  $('#action_annotated_help').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     helpDialog.open()
   })
 

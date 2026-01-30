@@ -72,8 +72,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#upload_button').click(function (eventObj) {
+   
+  $('#upload_button').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     $('#upload_field').off('change')
 
     $('#upload_field').on('change', function (event) {

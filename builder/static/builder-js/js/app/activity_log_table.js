@@ -193,8 +193,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
   const startDate = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
   const endDate = mdc.textField.MDCTextField.attachTo(document.getElementById('end_date'))
 
-  // eslint-disable-next-line no-unused-vars
-  $('#filter_date_button').click(function (eventObj) {
+   
+  $('#filter_date_button').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     if (startDate.value !== '' && endDate.value !== '' && endDate.value < startDate.value) {
       const endValue = endDate.value
 
@@ -237,8 +237,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#search_field_clear').click(function (eventObj) {
+   
+  $('#search_field_clear').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     currentUrl.searchParams.set('q', '')
@@ -246,8 +246,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_source').click(function (eventObj) {
+   
+  $('#sort_source').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'source') {
@@ -259,8 +259,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_player').click(function (eventObj) {
+   
+  $('#sort_player').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'player') {
@@ -272,8 +272,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_message').click(function (eventObj) {
+   
+  $('#sort_message').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'message') {
@@ -285,8 +285,8 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-  // eslint-disable-next-line no-unused-vars
-  $('#sort_logged').click(function (eventObj) {
+   
+  $('#sort_logged').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
     if (currentUrl.searchParams.get('sort', '') === 'logged') {

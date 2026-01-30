@@ -74,8 +74,6 @@ define(modules, function (mdc, Node) {
     }
 
     loadNode (definition) {
-      const me = this
-
       let found = false
 
       if (definition !== undefined) {
@@ -115,11 +113,11 @@ define(modules, function (mdc, Node) {
 
         node.initialize()
 
-        const waitAndCall = function () {
+        const waitAndCall = () => {
           const viewFrame = $('#preview-dialog-canvas').get(0)
 
           if (viewFrame.contentWindow.highlightGraphId !== undefined) {
-            viewFrame.contentWindow.highlightGraphId(me.definition.id + '#' + definition.id)
+            viewFrame.contentWindow.highlightGraphId(this.definition.id + '#' + definition.id)
           } else {
             window.setTimeout(this, 100)
           }
@@ -142,10 +140,10 @@ define(modules, function (mdc, Node) {
 
           $('#sequence_breadcrumbs').append(chevron + breadcrumb)
 
-          $('#breadcrumb-' + node.id).click(function (eventObj) {
+          $('#breadcrumb-' + node.id).click((eventObj) => {
             eventObj.preventDefault()
 
-            me.loadNode(definition)
+            this.loadNode(definition)
 
             return false
           })
@@ -168,8 +166,8 @@ define(modules, function (mdc, Node) {
 
           $('#' + destinationNode.cardId).css('background-color', '#E0E0E0')
 
-          destinationNode.onClick(function () {
-            me.loadNode(destinationNode.definition)
+          destinationNode.onClick(() => {
+            this.loadNode(destinationNode.definition)
           })
         }
 
@@ -190,8 +188,8 @@ define(modules, function (mdc, Node) {
 
           $('#' + sourceNode.cardId).css('background-color', '#E0E0E0')
 
-          sourceNode.onClick(function () {
-            me.loadNode(sourceNode.definition)
+          sourceNode.onClick(() => {
+            this.loadNode(sourceNode.definition)
           })
         }
 
@@ -209,12 +207,12 @@ define(modules, function (mdc, Node) {
       } else {
         $('.add_card_context').hide()
 
-        me.addCard(function (cardId) {
-          for (let j = 0; j < me.definition.items.length; j++) {
-            const item = me.definition.items[j]
+        this.addCard((cardId) => {
+          for (let j = 0; j < this.definition.items.length; j++) {
+            const item = this.definition.items[j]
 
             if (item.id === cardId) {
-              me.loadNode(item)
+              this.loadNode(item)
 
               return
             }
@@ -418,8 +416,6 @@ define(modules, function (mdc, Node) {
     refreshDestinationMenu (updateFunction) {
       $('#select-card-destination-edit-dialog-menu').html('')
 
-      const me = this
-
       $.each(window.dialogBuilder.definition.sequences, function (index, value) {
         let sequenceBody = ''
 
@@ -493,7 +489,7 @@ define(modules, function (mdc, Node) {
 
               $('.add_card_context').hide()
 
-              me.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
+              this.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
             } else {
               window.dialogBuilder.chooseDestinationDialogCallback(nodeId)
             }
@@ -507,8 +503,6 @@ define(modules, function (mdc, Node) {
     }
 
     initializeDestinationMenu () {
-      const me = this
-
       const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item')
 
       for (const option of options) {
@@ -547,7 +541,7 @@ define(modules, function (mdc, Node) {
             if (id === 'add_card') {
               $('.add_card_context').hide()
 
-              me.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
+              this.addCard(window.dialogBuilder.chooseDestinationDialogCallback)
             } else {
               window.dialogBuilder.chooseDestinationDialogCallback(nodeId)
             }
@@ -559,8 +553,6 @@ define(modules, function (mdc, Node) {
     }
 
     insertBefore (originalId, newId, transferLinks) {
-      const me = this
-
       let originalCard = null
       let newCard = null
 
@@ -595,11 +587,11 @@ define(modules, function (mdc, Node) {
 
         const sourceNodes = originalNode.sourceNodes(this)
 
-        sourceNodes.forEach(function (node) {
+        sourceNodes.forEach((node) => {
           node.updateReferences(originalId, newId)
 
           if (originalId.includes('#') === false) {
-            node.updateReferences(me.definition.id + '#' + originalId, newId)
+            node.updateReferences(this.definition.id + '#' + originalId, newId)
           }
         })
       }
@@ -610,8 +602,6 @@ define(modules, function (mdc, Node) {
     }
 
     addCard (callback) {
-      const me = this
-
       $('#add-card-name-value').val('')
 
       const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('add-card-name'))
@@ -620,7 +610,7 @@ define(modules, function (mdc, Node) {
       connectExisting.checked = true
 
       const listener = {
-        handleEvent: function (event) {
+        handleEvent: (event) => {
           window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this)
 
           if (event.detail.action === 'add_card') {
@@ -636,10 +626,10 @@ define(modules, function (mdc, Node) {
             const cardClass = window.dialogBuilder.cardMapping[cardType]
 
             const cardDef = cardClass.createCard(cardName)
-            cardDef.id = Node.newNodeId(cardName, me)
+            cardDef.id = Node.newNodeId(cardName, this)
 
-            if (me.definition.items.includes(cardDef) === false) {
-              me.definition.items.push(cardDef)
+            if (this.definition.items.includes(cardDef) === false) {
+              this.definition.items.push(cardDef)
             }
 
             callback(cardDef.id)

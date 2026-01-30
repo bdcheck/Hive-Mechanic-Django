@@ -70,8 +70,8 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
 
-  // eslint-disable-next-line no-unused-vars
-  $('input[type=radio][name=activity-template]').change(function (eventObj) {
+
+  $('input[type=radio][name=activity-template]').change(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = $('input[type=radio][name=activity-template]:checked')
 
     const name = selected.attr('data-name')
@@ -208,8 +208,8 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   $('.toggle_integration_content').hide()
 
-  // eslint-disable-next-line no-unused-vars
-  $('.toggle_integration').click(function (eventObj) {
+
+  $('.toggle_integration').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const visible = $('.toggle_integration_content:visible')
 
     $('.toggle_integration_content').hide()
@@ -227,8 +227,8 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   cytoscapeDagre(cytoscape) // register extension
 
-  // eslint-disable-next-line no-unused-vars
-  $('.builder_game_preview').each(function (index) {
+
+  $('.builder_game_preview').each(function (index) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const definition = $(this).data('definition')
 
     const cy = cytoscape({
@@ -242,8 +242,7 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
       }
     })
 
-    // eslint-disable-next-line no-unused-vars
-    cy.ready(function (event) {
+    cy.ready(function (event) { // eslint-disable-line @typescript-eslint/no-unused-vars
       cy.center()
       cy.autolock(true)
     })
