@@ -136,7 +136,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     drawer.open = true
   }, 1000)
 
-   
   function onSequenceChanged (changedId) { // eslint-disable-line @typescript-eslint/no-unused-vars
     dialogIsDirty = true
 
@@ -360,7 +359,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     let selectedSequenceOption = -1
 
-     
     const menuListener = function (event) { // eslint-disable-line @typescript-eslint/no-unused-vars
     }
 
@@ -505,7 +503,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.add_sequence').off('click')
-     
+
     $('.add_sequence').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
       const listener = {
         handleEvent: function (event) {
@@ -542,7 +540,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
     })
 
     $('.go_home').off('click')
-     
+
     $('.go_home').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
       window.location.href = '/builder/'
     })
@@ -857,7 +855,6 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
 
     const warning = document.getElementById('builder-outstanding-issues-dialog-save')
 
-     
     warning.addEventListener('click', (event) => { // eslint-disable-line @typescript-eslint/no-unused-vars
       const clean = cleanDefinition(window.dialogBuilder.definition)
 
@@ -1581,7 +1578,7 @@ requirejs(['material', 'app/sequence', 'cookie', 'slugify', 'cards/node', 'jquer
   const helpDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('annotated-help-dialog'))
 
   $('#action_annotated_help').off('click')
-   
+
   $('#action_annotated_help').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     helpDialog.open()
   })

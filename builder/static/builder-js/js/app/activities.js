@@ -70,7 +70,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   const nameField = mdc.textField.MDCTextField.attachTo(document.getElementById('textfield_add_game'))
 
-
   $('input[type=radio][name=activity-template]').change(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = $('input[type=radio][name=activity-template]:checked')
 
@@ -208,7 +207,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
 
   $('.toggle_integration_content').hide()
 
-
   $('.toggle_integration').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const visible = $('.toggle_integration_content:visible')
 
@@ -226,7 +224,6 @@ requirejs(['material', 'cookie', 'cytoscape', 'cytoscape-dagre'], function (mdc,
   })
 
   cytoscapeDagre(cytoscape) // register extension
-
 
   $('.builder_game_preview').each(function (index) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const definition = $(this).data('definition')

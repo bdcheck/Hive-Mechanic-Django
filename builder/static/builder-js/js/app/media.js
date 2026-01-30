@@ -72,7 +72,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
-   
   $('#upload_button').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     $('#upload_field').off('change')
 

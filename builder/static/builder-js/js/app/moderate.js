@@ -79,7 +79,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
   mdc.dataTable.MDCDataTable.attachTo(document.getElementById('moderation_table'))
 
-   
   $('.mdc-data-table__row').click(function (event) { // eslint-disable-line @typescript-eslint/no-unused-vars
 
   })
@@ -111,7 +110,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }
   })
 
-   
   $('#search_field_clear').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
@@ -120,7 +118,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-   
   $('#sort_player').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
@@ -133,7 +130,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-   
   $('#sort_content').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
@@ -146,7 +142,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     window.location = currentUrl.href
   })
 
-   
   $('#sort_submitted').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const currentUrl = new URL(window.location)
 
@@ -205,7 +200,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     }, 250)
   })
 
-   
   $('#button_approve').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 
@@ -221,7 +215,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     })
   })
 
-   
   $('#button_reject').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 
@@ -237,7 +230,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     })
   })
 
-   
   $('#button_reset').click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
     const selected = fetchSelected()
 

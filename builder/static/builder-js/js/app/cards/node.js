@@ -40,7 +40,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
-
     destinationDescription (nodeId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       return 'Go to...'
     }
@@ -145,7 +144,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       return issues
     }
-
 
     onFieldUpdated (field, value) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // Implement in subclasses...
@@ -298,7 +296,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       }
     }
 
-
     updateReferences (oldId, newId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       console.log('TODO: Implement "updateReferences" in ' + this.cardName())
     }
@@ -380,7 +377,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
       return term
     }
-
 
     addTerms (terms) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // Override in subclasses...
@@ -1236,8 +1232,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       const fieldLines = []
 
       const evalInContext = function (js, context) {
-
-        const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context))
+        const result = (new Function(...Object.keys(context), `return ${js}`))(...Object.values(context)) // eslint-disable-line
 
         return result
       }
@@ -1415,11 +1410,9 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
       return ''
     }
 
-
     destinationNodes (sequence) { // eslint-disable-line @typescript-eslint/no-unused-vars
       return []
     }
-
 
     setDefaultDestination (originalId) { // eslint-disable-line @typescript-eslint/no-unused-vars
       // replace nodes in def.
@@ -1462,7 +1455,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     onClick (callback) {
-
       $('#' + this.cardId).click(function (eventObj) { // eslint-disable-line @typescript-eslint/no-unused-vars
         callback()
       })
@@ -1497,14 +1489,12 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
         const classObj = window.dialogBuilder.cardMapping[definition.type]
 
         if (classObj !== undefined) {
-
-          return new classObj(definition, sequence)
+          return new classObj(definition, sequence) // eslint-disable-line
         }
       }
 
       return new Node(definition, sequence)
     }
-
 
     static canCreateCard (definition, sequence) { // eslint-disable-line @typescript-eslint/no-unused-vars
       if (window.dialogBuilder.cardMapping !== undefined) {
