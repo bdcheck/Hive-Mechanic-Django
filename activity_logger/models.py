@@ -115,7 +115,7 @@ class LogItem(models.Model):
             if media_file.startswith('/'):
                 media_file = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], media_file)
 
-            response = requests.head(media_file)
+            response = requests.head(media_file, timeout=120)
 
             if response.ok:
                 content_type = response.headers.get('content-type', None)
@@ -130,7 +130,7 @@ class LogItem(models.Model):
             if token.startswith('image:'):
                 image_url = token.replace('image:', '')
 
-                response = requests.head(image_url)
+                response = requests.head(image_url, timeout=120)
 
                 if response.ok:
                     content_type = response.headers.get('content-type', None)
