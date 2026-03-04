@@ -2,8 +2,11 @@
 
 import json
 
+import requests
+
 from six import python_2_unicode_compatible
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -97,7 +100,48 @@ class LogItem(models.Model):
         if len(media_files) > 0: # pylint: disable=len-as-condition
             return media_files[0]
 
+        for token in self.message.split(' '):
+            if token.startswith('image:'):
+                return token.replace('image:', '')
+
         return None
+
+    def fetch_preview_types(self):
+        metadata = self.fetch_metadata()
+
+        preview_types = []
+
+        for media_file in metadata.get('media_files', []):
+            if media_file.startswith('/'):
+                media_file = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], media_file)
+
+            response = requests.head(media_file)
+
+            if response.ok:
+                content_type = response.headers.get('content-type', None)
+
+                if content_type is None:
+                    content_type = 'unknown'
+
+                if content_type is not None and (content_type in preview_types) is False:
+                    preview_types.append(content_type)
+
+        for token in self.message.split(' '):
+            if token.startswith('image:'):
+                image_url = token.replace('image:', '')
+
+                response = requests.head(image_url)
+
+                if response.ok:
+                    content_type = response.headers.get('content-type', None)
+
+                    if content_type is None:
+                        content_type = 'unknown'
+
+                    if content_type is not None and (content_type in preview_types) is False:
+                        preview_types.append(content_type)
+
+        return preview_types
 
 def log(source, message, tags=list, metadata=None, player=None, session=None, game_version=None): # pylint: disable=too-many-arguments
     if metadata is None:

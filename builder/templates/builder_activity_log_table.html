@@ -78,12 +78,29 @@
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.source }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.player_str }}</td>
 								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row" style="white-space: break-spaces;">{{ item.message }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top;">{{ item.logged|date:'M j Y, g:iA' }}</td>
-								  <td class="mdc-data-table__cell mdc-typography--caption" style="vertical-align: top; text-align: center;">
-								  	{% with item.preview_count as preview_count %}
-								  		{% if preview_count > 0 %}
-											{{ preview_count }}
-										{% endif %}
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row">{{ item.logged|date:'M j Y, g:iA' }}</td>
+								  <td class="mdc-data-table__cell mdc-typography--caption" scope="row">
+								  	{% with item.fetch_preview_types as preview_types %}
+								  		{% for preview_type in preview_types %}
+											{% if 'image' in preview_type %}
+												<i class="material-icons" aria-hidden="true">image</i>
+											{% else %}
+												{% if 'audio' in preview_type %}
+													<i class="material-icons" aria-hidden="true">audiotrack</i>
+												{% else %}
+													{% if 'video' in preview_type %}
+														<i class="material-icons" aria-hidden="true">video_camera_back</i>
+													{% else %}
+														{% if 'pdf' in preview_type %}
+															<i class="material-icons" aria-hidden="true">picture_as_pdf</i>
+														{% else %}
+															<i class="material-icons" aria-hidden="true">insert_drive_file</i>
+														{% endif %}
+													{% endif %}
+												{% endif %}
+											{% endif %}
+											<br />
+										{% endfor %}
 									{% endwith %}
 								  </td>
 								</tr>
@@ -195,6 +212,7 @@
 							<div id="event_preview">
 								<img src="" style="display: block; border: thin solid #808080; border-radius: 4px; max-width: 100px;">
 								<audio controls src=""></audio>
+								<video controls src=""></video>
 								<div style="border: thin solid #404040; border-radius: 4px; background-color: #808080; color: #fff; padding: 8px;">
 									No preview for <strong>FILENAME</strong> file.
 								</div>
@@ -208,7 +226,7 @@
 							<p class="mdc-typography--caption" style="margin-bottom: 0;">
 								<strong>Details</strong><br />
 
-								<div id="event_details"></div>
+								<div id="event_details" style="overflow: hidden; text-overflow: ellipsis;"></div>
 
 								<div id="download_attachment">
 									<a href="#" id="download_attachment_link" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 8px;" id="filter_date_button">

@@ -129,34 +129,65 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
     $('#event_preview img').hide()
     $('#event_preview audio').hide()
     $('#event_preview div').hide()
+    $('#event_preview video').hide()
 
     $('#event_preview audio').get(0).load()
 
+    console.log(`ATTACH: ${preview}`)
+
     if (preview) {
-      if (preview.endsWith('.mp3')) {
-        $('#event_preview audio').attr('src', preview)
-        $('#event_preview audio').get(0).load()
-        $('#event_preview audio').css('width', ($('#right_bar').width() - 16))
-        $('#event_preview audio').show()
-      } else if (preview.endsWith('.jpg') || preview.endsWith('.png') || preview.endsWith('.gif')) {
-        $('#event_preview img').attr('src', preview)
+      fetch(preview, {
+        method: 'HEAD'
+      }).then((response) => {
+        if (response.ok) {
+          if (response.headers.get('Content-Type') === null) {
+            const tokens = preview.split('/')
 
-        $('#event_preview img').css('max-width', $('#activity_select').width() + 'px')
+            const filename = tokens[tokens.length - 1]
 
-        $('#dialog_preview_image').attr('data', preview)
+            let displayName = filename
 
-        $('#event_preview img').show()
-      } else {
-        const tokens = preview.split('/')
+            if (displayName.length > 23) {
+              displayName = `${filename.substring(0, 10)}...${filename.substring(filename.length - 10)}`
+            }
 
-        const filename = tokens[tokens.length - 1]
+            $('#event_preview strong').text(`${displayName} (${response.headers.get('Content-Type')})`)
 
-        const fileComponents = filename.split('.')
+            $('#event_preview div').show()
+          }
+          else if (response.headers.get('Content-Type').startsWith('image')) {
+            $('#event_preview img').attr('src', preview)
+            $('#event_preview img').css('max-width', $('#activity_select').width() + 'px')
+            $('#dialog_preview_image').attr('data', preview)
 
-        $('#event_preview strong').text(fileComponents[fileComponents.length - 1].toUpperCase())
+            $('#event_preview img').show()
+          } else if (response.headers.get('Content-Type').startsWith('audio')) {
+            $('#event_preview audio').attr('src', preview)
+            $('#event_preview audio').get(0).load()
+            $('#event_preview audio').css('width', ($('#right_bar').width() - 16))
+            $('#event_preview audio').show()
+          } else if (response.headers.get('Content-Type').startsWith('video')) {
+            $('#event_preview video').attr('src', preview)
+            $('#event_preview video').get(0).load()
+            $('#event_preview video').css('width', ($('#right_bar').width() - 16))
+            $('#event_preview video').show()
+          } else {
+            const tokens = preview.split('/')
 
-        $('#event_preview div').show()
-      }
+            const filename = tokens[tokens.length - 1]
+
+            let displayName = filename
+
+            if (displayName.length > 23) {
+              displayName = `${filename.substring(0, 10)}...${filename.substring(filename.length - 10)}`
+            }
+
+            $('#event_preview strong').text(`${displayName} (${response.headers.get('Content-Type')})`)
+
+            $('#event_preview div').show()
+          }
+        }
+      })
 
       $('#download_attachment_link').attr('href', `/builder/download?path=${encodeURIComponent(preview)}`)
 
@@ -167,7 +198,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
       $('#download_attachment').hide()
     }
 
-    $('#event_preview').click(function () {
+    $('#event_preview img').click(function () {
       dialogPreview.open()
     })
 
