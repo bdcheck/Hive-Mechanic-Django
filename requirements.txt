@@ -12,6 +12,8 @@ wheel
 -r simple_messaging_switchboard/requirements.txt
 -r simple_messaging_twilio/requirements.txt
 
+chardet==5.2.0 # Temporary fix until requests straightens out their versioning issues...
+
 django-db-logger==0.1.13
 django-filer==3.3.1; python_version >= '3.8'
 django-filer==3.3.0; python_version >= '3.2' and python_version < '3.8'
