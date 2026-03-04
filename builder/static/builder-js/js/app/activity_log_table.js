@@ -154,8 +154,7 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
             $('#event_preview strong').text(`${displayName} (${response.headers.get('Content-Type')})`)
 
             $('#event_preview div').show()
-          }
-          else if (response.headers.get('Content-Type').startsWith('image')) {
+          } else if (response.headers.get('Content-Type').startsWith('image')) {
             $('#event_preview img').attr('src', preview)
             $('#event_preview img').css('max-width', $('#activity_select').width() + 'px')
             $('#dialog_preview_image').attr('data', preview)
