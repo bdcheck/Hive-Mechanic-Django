@@ -30,10 +30,10 @@ class Command(BaseCommand):
         if has_preview_tag is None:
             has_preview_tag = LogTag.objects.create(tag='has_preview', name='Has Attachment')
 
-        voice_message_tag = LogTag.objects.filter(tag='voice_message_tag').first()
+        voice_message_tag = LogTag.objects.filter(tag='voice_message').first()
 
         if voice_message_tag is None:
-            voice_message_tag = LogTag.objects.create(tag='voice_message_tag', name='Voice Message')
+            voice_message_tag = LogTag.objects.create(tag='voice_message', name='Voice Message')
 
         incoming_tag = LogTag.objects.filter(tag='incoming_message').first()
 
