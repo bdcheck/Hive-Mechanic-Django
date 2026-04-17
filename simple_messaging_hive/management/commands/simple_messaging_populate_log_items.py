@@ -59,6 +59,7 @@ class Command(BaseCommand):
             log_item = LogItem.objects.create(source='simple_messaging_incoming_message:%s' % message.pk, message=message.message, logged=message.receive_date)
             log_item.tags.add(incoming_tag)
             log_item.tags.add(simple_messaging_tag)
+            log_item.tags.add(messaging_tag)
 
             if log_item.message is None or log_item.message == '':
                 log_item.message = '(Blank or no message provided.)'
@@ -115,6 +116,7 @@ class Command(BaseCommand):
             log_item = LogItem.objects.create(source='simple_messaging_outgoing_message:%s' % message.pk, message=message.message, logged=message.sent_date)
             log_item.tags.add(outgoing_tag)
             log_item.tags.add(simple_messaging_tag)
+            log_item.tags.add(messaging_tag)
 
             if log_item.message is None or log_item.message == '':
                 log_item.message = '(Blank or no message provided.)'
