@@ -22,8 +22,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -201,7 +199,7 @@ def DDE_BOTIUM_EXTRAS(player):
         'player': player
     }
 
-SILENCED_SYSTEM_CHECKS = ['fields.W904', 'security.W005', 'security.W021']
+SILENCED_SYSTEM_CHECKS = ['fields.W904', 'security.W005', 'security.W021', 'simple_messaging.W002']
 
 SECURE_HSTS_SECONDS = 300
 SECURE_SSL_REDIRECT = True
