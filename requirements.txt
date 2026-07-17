@@ -33,7 +33,7 @@ reportlab==3.5.59; python_version < '3.0'
 reportlab==3.6.11; python_version >= '3.0' and python_version < '3.7'
 reportlab==4.3.1; python_version >= '3.7'
 selenium==3.141.0
-sh==1.14.2
+sh==2.2.4
 svglib==0.9.4; python_version < '3.0'
 svglib==1.4.1; python_version >= '3.0'
 validators==0.16.0; python_version < '3.0'
