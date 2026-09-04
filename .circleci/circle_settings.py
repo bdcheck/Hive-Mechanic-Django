@@ -49,6 +49,7 @@ SILENCED_SYSTEM_CHECKS = [
     'simple_messaging.E002',
     'simple_messaging.E003',
     'simple_messaging.W002',
+    'simple_messaging_lopback.E001',
     'simple_messaging_switchboard.E001',
     'simple_messaging_switchboard.E002',
     'builder.W004',
