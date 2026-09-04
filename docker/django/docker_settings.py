@@ -25,7 +25,7 @@ if pg_database != '':
         'NAME':     os.getenv('PG_DB'),
         'USER':     os.getenv('PG_USER'),
         'PASSWORD': os.getenv('PG_PASSWORD'),
-        'HOST':     'db',
+        'HOST':     os.getenv('PG_HOST', 'db'),
     }
 else:
     DATABASES['default'] = {

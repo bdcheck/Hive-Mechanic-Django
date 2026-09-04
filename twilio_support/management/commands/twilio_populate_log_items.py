@@ -33,7 +33,7 @@ class Command(BaseCommand):
         voice_message_tag = LogTag.objects.filter(tag='voice_message').first()
 
         if voice_message_tag is None:
-            voice_message_tag = LogTag.objects.create(tag='voice_message', name='Voice Message')
+            voice_message_tag = LogTag.objects.create(tag='voice_message', name='Voice Message 2')
 
         incoming_tag = LogTag.objects.filter(tag='incoming_message').first()
 
