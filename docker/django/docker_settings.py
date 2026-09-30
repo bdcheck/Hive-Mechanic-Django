@@ -106,9 +106,10 @@ SILENCED_SYSTEM_CHECKS = [
     'simple_messaging_twilio.E001',
     'simple_messaging_twilio.E002',
     'simple_messaging_twilio.E003',
+    'simple_messaging_twilio.E004',
     'simple_messaging.E001',
     'simple_messaging.W002',
-
+    'builder.W004',
 ]
 
 if os.getenv('DJANGO_DEBUG', '') != '':

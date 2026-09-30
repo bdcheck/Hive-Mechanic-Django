@@ -22,4 +22,6 @@ server {
       proxy_redirect off;
       proxy_pass http://django:${DJANGO_WEB_PORT};
     }
+
+    client_max_body_size 128M;    
 }

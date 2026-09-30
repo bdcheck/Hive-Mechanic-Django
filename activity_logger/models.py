@@ -115,22 +115,8 @@ class LogItem(models.Model):
             if media_file.startswith('/'):
                 media_file = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], media_file)
 
-            response = requests.head(media_file, timeout=120)
-
-            if response.ok:
-                content_type = response.headers.get('content-type', None)
-
-                if content_type is None:
-                    content_type = 'unknown'
-
-                if content_type is not None and (content_type in preview_types) is False:
-                    preview_types.append(content_type)
-
-        for token in self.message.split(' '):
-            if token.startswith('image:'):
-                image_url = token.replace('image:', '')
-
-                response = requests.head(image_url, timeout=120)
+            try:
+                response = requests.head(media_file, timeout=120)
 
                 if response.ok:
                     content_type = response.headers.get('content-type', None)
@@ -140,6 +126,26 @@ class LogItem(models.Model):
 
                     if content_type is not None and (content_type in preview_types) is False:
                         preview_types.append(content_type)
+            except requests.exceptions.InvalidURL:
+                pass
+
+        for token in self.message.split(' '):
+            if token.startswith('image:'):
+                image_url = token.replace('image:', '')
+
+                try:
+                    response = requests.head(image_url, timeout=120)
+
+                    if response.ok:
+                        content_type = response.headers.get('content-type', None)
+
+                        if content_type is None:
+                            content_type = 'unknown'
+
+                        if content_type is not None and (content_type in preview_types) is False:
+                            preview_types.append(content_type)
+                except requests.exceptions.InvalidURL:
+                    pass
 
         return preview_types
 

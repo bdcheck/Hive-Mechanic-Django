@@ -505,6 +505,9 @@ def reset_game_metadata(sender, instance, *args, **kwargs): # pylint: disable=un
 
 @python_2_unicode_compatible  # pylint: disable=too-many-public-methods
 class Game(models.Model):  # pylint: disable=too-many-public-methods
+    class Meta: # pylint: disable=too-few-public-methods
+        ordering = ['name']
+
     name = models.CharField(max_length=1024, db_index=True)
     slug = models.SlugField(max_length=1024, db_index=True, unique=True)
 

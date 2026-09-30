@@ -73,6 +73,12 @@ services:
 
 volumes:
   db:
-  media:
   static:
   tmp:
+  media:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      # $PWD acts as the absolute path anchor, allowing a relative subfolder
+      device: ${PWD}/../media

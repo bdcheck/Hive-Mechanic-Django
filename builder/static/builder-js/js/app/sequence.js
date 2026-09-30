@@ -119,7 +119,7 @@ define(modules, function (mdc, Node) {
           if (viewFrame.contentWindow.highlightGraphId !== undefined) {
             viewFrame.contentWindow.highlightGraphId(this.definition.id + '#' + definition.id)
           } else {
-            window.setTimeout(this, 100)
+            window.setTimeout(waitAndCall, 100)
           }
         }
 

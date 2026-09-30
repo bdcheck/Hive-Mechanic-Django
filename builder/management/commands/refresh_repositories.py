@@ -9,12 +9,17 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from quicksilver.decorators import handle_lock, handle_schedule, add_qs_arguments
+
 from ...models import RemoteRepository, InteractionCard, InteractionCardCategory, DataProcessor
 
 class Command(BaseCommand):
+    @add_qs_arguments
     def add_arguments(self, parser):
         parser.add_argument('--silent', default=False, action='store_true')
 
+    @handle_schedule
+    @handle_lock
     def handle(self, *args, **cmd_options): # pylint: disable=unused-argument, too-many-locals, too-many-statements, too-many-branches
         for repository in RemoteRepository.objects.filter(enabled=True).order_by('priority'): # pylint: disable=too-many-nested-blocks
             headers = {
@@ -33,7 +38,15 @@ class Command(BaseCommand):
 
             repository_def = response.json()
 
-            if repository.repository_definition is None or repository_def != json.loads(repository.repository_definition):
+            local_def = None
+
+            try:
+                if repository.repository_definition is not None:
+                    local_def = json.loads(repository.repository_definition)
+            except json.decoder.JSONDecodeError:
+                local_def = None
+
+            if local_def is None or repository_def != local_def:
                 repository.repository_definition = json.dumps(repository_def, indent=2)
 
                 repository.last_updated = timezone.now()

@@ -73,7 +73,7 @@ def import_games(import_file): # pylint: disable=too-many-locals,too-many-branch
 
                 games_imported += 1
 
-                for version in game_json.get('version', []):
+                for version in game_json.get('versions', []):
                     if version.get('model', None) == 'builder.gameversion':
                         version_obj = GameVersion(game=game_obj)
 

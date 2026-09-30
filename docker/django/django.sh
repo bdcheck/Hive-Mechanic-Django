@@ -37,6 +37,9 @@ python3 manage.py initialize_default_site_settings --skip-checks
 echo Hive Mechanic: Initializing default repository...
 python3 manage.py install_default_repository --skip-checks
 
+echo Hive Mechanic: Refreshing repositories...
+python3 manage.py refresh_repositories --skip-checks
+
 # echo Hive Mechanic: Creating/updating default activity...
 # python3 manage.py docker_update_data docker/data/activities.json --skip-checks
 
@@ -51,6 +54,7 @@ python3 manage.py collectstatic --no-input
 
 echo Hive Mechanic: Validating installation...
 python3 manage.py check
+
 
 echo Installing and starting gunicorn...
 pip install gunicorn
