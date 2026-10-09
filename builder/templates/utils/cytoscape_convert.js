@@ -72,5 +72,3 @@ for (var i = 0; i < edges.length; i++) {
         'group': 'edges'
     });
 }
-
-console.log(JSON.stringify(cyto, null, 2))

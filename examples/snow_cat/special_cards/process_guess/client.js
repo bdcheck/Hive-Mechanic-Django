@@ -255,8 +255,6 @@ define(modules, function (mdc, Node) {
 			});
 
 			timeoutUnitField.listen('MDCSelect:change', () => {
-				console.log('Selected option at index ' + timeoutUnitField.selectedIndex + ' with value "' + timeoutUnitField.value + '"');
-
 				timeoutUnitField.value;
 				
 				if (me.definition["timeout"] == undefined) {

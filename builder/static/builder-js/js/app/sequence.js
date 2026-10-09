@@ -452,7 +452,7 @@ define(modules, function (mdc, Node) {
       const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item')
 
       for (const option of options) {
-        $(option).off('click')
+        $(option).off('click') // TODO: Harmonize with call below? Use just DOM or just jQuery, butu don't mix?
 
         option.addEventListener('click', (event) => {
           const prevent = event.currentTarget.classList.contains('prevent-menu-close')
@@ -506,7 +506,7 @@ define(modules, function (mdc, Node) {
       const options = document.querySelectorAll('.dialog_card_selection_menu .mdc-list-item')
 
       for (const option of options) {
-        $(option).off('click')
+        $(option).off('click') // Harmonize jQuery / DOM event listener pairs
 
         option.addEventListener('click', (event) => {
           const prevent = event.currentTarget.classList.contains('prevent-menu-close')
@@ -588,9 +588,11 @@ define(modules, function (mdc, Node) {
         const sourceNodes = originalNode.sourceNodes(this)
 
         sourceNodes.forEach((node) => {
+          console.log(`[1] Updating pointers in node ${node.id} from ${originalId} to ${newId}`)
           node.updateReferences(originalId, newId)
 
           if (originalId.includes('#') === false) {
+            console.log(`[2] Updating pointers in node ${node.id} from ${this.definition.id}#${originalId} to ${newId}`)
             node.updateReferences(this.definition.id + '#' + originalId, newId)
           }
         })
@@ -609,8 +611,10 @@ define(modules, function (mdc, Node) {
       const connectExisting = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById('add_card_context_connect_existing'))
       connectExisting.checked = true
 
+      const sequence = this
+
       const listener = {
-        handleEvent: (event) => {
+        handleEvent: function (event) {
           window.dialogBuilder.addCardDialog.unlisten('MDCDialog:closed', this)
 
           if (event.detail.action === 'add_card') {
@@ -625,12 +629,16 @@ define(modules, function (mdc, Node) {
 
             const cardClass = window.dialogBuilder.cardMapping[cardType]
 
-            const cardDef = cardClass.createCard(cardName)
-            cardDef.id = Node.newNodeId(cardName, this)
+            console.trace('About to add card!!!');
 
-            if (this.definition.items.includes(cardDef) === false) {
-              this.definition.items.push(cardDef)
+            const cardDef = cardClass.createCard(cardName)
+            cardDef.id = Node.newNodeId(cardName, sequence)
+
+            if (sequence.definition.items.includes(cardDef) === false) {
+              sequence.definition.items.push(cardDef)
             }
+
+            console.log(`Adding new card with ID: ${cardDef.id}`)
 
             callback(cardDef.id)
           }

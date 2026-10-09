@@ -263,17 +263,6 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
             const connectExisting = mdc.checkbox.MDCCheckbox.attachTo(document.getElementById('add_card_context_connect_existing'))
 
             this.sequence.insertBefore(this.id, newCardId, connectExisting.checked)
-
-            //              insertBeforeDialog.listen('MDCDialog:closed', function (event) {
-            //                if (event.detail.action === 'transfer') {
-            //                } else { // Keep
-            //                  this.sequence.insertBefore(this.id, newCardId, false)
-            //                }
-            //
-            //                insertBeforeDialog.unlisten('MDCDialog:closed', this)
-            //              })
-            //
-            //              insertBeforeDialog.open()
           })
         } else {
           advancedDialog.open()
@@ -770,7 +759,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
 
         itemDefinition[templateField.field] = itemDefinition[templateField.original_field]
 
-        this.initializeField(templateField, itemDefinition, function (newValue) {
+        this.initializeField(templateField, itemDefinition, (newValue) => {
           itemDefinition[templateField.original_field] = newValue
 
           this.onFieldUpdated(templateField.original_field, newValue)
