@@ -35,7 +35,7 @@ def cache_url(original_url, description=None):
     if cache_file is None:
         response = requests.get(original_url, timeout=60)
 
-        if response.status_code >= 200 and response.status_code < 300:
+        if 200 <= response.status_code < 300:
             content_type = response.headers.get('content-type')
 
             content_type = content_type.split(';')[0]

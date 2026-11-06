@@ -1,8 +1,6 @@
 # pylint: disable=line-too-long
 
-import json
 import os
-import tempfile
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
@@ -77,13 +75,13 @@ SITE_URL = 'https://%s' % ALLOWED_HOSTS[0]
 QUICKSILVER_LOCK_DIR = '/app/tmp'
 
 SIMPLE_DATA_EXPORTER_SITE_NAME = os.getenv('SIMPLE_DATA_EXPORTER_SITE_NAME', 'Hive Mechanic')
-SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = True
+SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = True # pylint: disable=invalid-name
 SIMPLE_DATA_EXPORT_FROM_ADDRESS = '%s <%s>' % (os.getenv('DJANGO_ADMIN_NAME', 'Hive Mechanic Admin'), os.getenv('DJANGO_ADMIN_EMAIL', 'hive-user@example.com'))
 
 SIMPLE_DASHBOARD_SITE_NAME = SIMPLE_DATA_EXPORTER_SITE_NAME
 
 if os.getenv('SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS', 'true').lower() == 'false':
-    SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = False
+    SIMPLE_DATA_EXPORTER_OBFUSCATE_IDENTIFIERS = False # pylint: disable=invalid-name
 
 SIMPLE_MESSAGING_SHOW_ENCRYPTED_VALUES = True
 
