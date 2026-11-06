@@ -588,11 +588,9 @@ define(modules, function (mdc, Node) {
         const sourceNodes = originalNode.sourceNodes(this)
 
         sourceNodes.forEach((node) => {
-          console.log(`[1] Updating pointers in node ${node.id} from ${originalId} to ${newId}`)
           node.updateReferences(originalId, newId)
 
           if (originalId.includes('#') === false) {
-            console.log(`[2] Updating pointers in node ${node.id} from ${this.definition.id}#${originalId} to ${newId}`)
             node.updateReferences(this.definition.id + '#' + originalId, newId)
           }
         })
@@ -629,7 +627,6 @@ define(modules, function (mdc, Node) {
 
             const cardClass = window.dialogBuilder.cardMapping[cardType]
 
-            console.trace('About to add card!!!');
 
             const cardDef = cardClass.createCard(cardName)
             cardDef.id = Node.newNodeId(cardName, sequence)
@@ -637,8 +634,6 @@ define(modules, function (mdc, Node) {
             if (sequence.definition.items.includes(cardDef) === false) {
               sequence.definition.items.push(cardDef)
             }
-
-            console.log(`Adding new card with ID: ${cardDef.id}`)
 
             callback(cardDef.id)
           }
