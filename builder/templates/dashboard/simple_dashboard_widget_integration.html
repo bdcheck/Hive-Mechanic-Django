@@ -26,8 +26,6 @@
 <script>
 	$(document).ready(function() {
 		$('.dashboard_date').each(function(index, element) {
-			console.log('PROCESS: ' + $(element).text())
-			
 			const parsed = moment($(element).text())
 			
 			if (parsed.isValid()) {

@@ -133,8 +133,6 @@ requirejs(['material', 'cookie', 'jquery'], function (mdc, Cookies) {
 
     $('#event_preview audio').get(0).load()
 
-    console.log(`ATTACH: ${preview}`)
-
     if (preview) {
       fetch(preview, {
         method: 'HEAD'
