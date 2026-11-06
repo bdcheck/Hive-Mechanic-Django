@@ -1,18 +1,19 @@
 {
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "eslint": "^9.39.2",
-    "globals": "^17.2.0",
-    "jiti": "^2.6.1",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "standard": "^17.1.2",
-    "typescript-eslint": "^8.54.0"
+    "typescript-eslint": "^8.72.1"
   },
   "standard": {
     "env": [
       "browser"
     ],
-  	"plugins": [
-    	"@typescript-eslint"
-	]
+    "plugins": [
+      "@typescript-eslint"
+    ]
+  },
+  "dependencies": {
   }
 }

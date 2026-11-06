@@ -627,7 +627,6 @@ define(modules, function (mdc, Node) {
 
             const cardClass = window.dialogBuilder.cardMapping[cardType]
 
-
             const cardDef = cardClass.createCard(cardName)
             cardDef.id = Node.newNodeId(cardName, sequence)
 
