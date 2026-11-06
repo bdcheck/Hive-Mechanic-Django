@@ -3,6 +3,7 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
+    "jiti": "^2.7.0",
     "standard": "^17.1.2",
     "typescript-eslint": "^8.72.1"
   },
