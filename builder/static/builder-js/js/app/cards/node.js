@@ -1115,8 +1115,8 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     }
 
     updatePatternView (pattern, operationField, patternField) {
-      const oldOperationValue = operationField.value
-      let newOperationValue = oldOperationValue
+      const oldOperationValue = operationField.value // eslint-disable-line no-useless-assignment
+      let newOperationValue = oldOperationValue // eslint-disable-line no-useless-assignment
 
       const oldPatternValue = patternField.value
       let newPatternValue = oldPatternValue
@@ -1154,7 +1154,7 @@ define(['material', 'slugify', 'marked', 'purify', 'jquery'], function (mdc, slu
     };
 
     updatePatternValue (operation, pattern, onUpdated) {
-      let patternValue = ''
+      let patternValue = '' // eslint-disable-line no-useless-assignment
 
       if (pattern === '') {
         patternValue = ''
